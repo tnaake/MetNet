@@ -117,7 +117,8 @@ The two main functionalities of the package include the creation of an
 adjacency matrix from structual properties, based on losses/addition of 
 functional groups defined by the user, and statistical associations. Currently,
 the following statistical models are implemented to infer a statistical 
-adjacency matrix: Least absolute shrinkage (LASSO, L1-norm regression), Random Forest,
+adjacency matrix: Least absolute shrinkage and selection operator 
+(LASSO, L1-norm regression), Random Forest,
 Pearson and Spearman correlation, context likelihood of relatedness (CLR), 
 the algorithm for the reconstruction of accurate cellular networks (ARACNE) and
 constraint-based structure learning (Bayes). Since all of these methods have
@@ -258,6 +259,13 @@ create_structural_matrix(x, functional_groups, ppm = 5)
 
 
 \section{Creating the statistical matrix}
+
+<<>>=
+stat_net <- create_statistical_network(x, model = c("pearson", "spearman"), adjust_correlation = "BH")
+
+l <- create_statistical_networks_list(x, model = c("pearson", "spearman"),  adjust_correlation = "BH")
+stat_net2 <- consensus_network(l = l)
+@
 
 \section{Combining the structural and statistical matrix}
 

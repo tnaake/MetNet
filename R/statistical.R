@@ -8,7 +8,6 @@
 #' @import bnlearn
 
 
-#### Regression 1: L1 Regularization / LASSO ####
 #' @name .lasso
 #' @title Create a statistical network based on LASSO
 #' @description  \code{.lasso} infers a statistical network using 
@@ -65,7 +64,6 @@
     return(l1_mat)
 }
 
-## randomForest
 #' @name .randomForest
 #' @title Create a statistical network based on random forest
 #' @description  \code{.randomForest} infers a statistical network using 
@@ -256,7 +254,6 @@
     return(bs_mat)
 }
 
-## add entry and name to last entry of a list
 #' @name .add_to_list
 #' @title Add network to list
 #' @description This helper function used in the function
