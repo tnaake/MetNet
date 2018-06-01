@@ -1,0 +1,30 @@
+Package: MetNet
+Type: Package
+Title: Inferring metabolic networks from untargeted mass spectrometry data
+Version: 0.9
+Date: 2018-05-14
+Authors@R: c(person(given = "Thomas", family = "Naake",
+    email = "thomasnaake@googlemail.com",
+    role = c("aut","cre")))
+Maintainer: Thomas Naake <thomasnaake@googlemail.com>
+VignetteBuilder: knitr
+Depends:
+    R (>= 3.4.4),
+    glmnet (>= 2.0),
+    stabs (>= 0.6),
+    randomForest (>= 4.6)
+    rfPermute (>= 2.1.5),
+    mpmi (>= 0.42), 
+    parmigene (>= 1.0.2)
+    psych (>= 1.7.8),
+    bnlearn (>= 4.3),
+    sna (>= 2.4), 
+    stats (>= 3.4.3)
+Suggests:
+    BiocGenerics,
+    igraph (>= 1.1.2), 
+    knitr (>= 1.11)    
+biocViews: Metabolomics, MassSpectrometry
+Description: MetNet
+License: GPL-2
+RoxygenNote: 6.0.1

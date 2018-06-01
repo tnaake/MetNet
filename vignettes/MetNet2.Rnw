@@ -1,0 +1,313 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Workflow for Metabolomics}
+%\VignetteKeywords{Mass Spectrometry, MS, MSMS, Metabolomics, Visualization}
+%\VignettePackage{MetNet-vignette}
+
+\documentclass[11pt,a4paper,english,arial,twoside]{article}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{geometry}
+\geometry{verbose,
+    tmargin=25mm,
+    bmargin=25mm,
+    lmargin=25mm,
+    rmargin=25mm}
+\setlength\parindent{0pt}
+
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usepackage{longtable}
+
+%\definecolor{red}{rgb}{1,0,0}
+%\definecolor{blue}{rgb}{0,0,1}
+
+%\usepackage{breakurl}
+\usepackage{hyperref}
+\hypersetup{%
+  pdfusetitle,
+  bookmarks = {true},
+  bookmarksnumbered = {true},
+  bookmarksopen = {true},
+  bookmarksopenlevel = 2,
+  unicode = {true},
+  breaklinks = {false},
+  hyperindex = {true},
+  colorlinks = {true},
+  linktocpage = {true},
+  plainpages = {false},
+  linkcolor = {blue},
+  citecolor = {blue},
+ % urlcolor = {red},
+  pdfstartview = {Fit},
+  pdfpagemode = {UseOutlines},
+  pdfview = {XYZ null null null}
+}
+
+\widowpenalty10000
+\clubpenalty10000
+
+\newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
+\newcommand{\R}{\texttt{R}}
+\newcommand{\code}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\mbox{\normalfont\textsf{#1}}}}
+
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\usepackage[nottoc]{tocbibind}
+
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+
+\usepackage{graphicx}
+%\usepackage[font=footnotesize]{subfig}
+
+\usepackage[english]{babel}
+\usepackage{color}
+
+\usepackage[backend=bibtex,natbib,style=authoryear,maxcitenames=2]{biblatex}
+\addbibresource{MetNet-citations}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{authblk} 
+\author[]{Thomas Naake}
+
+
+
+\affil{
+    Max Planck Institute of Molecular Plant Physiology \\ 
+    14476 Potsdam-Golm, Germany 
+}
+
+\title{MetNet: Inferring metabolic networks from untargeted mass spectrometry 
+    data}
+    
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Among the main challenges in mass spectrometry analysis is the high-throughput 
+analysis of metabolic features, their fast detection and annotation. 
+In contrast to the screening of known, previously characterized,
+metabolic features in these data, the putative annotation of unknown 
+features is often cumbersome and requires a lot of manual work, lagging
+the biological information retrieval of these data. 
+High-resolution mass spectrometric data is often very rich in information 
+content and metabolic conversions, and reactions can be derived from structural 
+properties of features. In addition to that, statistical associations between 
+features (based on their intensity values) can be a valuable ressource to 
+find co-synthesised or co-regulated metabolites, that are synthesised in the same 
+biosynthetic pathways. Since any analysis tool is still lacking that is 
+integrating the two natures of mass spectrometric data we developped 
+\Rpackage{MetNet} to close this gap. 
+The \Rpackage{MetNet} package comprises functionalities to infer network 
+topologies from high-resolution mass spectrometry data. \Rpackage{MetNet} 
+combines information from both structural data (differences in m/z values 
+of features) and statistical associations (intensity values of features per
+sample) to propose putative metabolic networks that can be used for further
+exploration. 
+
+The two main functionalities of the package include the creation of an
+adjacency matrix from structual properties, based on losses/addition of 
+functional groups defined by the user, and statistical associations. Currently,
+the following statistical models are implemented to infer a statistical 
+adjacency matrix: Least absolute shrinkage (LASSO, L1-norm regression), Random Forest,
+Pearson and Spearman correlation, context likelihood of relatedness (CLR), 
+the algorithm for the reconstruction of accurate cellular networks (ARACNE) and
+constraint-based structure learning (Bayes). Since all of these methods have
+advantages and disadvantages, the user has the possibility to select 
+several of these methods, compute adjacency matrices from these models and 
+create a consensus matrix from the different statistical frameworks. 
+
+After creating the statistical and structural network these two matrices 
+will be combined to form a consensus matrix thta has both information from 
+structural and statistical properties of the data. This can be followed by 
+further network analyses (e.g. calculation of topological parameters),
+integration with other data sources (e.g. genomic information or 
+transcriptomic data) and/or visualization. 
+
+\Rpackage{MetCirc} is currently under active development. If you 
+discover any bugs, typos or develop ideas of improving 
+\Rpackage{MetCirc} feel free to raise an issue via 
+\href{https://github.com/tnaake/MetCirc}{GitHub} or 
+send a mail to the developers. 
+
+<<knitr, include=FALSE, cache=FALSE>>=
+library("knitr")
+@
+
+\section{Prepare the environment and load the data}
+To install \Rpackage{MetNet} enter the following to the \R~console
+<<eval=FALSE>>=
+source("https://bioconductor.org/biocLite.R")
+biocLite("MetNet")
+@
+
+Before starting, load the \Rpackage{MetNet} package. This will also
+load the required packages 
+<<eval=TRUE>>=
+library(MetCirc)
+@
+
+The data format that is compatible with the \Rpackage{MetNet} framework is 
+in the \Rpackage{xcms}/\Rpackage{CAMERA} outout-like $m x n$ matrix, where 
+columns denote the different samples $n$ and where $m$ features are present. 
+The information about the m/z values has to be stored in a vector of 
+length $|m|$. \Rpackage{MetNet} does not impose any requirements for 
+data normalization, filtering, etc., however, the user has to make sure that
+the data is in an appropriate format (e.g. divided by internal standard, 
+log2 transformed, noise filtering, removal of features that do not represent
+mass features/metabolites, eventually removal of isotopes). 
+
+<<data,eval=TRUE>>=
+load("/home/thomas/Documents/University/Master/MScArbeit/Metabolic_profiling/WOS_0h_72h/metabolicProfiling.RData")
+load("/home/thomas/Documents/University/Master/MScArbeit/Metabolic_profiling/WOS_0h_72h/CAMERA_complete.RData")
+##an <- xsAnnotate(xset5)
+##anF <- groupFWHM(an, perfwhm = 0.6)
+##anI <- findIsotopes(anF, mzabs=0.01)
+##anIC <- groupCorr(anI, cor_eic_th=0.75, graphMethod = "lpc")
+##anFA <- findAdducts(anIC, polarity="positive")
+peaklist <- getPeaklist(anFA)
+rtDTG <- c(5.55 * 60, 7.75 * 60) 
+peaklistDTG <- peaklist[ which(peaklist$rt >= rtDTG[1] & peaklist$rt <= rtDTG[2]), ]
+mz <- peaklist[,"mz"]
+mzDTG <- peaklistDTG[,"mz"]
+
+x_test <- peaklist[peaklist[, "mz"] > 739.35 & peaklist[, "mz"] < 739.36 & peaklist[, "rt"] > 426.72 & peaklist[, "rt"] < 426.73, ] ## Nicotianoside IX  M+Na+ 739.3515 rt 426.1241
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 653.34 & peaklist[, "mz"] < 653.35 & peaklist[, "rt"] > 418.43 & peaklist[, "rt"] < 418.44, ]) ## Lyciumoside I M+Na+ 653.3497 rt 418.4392
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 825.35 & peaklist[, "mz"] < 825.36 & peaklist[, "rt"] > 435.39 & peaklist[, "rt"] < 435.40, ]) ## Nicotianoside X M+Na+ 825.3503 rt 435.3925
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 815.39 & peaklist[, "mz"] < 815.40 & peaklist[, "rt"] > 384.17 & peaklist[, "rt"] < 384.18, ]) ## LyciumosideII M+Na+  815.4043 rt 384.1765
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 901.40 & peaklist[, "mz"] < 901.41 & peaklist[, "rt"] > 391.55 & peaklist[, "rt"] < 391.56, ]) ## Nicotianoside XI M+Na+  901.39913 rt 391.5513
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 987.40 & peaklist[, "mz"] < 987.41 & peaklist[, "rt"] > 398.87 & peaklist[, "rt"] < 398.88, ]) ## NicotianosideXII M+Na+ 987.4037 rt 398.8718
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1074.40 & peaklist[, "mz"] < 1074.41 & peaklist[, "rt"] > 405.22 & peaklist[, "rt"] < 405.22, ]) ## NicotianosideXIII M+Na+ 1074.4042 rt 405.2244
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 799.40 & peaklist[, "mz"] < 799.41 & peaklist[, "rt"] > 411.80 & peaklist[, "rt"] < 411.81, ]) ## Lyciumoside IV  M+Na+ 799.4091 rt 411.8094
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 885.40 & peaklist[, "mz"] < 885.41 & peaklist[, "rt"] > 420.65 & peaklist[, "rt"] < 420.66, ]) ## Nicotianoside I iso 1 M+Na+ 885.4084 rt 411.8094
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 971.40 & peaklist[, "mz"] < 971.41 & peaklist[, "rt"] > 429.37 & peaklist[, "rt"] < 429.37, ]) ## Nicotianoside II  M+Na+ 971.4074 rt 429.3786
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 945.46 & peaklist[, "mz"] < 945.47 & peaklist[, "rt"] > 403.18 & peaklist[, "rt"] < 403.19, ]) ## Nicotianoside III  M+Na+ 945.4653 rt 403.1816
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1031.46 & peaklist[, "mz"] < 1031.47 & peaklist[, "rt"] > 412.80 & peaklist[, "rt"] < 412.81, ]) ## Nicotianoside IV M+Na+ 1031.4645 rt 412.8062
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1117.46 & peaklist[, "mz"] < 1117.47 & peaklist[, "rt"] > 422.67 & peaklist[, "rt"] < 422.68, ]) ## Nicotianoside V M+Na+ 1117.4681 rt 422.675
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1117.46 & peaklist[, "mz"] < 1117.47 & peaklist[, "rt"] > 422.67 & peaklist[, "rt"] < 422.68, ] )## Nicotianoside V M+Na+ 1117.4681 rt 422.675
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 961.45 & peaklist[, "mz"] < 961.47 & peaklist[, "rt"] > 381.59 & peaklist[, "rt"] < 381.60, ]) ## Attenoside (or DTG956) M+Na+ 961.4601 rt 381.5979
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1047.46 & peaklist[, "mz"] < 1047.47 & peaklist[, "rt"] > 387.66 & peaklist[, "rt"] < 387.67, ]) ## DTG1042/Nicotianoside VI M+Na+ 1047.4525 rt 387.6643
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1133.46 & peaklist[,  "mz"] < 1133.47 & peaklist[, "rt"] > 394.90 & peaklist[, "rt"] < 394.91, ]) ## NicotianosideVII M+Na+ 1133.4624 rt 394.9096
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1219.46 & peaklist[, "mz"] < 1219.47 & peaklist[, "rt"] > 401.56 & peaklist[, "rt"] < 401.57, ]) ## NicotianosideVII M+Na+ 1133.4624 rt 394.9096
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 235.14 & peaklist[, "mz"] < 235.15 & peaklist[, "rt"] > 195.11 & peaklist[, "rt"] < 195.12, ]) ## N-coumaroylputrescine [M+H+]+ 235.143 rt 195.1137
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 454.23 & peaklist[, "mz"] < 454.24 & peaklist[, "rt"] > 263.48 & peaklist[, "rt"] < 263.49, ]) ## N',N''-coumaroyl,caffeoylspermidine [M+H+]+ 454.23 rt 263.4883
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 251.13 & peaklist[, "mz"] < 251.14 & peaklist[, "rt"] > 108.72 & peaklist[, "rt"] < 108.73, ]) ## N-caffeoylputrescine iso1 [M+H+]+ 251.14 rt 108.7266
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 251.13 & peaklist[, "mz"] < 251.14 & peaklist[, "rt"] > 144.08 & peaklist[, "rt"] < 144.09, ]) ## N-caffeoylputrescine iso2 [M+H+]+ 251.14 rt 1144.08
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 308.19 & peaklist[, "mz"] < 308.20 & peaklist[, "rt"] > 246.96 & peaklist[, "rt"] < 246.97, ]) ## N-caffeoylspermidine [M+H+]+ 308.2 rt 246.9634
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 265.15 & peaklist[, "mz"] < 265.16 & peaklist[, "rt"] > 192.03 & peaklist[, "rt"] < 192.04, ]) ## N-feruloylputrescine [M+H+]+ 265.153 rt 192.0381
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 322.21 & peaklist[, "mz"] < 322.22 & peaklist[, "rt"] > 104.61 & peaklist[, "rt"] < 104.62, ]) ## N-feruloyl-spermidine iso1 [M+H+]+ 322.212 rt 104.6152
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 322.21 & peaklist[, "mz"] < 322.22 & peaklist[, "rt"] > 149.23 & peaklist[, "rt"] < 149.24, ]) ## N-feruloyl-spermidine iso2 [M+H+]+ 322.212 rt 149.2361
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 470.22 & peaklist[, "mz"] < 470.23 & peaklist[, "rt"] > 247.52 & peaklist[, "rt"] < 247.53, ]) ## N'-N''-dicaffeoyl -spermidine [M+H+]+ 470.23 rt 247.5269
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 498.25 & peaklist[, "mz"] < 498.26 & peaklist[, "rt"] > 289.17 & peaklist[, "rt"] < 289.18, ]) ## N'-N''-diferuloyl-spermidine [M+H+]+ 498.260, N#,N$-Coumaroyl,sinapoyl spermidine isomer [M+H+]+ 498.261 rt 289.1741
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 502.25 & peaklist[, "mz"] < 502.26 & peaklist[, "rt"] > 243.08 & peaklist[, "rt"] < 243.09, ]) ## N'-N''-dihydrated-diferuloyl-spermidine [M+H+]+ 502.25 rt 243.0818
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 411.19 & peaklist[, "mz"] < 411.20 & peaklist[, "rt"] > 211.98 & peaklist[, "rt"] < 211.99, ]) ## unknown conjugate [M+H+]+ 411.2012 rt 211.981
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 484.24 & peaklist[, "mz"] < 484.25 & peaklist[, "rt"] > 265.65 & peaklist[, "rt"] < 265.65, ]) ## N'-N''-caffeoyl,feruloyl spermidine 484.245 rt 265.6572
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 339.10 & peaklist[, "mz"] < 339.11 & peaklist[, "rt"] > 249.43 & peaklist[, "rt"] < 249.44, ]) ## O -Coumaroylquinic acid isomer 1 [M+H+]+  339.109 rt 249.4346
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 339.11 & peaklist[, "mz"] < 339.12 & peaklist[, "rt"] > 269.50 & peaklist[, "rt"] < 269.51, ]) ## O -Coumaroylquinic acid isomer 1 [M+H+]+  339.109 rt 269.5024
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 355.10 & peaklist[, "mz"] < 355.11 & peaklist[, "rt"] > 176.63 & peaklist[, "rt"] < 176.64, ]) ## O-caffeoylquinic acid isomer 1 [M+H+]+ 355.1014 rt 176.6309
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 355.10 & peaklist[, "mz"] < 355.11 & peaklist[, "rt"] > 216.58 & peaklist[, "rt"] < 216.59, ]) ## O-caffeoylquinic acid isomer 2 [M+H+]+ 355.1014 rt 216.5825
+x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 355.10 & peaklist[, "mz"] < 355.11 & peaklist[, "rt"] > 241.51 & peaklist[, "rt"] < 241.52, ]) ## O-caffeoylquinic acid isomer 3 [M+H+]+ 355.1014 rt 241.5183
+
+x_test[, c("mz", "rt", colnames(x_test)[grep(colnames(x_test), pattern = "X[0-9]")])]
+@
+
+\section{Creating the structural matrix}
+The function 
+
+
+\section{Creating the statistical matrix}
+
+\section{Combining the structural and statistical matrix}
+
+\section{Visualization and further analyses}
+
+% \begin{figure}[h!]
+%     \center
+%     \includegraphics{./figure/circos-1}
+%     \caption{}
+% \end{figure}
+
+\newpage
+\printbibliography
+
+\newpage 
+\section*{Appendix}
+
+\subsection*{Session information}
+
+All software and respective versions to build this vignette are listed here:
+<<session,eval=TRUE,echo=FALSE>>=
+sessionInfo()
+@
+
+\newpage
+\subsection*{Neutral losses}
+\begin{longtable}{l | l } 
+    \caption{The table gives examplatory fractionation of precursors 
+    into neutral losses (given their m/z and the corresponding atoms):} 
+    \label{tab:neutrallosses} \\
+    CH$_2$ & 14.0157 \\
+    CH$_4$ & 16.0313 \\
+    NH$_3$ &  17.0265 \\
+    H$_2$O & 18.0106 \\
+    K$^+$ to NH$_4$$^+$" & 20.9293 \\
+    Na$^+$ to H$^+$ & 21.9819 \\
+    C$_2$H$_2$ & 26.0157 \\
+    CO & 27.9949 \\
+    C$_2$H$_4$ & 28.0313 \\
+    CH$_3$N & 29.0266 \\
+    CH$_2$O & 30.0106 \\
+    CH$_5$N & 31.0422 \\
+    S & 31.9721 \\
+    H$_2$S & 33.9877 \\
+    K$^+$to H$^+$ &  37.9559 \\
+    C$_2$H$_2$O & 42.0106 \\
+    C$_3$H$_6$ & 42.0470 \\
+    CHNO & 43.0058 \\
+    CO$_2$ & 43.9898 \\
+    CH$_2$ O$_2$ & 46.0055 \\
+    C$_4$H$_8$ & 56.0626 \\
+    C$_3$H$_9$N & 59.0735 \\
+    C$_2$H$_4$ O$_2$ & 60.0211 \\
+    CH$_4$N$_2$O & 60.0324 \\
+    SO$_2$ & 63.9619 \\
+    C$_5$H$_8$ & 68.0626 \\
+    C$_3$H$_6$ O$_2$ & 74.0368 \\
+    C$_6$H$_6$ & 78.0470 \\
+    SO$_3$ & 79.9568 \\
+    C$_3$H$_2$O$_3$ & 86.0004 \\
+    C$_4$H$_8$O$_2$ & 88.0517 \\
+    C$_4$H$_{12}$N$_2$ & 88.1000 \\
+    H$_2$(SO)$_4$ & 97.9674 \\
+    H$_3$(PO)$_4$ & 97.9769 \\
+    C$_5$H$_{10}$O$_2$ & 102.0618 \\
+    C$_3$H$_4$O$_4$ & 104.0110 \\
+    C$_6$H$_{12}$O$_2$ & 116.0861 \\
+    C$_2$H$_5$O$_4$P & 123.9926 \\
+    C$_5$H$_8$O$_4$ & 132.0423 \\
+    C$_7$H$_{19}$N$_3$ & 145.1579 \\
+    C$_6$H$_{10}$O$_4$ & 146.0579 \\
+    C$_6$H$_{10}$O$_5$ & 162.0528 \\
+    C$_6$H$_{12}$O$_5$ & 164.0685 \\ 
+    C$_6$H$_8$O$_6$ & 176.0321 \\
+    C$_6$H$_{12}$O$_6$ & 180.0634 \\
+    C$_6$H$_{10}$O$_7$ & 194.0427 \\
+    C$_8$H$_{12}$O$_6$ & 204.0655 \\
+    C$_{11}$H$_{10}$O$_4$ & 206.0579 \\
+    C$_{10}$H$_{15}$N$_3$ O$_6$ S & 305.0682 \\
+    C$_{10}$H$_{17}$N$_3$ O$_6$ S & 307.0838 \\
+    C$_{12}$H$_{20}$O$_{10}$ & 324.1057 \\
+    C$_{12}$H$_{22}$O$_{11}$ & 342.1162 \\
+    \hline
+\end{longtable}
+
+
+\end{document}
