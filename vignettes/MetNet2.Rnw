@@ -220,7 +220,41 @@ x_test[, c("mz", "rt", colnames(x_test)[grep(colnames(x_test), pattern = "X[0-9]
 @
 
 \section{Creating the structural matrix}
-The function 
+The function \Rfunction{create_structural_network} will create the 
+structural network. The function expects a matrix with a column \code{"mz"} 
+that contains the m/z value of the corresponding features. Furthermore, 
+\Rfunction{create_structural_network} takes a \Robject{data.frame} 
+object as argument \Robject{functional_groups} with the \code{colnames} 
+\code{"mass"}, \code{"name"} and additional columns (e.g. \code{"formula"}). The 
+numerical values in the column \code{"mass"} will define for what 
+additions/losses the function \Rfunction{create_structural_network} will 
+look for in the differences of the m/z feature values. Hereby, 
+\Rfunction{create_structural_network} will take into account the \Robject{ppm} 
+value, to adjust for inaccuracies in m/z values due to technical reasons
+according to the formula
+
+\begin{equation}
+    ppm = \frac{m_{exp} - m_{calc}}{m_{exp}}  \cdot 10$^{-6}$
+    
+\end{equation}
+
+with $m_{exp}$ the experimentally determined m/z value and $m_{calc}$ the 
+calculated accurate mass of a molecule. Within the function, a lower and upper 
+range is calculated depending on the supplied \Robject{ppm} value, differences
+between the m/z feature values are calculated and matched against the 
+\code{"mass"}es of the \Robject{functional_groups} argument. If any 
+of the additions/losses defined in \Robject{functional_groups} is found in the 
+data, it will be reported as an (unweighted) connection in the 
+returned adjacency matrix. Together with the adjacency matrix the type of 
+connection (derived from the column \code{"name"} in the 
+\Robject{functional_groups}) will be written to a character matrix. These 
+two matrices will be returned as a list (first entry: numerical adjacency
+matrix, second entry: character matrix) by the function 
+\Rfunction{create_structural_network}. 
+
+<<>>=
+create_structural_matrix(x, functional_groups, ppm = 5)
+@
 
 
 \section{Creating the statistical matrix}
