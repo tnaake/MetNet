@@ -302,6 +302,12 @@ will be reported as a connection in the returned matrix (if $a_{i,j} \geq$ \code
 or not. \Rfunction{create_statistical_network} and \Rfunction{consensus_network}
 will return an unweighted adjancency matrix with connections inferred from the
 respective models. 
+
+In the following example, we will create a consensus adjacency matrix using 
+Pearson and Spearman correlation using the intensity values as input data. 
+The p-values that will be used for assigning edges in the unweighted 
+adjacency matrix will be adjusted by the Benjamini & Hochberg (False Discovery 
+rate) method and the default q-value of 0.05. 
 <<>>=
 stat_net <- create_statistical_network(x, model = c("pearson", "spearman"), adjust_correlation = "BH")
 @
@@ -315,6 +321,8 @@ stat_net <- consensus_network(l = l)
 @
 
 \section{Combining the structural and statistical matrix}
+After creating the structural and statistical matrix, it is time to combine 
+these two matrices. 
 
 \section{Visualization and further analyses}
 
