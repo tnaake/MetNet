@@ -270,6 +270,38 @@ The function \Rfunction{create_statistical_network} will create the adjacency
 matrix based on statistical associations. \Rfunction{create_statistical_network}
 is a wrapper function for the functions 
 \Rfunction{create_statistical_networks_list} and \Rfunction{consensus_network}. 
+The function \Rfunction{create_statistical_networks_list} will create a 
+list of adjacency matrices using the statistical models defined by the 
+\Robject{model} argument. Currently, the models LASSO, Random Forest, 
+CLR, ARACNE (the two latter using the functions \Rfunction{clr} and 
+\Rfunction{aracne.a} from the \Rpackage{parmigene} package, 
+based on Mutual Information calculation), Pearson 
+and Spearman correlation and constraint-based structure learnging (based on 
+the Fast Incremental Association, Fast-IAMB, algorithm from the \Rpackage{bnlearn}
+package). For furthe information on the different models take a look on the 
+respective help pages of \code{.lasso}, \code{.randomForest}, \code{.clr},
+\code{.aracne}, \code{?.correlation} and/or \code{.bayes}. Functions that are 
+accepted by the respective underlying functions can be passed directly to 
+the \Rfunction{create_statistical_network} and 
+\Rfunction{create_statistical_networks_list} functions. In addition, arguments 
+that are defined in the functions \code{.lasso}, \code{.randomForest}, 
+\code{.clr}, \code{.aracne}, \code{?.correlation} and/or \code{.bayes} can 
+be passed like-wise to the functions. 
+
+From the list of adjacency matrices the function \Rfunction{conensus_network}
+will create a consensus adjacency matrix using the employed statistical models.
+The reasoning behing this step is to circumvent disadvantages arising from each 
+model and creating a statistically reliable topology that reflects the actual 
+metabolic relations. To calculate the consensus adjacency matrix, the 
+\Rfunction{consensus} from the \Rpackage{sna} is employed. The arguments that 
+are accepted by this function can be passed to the \Rfunction{consensus_network}
+and \Rfunction{create_statistical_network} function, respectively. Furthermore, 
+in case another method than \code{"central.graph"} is used the argument
+\Robject{threshold} will define if the value $a_{i,j}$ of the consensus matrix 
+will be reported as a connection in the returned matrix (if $a_{i,j} \geq$ \code{threshold})
+or not. \Rfunction{create_statistical_network} and \Rfunction{consensus_network}
+will return an unweighted adjancency matrix with connections inferred from the
+respective models. 
 <<>>=
 stat_net <- create_statistical_network(x, model = c("pearson", "spearman"), adjust_correlation = "BH")
 @
@@ -310,8 +342,8 @@ sessionInfo()
 
 The list of functional groups is taken from \citet{Breitling2006}. The numerical
 m/z values were calculated by using the structural formula and the 
-Biological Magnetic Resonance Data Bank web tool 
-http://www.bmrb.wisc.edu/metabolomics/mol_mass.php
+Biological Magnetic Resonance Data Bank
+\href{http://www.bmrb.wisc.edu/metabolomics/mol_mass.php}{web tool}. 
 <<>>=
 functional_groups <- rbind(
     c("Alanine", "C3H5NO", "71.0371137878"),
