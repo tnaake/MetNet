@@ -1,4 +1,4 @@
-%\VignetteEngine{knitr::knitr}
+c(%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Workflow for Metabolomics}
 %\VignetteKeywords{Mass Spectrometry, MS, MSMS, Metabolomics, Visualization}
 %\VignettePackage{MetNet-vignette}
@@ -113,6 +113,9 @@ of features) and statistical associations (intensity values of features per
 sample) to propose putative metabolic networks that can be used for further
 exploration. 
 
+Breitling 2006 Ab initio prediction
+Jourdan 2007 MetaNetter 
+
 The two main functionalities of the package include the creation of an
 adjacency matrix from structual properties, based on losses/addition of 
 functional groups defined by the user, and statistical associations. Currently,
@@ -221,8 +224,9 @@ x_test[, c("mz", "rt", colnames(x_test)[grep(colnames(x_test), pattern = "X[0-9]
 @
 
 \section{Creating the structural matrix}
-The function \Rfunction{create_structural_network} will create the 
-structural network. The function expects a matrix with a column \code{"mz"} 
+The function \Rfunction{create_structural_network} will create the adjacency
+matrix based on structual properties (m/z values) of the features. 
+The function expects a matrix with a column \code{"mz"} 
 that contains the m/z value of the corresponding features. Furthermore, 
 \Rfunction{create_structural_network} takes a \Robject{data.frame} 
 object as argument \Robject{functional_groups} with the \code{colnames} 
@@ -253,6 +257,8 @@ two matrices will be returned as a list (first entry: numerical adjacency
 matrix, second entry: character matrix) by the function 
 \Rfunction{create_structural_network}. 
 
+
+
 <<>>=
 create_structural_matrix(x, functional_groups, ppm = 5)
 @
@@ -260,11 +266,20 @@ create_structural_matrix(x, functional_groups, ppm = 5)
 
 \section{Creating the statistical matrix}
 
+The function \Rfunction{create_statistical_network} will create the adjacency
+matrix based on statistical associations. \Rfunction{create_statistical_network}
+is a wrapper function for the functions 
+\Rfunction{create_statistical_networks_list} and \Rfunction{consensus_network}. 
 <<>>=
 stat_net <- create_statistical_network(x, model = c("pearson", "spearman"), adjust_correlation = "BH")
+@
 
+To create the same adjacency matrix without using the wrapper function, you can
+call the two functions \Rfunction{create_statistical_networks_list} and 
+\Rfunction{consensus_network} individually: 
+<<>>= 
 l <- create_statistical_networks_list(x, model = c("pearson", "spearman"),  adjust_correlation = "BH")
-stat_net2 <- consensus_network(l = l)
+stat_net <- consensus_network(l = l)
 @
 
 \section{Combining the structural and statistical matrix}
@@ -291,7 +306,102 @@ sessionInfo()
 @
 
 \newpage
-\subsection*{Neutral losses}
+\subsection*{Functional groups}
+
+The list of functional groups is taken from \citet{Breitling2006}. The numerical
+m/z values were calculated by using the structural formula and the 
+Biological Magnetic Resonance Data Bank web tool 
+http://www.bmrb.wisc.edu/metabolomics/mol_mass.php
+<<>>=
+functional_groups <- rbind(
+    c("Alanine", "C3H5NO", "71.0371137878"),
+    c("Arginine", "C6H12N4O", "156.1011110281"),
+    c("Asparagine", "C4H6N2O2", "114.0429274472"),
+    c("Guanosine 5-diphosphate (–H2O)", "C10H13N5O10P2", "425.0137646843"),
+    c("Guanosine 5-monophosphate (–H2O)", "C10H12N5O7P", "345.0474342759"),
+    c("Guanine (–H)", "C5H4N5O", "150.0415847765"),
+    c("Aspartic acid", "C4H5NO3", "115.0269430320"),
+    c("Guanosine (–H2O)", "C10H11N5O4", "265.0811038675"),
+    c("Cysteine", "C3H5NOS", "103.0091844778"),
+    c("Deoxythymidine 5'-diphosphate (–H2O)", "C10H14N2O10P2", "384.0123677008"),
+    c("Cystine", "C6H10N2O3S2", "222.0132835777"),
+    c("Thymidine (–H2O)", "C10H12N2O4", "224.0797068840"),
+    c("Glutamic acid", "C5H7NO3", "129.0425930962"),
+    c("Thymine (–H)", "C5H5N2O2", "125.0351024151"),
+    c("Glutamine", "C5H8N2O2", "128.0585775114"),
+    c("Thymidine 5'-monophosphate (–H2O)", "C10H13N2O7P", "304.0460372924"),
+    c("Glycine", "C2H3NO", "57.0214637236"),
+    c("Uridine 5'-diphosphate (–H2O)", "C9H12N2O11P2", "385.9916322587"),
+    c("Histidine", "C6H7N3O", "137.0589118624"),
+    c("Uridine 5'-monophosphate (–H2O)", "C9H11N2O8P", "306.0253018503"),
+    c("Isoleucine", "C6H11NO", "113.0840639804"),
+    c("Uracil (–H)", "C4H3N2O2", "111.0194523509"),
+    c("Leucine", "C6H11NO", "113.0840639804"),
+    c("Uridine (–H2O)", "C9H10N2O5", "226.0589714419"),
+    c("Lysine", "C6H12N2O", "128.0949630177"),
+    c("Acetylation (–H)", "C2H3O2", "59.0133043405"),
+    c("Methionine", "C5H9NOS", "131.0404846062"),
+    c("Acetylation (–H2O)", "C2H2O",  "42.0105646863"),
+    c("Phenylalanine", "C9H9NO",  "147.0684139162"),
+    c("C2H2", "C2H2", "26.0156500642"),
+    c("Proline", "C5H7NO", "97.0527638520"),
+    c("Carboxylation", "CO2", "43.9898292442"),
+    c("Serine", "C3H5NO2", "87.0320284099"),
+    c("CHO2", "CHO2", "44.9976542763"),
+    c("Threonine",  "C4H7NO2",  "101.0476784741"),
+    c("Condensation/dehydration", "H2O", "18.0105646863"),
+    c("Tryptophan", "C11H10N2O",  "186.0793129535"),
+    c("Diphosphate", "H3O6P2", "160.9404858489"),
+    c("Tyrosine", "C9H9NO2", "163.0633285383"),
+    c("Ethyl addition (–H2O)", "C2H4", "28.0313001284"),
+    c("Valine", "C5H9NO",  "99.0684139162"),
+    c("Formic Acid (–H2O)", "CO", "27.9949146221"),
+    c("Acetotacetate (–H2O)",  "C4H4O2", "84.0211293726"),
+    c("Glyoxylate (–H2O)", "C2O2",  "55.9898292442"),
+    c("Acetone (–H)", "C3H5O", "57.0340397826"),
+    c("Hydrogenation/dehydrogenation", "H2", "2.0156500642"),
+    c("Adenylate (–H2O)", "C10H12N5O6P", "329.0525196538"),
+    c("Hydroxylation (–H)", "O", "15.9949146221"),
+    c("Biotinyl (–H)", "C10H15N2O3S", "243.0803380482"),
+    c("Inorganic phosphate", "P", "30.9737615100"),
+    c("Biotinyl (–H2O)", "C10H14N2O2S", "226.0775983940"),
+    c("Ketol group (–H2O)", "C2H2O", "42.0105646863"),
+    c("Carbamoyl P transfer (–H2PO4)", "CH2ON", "44.0136386915"),
+    c("Methanol (–H2O)", "CH2", "14.0156500642"),
+    c("Co-enzyme A (–H)", "C21H34N7O16P3S", "765.0995583014"),
+    c("Phosphate", "HPO3", "79.9663304084"),
+    c("Co-enzyme A (–H2O)", "C21H33N7O15P3S", "748.0968186472"),
+    c("Primary amine", "NH2", "16.0187240694"),
+    c("Glutathione (–H2O)", "C10H15N3O5S", "289.0732412976"),
+    c("Pyrophosphate", "PP", "61.9475230200"),
+    c("Isoprene addition (–H)", "C5H7", "67.0547752247"),
+    c("Secondary amine", "NH", "15.0108990373"),
+    c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
+    c("Sulfate (–H2O)", "SO3", "79.9568145563"),
+    c("Palmitoylation (–H2O)", "C16H30O", "238.2296655851"),
+    c("Tertiary amine", "N", "14.0030740052"),
+    c("Pyridoxal phosphate (–H2O)", "C8H8NO5P", "229.0140088825"),
+    c("C6H10O5", "C6H10O5", "162.0528234315"),
+    c("Urea addition (–H)", "CH3N2O", "59.0245377288"),
+    c("C6H10O6", "C6H10O6", "178.0477380536"),
+    c("Adenine (–H)", "C5H4N5", "134.0466701544"),
+    c("D-ribose (–H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
+    c("Adenosine (–H2O)", "C10H11N5O3", "249.0861892454"),
+    c("Disaccharide (–H2O)", "C12H20O11", "340.1005614851"),
+    c("Adenosine 5'-diphosphate (–H2O)", "C10H13N5O9P2", "409.0188500622"),
+    c("Glucose-N-phosphate (–H2O)", "C6H11O8P", "242.0191538399"),
+    c("Adenosine 5'-monophosphate (–H2O)", "C10H12N5O6P", "329.0525196538"),
+    c("Glucuronic acid (–H2O)", "C6H8O6", "176.0320879894"),
+    c("Cytidine 5'-diphosphate (–H2O)", "C9H13N3O10P2", "385.0076166739"),
+    c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"),
+    c("Cytidine 5'-monophsophate (–H2O)", "C9H12N3O7P", "305.0412862655"),
+    c("Trisaccharide (–H2O)", "C18H30O15", "486.1584702945"),
+    c("Cytosine (–H)", "C4H4N3O",  "110.0354367661"))
+
+functional_groups <- data.frame(name = functional_groups[,1], 
+            formula = functional_groups[,2],
+            mass = as.numeric(functional_groups[,3]))
+@
 \begin{longtable}{l | l } 
     \caption{The table gives examplatory fractionation of precursors 
     into neutral losses (given their m/z and the corresponding atoms):} 
