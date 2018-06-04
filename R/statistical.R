@@ -59,7 +59,7 @@
     
     l1_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(l1_mat) <- rownames(l1_mat) <- rownames(x)
-    for (i in 1:length(l1)) {l1_mat[l1[[i]], i] <- 1} ## ; l1_mat[i, l1[[i]]] <- 1}
+    for (i in 1:length(l1)) {l1_mat[names(l1[[i]]), i] <- 1} ## ; l1_mat[i, l1[[i]]] <- 1}
     
     return(l1_mat)
 }
@@ -113,7 +113,9 @@
     
     for (i in 1:length(rf)) {rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]}
     rf_mat <- p.adjust(rf_mat, method = randomforest_adjust)     
+    rf_mat <- matrix(rf_mat, ncol = nrow(x), nrow = nrow(x), byrow = FALSE)
     rf_mat <- ifelse(rf_mat > 0.05, 0, 1)
+    colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
     
     return(rf_mat)
 }
@@ -126,8 +128,8 @@
 #' \code{parmigene} package. The presence/absence is based on if the 
 #' returned value exceeds a user-defined threshold value. \code{.clr} will 
 #' return the adjacency matrix containing the presence/absence value.
-#' @usage .clr(mi = mi_x_z, threshold_clr = 0)
-#' @param mi_x_z matrix, where columns and the rows are features 
+#' @usage .clr(mi, threshold_clr = 0)
+#' @param mi matrix, where columns and the rows are features 
 #' (metabolites), cell entries are mutual information values between the 
 #' features. As input, the mutual information (e.g. raw MI estimates or 
 #' Jackknife bias corrected MI estimates) from the \code{cmi} function of the
@@ -143,9 +145,11 @@
 #' Relatedness Network algorithm \code{clr}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
 #' @examples .clr(mi_x_z, threshold_clr = 0)
-.clr <- function(mi = mi_x_z, threshold_clr = 0) {
+.clr <- function(mi, threshold_clr = 0) {
+    if (!is.numeric(threshold_clr)) stop("threshold_clr is not numeric")
     clr_mat <- clr(mi)
     clr_mat <- ifelse(clr_mat > threshold_clr, 1, 0)
+    colnames(clr_mat) <- rownames(clr_mat) <- rownames(mi)
     return(clr_mat)
 }
 
@@ -159,7 +163,7 @@
 #' returned value exceeds a user-defined threshold value. \code{.aracne} will 
 #' return the adjacency matrix containing the presence/absence value.
 #' @usage .aracne(mi = mi_x_z, eps = 0.05, threshold_aracne = 0)
-#' @param mi_x_z matrix, where columns and the rows are features 
+#' @param mi matrix, where columns and the rows are features 
 #' (metabolites), cell entries are mutual information values between the 
 #' features. As input, the mutual information (e.g. raw MI estimates or 
 #' Jackknife bias corrected MI estimates) from the \code{cmi} function of the
@@ -175,9 +179,11 @@
 #' cellular networks algorithm \code{aracne}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
 #' @examples .aracne(mi_x_z, eps = 0.05, threshold_aracne = 0)
-.aracne <- function(mi = mi_x_z, eps = 0.05, threshold_aracne = 0) {
+.aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
+    if (!is.numeric(threshold_aracne)) stop("threshold_aracne is not numeric")
     aracne_mat <- aracne.a(mi, eps = eps)  
     aracne_mat <- ifelse(aracne_mat > threshold_aracne, 1, 0)
+    colnames(aracne_mat) <- rownames(aracne_mat) <- rownames(mi)
     return(aracne_mat)
 }
 
@@ -208,6 +214,8 @@
 #' @examples .correlation(x, adjust_correlation = "none", threshold_correlation = 0.05, ...)
 .correlation <- function(x, adjust_correlation = "none", type = "pearson", 
                          threshold_correlation = 0.05, ...) {
+    if (!is.numeric(threshold_correlation)) 
+        stop("threshold_correlation is not numeric")
     ## get character vector for p-value adjustment
     adjust <- adjust_correlation
     ## allow for compatibility of arguments 
@@ -244,7 +252,6 @@
     ## allow for compatibility of arguments 
     x_fast.iamb <- .threeDots_call("fast.iamb", x = x_df, ...)
     ## was x_fast.iamb <- fast.iamb(x_df, ...) 
-    x_fast.iamb <- fast.iamb(x_df, ...)    
     bs_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(bs_mat) <- rownames(bs_mat) <- rownames(x)
     arcs_fast.iamb <- arcs(x_fast.iamb)
@@ -336,18 +343,19 @@ create_statistical_networks_list <- function(x, model, ...) {
         l <- .add_to_list(l, "randomForest", randomForest)
     }
     if (any(c("clr", "aracne") %in% model)) {
-        mi_x_z <- cmi(x_z)$bcmi
-        rownames(mi_x_z) <- colnames(mi_x_z) <- colnames(x_z)
+        mi_x_z <- cmi(t(x_z))$bcmi
+        rownames(mi_x_z) <- colnames(mi_x_z) <- rownames(x)
     }
     
     ## add entry for clr if "clr" is in model
     if ("clr" %in% model) {
-        clr <- .clr(mi = mi_x_z, ...)
+        clr <- .threeDots_call(".clr", mi = mi_x_z, ...)
+                               ##.clr(mi = mi_x_z, ...)
         l <- .add_to_list(l, "clr", clr)
     }
     ## add entry for aracne if "aracne" is in model
     if ("aracne" %in% model) {
-        aracne <- .aracne(mi_mi_x_z, ...)
+        aracne <- .threeDots_call(".aracne", mi = mi_x_z, ...)
         l <- .add_to_list(l, "aracne", aracne)
     }
     ## add entry for pearson if "pearson" is in model
