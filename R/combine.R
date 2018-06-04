@@ -22,11 +22,12 @@ peaklist <- peaklist[sort(sample(x = 1:dim(peaklist)[1], size = 100)),]
 #' @examples combine_structural_statistical(structure, statistical, threshold, ...)
 #' @export
 combine_structural_statistical <- function(structure, statistical, 
-                    threshold = 1, ...) {
+                    threshold = 1) {
     
-    
+    if (rownames(structure) != rownames(statistical)) stop("rownames are not identical")
+    if (colnames(structure) != colnames(statistical)) stop("colnames are not identical")
     ##l <- list(structure, statistical)
-    consensus_mat <- consensus_network(statistical, ...)
+    ##consensus_mat <- consensus_network(statistical, ...)
     consensus_mat <- structure + consensus_mat
     consensus_mat <- ifelse(consensus_mat > threshold, 1, 0)
     return(consensus_mat)

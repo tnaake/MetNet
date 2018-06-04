@@ -136,11 +136,11 @@ further network analyses (e.g. calculation of topological parameters),
 integration with other data sources (e.g. genomic information or 
 transcriptomic data) and/or visualization. 
 
-\Rpackage{MetCirc} is currently under active development. If you 
+\Rpackage{MetNet} is currently under active development. If you 
 discover any bugs, typos or develop ideas of improving 
-\Rpackage{MetCirc} feel free to raise an issue via 
-\href{https://github.com/tnaake/MetCirc}{GitHub} or 
-send a mail to the developers. 
+\Rpackage{MetNet} feel free to raise an issue via 
+\href{https://github.com/tnaake/MetNet}{GitHub} or 
+send a mail to the developer. 
 
 <<knitr, include=FALSE, cache=FALSE>>=
 library("knitr")
@@ -156,18 +156,18 @@ biocLite("MetNet")
 Before starting, load the \Rpackage{MetNet} package. This will also
 load the required packages 
 <<eval=TRUE>>=
-library(MetCirc)
+library(MetNet)
 @
 
 The data format that is compatible with the \Rpackage{MetNet} framework is 
-in the \Rpackage{xcms}/\Rpackage{CAMERA} outout-like $m x n$ matrix, where 
+in the \Rpackage{xcms}/\Rpackage{CAMERA} output-like $m x n$ matrix, where 
 columns denote the different samples $n$ and where $m$ features are present. 
 The information about the m/z values has to be stored in a vector of 
 length $|m|$. \Rpackage{MetNet} does not impose any requirements for 
-data normalization, filtering, etc., however, the user has to make sure that
-the data is in an appropriate format (e.g. divided by internal standard, 
-log2 transformed, noise filtering, removal of features that do not represent
-mass features/metabolites, eventually removal of isotopes). 
+data normalization, filtering, etc. However, the user has to make sure that
+the data is in an appropriate format. These include division by internal standard, 
+log2 transformation, noise filtering, removal of features that do not represent
+mass features/metabolites, removal of isotopes, etc. 
 
 <<data,eval=TRUE>>=
 load("/home/thomas/Documents/University/Master/MScArbeit/Metabolic_profiling/WOS_0h_72h/metabolicProfiling.RData")
@@ -260,7 +260,7 @@ matrix, second entry: character matrix) by the function
 
 
 <<>>=
-create_structural_matrix(x, functional_groups, ppm = 5)
+struct_adj <- create_structural_matrix(x, functional_groups, ppm = 5)
 @
 
 
@@ -308,29 +308,56 @@ Pearson and Spearman correlation using the intensity values as input data.
 The p-values that will be used for assigning edges in the unweighted 
 adjacency matrix will be adjusted by the Benjamini & Hochberg (False Discovery 
 rate) method and the default q-value of 0.05. 
-<<>>=
-stat_net <- create_statistical_network(x, model = c("pearson", "spearman"), adjust_correlation = "BH")
+<<statistical>>=
+stat_adj <- create_statistical_network(x, model = c("pearson", "spearman"), adjust_correlation = "BH")
 @
 
 To create the same adjacency matrix without using the wrapper function, you can
 call the two functions \Rfunction{create_statistical_networks_list} and 
 \Rfunction{consensus_network} individually: 
-<<>>= 
+<<statistical_stepwise>>= 
 l <- create_statistical_networks_list(x, model = c("pearson", "spearman"),  adjust_correlation = "BH")
-stat_net <- consensus_network(l = l)
+stat_adj <- consensus_network(l = l)
 @
 
 \section{Combining the structural and statistical matrix}
 After creating the structural and statistical matrix, it is time to combine 
-these two matrices. 
+these two matrices. The function \Rfunction{combine_structural_statistical} 
+will combine the matrices to the consensus matrix. The function accepts 
+the arguments \code{structure} and \code{statistical} for the two matrices,
+respectively, and the argument \code{threshold}, that is a numerical value 
+(default = 1). After adding the matrices, the entries will be checked if 
+they are greater or equal than \code{threshold} and 1 or 0, will be returned. 
+The argument \code{threshold} needs to be adjusted if another \code{method} 
+than \code{"central.graph"} in 
+\Rfunction{create_statistical_network}/\Rfunction{consensus_network} is used. 
+
+<<combine>>=
+cons_adj <- combine_structural_statistical(structure = struct_adj,
+                                    statistical = stat_adj)
+@
 
 \section{Visualization and further analyses}
+To display the createed consensus adjacency matrix, visualisation tools 
+available in the \R framework can be employed or any other visualisation tool
+after exporting the consensus matrix as a text file. In this example 
+we will use the \Rpackage{igraph} to visualize the adjacency matrix. 
 
-% \begin{figure}[h!]
-%     \center
-%     \includegraphics{./figure/circos-1}
-%     \caption{}
-% \end{figure}
+<<visualisation,eval=TRUE>>=
+cons_adj_g <- graph_fromadjacency_matrix(matrix = cons_adj, mode = "directed", 
+                           directed = FALSE)
+plot(cons_adj_g)
+@
+
+\begin{figure}[h!]
+    \center
+    \includegraphics{./figure/visualisation-1}
+    \caption{}
+\end{figure}
+
+Furthermore, the adjacency matrix can be analysed by network analysis techniques
+(topological parameters such as centrality, ...) that are implemented in 
+different packages in \R (e.g. \Rpackage{igraph} or \Rpackage{sna}). 
 
 \newpage
 \printbibliography
