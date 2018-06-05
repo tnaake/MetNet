@@ -25,8 +25,6 @@
     higher_n <- if(m_1 >= m_2) m_1 else m_2
     in_range <- which(lower_n <= functional_groups & 
                           higher_n >= functional_groups)
-    ## only remove one feature when several are in range
-    in_range <- in_range[1]
     return(in_range)
 }
 
@@ -59,26 +57,18 @@
 #' data("x_test", package = "MetNet")
 #' x <- as.matrix(x)
 #' functional_groups <- rbind(
-#'     c("Acetylation (–H)", "C2H3O2", "59.0133043405"),
-#'     c("Acetylation (–H2O)", "C2H2O",  "42.0105646863"),
-#'     c("Phenylalanine", "C9H9NO",  "147.0684139162"),
-#'     c("C2H2", "C2H2", "26.0156500642"),
-#'     c("Carboxylation", "CO2", "43.9898292442"),
-#'     c("CHO2", "CHO2", "44.9976542763"),
-#'     c("Condensation/dehydration", "H2O", "18.0105646863"),
-#'     c("Hydrogenation/dehydrogenation", "H2", "2.0156500642"),
 #'     c("Hydroxylation (–H)", "O", "15.9949146221"),
-#'     c("Secondary amine", "NH", "15.0108990373"),
 #'     c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
-#'     c("Tertiary amine", "N", "14.0030740052"),
 #'     c("C6H10O6", "C6H10O6", "178.0477380536"),
 #'     c("D-ribose (–H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
 #'     c("Disaccharide (–H2O)", "C12H20O11", "340.1005614851"),
-#'     c("Glucose-N-phosphate (–H2O)", "C6H11O8P", "242.0191538399"),
 #'     c("Glucuronic acid (–H2O)", "C6H8O6", "176.0320879894"),
 #'     c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"),
 #'     c("Trisaccharide (–H2O)", "C18H30O15", "486.1584702945"))
-#' struct_net <- create_structural_network(x, functional_groups, ppm = 5)
+#' functional_groups <- data.frame(group = functional_groups[,1],
+#'                                 formula = functional_groups[,2],
+#'                                 mass = as.numeric(functional_groups[,3]))
+#' struct_net <- create_structural_network(x_test, functional_groups, ppm = 5)
 #' @export
 create_structural_network <- function(x, functional_groups, ppm = 5) {
     
@@ -87,6 +77,7 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
     if (!all(c("group", "formula", "mass") %in% colnames(functional_groups))) {
         stop("functional_groups does not contain the columns group, formula and mass")
     }
+    if (!is.numeric(ppm)) stop("ppm is not numeric")
     
     mass <- x[, "mz"]
     
@@ -94,7 +85,7 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
     mass_1 <- mass / abs(ppm / 10 ^ 6  + 1 ) 
     mass_2 <- mass / abs(ppm / 10 ^ 6 - 1)
     mat <- matrix(0, nrow = dim(x)[1], ncol = dim(x)[1])
-    mat_type <- matrix(NA, ncol = nrow(mat), nrow(mat))
+    mat_type <- matrix("", ncol = nrow(mat), nrow(mat))
     
     mass_fg <- functional_groups[, "mass"]
     ## iterate through columns 
@@ -103,20 +94,28 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
             function(x, z = i) {
                 m_1 <- abs(mass_1[z] - mass_2[x])
                 m_2 <- abs(mass_2[z] - mass_1[x])
+                ## use .in_range_which to find the indices of the mass 
+                ## differences, that are in range with the masses 
                 presence_l <- .in_range_which(m_1, m_2, mass_fg)
                 presence_l <- functional_groups[presence_l, "group"]
                 presence_l <- as.character(presence_l)
+                
                 if(length(presence_l) > 0) {
+                    ## if there are several possible groups mapped, return the
+                    ## names separated by "/"
                     if (length(presence_l) > 1) {
                         return(paste(presence_l, collapse = "/"))
+                    ## if only one possible groups is mapped, return only this 
+                    ## name
                     } else {return(presence_l)}
-                } else {return(NA)}
+                } else {return("")}
             }
         )
         functional_group_vec <- unlist(functional_group_vec)
         mat_type[,i] <- functional_group_vec
     }
-    mat <- ifelse(is.na(mat_type), 0, 1)
+    ## use mat_type to assign 0 or 1 to the adjacency matrix
+    mat <- ifelse(mat_type == "", 0, 1)
     rownames(mat) <- colnames(mat) <- rownames(x)
     rownames(mat_type) <- colnames(mat_type) <- rownames(x)
     return(list(mat, mat_type))

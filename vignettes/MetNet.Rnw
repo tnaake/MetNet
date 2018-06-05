@@ -154,7 +154,9 @@ biocLite("MetNet")
 @
 
 Before starting, load the \Rpackage{MetNet} package. This will also
-load the required packages 
+load the required packages \Rpackage{glmnet}, \Rpackage{stabs}, 
+\Rpackage{randomForest}, \Rpackage{rfPermute}, \Rpackage{mpmi}, 
+\Rpackage{parmigene}, \Rpackage{psych} and \Rpackage{bnlearn}. 
 <<eval=TRUE>>=
 library(MetNet)
 @
@@ -169,8 +171,9 @@ the data is in an appropriate format. These include division by internal standar
 log2 transformation, noise filtering, removal of features that do not represent
 mass features/metabolites, removal of isotopes, etc. 
 
-<<data,eval=TRUE>>=
+<<data,eval=TRUE,echo=TRUE>>=
 data("x_test", package = "MetNet")
+x_test <- as.matrix
 @
 
 \section{Creating the structural matrix}
@@ -207,10 +210,23 @@ two matrices will be returned as a list (first entry: numerical adjacency
 matrix, second entry: character matrix) by the function 
 \Rfunction{create_structural_network}. 
 
+<<functional_groups,echo=TRUE,eval=TRUE>>=
+functional_groups <- rbind(
+    c("Hydroxylation (–H)", "O", "15.9949146221"),
+    c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
+    c("C6H10O6", "C6H10O6", "178.0477380536"),
+    c("D-ribose (–H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
+    c("Disaccharide (–H2O)", "C12H20O11", "340.1005614851"),
+    c("Glucuronic acid (–H2O)", "C6H8O6", "176.0320879894"),
+    c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"),
+    c("Trisaccharide (–H2O)", "C18H30O15", "486.1584702945"))
+functional_groups <- data.frame(group = functional_groups[,1],
+                            formula = functional_groups[,2],
+                            mass = as.numeric(functional_groups[,3]))
+@
 
-
-<<>>=
-struct_adj <- create_structural_matrix(x, functional_groups, ppm = 5)
+<<structure,eval=TRUE,echo=TRUE>>=
+struct_adj <- create_structural_matrix(x_test, functional_groups, ppm = 5)
 @
 
 
@@ -259,14 +275,16 @@ The p-values that will be used for assigning edges in the unweighted
 adjacency matrix will be adjusted by the Benjamini & Hochberg (False Discovery 
 rate) method and the default q-value of 0.05. 
 <<statistical>>=
-stat_adj <- create_statistical_network(x, model = c("pearson", "spearman"), adjust_correlation = "BH")
+x_int <- x_test[,-3:dim(x_test)[2]]
+stat_adj <- create_statistical_network(x_x_int, 
+                model = c("pearson", "spearman"), adjust_correlation = "BH")
 @
 
 To create the same adjacency matrix without using the wrapper function, you can
 call the two functions \Rfunction{create_statistical_networks_list} and 
 \Rfunction{consensus_network} individually: 
 <<statistical_stepwise>>= 
-l <- create_statistical_networks_list(x, model = c("pearson", "spearman"),  adjust_correlation = "BH")
+l <- create_statistical_networks_list(x_int, model = c("pearson", "spearman"),  adjust_correlation = "BH")
 stat_adj <- consensus_network(l = l)
 @
 
@@ -293,10 +311,10 @@ available in the \R framework can be employed or any other visualisation tool
 after exporting the consensus matrix as a text file. In this example 
 we will use the \Rpackage{igraph} to visualize the adjacency matrix. 
 
-<<visualisation,eval=TRUE>>=
-cons_adj_g <- graph_fromadjacency_matrix(matrix = cons_adj, mode = "directed", 
+<<visualisation,eval=TRUE,echo=TRUE>>=
+g <- graph_fromadjacency_matrix(matrix = cons_adj, mode = "directed", 
                            directed = FALSE)
-plot(cons_adj_g)
+plot(g)
 @
 
 \begin{figure}[h!]
@@ -329,7 +347,7 @@ The list of functional groups is taken from \citet{Breitling2006}. The numerical
 m/z values were calculated by using the structural formula and the 
 Biological Magnetic Resonance Data Bank
 \href{http://www.bmrb.wisc.edu/metabolomics/mol_mass.php}{web tool}. 
-<<>>=
+<<functional_groups,eval=TRUE,echo=TRUE>>=
 functional_groups <- rbind(
     c("Alanine", "C3H5NO", "71.0371137878"),
     c("Arginine", "C6H12N4O", "156.1011110281"),
@@ -419,64 +437,5 @@ functional_groups <- data.frame(name = functional_groups[,1],
             formula = functional_groups[,2],
             mass = as.numeric(functional_groups[,3]))
 @
-\begin{longtable}{l | l } 
-    \caption{The table gives examplatory fractionation of precursors 
-    into neutral losses (given their m/z and the corresponding atoms):} 
-    \label{tab:neutrallosses} \\
-    CH$_2$ & 14.0157 \\
-    CH$_4$ & 16.0313 \\
-    NH$_3$ &  17.0265 \\
-    H$_2$O & 18.0106 \\
-    K$^+$ to NH$_4$$^+$" & 20.9293 \\
-    Na$^+$ to H$^+$ & 21.9819 \\
-    C$_2$H$_2$ & 26.0157 \\
-    CO & 27.9949 \\
-    C$_2$H$_4$ & 28.0313 \\
-    CH$_3$N & 29.0266 \\
-    CH$_2$O & 30.0106 \\
-    CH$_5$N & 31.0422 \\
-    S & 31.9721 \\
-    H$_2$S & 33.9877 \\
-    K$^+$to H$^+$ &  37.9559 \\
-    C$_2$H$_2$O & 42.0106 \\
-    C$_3$H$_6$ & 42.0470 \\
-    CHNO & 43.0058 \\
-    CO$_2$ & 43.9898 \\
-    CH$_2$ O$_2$ & 46.0055 \\
-    C$_4$H$_8$ & 56.0626 \\
-    C$_3$H$_9$N & 59.0735 \\
-    C$_2$H$_4$ O$_2$ & 60.0211 \\
-    CH$_4$N$_2$O & 60.0324 \\
-    SO$_2$ & 63.9619 \\
-    C$_5$H$_8$ & 68.0626 \\
-    C$_3$H$_6$ O$_2$ & 74.0368 \\
-    C$_6$H$_6$ & 78.0470 \\
-    SO$_3$ & 79.9568 \\
-    C$_3$H$_2$O$_3$ & 86.0004 \\
-    C$_4$H$_8$O$_2$ & 88.0517 \\
-    C$_4$H$_{12}$N$_2$ & 88.1000 \\
-    H$_2$(SO)$_4$ & 97.9674 \\
-    H$_3$(PO)$_4$ & 97.9769 \\
-    C$_5$H$_{10}$O$_2$ & 102.0618 \\
-    C$_3$H$_4$O$_4$ & 104.0110 \\
-    C$_6$H$_{12}$O$_2$ & 116.0861 \\
-    C$_2$H$_5$O$_4$P & 123.9926 \\
-    C$_5$H$_8$O$_4$ & 132.0423 \\
-    C$_7$H$_{19}$N$_3$ & 145.1579 \\
-    C$_6$H$_{10}$O$_4$ & 146.0579 \\
-    C$_6$H$_{10}$O$_5$ & 162.0528 \\
-    C$_6$H$_{12}$O$_5$ & 164.0685 \\ 
-    C$_6$H$_8$O$_6$ & 176.0321 \\
-    C$_6$H$_{12}$O$_6$ & 180.0634 \\
-    C$_6$H$_{10}$O$_7$ & 194.0427 \\
-    C$_8$H$_{12}$O$_6$ & 204.0655 \\
-    C$_{11}$H$_{10}$O$_4$ & 206.0579 \\
-    C$_{10}$H$_{15}$N$_3$ O$_6$ S & 305.0682 \\
-    C$_{10}$H$_{17}$N$_3$ O$_6$ S & 307.0838 \\
-    C$_{12}$H$_{20}$O$_{10}$ & 324.1057 \\
-    C$_{12}$H$_{22}$O$_{11}$ & 342.1162 \\
-    \hline
-\end{longtable}
-
 
 \end{document}
