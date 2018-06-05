@@ -19,7 +19,25 @@ peaklist <- peaklist[sort(sample(x = 1:dim(peaklist)[1], size = 100)),]
 #' harbouring connections reported by the structual network and statistcal 
 #' networks. 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples combine_structural_statistical(structure, statistical, threshold)
+#' @examples 
+#' #' data("x_test", package = "MetNet")
+#' x_test <- as.matrix(x_test)
+#' functional_groups <- rbind(
+#'     c("Hydroxylation (–H)", "O", "15.9949146221"),
+#'     c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
+#'     c("C6H10O6", "C6H10O6", "178.0477380536"),
+#'     c("D-ribose (–H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
+#'     c("Disaccharide (–H2O)", "C12H20O11", "340.1005614851"),
+#'     c("Glucuronic acid (–H2O)", "C6H8O6", "176.0320879894"),
+#'     c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"),
+#'     c("Trisaccharide (–H2O)", "C18H30O15", "486.1584702945"))
+#' functional_groups <- data.frame(group = functional_groups[,1],
+#'                                 formula = functional_groups[,2],
+#'                                 mass = as.numeric(functional_groups[,3]))
+#' struct_net <- create_structural_network(x_test, functional_groups, ppm = 5)
+#' stat_net <- create_statistical_network(x_test, model = c("pearson", "spearman","bayes"), 
+#'     adjust_correlation = "bonferroni")
+#' combine_structural_statistical(struct_net[[1]], stat_net)
 #' @export
 combine_structural_statistical <- function(structure, statistical, 
                     threshold = 1) {
@@ -39,9 +57,3 @@ combine_structural_statistical <- function(structure, statistical,
     consensus_mat <- ifelse(consensus_mat > threshold, 1, 0)
     return(consensus_mat)
 }
-
-
-combine_structural_statistical(mat_fg[[1]], l, method = "central.graph")
-
-
-combine_structural_statistical(mat_fg[[1]], l, method = "central.graph")
