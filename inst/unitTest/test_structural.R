@@ -42,7 +42,26 @@ test_.in_range_which <- function() {
 ## START unit test create_structural_network ##
 struct_net <- create_structural_network(mat_test, functional_groups = functional_groups, ppm = 5)
 test_create_structural_network <- function() {
-    checkException()
-    checkEquals()
+    checkException(create_structural_network(mat_test[, -1], functional_groups))
+    checkException(create_structural_network(NULL, functional_groups))
+    checkException(create_structural_network(mat_test, functional_groups[,-1]))
+    checkException(create_structural_network(mat_test, functional_groups[,-2]))
+    checkException(create_structural_network(mat_test, functional_groups[,-3]))
+    checkException(create_structural_network(mat_test, matrix()))
+    checkException(create_structural_network(mat_test, functional_groups, ppm = "a"))
+    checkEquals(length(struct_net), 2)
+    checkEquals(dim(struct_net[[1]]), c(7, 7))
+    checkEquals(dim(struct_net[[2]]), c(7, 7))
+    checkEquals(rownames(struct_net[[1]]), colnames(struct_net[[1]]))
+    checkEquals(rownames(struct_net[[2]]), colnames(struct_net[[2]]))
+    checkEquals(rownames(struct_net[[1]]), rownames(struct_net[[2]]))
+    checkEquals(rownames(struct_net[[1]]), paste0("x", 1:7))
+    checkEquals(sum(struct_net[[1]]), 6)
+    checkEquals(unique(as.vector(struct_net[[2]])), 
+                c(NA, "Monosaccharide (–H2O)", "Malonyl group (–H2O)" ))
+    checkTrue(is.matrix(struct_net[[1]]))
+    checkTrue(is.matrix(struct_net[[2]]))
+    checkTrue(is.numeric(struct_net[[1]]))
+    checkTrue(is.character(struct_net[[2]]))
 }
 ## END unit test create_structural_network ## 

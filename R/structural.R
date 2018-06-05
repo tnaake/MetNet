@@ -59,11 +59,10 @@
 #' @export
 create_structural_network <- function(x, functional_groups, ppm = 5) {
     
-    if (!is.data.frame(functional_groups)) stop("functional_groups is not a 
-                                                data.frame")
-    if (!all(colnames(functional_groups) %in% c("group", "formula", "mass"))) {
-        stop("functional_groups does not contain the columns group, formula and
-             mass")
+    if (!is.data.frame(functional_groups)) 
+        stop("functional_groups is not a data.frame")
+    if (!all(c("group", "formula", "mass") %in% colnames(functional_groups))) {
+        stop("functional_groups does not contain the columns group, formula and mass")
     }
     
     mass <- x[, "mz"]
@@ -95,6 +94,8 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
         mat_type[,i] <- functional_group_vec
     }
     mat <- ifelse(is.na(mat_type), 0, 1)
+    rownames(mat) <- colnames(mat) <- rownames(x)
+    rownames(mat_type) <- colnames(mat_type) <- rownames(x)
     return(list(mat, mat_type))
 }
 
