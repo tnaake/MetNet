@@ -418,11 +418,19 @@ consensus_network <- function(l, threshold = 1, ...) {
         for (i in 2:length(l)) {
             ## check if number of columns and rows are identical for 
             ## all matrices
-            if (ncol(l[[i]]) != ncol_1) stop("ncol of matrices are not identical")
-            if (nrow(l[[i]]) != nrow_1) stop("nrow of matrices are not identical")
+            if (ncol(l[[i]]) != ncol_1) 
+                stop("ncol of matrices are not identical")
+            if (nrow(l[[i]]) != nrow_1) 
+                stop("nrow of matrices are not identical")
             ## check if colnames and rownames are identical for all matrices
-            if (!all(colnames(l[[i]]) == colnames_1)) stop("matrices have different colnames")
-            if (!all(rownames(l[[i]]) == rownames_1)) stop("matrices have different rownames")
+            if (!all(colnames(l[[i]]) == colnames_1)) 
+                stop("matrices have different colnames")
+            if (!all(rownames(l[[i]]) == rownames_1)) 
+                stop("matrices have different rownames")
+            if (!is.null(colnames_1) & is.null(colnames(l[[i]]))) 
+                stop("matrices have different colnames")
+            if (!is.null(rownames_1) & is.null(rownames(l[[i]]))) 
+                stop("matrices have different rownames")
         }
     }
     ## end check compatibility 
@@ -461,6 +469,7 @@ consensus_network <- function(l, threshold = 1, ...) {
 .threeDots_call <- function(fun, ...) {
     formal_args <- formalArgs(fun)
     args <- list(...)
+    if (any(duplicated(names(args)))) stop("duplicated args in ...")
     
     input <- args[names(args) %in% formal_args]
     input <- input[!duplicated(names(input))]

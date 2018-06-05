@@ -120,6 +120,13 @@ test_.add_to_list <- function() {
 }
 ## END unit test .add_to_list ##
 
+## START unit test .threeDots_call ##
+test_.threeDots_call <- function() {
+    checkException(.threeDots_call("mean", x = 1:10, x = 1:10))
+    checkEquals(.threeDots_call("mean", x = 1:10, foo = 1), mean(1:10))
+}
+## END unit test .threeDots_call ## 
+
 ## START unit test create_statistical_networks_list ##
 stat_net_l <- create_statistical_networks_list(mat_test, 
     model = c("lasso", "randomForest", "clr", "aracne","pearson", 
@@ -141,3 +148,36 @@ test_create_statistical_networks_list <- function() {
 }
 ## END unit test create_statistical_networks_list ## 
 
+## START unit test consensus_network ##
+stat_net_cons <- consensus_network(stat_net_l)
+list_foo <- list(matrix(1:49, ncol = 7), matrix(1:49, ncol = 7))
+rownames(list_foo[[1]]) <- rownames(stat_net_l[[1]][])
+colnames(list_foo[[1]]) <- rownames(stat_net_l[[1]][])
+test_consensus_network <- function() {
+    checkException(consensus_network(NULL))
+    checkException(consensus_network(stat_net_l, threshold = "a"))
+    checkException(consensus_network(stat_net_l, method = "foo"))
+    checkException(consensus_network(
+        list(matrix(1:25, ncol = 5), matrix(1:36, ncol = 6))))
+    checkException(consensus_network(list_foo))
+    checkEquals(ncol(stat_net_cons), 7)
+    checkEquals(nrow(stat_net_cons), 7)
+    checkEquals(rownames(stat_net_cons), 
+        c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
+    checkEquals(colnames(stat_net_cons), 
+        c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
+    checkTrue(is.numeric(stat_net_cons))
+    checkTrue(is.matrix(stat_net_cons))
+}
+## END unit test consensus_network ## 
+
+## START unit test create_statistical_network ## 
+stat_net_l <- create_statistical_networks_list(mat_test, 
+        model = c("clr", "aracne","pearson", "spearman", "bayes"))
+stat_net_cons <- consensus_network(stat_net_l)
+stat_net_l_wrapper <- create_statistical_network(mat_test, 
+        model = c("clr", "aracne","pearson", "spearman", "bayes"))
+test_create_statistical_network <- function() {
+    checkEquals(stat_net_l_wrapper, stat_net_cons)
+}
+## END unit test create_statistical_network
