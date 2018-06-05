@@ -1,3 +1,4 @@
+## create toy example data set
 set.seed(1)
 mat_test <- matrix(rnorm(140, mean = 10, sd = 2), nrow = 7)
 mat_test[1:3, ] <- t(apply(mat_test[1:3, ], 1, sort))

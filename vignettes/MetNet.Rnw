@@ -1,4 +1,4 @@
-c(%\VignetteEngine{knitr::knitr}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{Workflow for Metabolomics}
 %\VignetteKeywords{Mass Spectrometry, MS, MSMS, Metabolomics, Visualization}
 %\VignettePackage{MetNet-vignette}
@@ -38,7 +38,7 @@ c(%\VignetteEngine{knitr::knitr}
   plainpages = {false},
   linkcolor = {blue},
   citecolor = {blue},
- % urlcolor = {red},
+  urlcolor = {red},
   pdfstartview = {Fit},
   pdfpagemode = {UseOutlines},
   pdfview = {XYZ null null null}
