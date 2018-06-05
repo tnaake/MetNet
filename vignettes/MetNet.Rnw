@@ -170,57 +170,7 @@ log2 transformation, noise filtering, removal of features that do not represent
 mass features/metabolites, removal of isotopes, etc. 
 
 <<data,eval=TRUE>>=
-load("/home/thomas/Documents/University/Master/MScArbeit/Metabolic_profiling/WOS_0h_72h/metabolicProfiling.RData")
-load("/home/thomas/Documents/University/Master/MScArbeit/Metabolic_profiling/WOS_0h_72h/CAMERA_complete.RData")
-##an <- xsAnnotate(xset5)
-##anF <- groupFWHM(an, perfwhm = 0.6)
-##anI <- findIsotopes(anF, mzabs=0.01)
-##anIC <- groupCorr(anI, cor_eic_th=0.75, graphMethod = "lpc")
-##anFA <- findAdducts(anIC, polarity="positive")
-peaklist <- getPeaklist(anFA)
-rtDTG <- c(5.55 * 60, 7.75 * 60) 
-peaklistDTG <- peaklist[ which(peaklist$rt >= rtDTG[1] & peaklist$rt <= rtDTG[2]), ]
-mz <- peaklist[,"mz"]
-mzDTG <- peaklistDTG[,"mz"]
-
-x_test <- peaklist[peaklist[, "mz"] > 739.35 & peaklist[, "mz"] < 739.36 & peaklist[, "rt"] > 426.72 & peaklist[, "rt"] < 426.73, ] ## Nicotianoside IX  M+Na+ 739.3515 rt 426.1241
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 653.34 & peaklist[, "mz"] < 653.35 & peaklist[, "rt"] > 418.43 & peaklist[, "rt"] < 418.44, ]) ## Lyciumoside I M+Na+ 653.3497 rt 418.4392
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 825.35 & peaklist[, "mz"] < 825.36 & peaklist[, "rt"] > 435.39 & peaklist[, "rt"] < 435.40, ]) ## Nicotianoside X M+Na+ 825.3503 rt 435.3925
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 815.39 & peaklist[, "mz"] < 815.40 & peaklist[, "rt"] > 384.17 & peaklist[, "rt"] < 384.18, ]) ## LyciumosideII M+Na+  815.4043 rt 384.1765
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 901.40 & peaklist[, "mz"] < 901.41 & peaklist[, "rt"] > 391.55 & peaklist[, "rt"] < 391.56, ]) ## Nicotianoside XI M+Na+  901.39913 rt 391.5513
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 987.40 & peaklist[, "mz"] < 987.41 & peaklist[, "rt"] > 398.87 & peaklist[, "rt"] < 398.88, ]) ## NicotianosideXII M+Na+ 987.4037 rt 398.8718
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1074.40 & peaklist[, "mz"] < 1074.41 & peaklist[, "rt"] > 405.22 & peaklist[, "rt"] < 405.22, ]) ## NicotianosideXIII M+Na+ 1074.4042 rt 405.2244
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 799.40 & peaklist[, "mz"] < 799.41 & peaklist[, "rt"] > 411.80 & peaklist[, "rt"] < 411.81, ]) ## Lyciumoside IV  M+Na+ 799.4091 rt 411.8094
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 885.40 & peaklist[, "mz"] < 885.41 & peaklist[, "rt"] > 420.65 & peaklist[, "rt"] < 420.66, ]) ## Nicotianoside I iso 1 M+Na+ 885.4084 rt 411.8094
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 971.40 & peaklist[, "mz"] < 971.41 & peaklist[, "rt"] > 429.37 & peaklist[, "rt"] < 429.37, ]) ## Nicotianoside II  M+Na+ 971.4074 rt 429.3786
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 945.46 & peaklist[, "mz"] < 945.47 & peaklist[, "rt"] > 403.18 & peaklist[, "rt"] < 403.19, ]) ## Nicotianoside III  M+Na+ 945.4653 rt 403.1816
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1031.46 & peaklist[, "mz"] < 1031.47 & peaklist[, "rt"] > 412.80 & peaklist[, "rt"] < 412.81, ]) ## Nicotianoside IV M+Na+ 1031.4645 rt 412.8062
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1117.46 & peaklist[, "mz"] < 1117.47 & peaklist[, "rt"] > 422.67 & peaklist[, "rt"] < 422.68, ]) ## Nicotianoside V M+Na+ 1117.4681 rt 422.675
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1117.46 & peaklist[, "mz"] < 1117.47 & peaklist[, "rt"] > 422.67 & peaklist[, "rt"] < 422.68, ] )## Nicotianoside V M+Na+ 1117.4681 rt 422.675
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 961.45 & peaklist[, "mz"] < 961.47 & peaklist[, "rt"] > 381.59 & peaklist[, "rt"] < 381.60, ]) ## Attenoside (or DTG956) M+Na+ 961.4601 rt 381.5979
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1047.46 & peaklist[, "mz"] < 1047.47 & peaklist[, "rt"] > 387.66 & peaklist[, "rt"] < 387.67, ]) ## DTG1042/Nicotianoside VI M+Na+ 1047.4525 rt 387.6643
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1133.46 & peaklist[,  "mz"] < 1133.47 & peaklist[, "rt"] > 394.90 & peaklist[, "rt"] < 394.91, ]) ## NicotianosideVII M+Na+ 1133.4624 rt 394.9096
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 1219.46 & peaklist[, "mz"] < 1219.47 & peaklist[, "rt"] > 401.56 & peaklist[, "rt"] < 401.57, ]) ## NicotianosideVII M+Na+ 1133.4624 rt 394.9096
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 235.14 & peaklist[, "mz"] < 235.15 & peaklist[, "rt"] > 195.11 & peaklist[, "rt"] < 195.12, ]) ## N-coumaroylputrescine [M+H+]+ 235.143 rt 195.1137
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 454.23 & peaklist[, "mz"] < 454.24 & peaklist[, "rt"] > 263.48 & peaklist[, "rt"] < 263.49, ]) ## N',N''-coumaroyl,caffeoylspermidine [M+H+]+ 454.23 rt 263.4883
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 251.13 & peaklist[, "mz"] < 251.14 & peaklist[, "rt"] > 108.72 & peaklist[, "rt"] < 108.73, ]) ## N-caffeoylputrescine iso1 [M+H+]+ 251.14 rt 108.7266
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 251.13 & peaklist[, "mz"] < 251.14 & peaklist[, "rt"] > 144.08 & peaklist[, "rt"] < 144.09, ]) ## N-caffeoylputrescine iso2 [M+H+]+ 251.14 rt 1144.08
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 308.19 & peaklist[, "mz"] < 308.20 & peaklist[, "rt"] > 246.96 & peaklist[, "rt"] < 246.97, ]) ## N-caffeoylspermidine [M+H+]+ 308.2 rt 246.9634
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 265.15 & peaklist[, "mz"] < 265.16 & peaklist[, "rt"] > 192.03 & peaklist[, "rt"] < 192.04, ]) ## N-feruloylputrescine [M+H+]+ 265.153 rt 192.0381
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 322.21 & peaklist[, "mz"] < 322.22 & peaklist[, "rt"] > 104.61 & peaklist[, "rt"] < 104.62, ]) ## N-feruloyl-spermidine iso1 [M+H+]+ 322.212 rt 104.6152
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 322.21 & peaklist[, "mz"] < 322.22 & peaklist[, "rt"] > 149.23 & peaklist[, "rt"] < 149.24, ]) ## N-feruloyl-spermidine iso2 [M+H+]+ 322.212 rt 149.2361
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 470.22 & peaklist[, "mz"] < 470.23 & peaklist[, "rt"] > 247.52 & peaklist[, "rt"] < 247.53, ]) ## N'-N''-dicaffeoyl -spermidine [M+H+]+ 470.23 rt 247.5269
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 498.25 & peaklist[, "mz"] < 498.26 & peaklist[, "rt"] > 289.17 & peaklist[, "rt"] < 289.18, ]) ## N'-N''-diferuloyl-spermidine [M+H+]+ 498.260, N#,N$-Coumaroyl,sinapoyl spermidine isomer [M+H+]+ 498.261 rt 289.1741
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 502.25 & peaklist[, "mz"] < 502.26 & peaklist[, "rt"] > 243.08 & peaklist[, "rt"] < 243.09, ]) ## N'-N''-dihydrated-diferuloyl-spermidine [M+H+]+ 502.25 rt 243.0818
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 411.19 & peaklist[, "mz"] < 411.20 & peaklist[, "rt"] > 211.98 & peaklist[, "rt"] < 211.99, ]) ## unknown conjugate [M+H+]+ 411.2012 rt 211.981
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 484.24 & peaklist[, "mz"] < 484.25 & peaklist[, "rt"] > 265.65 & peaklist[, "rt"] < 265.65, ]) ## N'-N''-caffeoyl,feruloyl spermidine 484.245 rt 265.6572
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 339.10 & peaklist[, "mz"] < 339.11 & peaklist[, "rt"] > 249.43 & peaklist[, "rt"] < 249.44, ]) ## O -Coumaroylquinic acid isomer 1 [M+H+]+  339.109 rt 249.4346
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 339.11 & peaklist[, "mz"] < 339.12 & peaklist[, "rt"] > 269.50 & peaklist[, "rt"] < 269.51, ]) ## O -Coumaroylquinic acid isomer 1 [M+H+]+  339.109 rt 269.5024
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 355.10 & peaklist[, "mz"] < 355.11 & peaklist[, "rt"] > 176.63 & peaklist[, "rt"] < 176.64, ]) ## O-caffeoylquinic acid isomer 1 [M+H+]+ 355.1014 rt 176.6309
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 355.10 & peaklist[, "mz"] < 355.11 & peaklist[, "rt"] > 216.58 & peaklist[, "rt"] < 216.59, ]) ## O-caffeoylquinic acid isomer 2 [M+H+]+ 355.1014 rt 216.5825
-x_test <- rbind(x_test, peaklist[peaklist[, "mz"] > 355.10 & peaklist[, "mz"] < 355.11 & peaklist[, "rt"] > 241.51 & peaklist[, "rt"] < 241.52, ]) ## O-caffeoylquinic acid isomer 3 [M+H+]+ 355.1014 rt 241.5183
-
-x_test[, c("mz", "rt", colnames(x_test)[grep(colnames(x_test), pattern = "X[0-9]")])]
+data("x_test", package = "MetNet")
 @
 
 \section{Creating the structural matrix}
