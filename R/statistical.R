@@ -28,7 +28,12 @@
 #' @return matrix, matrix with edges inferred from LASSO algorithm 
 #' \code{stabsel}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples .lasso(x, parallel = FALSE, ...)
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
+#' \dontrun{.lasso(x_z, PFER = 0.75, cutoff = 0.95)}
 .lasso <- function(x, parallel = FALSE, ...) {
     ## x should be z-scaled
     if (parallel) {
@@ -85,7 +90,11 @@
 #' @return matrix, matrix with edges inferred from random forest algorithm 
 #' \code{rfPermute} and \code{rp.importance}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples .randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' \dontrun{.randomForest(x)}
 .randomForest <- function(x, parallel = FALSE, randomforest_adjust = "none", ...) {
     df_x <- data.matrix(t(x))
     
@@ -144,7 +153,13 @@
 #' @return matrix, matrix with edges inferred from Context Likelihood or 
 #' Relatedness Network algorithm \code{clr}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
-#' @examples .clr(mi_x_z, threshold_clr = 0)
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
+#' mi_x_z <- mpmi::cmi(x_z)$bcmi
+#' .clr(mi_x_z, threshold_clr = 0)
 .clr <- function(mi, threshold_clr = 0) {
     if (!is.numeric(threshold_clr)) stop("threshold_clr is not numeric")
     clr_mat <- clr(mi)
@@ -178,7 +193,13 @@
 #' @return matrix, matrix with edges inferred from Reconstruction of accurate
 #' cellular networks algorithm \code{aracne}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
-#' @examples .aracne(mi_x_z, eps = 0.05, threshold_aracne = 0)
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
+#' mi_x_z <- mpmi::cmi(x_z)$bcmi
+#' .aracne(mi_x_z, eps = 0.05, threshold_aracne = 0)
 .aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
     if (!is.numeric(threshold_aracne)) stop("threshold_aracne is not numeric")
     aracne_mat <- aracne.a(mi, eps = eps)  
@@ -211,7 +232,11 @@
 #' @return matrix, matrix with edges inferred from correlation algorithm 
 #' \code{corr.test}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
-#' @examples .correlation(x, adjust_correlation = "none", threshold_correlation = 0.05, ...)
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' .correlation(x, adjust_correlation = "bonferroni", type = "pearson")
 .correlation <- function(x, adjust_correlation = "none", type = "pearson", 
                          threshold_correlation = 0.05, ...) {
     if (!is.numeric(threshold_correlation)) 
@@ -246,7 +271,11 @@
 #' @return matrix, matrix with edges inferred from constraint-based structure 
 #' learning algorithm \code{fast.iamb}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
-#' @examples .bayes(x, ...)
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' .bayes(x)
 .bayes <- function(x, ...) {
     x_df <- data.frame(t(x))
     ## allow for compatibility of arguments 
@@ -273,6 +302,13 @@
 #' @return list containing the existing networks and the added network 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples .add_to_list(l, name, object) 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' cor_pearson <- .correlation(x, type = "pearson")
+#' cor_spearman <- .correlation(x, type = "spearman")
+#' l <- list(pearson = cor_pearson)
+#' .add_to_list(l, "spearman", cor_spearman)
 #' @export
 .add_to_list <- function(l, name, object) {
     if (!is.list(l)) stop("l is not a list")
@@ -314,7 +350,11 @@
 #' @return list containing the respective statistical networks specified by 
 #' \code{model}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples create_statistical_networks_list(x, model, ...) 
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' create_statistical_networks_list(x, c("pearson", "spearman"))
 #' @export
 create_statistical_networks_list <- function(x, model, ...) {
     
@@ -399,7 +439,12 @@ create_statistical_networks_list <- function(x, model, ...) {
 #' parameters used in the \code{consensus} function, refer to ?sna::consensus.
 #' @return matrix, consensus matrix from statistical networks
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples consensus_network(l, threshold = 1, ... )
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' stat_net_l <- create_statistical_networks_list(x, c("pearson", "spearman"))
+#' consensus_network(l)
 #' @export
 consensus_network <- function(l, threshold = 1, ...) {
     
@@ -505,7 +550,11 @@ stat_net2 <- consensus_network(l = l, threshold = 1, method = "PCA.reweight")
 ## cellular networks (ARACNE), Pearson correlation,
 #' Spearman correlation and Constraint-based structure learning (Bayes). 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples create_statistical_network(x, model, threshold = 1, ...)
+#' @examples 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' create_statistical_network(x, c("pearson", "spearman"))
 #' @export
 create_statistical_network <- function(x, model, threshold = 1, ...) {
     ##l <- .threeDots_call(create_statistical_networks_list, x = x, model = model, ...)
