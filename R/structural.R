@@ -23,7 +23,10 @@
     if (!is.numeric(functional_groups)) stop("functional_groups is not numeric")
     lower_n <- if(m_1 < m_2) m_1 else m_2
     higher_n <- if(m_1 >= m_2) m_1 else m_2
-    in_range <- which(lower_n <= functional_groups & higher_n >= functional_groups)
+    in_range <- which(lower_n <= functional_groups & 
+                          higher_n >= functional_groups)
+    ## only remove one feature when several are in range
+    in_range <- in_range[1]
     return(in_range)
 }
 
@@ -68,8 +71,8 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
     ## calculate according to ppm = (mass_measured - mass_theoretical) / mass_theoretical * 10^6
     mass_1 <- mass / abs(ppm / 10 ^ 6  + 1 ) 
     mass_2 <- mass / abs(ppm / 10 ^ 6 - 1)
-    mat <- matrix(0, nrow = dim(peaklist)[1], ncol = dim(peaklist)[1])
-    mat_type <- matrix(NA, ncol = ncol(mat), nrow(mat))
+    mat <- matrix(0, nrow = dim(x)[1], ncol = dim(x)[1])
+    mat_type <- matrix(NA, ncol = nrow(mat), nrow(mat))
     
     mass_fg <- functional_groups[, "mass"]
     ## iterate through columns 

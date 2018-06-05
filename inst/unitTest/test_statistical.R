@@ -175,9 +175,9 @@ test_consensus_network <- function() {
 stat_net_l <- create_statistical_networks_list(mat_test, 
         model = c("clr", "aracne","pearson", "spearman", "bayes"))
 stat_net_cons <- consensus_network(stat_net_l)
-stat_net_l_wrapper <- create_statistical_network(mat_test, 
+stat_net <- create_statistical_network(mat_test, 
         model = c("clr", "aracne","pearson", "spearman", "bayes"))
 test_create_statistical_network <- function() {
-    checkEquals(stat_net_l_wrapper, stat_net_cons)
+    checkEquals(stat_net, stat_net_cons)
 }
 ## END unit test create_statistical_network
