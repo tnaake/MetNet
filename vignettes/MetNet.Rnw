@@ -124,7 +124,8 @@ functional groups defined by the user, and statistical associations. Currently,
 the following statistical models are implemented to infer a statistical
 adjacency matrix: Least absolute shrinkage and selection operator
 (LASSO, L1-norm regression), Random Forest,
-Pearson and Spearman correlation (see \citep{}), context likelihood of relatedness (CLR),
+Pearson and Spearman correlation (see \citep{Steuer2006} for a discussion on 
+correlation-based metabolic networks), context likelihood of relatedness (CLR),
 the algorithm for the reconstruction of accurate cellular networks (ARACNE) and
 constraint-based structure learning (Bayes). Since all of these methods have
 advantages and disadvantages, the user has the possibility to select
@@ -264,7 +265,7 @@ list of adjacency matrices using the statistical models defined by the
 CLR, ARACNE (the two latter using the functions \Rfunction{clr} and 
 \Rfunction{aracne.a} from the \Rpackage{parmigene} package, 
 based on Mutual Information calculation), Pearson 
-and Spearman correlation and constraint-based structure learnging (based on 
+and Spearman correlation and constraint-based structure learning (based on 
 the Fast Incremental Association, Fast-IAMB, algorithm from the \Rpackage{bnlearn}
 package). For furthe information on the different models take a look on the 
 respective help pages of \code{lasso}, \code{randomForest}, \code{clr},

@@ -75,7 +75,7 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' random forest using the \code{rfPermute} function from the 
 #' \code{rfPermute} package. \code{randomForest} extracts the p-values  
 #' by the function \code{rp.importance} and the presence/absence based on the 
-#' significance value ($\alpha$ <= 0.05) of this 
+#' significance value (alpha $\leq$ 0.05) of this 
 #' connection to a matrix that is returned. 
 #' @usage randomForest(x, parallel = FALSE, randomforest_adjust = NULL, ...)
 #' @param x matrix, where columns are the samples and the rows are features 
@@ -219,7 +219,7 @@ aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
 #' @param adjust_correlation character 
-#' @param threshold_correlation numeric, significance level $\alpha$ 
+#' @param threshold_correlation numeric, significance level alpha
 #' (default: 0.05), if the (adjusted) p-values exceed this value, there 
 #' is no statistical connection between features 
 #' @param ... parameters passed to \code{corr.test} (argument \code{adjust} will be ignored) 

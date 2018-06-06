@@ -26,7 +26,7 @@ matrix, matrix with edges inferred from random forest algorithm
 random forest using the \code{rfPermute} function from the 
 \code{rfPermute} package. \code{randomForest} extracts the p-values  
 by the function \code{rp.importance} and the presence/absence based on the 
-significance value ($\alpha$ <= 0.05) of this 
+significance value (alpha $\leq$ 0.05) of this 
 connection to a matrix that is returned.
 }
 \details{

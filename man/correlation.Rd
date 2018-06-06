@@ -12,7 +12,7 @@ correlation(x, adjust_correlation = "none", threshold_correlation = 0.05, ...)
 
 \item{adjust_correlation}{character}
 
-\item{threshold_correlation}{numeric, significance level $\alpha$ 
+\item{threshold_correlation}{numeric, significance level alpha
 (default: 0.05), if the (adjusted) p-values exceed this value, there 
 is no statistical connection between features}
 
