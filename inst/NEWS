@@ -1,0 +1,15 @@
+CHANGES IN VERSION 0.9.0
+------------------------
+ o implement functionality to calculate statistical models of correlation 
+   (Pearson, Spearman), LASSO, Random Forest, Context likelihood or 
+   relatedness network algorithm, algorithm for the reconstruction of 
+   accurate cellular networks, constraint-based structure learning 
+   algorithm [2018-05-14 Mon]
+ o implement the function create_statistical_network to calcululate the 
+   consensus matrix from the different statistically-infered networks
+   [2018-05-19 Sat]
+ o implement the function create_structural_network to calculate 
+   molecular weight differences and create a network [2018-05-19 Sat]
+ o implement the function combine_structural_statistical to combine 
+   the structurally-derived and statistically-derived network [2018-05-26 Sat]
+

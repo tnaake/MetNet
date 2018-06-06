@@ -4,7 +4,7 @@
 \alias{correlation}
 \title{Create a statistical network based on correlation}
 \usage{
-correlation(x, adjust_correlation = "none", threshold_correlation = 0.05, ...)
+correlation(x, adjust_correlation = "none", type = "pearson", threshold_correlation = 0.05, ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
@@ -12,7 +12,7 @@ correlation(x, adjust_correlation = "none", threshold_correlation = 0.05, ...)
 
 \item{adjust_correlation}{character}
 
-\item{threshold_correlation}{numeric, significance level alpha
+\item{threshold_correlation}{numeric, significance level \alpha
 (default: 0.05), if the (adjusted) p-values exceed this value, there 
 is no statistical connection between features}
 

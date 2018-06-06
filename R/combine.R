@@ -3,15 +3,18 @@ load("/home/thomas/Documents/University/Master/MScArbeit/Metabolic_profiling/WOS
 peaklist <- peaklist[sort(sample(x = 1:dim(peaklist)[1], size = 100)),]
 
 #' @name combine_structural_statistical
+#' @aliases combine_structural_statistical
 #' @title Combine structural and statistical network
 #' @description The function \code{combine_structural_statistical} takes as 
 #' input the structural and statistical network, that were create in former 
 #' steps, adds them together and will report a connection between metabolites
 #' when the edge is reported in networks. \code{combine_structural_statistical}
 #' returns this consensus matrix of the structural and statistical network.
-#' @usage combine_structural_statistical(structure, statistical, treshold = 1)
+#' @usage combine_structural_statistical(structure, statistical, threshold = 1)
 #' @param structure matrix containing structural network
-#' @param statistical matrix containing statistical netowrk
+#' @param statistical matrix containing statistical network
+#' @param threshold numeric, threshold value to be applied to define a 
+#' connection as present 
 #' @details \code{combine_structural_statistical} will call internally the 
 #' function \code{consensus_network} to create the consensus network of the 
 #' statistical networks. 

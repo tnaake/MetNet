@@ -5,7 +5,7 @@
 \title{Create a statistical network based on algorithm for the reconstruction
 of accurate cellular networks}
 \usage{
-aracne(mi = mi_x_z, eps = 0.05, threshold_aracne = 0)
+aracne(mi, eps = 0.05, threshold_aracne = 0)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
@@ -13,6 +13,8 @@ aracne(mi = mi_x_z, eps = 0.05, threshold_aracne = 0)
 features. As input, the mutual information (e.g. raw MI estimates or 
 Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 \code{mpmi} package can be used.}
+
+\item{eps}{numeric, used to remove the weakest edge of each triple of nodes}
 
 \item{threshold_aracne}{numeric, if the aracne value exceeds the threshold 
 (aracne$_{i,j}$ > threshold, where aracne$_{i, j}$ is the aracne value of 

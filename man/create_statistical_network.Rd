@@ -10,8 +10,14 @@ create_statistical_network(x, model, threshold = 1, ...)
 \item{x}{matrix that contains intensity values of features/metabolites (rows)
 per sample (columns).}
 
-\item{model, }{character vector containing the model that will be used 
+\item{model, }{character, vector containing the model that will be used 
 ("lasso", "randomForest", "clr", "aracne", "pearson", "spearman", "bayes")}
+
+\item{threshold}{numeric, when combining the networks the threshold 
+parameter defines if an edge is reported or not. For 
+\code{method = "central.graph"} threshold is set to 1 by default. For other
+values of method, the value should be carefully defined by the user. If 
+threshold is set to NULL (default), it will be set to 1 internally.}
 
 \item{...}{parameters passed to the functions  \code{lasso}, 
 \code{randomForest}, \code{clr}, \code{aracne}, \code{correlation},

@@ -113,10 +113,19 @@ topologies from high-resolution mass spectrometry data. \Rpackage{MetNet}
 combines information from both structural data (differences in m/z values
 of features) and statistical associations (intensity values of features per
 sample) to propose putative metabolic networks that can be used for further
-exploration.
+exploration. \newline
 
-Breitling 2006 Ab initio prediction
-Jourdan 2007 MetaNetter
+The idea of using high-resolution mass spectrometry data for network 
+construction was first proposed in \citep{Breitling2006} and followed soon 
+afterwards by a Cytoscape plugin, MetaNetter \citet{Jourdan2007}, that 
+is based on the inference of metabolic networks on molecular weight differences
+and correlation (Pearson correlation and partial correlation). 
+
+Inspired of the paper by \citep{Marbach2012} we decided to implement in 
+\Rpackage{MetNet} different algorithms for network inference to account for 
+biases that are inherent in these statistical methods, followed by the 
+calculation of a consensus network using the differently computed individual 
+networks. \newline
 
 The two main functionalities of the package include the creation of an
 adjacency matrix from structual properties, based on losses/addition of
@@ -130,7 +139,7 @@ the algorithm for the reconstruction of accurate cellular networks (ARACNE) and
 constraint-based structure learning (Bayes). Since all of these methods have
 advantages and disadvantages, the user has the possibility to select
 several of these methods, compute adjacency matrices from these models and
-create a consensus matrix from the different statistical frameworks.
+create a consensus matrix from the different statistical frameworks. \newline
  
 After creating the statistical and structural network these two matrices
 will be combined to form a consensus matrix thta has both information from
@@ -145,7 +154,7 @@ discover any bugs, typos or develop ideas of improving
 \href{https://github.com/tnaake/MetNet}{GitHub} or
 send a mail to the developer.
 
-knitr, include=FALSE, cache=FALSE>>=
+<<knitr, include=FALSE, cache=FALSE>>=
 library("knitr")
 @
 

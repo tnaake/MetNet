@@ -1,4 +1,5 @@
 #' @name in_range_which
+#' @aliases in_range_which
 #' @title in_range_which
 #' @description The function \code{in_range_which} checks if a m/z feature
 #' (given as a range defined by \code{m_1} and \code{m_2}) is present in a 
@@ -29,6 +30,7 @@ in_range_which <- function(m_1, m_2, functional_groups) {
 }
 
 #' @name create_structural_network
+#' @aliases create_structural_network
 #' @title Create structural network
 #' @description The function \code{create_structural_network} infers network 
 #' topologies using differences in m/z values that are matched against a 

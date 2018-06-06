@@ -4,12 +4,15 @@
 \alias{combine_structural_statistical}
 \title{Combine structural and statistical network}
 \usage{
-combine_structural_statistical(structure, statistical, treshold = 1)
+combine_structural_statistical(structure, statistical, threshold = 1)
 }
 \arguments{
 \item{structure}{matrix containing structural network}
 
-\item{statistical}{matrix containing statistical netowrk}
+\item{statistical}{matrix containing statistical network}
+
+\item{threshold}{numeric, threshold value to be applied to define a 
+connection as present}
 }
 \value{
 a matrix containing the consensus network as described above 

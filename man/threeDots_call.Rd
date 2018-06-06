@@ -27,10 +27,10 @@ Used internally in \code{lasso}, \code{randomForest},
 \code{correlation}, \code{bayes}, \code{consensus_network}
 }
 \examples{
-threeDots_call("sd", x = 1:10, y = 1:10)
+threeDots_call(stats::sd, x = 1:10, y = 1:10)
 ## in contrast to the above example, the following example will result in an 
 ## error
-\\donotrun{sd(x = 1:10, y = 1:10)}
+\\donotrun{stats::sd(x = 1:10, y = 1:10)}
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}
