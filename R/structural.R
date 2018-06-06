@@ -1,14 +1,14 @@
-#' @name .in_range_which
-#' @title .in_range_which
-#' @description The function \code{.in_range_which} checks if a m/z feature
+#' @name in_range_which
+#' @title in_range_which
+#' @description The function \code{in_range_which} checks if a m/z feature
 #' (given as a range defined by \code{m_1} and \code{m_2}) is present in a 
 #' list of m/z features given by the \code{functional_groups} argument. 
-#' @usage .in_range_which(m_1, m_2, functional_groups)
+#' @usage in_range_which(m_1, m_2, functional_groups)
 #' @param m_1 numeric, value of the first m/z range
 #' @param m_2 numeric, value of the second m/z range
 #' @param functional_groups numeric, m/z values of the functional groups
-#' @details The function \code{.in_range_which} is a helper function for 
-#' \code{create_structural_network}. \code{.in_range_which} returns the index of
+#' @details The function \code{in_range_which} is a helper function for 
+#' \code{create_structural_network}. \code{in_range_which} returns the index of
 #' the element in \code{functional_groups} that is in the range defined by 
 #' \code{m_1} and \code{m_2}. 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -16,8 +16,8 @@
 #' m_1 <- 180.155
 #' m_2 <- 180.157
 #' functional_groups <- c(164.16, 180.156)
-#' .in_range_which(m_1, m_2, functional_groups)
-.in_range_which <- function(m_1, m_2, functional_groups) {
+#' in_range_which(m_1, m_2, functional_groups)
+in_range_which <- function(m_1, m_2, functional_groups) {
     if (!is.numeric(m_1)) stop("m_1 is not numeric")
     if (!is.numeric(m_2)) stop("m_2 is not numeric")
     if (!is.numeric(functional_groups)) stop("functional_groups is not numeric")
@@ -94,9 +94,9 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
             function(x, z = i) {
                 m_1 <- abs(mass_1[z] - mass_2[x])
                 m_2 <- abs(mass_2[z] - mass_1[x])
-                ## use .in_range_which to find the indices of the mass 
+                ## use in_range_which to find the indices of the mass 
                 ## differences, that are in range with the masses 
-                presence_l <- .in_range_which(m_1, m_2, mass_fg)
+                presence_l <- in_range_which(m_1, m_2, mass_fg)
                 presence_l <- functional_groups[presence_l, "group"]
                 presence_l <- as.character(presence_l)
                 

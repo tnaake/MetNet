@@ -16,26 +16,26 @@ functional_groups <- data.frame(group = as.character(functional_groups[, 1]),
                             formula = as.character(functional_groups[, 2]),
                             mass = as.numeric(functional_groups[, 3]))
 
-## START unit test .in_range_which ##
-test_.in_range_which <- function() {
-    checkException(.in_range_which(m_1 = NULL, m_2 = 100, 
+## START unit test in_range_which ##
+test_in_range_which <- function() {
+    checkException(in_range_which(m_1 = NULL, m_2 = 100, 
                                    functional_groups = 99.9))
-    checkException(.in_range_which(m_1 = 99.8, m_2 = NULL, 
+    checkException(in_range_which(m_1 = 99.8, m_2 = NULL, 
                                    functional_groups = 99.9))
-    checkException(.in_range_which(m_1 = 99.8, m_2 = 100, 
+    checkException(in_range_which(m_1 = 99.8, m_2 = 100, 
                                    functional_groups = NULL))
-    checkEquals(.in_range_which(m_1 = 86.0002, m_2 = 86.0004, 
+    checkEquals(in_range_which(m_1 = 86.0002, m_2 = 86.0004, 
         functional_groups = functional_groups[, "mass"]), 1)
-    checkEquals(.in_range_which(m_1 = 86.0004, m_2 = 86.0002, 
+    checkEquals(in_range_which(m_1 = 86.0004, m_2 = 86.0002, 
         functional_groups = functional_groups[, "mass"]), 1)
-    checkEquals(.in_range_which(m_1 = 162.0527, m_2 = 162.0529, 
+    checkEquals(in_range_which(m_1 = 162.0527, m_2 = 162.0529, 
         functional_groups = functional_groups[, "mass"]), 2)
-    checkEquals(.in_range_which(m_1 = 162.0529, m_2 = 162.0527, 
+    checkEquals(in_range_which(m_1 = 162.0529, m_2 = 162.0527, 
         functional_groups = functional_groups[, "mass"]), 2)
-    checkEquals(.in_range_which(m_1 = 86.0002, m_2 = 162.0529, 
+    checkEquals(in_range_which(m_1 = 86.0002, m_2 = 162.0529, 
         functional_groups = functional_groups[, "mass"]), 1)
 }
-## END unit test .in_range_which ## 
+## END unit test in_range_which ## 
 
 ## START unit test create_structural_network ##
 struct_net <- create_structural_network(mat_test, 
