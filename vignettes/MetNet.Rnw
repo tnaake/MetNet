@@ -44,8 +44,8 @@
   pdfview = {XYZ null null null}
 }
 
-\widowpenalty10000
-\clubpenalty10000
+\widowpenalty100000
+\clubpenalty100000
 
 \newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
 \newcommand{\R}{\texttt{R}}
@@ -75,12 +75,12 @@
 \onehalfspacing
 
 \usepackage{authblk} 
-\author[]{Thomas Naake}
+\author{Thomas Naake}
 
 
 
 \affil{
-    Max Planck Institute of Molecular Plant Physiology \\ 
+    Max Planck Institute of Molecular Plant Physiology 
     14476 Potsdam-Golm, Germany 
 }
 
@@ -92,125 +92,147 @@
 \maketitle
 
 \section{Introduction}
-Among the main challenges in mass spectrometry analysis is the high-throughput 
-analysis of metabolic features, their fast detection and annotation. 
+Among the main challenges in mass spectrometry analysis is the high-throughput
+analysis of metabolic features, their fast detection and annotation.
 In contrast to the screening of known, previously characterized,
-metabolic features in these data, the putative annotation of unknown 
+metabolic features in these data, the putative annotation of unknown
 features is often cumbersome and requires a lot of manual work, lagging
-the biological information retrieval of these data. 
-High-resolution mass spectrometric data is often very rich in information 
-content and metabolic conversions, and reactions can be derived from structural 
-properties of features. In addition to that, statistical associations between 
-features (based on their intensity values) can be a valuable ressource to 
-find co-synthesised or co-regulated metabolites, that are synthesised in the same 
-biosynthetic pathways. Since any analysis tool is still lacking that is 
-integrating the two natures of mass spectrometric data we developped 
-\Rpackage{MetNet} to close this gap. 
-The \Rpackage{MetNet} package comprises functionalities to infer network 
-topologies from high-resolution mass spectrometry data. \Rpackage{MetNet} 
-combines information from both structural data (differences in m/z values 
+the biological information retrieval of these data.
+High-resolution mass spectrometric data is often very rich in information
+content and metabolic conversions, and reactions can be derived from structural
+properties of features \citep{Bretiling2006}. 
+In addition to that, statistical associations between
+features (based on their intensity values) can be a valuable ressource to
+find co-synthesised or co-regulated metabolites, that are synthesised in the same
+biosynthetic pathways. Since any analysis tool within the \R framework 
+is still lacking that is
+integrating the two natures of mass spectrometric data we developped
+\Rpackage{MetNet} to close this gap.
+The \Rpackage{MetNet} package comprises functionalities to infer network
+topologies from high-resolution mass spectrometry data. \Rpackage{MetNet}
+combines information from both structural data (differences in m/z values
 of features) and statistical associations (intensity values of features per
 sample) to propose putative metabolic networks that can be used for further
-exploration. 
+exploration.
 
 Breitling 2006 Ab initio prediction
-Jourdan 2007 MetaNetter 
+Jourdan 2007 MetaNetter
 
 The two main functionalities of the package include the creation of an
-adjacency matrix from structual properties, based on losses/addition of 
+adjacency matrix from structual properties, based on losses/addition of
 functional groups defined by the user, and statistical associations. Currently,
-the following statistical models are implemented to infer a statistical 
-adjacency matrix: Least absolute shrinkage and selection operator 
+the following statistical models are implemented to infer a statistical
+adjacency matrix: Least absolute shrinkage and selection operator
 (LASSO, L1-norm regression), Random Forest,
-Pearson and Spearman correlation, context likelihood of relatedness (CLR), 
+Pearson and Spearman correlation (see \citep{}), context likelihood of relatedness (CLR),
 the algorithm for the reconstruction of accurate cellular networks (ARACNE) and
 constraint-based structure learning (Bayes). Since all of these methods have
-advantages and disadvantages, the user has the possibility to select 
-several of these methods, compute adjacency matrices from these models and 
-create a consensus matrix from the different statistical frameworks. 
-
-After creating the statistical and structural network these two matrices 
-will be combined to form a consensus matrix thta has both information from 
-structural and statistical properties of the data. This can be followed by 
+advantages and disadvantages, the user has the possibility to select
+several of these methods, compute adjacency matrices from these models and
+create a consensus matrix from the different statistical frameworks.
+ 
+After creating the statistical and structural network these two matrices
+will be combined to form a consensus matrix thta has both information from
+structural and statistical properties of the data. This can be followed by
 further network analyses (e.g. calculation of topological parameters),
-integration with other data sources (e.g. genomic information or 
-transcriptomic data) and/or visualization. 
+integration with other data sources (e.g. genomic information or
+transcriptomic data) and/or visualization.
 
-\Rpackage{MetNet} is currently under active development. If you 
-discover any bugs, typos or develop ideas of improving 
-\Rpackage{MetNet} feel free to raise an issue via 
-\href{https://github.com/tnaake/MetNet}{GitHub} or 
-send a mail to the developer. 
+\Rpackage{MetNet} is currently under active development. If you
+discover any bugs, typos or develop ideas of improving
+\Rpackage{MetNet} feel free to raise an issue via
+\href{https://github.com/tnaake/MetNet}{GitHub} or
+send a mail to the developer.
 
-<<knitr, include=FALSE, cache=FALSE>>=
+knitr, include=FALSE, cache=FALSE>>=
 library("knitr")
 @
 
 \section{Prepare the environment and load the data}
-To install \Rpackage{MetNet} enter the following to the \R~console
-<<eval=FALSE>>=
+To install \Rpackage{MetNet} enter the following to the \R console
+<<install,eval=FALSE>>=
 source("https://bioconductor.org/biocLite.R")
 biocLite("MetNet")
 @
 
 Before starting, load the \Rpackage{MetNet} package. This will also
-load the required packages \Rpackage{glmnet}, \Rpackage{stabs}, 
-\Rpackage{randomForest}, \Rpackage{rfPermute}, \Rpackage{mpmi}, 
-\Rpackage{parmigene}, \Rpackage{psych} and \Rpackage{bnlearn}. 
-<<eval=TRUE>>=
+load the required packages \Rpackage{glmnet}, \Rpackage{stabs},
+\Rpackage{randomForest}, \Rpackage{rfPermute}, \Rpackage{mpmi},
+\Rpackage{parmigene}, \Rpackage{psych} and \Rpackage{bnlearn}.
+<<load_MetNet,eval=TRUE>>=
 library(MetNet)
 @
 
-The data format that is compatible with the \Rpackage{MetNet} framework is 
-in the \Rpackage{xcms}/\Rpackage{CAMERA} output-like $m x n$ matrix, where 
-columns denote the different samples $n$ and where $m$ features are present. 
-The information about the m/z values has to be stored in a vector of 
-length $|m|$. \Rpackage{MetNet} does not impose any requirements for 
+The data format that is compatible with the \Rpackage{MetNet} framework is
+in the \Rpackage{xcms}/\Rpackage{CAMERA} output-like $m x n$ matrix, where
+columns denote the different samples $n$ and where $m$ features are present.
+In such a matrix, information about the masses of the features and quantitative
+information of the features (intensity or concentration values) are needed. 
+The information about the m/z values has to be stored in a vector of
+length $\vert m \vert$. 
+
+\Rpackage{MetNet} does not impose any requirements for
 data normalization, filtering, etc. However, the user has to make sure that
-the data is in an appropriate format. These include division by internal standard, 
-log2 transformation, noise filtering, removal of features that do not represent
-mass features/metabolites, removal of isotopes, etc. 
+the data is properly preprocessed. These include division by internal standard,
+\code{log2} transformation, noise filtering, removal of features that do not represent
+mass features/metabolites, removal of isotopes, etc.
 
 <<data,eval=TRUE,echo=TRUE>>=
 data("x_test", package = "MetNet")
-x_test <- as.matrix
+x_test <- as.matrix(x_test)
 @
 
 \section{Creating the structural matrix}
-The function \Rfunction{create_structural_network} will create the adjacency
-matrix based on structual properties (m/z values) of the features. 
-The function expects a matrix with a column \code{"mz"} 
-that contains the m/z value of the corresponding features. Furthermore, 
-\Rfunction{create_structural_network} takes a \Robject{data.frame} 
-object as argument \Robject{functional_groups} with the \code{colnames} 
-\code{"mass"}, \code{"name"} and additional columns (e.g. \code{"formula"}). The 
-numerical values in the column \code{"mass"} will define for what 
-additions/losses the function \Rfunction{create_structural_network} will 
-look for in the differences of the m/z feature values. Hereby, 
-\Rfunction{create_structural_network} will take into account the \Robject{ppm} 
+
+The function \Rfunction{create\_structural\_network} will create the adjacency
+matrix based on structual properties (m/z values) of the features.
+The function expects a matrix with a column \code{"mz"} that contains the 
+mass information of a feature (typically the m/z value). Furthermore,
+\Rfunction{create\_structural\_network} takes a \Robject{data.frame}
+object as argument \Robject{functional\_groups} with the \code{colnames}
+\code{"mass"}, \code{"name"} and additional columns (e.g. \code{"formula"}). 
+\Rfunction{create\_structural\_network} looks for transformation (in the 
+sense of additions/losses of functional groups mediated by biochemical,
+enzymatic reactions) in the data using the mass information. 
+
+Following the work of \citep{Breitling2006} and \citep{Jourdan2007}, 
+molecular weight difference w$_{X}$ is defined by 
+\(w_{X} = \vert w_{A} - w_{B} \vert \), where w$_{A}$ is the molecular weight
+of substrate A, and w$_{B}$ is the molecular weight of product B 
+(typically, m/z values will be used as a proxy for the molecular weight since 
+the molecular weight is not directly derivable from mass spectrometric data). 
+As examplified in \citep{Jourdan2007} specific enzymatic reactions refer to 
+specific changes in the molecular weight, e.g. carboxylation reactions 
+will result in a mass difference of 43.98983 (molecular weight of CO$_2$) 
+between metabolic features. 
+
+The search space for these transformation is adjustable by the 
+\Robject{functional\_groups} argument in 
+\Rfunction{create\_structural\_network} allowing to look for specific 
+enzymatic transformations in mind. Hereby,
+\Rfunction{create\_structural\_network} will take into account the \Robject{ppm}
 value, to adjust for inaccuracies in m/z values due to technical reasons
 according to the formula
 
 \begin{equation}
-    ppm = \frac{m_{exp} - m_{calc}}{m_{exp}}  \cdot 10$^{-6}$
-    
+    ppm = \frac{m_{exp} - m_{calc}}{m_{exp}} \cdot 10^{-6}
 \end{equation}
 
-with $m_{exp}$ the experimentally determined m/z value and $m_{calc}$ the 
-calculated accurate mass of a molecule. Within the function, a lower and upper 
+with $m_{exp}$ the experimentally determined m/z value and $m_{calc}$ the
+calculated accurate mass of a molecule. Within the function, a lower and upper
 range is calculated depending on the supplied \Robject{ppm} value, differences
-between the m/z feature values are calculated and matched against the 
-\code{"mass"}es of the \Robject{functional_groups} argument. If any 
-of the additions/losses defined in \Robject{functional_groups} is found in the 
-data, it will be reported as an (unweighted) connection in the 
-returned adjacency matrix. Together with the adjacency matrix the type of 
-connection (derived from the column \code{"name"} in the 
-\Robject{functional_groups}) will be written to a character matrix. These 
+between the m/z feature values are calculated and matched against the
+\code{"mass"}es of the \Robject{functional\_groups} argument. If any
+of the additions/losses defined in \Robject{functional\_groups} is found in the
+data, it will be reported as an (unweighted) connection in the
+returned adjacency matrix. Together with the adjacency matrix the type of
+connection (derived from the column \code{"name"} in the
+\Robject{functional\_groups}) will be written to a character matrix. These
 two matrices will be returned as a list (first entry: numerical adjacency
-matrix, second entry: character matrix) by the function 
-\Rfunction{create_structural_network}. 
+matrix, second entry: character matrix) by the function
+\Rfunction{create\_structural\_network}.
 
-<<functional_groups,echo=TRUE,eval=TRUE>>=
+<<functionalgroups_example,echo=TRUE,eval=TRUE>>=
 functional_groups <- rbind(
     c("Hydroxylation (–H)", "O", "15.9949146221"),
     c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
@@ -225,18 +247,18 @@ functional_groups <- data.frame(group = functional_groups[,1],
                             mass = as.numeric(functional_groups[,3]))
 @
 
-<<structure,eval=TRUE,echo=TRUE>>=
-struct_adj <- create_structural_matrix(x_test, functional_groups, ppm = 5)
+<<structure,eval=FALSE,echo=TRUE>>=
+struct_adj <- create_structural_network(x = x_test, functional_groups = functional_groups, ppm = 3)
 @
 
 
 \section{Creating the statistical matrix}
 
-The function \Rfunction{create_statistical_network} will create the adjacency
-matrix based on statistical associations. \Rfunction{create_statistical_network}
+The function \Rfunction{create\_statistical\_network} will create the adjacency
+matrix based on statistical associations. \Rfunction{create\_statistical\_network}
 is a wrapper function for the functions 
-\Rfunction{create_statistical_networks_list} and \Rfunction{consensus_network}. 
-The function \Rfunction{create_statistical_networks_list} will create a 
+\Rfunction{create\_statistical\_networks\_list} and \Rfunction{consensus\_network}. 
+The function \Rfunction{create\_statistical\_networks\_list} will create a 
 list of adjacency matrices using the statistical models defined by the 
 \Robject{model} argument. Currently, the models LASSO, Random Forest, 
 CLR, ARACNE (the two latter using the functions \Rfunction{clr} and 
@@ -245,63 +267,63 @@ based on Mutual Information calculation), Pearson
 and Spearman correlation and constraint-based structure learnging (based on 
 the Fast Incremental Association, Fast-IAMB, algorithm from the \Rpackage{bnlearn}
 package). For furthe information on the different models take a look on the 
-respective help pages of \code{.lasso}, \code{.randomForest}, \code{.clr},
-\code{.aracne}, \code{?.correlation} and/or \code{.bayes}. Functions that are 
+respective help pages of \code{lasso}, \code{randomForest}, \code{clr},
+\code{.aracne}, \code{?correlation} and/or \code{bayes}. Functions that are 
 accepted by the respective underlying functions can be passed directly to 
-the \Rfunction{create_statistical_network} and 
-\Rfunction{create_statistical_networks_list} functions. In addition, arguments 
-that are defined in the functions \code{.lasso}, \code{.randomForest}, 
-\code{.clr}, \code{.aracne}, \code{?.correlation} and/or \code{.bayes} can 
+the \Rfunction{create\_statistical\_networks} and 
+\Rfunction{create\_statistical\_networks\_list} functions. In addition, arguments 
+that are defined in the functions \code{lasso}, \code{randomForest}, 
+\code{clr}, \code{.aracne}, \code{?correlation} and/or \code{bayes} can 
 be passed like-wise to the functions. 
 
-From the list of adjacency matrices the function \Rfunction{conensus_network}
+From the list of adjacency matrices the function \Rfunction{consensus\_network}
 will create a consensus adjacency matrix using the employed statistical models.
 The reasoning behing this step is to circumvent disadvantages arising from each 
 model and creating a statistically reliable topology that reflects the actual 
 metabolic relations. To calculate the consensus adjacency matrix, the 
 \Rfunction{consensus} from the \Rpackage{sna} is employed. The arguments that 
-are accepted by this function can be passed to the \Rfunction{consensus_network}
-and \Rfunction{create_statistical_network} function, respectively. Furthermore, 
+are accepted by this function can be passed to the \Rfunction{consensus\_network}
+and \Rfunction{create\_statistical\_networks} function, respectively. Furthermore, 
 in case another method than \code{"central.graph"} is used the argument
 \Robject{threshold} will define if the value $a_{i,j}$ of the consensus matrix 
 will be reported as a connection in the returned matrix (if $a_{i,j} \geq$ \code{threshold})
-or not. \Rfunction{create_statistical_network} and \Rfunction{consensus_network}
+or not. \Rfunction{create\_statistical\_networks} and \Rfunction{consensus\_network}
 will return an unweighted adjancency matrix with connections inferred from the
 respective models. 
 
 In the following example, we will create a consensus adjacency matrix using 
 Pearson and Spearman correlation using the intensity values as input data. 
 The p-values that will be used for assigning edges in the unweighted 
-adjacency matrix will be adjusted by the Benjamini & Hochberg (False Discovery 
+adjacency matrix will be adjusted by the Benjamini \& Hochberg (False Discovery 
 rate) method and the default q-value of 0.05. 
-<<statistical>>=
+<<statistical,eval=FALSE,echo=TRUE>>=
 x_int <- x_test[,-3:dim(x_test)[2]]
-stat_adj <- create_statistical_network(x_x_int, 
+stat_adj <- create_statistical_network(x_int, 
                 model = c("pearson", "spearman"), adjust_correlation = "BH")
 @
 
 To create the same adjacency matrix without using the wrapper function, you can
-call the two functions \Rfunction{create_statistical_networks_list} and 
-\Rfunction{consensus_network} individually: 
-<<statistical_stepwise>>= 
+call the two functions \Rfunction{create\_statistical\_networks\_list} and 
+\Rfunction{consensus\_network} individually: 
+<<statistical_stepwise,eval=FALSE,echo=TRUE>>= 
 l <- create_statistical_networks_list(x_int, model = c("pearson", "spearman"),  adjust_correlation = "BH")
 stat_adj <- consensus_network(l = l)
 @
 
 \section{Combining the structural and statistical matrix}
 After creating the structural and statistical matrix, it is time to combine 
-these two matrices. The function \Rfunction{combine_structural_statistical} 
+these two matrices. The function \Rfunction{combine\_structural\_statistical} 
 will combine the matrices to the consensus matrix. The function accepts 
 the arguments \code{structure} and \code{statistical} for the two matrices,
 respectively, and the argument \code{threshold}, that is a numerical value 
 (default = 1). After adding the matrices, the entries will be checked if 
 they are greater or equal than \code{threshold} and 1 or 0, will be returned. 
 The argument \code{threshold} needs to be adjusted if another \code{method} 
-than \code{"central.graph"} in 
-\Rfunction{create_statistical_network}/\Rfunction{consensus_network} is used. 
+% than \code{"central.graph"} in 
+% \Rfunction{create\_statistical\_networks}/\Rfunction{consensus\_network} is used. 
 
-<<combine>>=
-cons_adj <- combine_structural_statistical(structure = struct_adj,
+<<combine,eval=FALSE,echo=TRUE>>=
+cons_adj <- combine_structural_statistical(structure = struct_adj[[1]],
                                     statistical = stat_adj)
 @
 
@@ -311,21 +333,23 @@ available in the \R framework can be employed or any other visualisation tool
 after exporting the consensus matrix as a text file. In this example 
 we will use the \Rpackage{igraph} to visualize the adjacency matrix. 
 
-<<visualisation,eval=TRUE,echo=TRUE>>=
-g <- graph_fromadjacency_matrix(matrix = cons_adj, mode = "directed", 
+<<visualisation,eval=FALSE,echo=TRUE,fig.show='hide'>>=
+g <- igraph::graph_from_adjacency_matrix(matrix = cons_adj, mode = "directed", 
                            directed = FALSE)
 plot(g)
 @
 
-\begin{figure}[h!]
-    \center
-    \includegraphics{./figure/visualisation-1}
-    \caption{}
-\end{figure}
+% \begin{figure}[h!]
+%     \center
+%     \includegraphics{./figure/visualisation-1}
+%     \caption{}
+% \end{figure}
 
-Furthermore, the adjacency matrix can be analysed by network analysis techniques
-(topological parameters such as centrality, ...) that are implemented in 
-different packages in \R (e.g. \Rpackage{igraph} or \Rpackage{sna}). 
+Furthermore, the network can be analysed by network analysis techniques
+(topological parameters such as centrality, degree, clustering indices) that are 
+implemented in different packages in \R 
+(e.g. \Rpackage{igraph} or \Rpackage{sna}) or other software tools outside of 
+the \R environment. 
 
 \newpage
 \printbibliography

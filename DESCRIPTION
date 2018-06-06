@@ -12,10 +12,10 @@ Depends:
     R (>= 3.4.4),
     glmnet (>= 2.0),
     stabs (>= 0.6),
-    randomForest (>= 4.6)
+    randomForest (>= 4.6),
     rfPermute (>= 2.1.5),
     mpmi (>= 0.42), 
-    parmigene (>= 1.0.2)
+    parmigene (>= 1.0.2),
     psych (>= 1.7.8),
     bnlearn (>= 4.3),
     sna (>= 2.4), 
