@@ -13,6 +13,7 @@
 #' the element in \code{functional_groups} that is in the range defined by 
 #' \code{m_1} and \code{m_2}. 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' @return numeric
 #' @examples 
 #' m_1 <- 180.155
 #' m_2 <- 180.157
@@ -26,7 +27,7 @@ in_range_which <- function(m_1, m_2, functional_groups) {
     lower_n <- if(m_1 < m_2) m_1 else m_2
     higher_n <- if(m_1 >= m_2) m_1 else m_2
     in_range <- which(lower_n <= functional_groups & 
-                          higher_n >= functional_groups)
+                                                higher_n >= functional_groups)
     return(in_range)
 }
 
@@ -55,6 +56,7 @@ in_range_which <- function(m_1, m_2, functional_groups) {
 #' in parts per million (ppm) by the \code{ppm} argument. The m/z values in the 
 #' \code{'mz'} column of \code{x} will be converted to m/z ranges according to 
 #' the \code{ppm} argument (default \code{ppm = 5}). 
+#' @return matrix, matrix with edges inferred mass differences
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
 #' data("x_test", package = "MetNet")
@@ -77,13 +79,15 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
     if (!is.data.frame(functional_groups)) 
         stop("functional_groups is not a data.frame")
     if (!all(c("group", "formula", "mass") %in% colnames(functional_groups))) {
-        stop("functional_groups does not contain the columns group, formula and mass")
+        stop("functional_groups doesn't contain the columns group, formula 
+            and mass")
     }
     if (!is.numeric(ppm)) stop("ppm is not numeric")
     
     mass <- x[, "mz"]
     
-    ## calculate according to ppm = (mass_measured - mass_theoretical) / mass_theoretical * 10^6
+    ## calculate according to 
+    ## ppm = (mass_measured - mass_theoretical) / mass_theoretical * 10^6
     mass_1 <- mass / abs(ppm / 10 ^ 6  + 1 ) 
     mass_2 <- mass / abs(ppm / 10 ^ 6 - 1)
     mat <- matrix(0, nrow = dim(x)[1], ncol = dim(x)[1])

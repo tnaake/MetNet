@@ -25,23 +25,23 @@
 %\usepackage{breakurl}
 \usepackage{hyperref}
 \hypersetup{%
-  pdfusetitle,
-  bookmarks = {true},
-  bookmarksnumbered = {true},
-  bookmarksopen = {true},
-  bookmarksopenlevel = 2,
-  unicode = {true},
-  breaklinks = {false},
-  hyperindex = {true},
-  colorlinks = {true},
-  linktocpage = {true},
-  plainpages = {false},
-  linkcolor = {blue},
-  citecolor = {blue},
-  urlcolor = {red},
-  pdfstartview = {Fit},
-  pdfpagemode = {UseOutlines},
-  pdfview = {XYZ null null null}
+    pdfusetitle,
+    bookmarks = {true},
+    bookmarksnumbered = {true},
+    bookmarksopen = {true},
+    bookmarksopenlevel = 2,
+    unicode = {true},
+    breaklinks = {false},
+    hyperindex = {true},
+    colorlinks = {true},
+    linktocpage = {true},
+    plainpages = {false},
+    linkcolor = {blue},
+    citecolor = {blue},
+    urlcolor = {red},
+    pdfstartview = {Fit},
+    pdfpagemode = {UseOutlines},
+    pdfview = {XYZ null null null}
 }
 
 \widowpenalty100000
@@ -85,7 +85,7 @@
 }
 
 \title{MetNet: Inferring metabolic networks from untargeted mass spectrometry 
-    data}
+                                                                        data}
     
 \begin{document}
 
@@ -102,8 +102,8 @@ High-resolution mass spectrometric data is often very rich in information
 content and metabolic conversions, and reactions can be derived from structural
 properties of features \citep{Bretiling2006}. 
 In addition to that, statistical associations between
-features (based on their intensity values) can be a valuable ressource to
-find co-synthesised or co-regulated metabolites, that are synthesised in the same
+features (based on their intensity values) can be a valuable ressource to find 
+co-synthesised or co-regulated metabolites, that are synthesised in the same
 biosynthetic pathways. Since any analysis tool within the \R framework 
 is still lacking that is
 integrating the two natures of mass spectrometric data we developped
@@ -140,7 +140,7 @@ constraint-based structure learning (Bayes). Since all of these methods have
 advantages and disadvantages, the user has the possibility to select
 several of these methods, compute adjacency matrices from these models and
 create a consensus matrix from the different statistical frameworks. \newline
- 
+
 After creating the statistical and structural network these two matrices
 will be combined to form a consensus matrix thta has both information from
 structural and statistical properties of the data. This can be followed by
@@ -184,8 +184,8 @@ length $\vert m \vert$.
 \Rpackage{MetNet} does not impose any requirements for
 data normalization, filtering, etc. However, the user has to make sure that
 the data is properly preprocessed. These include division by internal standard,
-\code{log2} transformation, noise filtering, removal of features that do not represent
-mass features/metabolites, removal of isotopes, etc.
+\code{log2} transformation, noise filtering, removal of features that do not 
+represent mass features/metabolites, removal of isotopes, etc.
 
 <<data,eval=TRUE,echo=TRUE>>=
 data("x_test", package = "MetNet")
@@ -220,9 +220,9 @@ The search space for these transformation is adjustable by the
 \Robject{functional\_groups} argument in 
 \Rfunction{create\_structural\_network} allowing to look for specific 
 enzymatic transformations in mind. Hereby,
-\Rfunction{create\_structural\_network} will take into account the \Robject{ppm}
-value, to adjust for inaccuracies in m/z values due to technical reasons
-according to the formula
+\Rfunction{create\_structural\_network} will take into account the 
+\Robject{ppm} value, to adjust for inaccuracies in m/z values due to technical 
+reasons according to the formula
 
 \begin{equation}
     ppm = \frac{m_{exp} - m_{calc}}{m_{exp}} \cdot 10^{-6}
@@ -244,45 +244,47 @@ matrix, second entry: character matrix) by the function
 
 <<functionalgroups_example,echo=TRUE,eval=TRUE>>=
 functional_groups <- rbind(
-    c("Hydroxylation (–H)", "O", "15.9949146221"),
-    c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
+    c("Hydroxylation (-H)", "O", "15.9949146221"),
+    c("Malonyl group (-H2O)", "C3H2O3", "86.0003939305"),
     c("C6H10O6", "C6H10O6", "178.0477380536"),
-    c("D-ribose (–H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
-    c("Disaccharide (–H2O)", "C12H20O11", "340.1005614851"),
-    c("Glucuronic acid (–H2O)", "C6H8O6", "176.0320879894"),
-    c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"),
-    c("Trisaccharide (–H2O)", "C18H30O15", "486.1584702945"))
+    c("D-ribose (-H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
+    c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
+    c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
+    c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
+    c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
 functional_groups <- data.frame(group = functional_groups[,1],
                             formula = functional_groups[,2],
                             mass = as.numeric(functional_groups[,3]))
 @
 
-<<structure,eval=FALSE,echo=TRUE>>=
-struct_adj <- create_structural_network(x = x_test, functional_groups = functional_groups, ppm = 3)
+<<structure,eval=TRUE,echo=TRUE>>=
+struct_adj <- create_structural_network(x = x_test, 
+                                functional_groups = functional_groups, ppm = 3)
 @
 
 
 \section{Creating the statistical matrix}
 
 The function \Rfunction{create\_statistical\_network} will create the adjacency
-matrix based on statistical associations. \Rfunction{create\_statistical\_network}
-is a wrapper function for the functions 
-\Rfunction{create\_statistical\_networks\_list} and \Rfunction{consensus\_network}. 
-The function \Rfunction{create\_statistical\_networks\_list} will create a 
+matrix based on statistical associations. 
+\Rfunction{create\_statistical\_network} is a wrapper function for the 
+functions \Rfunction{create\_statistical\_networks\_list} and 
+\Rfunction{consensus\_network}. The function 
+\Rfunction{create\_statistical\_networks\_list} will create a 
 list of adjacency matrices using the statistical models defined by the 
 \Robject{model} argument. Currently, the models LASSO, Random Forest, 
 CLR, ARACNE (the two latter using the functions \Rfunction{clr} and 
 \Rfunction{aracne.a} from the \Rpackage{parmigene} package, 
 based on Mutual Information calculation), Pearson 
 and Spearman correlation and constraint-based structure learning (based on 
-the Fast Incremental Association, Fast-IAMB, algorithm from the \Rpackage{bnlearn}
-package). For furthe information on the different models take a look on the 
-respective help pages of \code{lasso}, \code{randomForest}, \code{clr},
-\code{.aracne}, \code{?correlation} and/or \code{bayes}. Functions that are 
-accepted by the respective underlying functions can be passed directly to 
-the \Rfunction{create\_statistical\_networks} and 
-\Rfunction{create\_statistical\_networks\_list} functions. In addition, arguments 
-that are defined in the functions \code{lasso}, \code{randomForest}, 
+the Fast Incremental Association, Fast-IAMB, algorithm from the 
+\Rpackage{bnlearn} package). For furthe information on the different models 
+take a look on the respective help pages of \code{lasso}, \code{randomForest}, 
+\code{clr}, \code{.aracne}, \code{?correlation} and/or \code{bayes}. Functions 
+that are accepted by the respective underlying functions can be passed directly 
+to the \Rfunction{create\_statistical\_networks} and 
+\Rfunction{create\_statistical\_networks\_list} functions. In addition, 
+arguments that are defined in the functions \code{lasso}, \code{randomForest}, 
 \code{clr}, \code{.aracne}, \code{?correlation} and/or \code{bayes} can 
 be passed like-wise to the functions. 
 
@@ -292,22 +294,24 @@ The reasoning behing this step is to circumvent disadvantages arising from each
 model and creating a statistically reliable topology that reflects the actual 
 metabolic relations. To calculate the consensus adjacency matrix, the 
 \Rfunction{consensus} from the \Rpackage{sna} is employed. The arguments that 
-are accepted by this function can be passed to the \Rfunction{consensus\_network}
-and \Rfunction{create\_statistical\_networks} function, respectively. Furthermore, 
-in case another method than \code{"central.graph"} is used the argument
-\Robject{threshold} will define if the value $a_{i,j}$ of the consensus matrix 
-will be reported as a connection in the returned matrix (if $a_{i,j} \geq$ \code{threshold})
-or not. \Rfunction{create\_statistical\_networks} and \Rfunction{consensus\_network}
-will return an unweighted adjancency matrix with connections inferred from the
-respective models. 
+are accepted by this function can be passed to the 
+\Rfunction{consensus\_network} and \Rfunction{create\_statistical\_networks} 
+function, respectively. Furthermore, in case another method than 
+\code{"central.graph"} is used the argument \Robject{threshold} will define if 
+the value $a_{i,j}$ of the consensus matrix 
+will be reported as a connection in the returned matrix 
+(if $a_{i,j} \geq$ \code{threshold})
+or not. \Rfunction{create\_statistical\_networks} and 
+\Rfunction{consensus\_network} will return an unweighted adjancency matrix 
+with connections inferred from the respective models. 
 
 In the following example, we will create a consensus adjacency matrix using 
 Pearson and Spearman correlation using the intensity values as input data. 
 The p-values that will be used for assigning edges in the unweighted 
 adjacency matrix will be adjusted by the Benjamini \& Hochberg (False Discovery 
 rate) method and the default q-value of 0.05. 
-<<statistical,eval=FALSE,echo=TRUE>>=
-x_int <- x_test[,-3:dim(x_test)[2]]
+<<statistical,eval=TRUE,echo=TRUE>>=
+x_int <- x_test[,3:dim(x_test)[2]]
 stat_adj <- create_statistical_network(x_int, 
                 model = c("pearson", "spearman"), adjust_correlation = "BH")
 @
@@ -315,8 +319,9 @@ stat_adj <- create_statistical_network(x_int,
 To create the same adjacency matrix without using the wrapper function, you can
 call the two functions \Rfunction{create\_statistical\_networks\_list} and 
 \Rfunction{consensus\_network} individually: 
-<<statistical_stepwise,eval=FALSE,echo=TRUE>>= 
-l <- create_statistical_networks_list(x_int, model = c("pearson", "spearman"),  adjust_correlation = "BH")
+<<statistical_stepwise,eval=TRUE,echo=TRUE>>= 
+l <- create_statistical_networks_list(x_int, model = c("pearson", "spearman"),  
+                                                    adjust_correlation = "BH")
 stat_adj <- consensus_network(l = l)
 @
 
@@ -329,10 +334,11 @@ respectively, and the argument \code{threshold}, that is a numerical value
 (default = 1). After adding the matrices, the entries will be checked if 
 they are greater or equal than \code{threshold} and 1 or 0, will be returned. 
 The argument \code{threshold} needs to be adjusted if another \code{method} 
-% than \code{"central.graph"} in 
-% \Rfunction{create\_statistical\_networks}/\Rfunction{consensus\_network} is used. 
+than \code{"central.graph"} in 
+\Rfunction{create\_statistical\_networks}/\Rfunction{consensus\_network} is 
+used. 
 
-<<combine,eval=FALSE,echo=TRUE>>=
+<<combine,eval=TRUE,echo=TRUE>>=
 cons_adj <- combine_structural_statistical(structure = struct_adj[[1]],
                                     statistical = stat_adj)
 @
@@ -343,21 +349,20 @@ available in the \R framework can be employed or any other visualisation tool
 after exporting the consensus matrix as a text file. In this example 
 we will use the \Rpackage{igraph} to visualize the adjacency matrix. 
 
-<<visualisation,eval=FALSE,echo=TRUE,fig.show='hide'>>=
-g <- igraph::graph_from_adjacency_matrix(matrix = cons_adj, mode = "directed", 
-                           directed = FALSE)
+<<visualisation,eval=TRUE,echo=TRUE,fig.show='hide'>>=
+g <- igraph::graph_from_adjacency_matrix(cons_adj, mode = "directed")
 plot(g)
 @
 
-% \begin{figure}[h!]
-%     \center
-%     \includegraphics{./figure/visualisation-1}
-%     \caption{}
-% \end{figure}
+\begin{figure}[h!]
+    \center
+    \includegraphics{./figure/visualisation-1}
+    \caption{}
+\end{figure}
 
 Furthermore, the network can be analysed by network analysis techniques
-(topological parameters such as centrality, degree, clustering indices) that are 
-implemented in different packages in \R 
+(topological parameters such as centrality, degree, clustering indices) that 
+are implemented in different packages in \R 
 (e.g. \Rpackage{igraph} or \Rpackage{sna}) or other software tools outside of 
 the \R environment. 
 
@@ -377,40 +382,40 @@ sessionInfo()
 \newpage
 \subsection*{Functional groups}
 
-The list of functional groups is taken from \citet{Breitling2006}. The numerical
-m/z values were calculated by using the structural formula and the 
-Biological Magnetic Resonance Data Bank
+The list of functional groups is taken from \citet{Breitling2006}. 
+The numerical m/z values were calculated by using the structural formula and 
+the Biological Magnetic Resonance Data Bank
 \href{http://www.bmrb.wisc.edu/metabolomics/mol_mass.php}{web tool}. 
 <<functional_groups,eval=TRUE,echo=TRUE>>=
 functional_groups <- rbind(
     c("Alanine", "C3H5NO", "71.0371137878"),
     c("Arginine", "C6H12N4O", "156.1011110281"),
     c("Asparagine", "C4H6N2O2", "114.0429274472"),
-    c("Guanosine 5-diphosphate (–H2O)", "C10H13N5O10P2", "425.0137646843"),
-    c("Guanosine 5-monophosphate (–H2O)", "C10H12N5O7P", "345.0474342759"),
-    c("Guanine (–H)", "C5H4N5O", "150.0415847765"),
+    c("Guanosine 5-diphosphate (-H2O)", "C10H13N5O10P2", "425.0137646843"),
+    c("Guanosine 5-monophosphate (-H2O)", "C10H12N5O7P", "345.0474342759"),
+    c("Guanine (-H)", "C5H4N5O", "150.0415847765"),
     c("Aspartic acid", "C4H5NO3", "115.0269430320"),
-    c("Guanosine (–H2O)", "C10H11N5O4", "265.0811038675"),
+    c("Guanosine (-H2O)", "C10H11N5O4", "265.0811038675"),
     c("Cysteine", "C3H5NOS", "103.0091844778"),
-    c("Deoxythymidine 5'-diphosphate (–H2O)", "C10H14N2O10P2", "384.0123677008"),
+    c("Deoxythymidine 5'-diphosphate (-H2O)", "C10H14N2O10P2", "384.01236770"),
     c("Cystine", "C6H10N2O3S2", "222.0132835777"),
-    c("Thymidine (–H2O)", "C10H12N2O4", "224.0797068840"),
+    c("Thymidine (-H2O)", "C10H12N2O4", "224.0797068840"),
     c("Glutamic acid", "C5H7NO3", "129.0425930962"),
-    c("Thymine (–H)", "C5H5N2O2", "125.0351024151"),
+    c("Thymine (-H)", "C5H5N2O2", "125.0351024151"),
     c("Glutamine", "C5H8N2O2", "128.0585775114"),
-    c("Thymidine 5'-monophosphate (–H2O)", "C10H13N2O7P", "304.0460372924"),
+    c("Thymidine 5'-monophosphate (-H2O)", "C10H13N2O7P", "304.0460372924"),
     c("Glycine", "C2H3NO", "57.0214637236"),
-    c("Uridine 5'-diphosphate (–H2O)", "C9H12N2O11P2", "385.9916322587"),
+    c("Uridine 5'-diphosphate (-H2O)", "C9H12N2O11P2", "385.9916322587"),
     c("Histidine", "C6H7N3O", "137.0589118624"),
-    c("Uridine 5'-monophosphate (–H2O)", "C9H11N2O8P", "306.0253018503"),
+    c("Uridine 5'-monophosphate (-H2O)", "C9H11N2O8P", "306.0253018503"),
     c("Isoleucine", "C6H11NO", "113.0840639804"),
-    c("Uracil (–H)", "C4H3N2O2", "111.0194523509"),
+    c("Uracil (-H)", "C4H3N2O2", "111.0194523509"),
     c("Leucine", "C6H11NO", "113.0840639804"),
-    c("Uridine (–H2O)", "C9H10N2O5", "226.0589714419"),
+    c("Uridine (-H2O)", "C9H10N2O5", "226.0589714419"),
     c("Lysine", "C6H12N2O", "128.0949630177"),
-    c("Acetylation (–H)", "C2H3O2", "59.0133043405"),
+    c("Acetylation (-H)", "C2H3O2", "59.0133043405"),
     c("Methionine", "C5H9NOS", "131.0404846062"),
-    c("Acetylation (–H2O)", "C2H2O",  "42.0105646863"),
+    c("Acetylation (-H2O)", "C2H2O",  "42.0105646863"),
     c("Phenylalanine", "C9H9NO",  "147.0684139162"),
     c("C2H2", "C2H2", "26.0156500642"),
     c("Proline", "C5H7NO", "97.0527638520"),
@@ -422,50 +427,50 @@ functional_groups <- rbind(
     c("Tryptophan", "C11H10N2O",  "186.0793129535"),
     c("Diphosphate", "H3O6P2", "160.9404858489"),
     c("Tyrosine", "C9H9NO2", "163.0633285383"),
-    c("Ethyl addition (–H2O)", "C2H4", "28.0313001284"),
+    c("Ethyl addition (-H2O)", "C2H4", "28.0313001284"),
     c("Valine", "C5H9NO",  "99.0684139162"),
-    c("Formic Acid (–H2O)", "CO", "27.9949146221"),
-    c("Acetotacetate (–H2O)",  "C4H4O2", "84.0211293726"),
-    c("Glyoxylate (–H2O)", "C2O2",  "55.9898292442"),
-    c("Acetone (–H)", "C3H5O", "57.0340397826"),
+    c("Formic Acid (-H2O)", "CO", "27.9949146221"),
+    c("Acetotacetate (-H2O)",  "C4H4O2", "84.0211293726"),
+    c("Glyoxylate (-H2O)", "C2O2",  "55.9898292442"),
+    c("Acetone (-H)", "C3H5O", "57.0340397826"),
     c("Hydrogenation/dehydrogenation", "H2", "2.0156500642"),
-    c("Adenylate (–H2O)", "C10H12N5O6P", "329.0525196538"),
-    c("Hydroxylation (–H)", "O", "15.9949146221"),
-    c("Biotinyl (–H)", "C10H15N2O3S", "243.0803380482"),
+    c("Adenylate (-H2O)", "C10H12N5O6P", "329.0525196538"),
+    c("Hydroxylation (-H)", "O", "15.9949146221"),
+    c("Biotinyl (-H)", "C10H15N2O3S", "243.0803380482"),
     c("Inorganic phosphate", "P", "30.9737615100"),
-    c("Biotinyl (–H2O)", "C10H14N2O2S", "226.0775983940"),
-    c("Ketol group (–H2O)", "C2H2O", "42.0105646863"),
-    c("Carbamoyl P transfer (–H2PO4)", "CH2ON", "44.0136386915"),
-    c("Methanol (–H2O)", "CH2", "14.0156500642"),
-    c("Co-enzyme A (–H)", "C21H34N7O16P3S", "765.0995583014"),
+    c("Biotinyl (-H2O)", "C10H14N2O2S", "226.0775983940"),
+    c("Ketol group (-H2O)", "C2H2O", "42.0105646863"),
+    c("Carbamoyl P transfer (-H2PO4)", "CH2ON", "44.0136386915"),
+    c("Methanol (-H2O)", "CH2", "14.0156500642"),
+    c("Co-enzyme A (-H)", "C21H34N7O16P3S", "765.0995583014"),
     c("Phosphate", "HPO3", "79.9663304084"),
-    c("Co-enzyme A (–H2O)", "C21H33N7O15P3S", "748.0968186472"),
+    c("Co-enzyme A (-H2O)", "C21H33N7O15P3S", "748.0968186472"),
     c("Primary amine", "NH2", "16.0187240694"),
-    c("Glutathione (–H2O)", "C10H15N3O5S", "289.0732412976"),
+    c("Glutathione (-H2O)", "C10H15N3O5S", "289.0732412976"),
     c("Pyrophosphate", "PP", "61.9475230200"),
-    c("Isoprene addition (–H)", "C5H7", "67.0547752247"),
+    c("Isoprene addition (-H)", "C5H7", "67.0547752247"),
     c("Secondary amine", "NH", "15.0108990373"),
-    c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
-    c("Sulfate (–H2O)", "SO3", "79.9568145563"),
-    c("Palmitoylation (–H2O)", "C16H30O", "238.2296655851"),
+    c("Malonyl group (-H2O)", "C3H2O3", "86.0003939305"),
+    c("Sulfate (-H2O)", "SO3", "79.9568145563"),
+    c("Palmitoylation (-H2O)", "C16H30O", "238.2296655851"),
     c("Tertiary amine", "N", "14.0030740052"),
-    c("Pyridoxal phosphate (–H2O)", "C8H8NO5P", "229.0140088825"),
+    c("Pyridoxal phosphate (-H2O)", "C8H8NO5P", "229.0140088825"),
     c("C6H10O5", "C6H10O5", "162.0528234315"),
-    c("Urea addition (–H)", "CH3N2O", "59.0245377288"),
+    c("Urea addition (-H)", "CH3N2O", "59.0245377288"),
     c("C6H10O6", "C6H10O6", "178.0477380536"),
-    c("Adenine (–H)", "C5H4N5", "134.0466701544"),
-    c("D-ribose (–H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
-    c("Adenosine (–H2O)", "C10H11N5O3", "249.0861892454"),
-    c("Disaccharide (–H2O)", "C12H20O11", "340.1005614851"),
-    c("Adenosine 5'-diphosphate (–H2O)", "C10H13N5O9P2", "409.0188500622"),
-    c("Glucose-N-phosphate (–H2O)", "C6H11O8P", "242.0191538399"),
-    c("Adenosine 5'-monophosphate (–H2O)", "C10H12N5O6P", "329.0525196538"),
-    c("Glucuronic acid (–H2O)", "C6H8O6", "176.0320879894"),
-    c("Cytidine 5'-diphosphate (–H2O)", "C9H13N3O10P2", "385.0076166739"),
-    c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"),
-    c("Cytidine 5'-monophsophate (–H2O)", "C9H12N3O7P", "305.0412862655"),
-    c("Trisaccharide (–H2O)", "C18H30O15", "486.1584702945"),
-    c("Cytosine (–H)", "C4H4N3O",  "110.0354367661"))
+    c("Adenine (-H)", "C5H4N5", "134.0466701544"),
+    c("D-ribose (-H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
+    c("Adenosine (-H2O)", "C10H11N5O3", "249.0861892454"),
+    c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
+    c("Adenosine 5'-diphosphate (-H2O)", "C10H13N5O9P2", "409.0188500622"),
+    c("Glucose-N-phosphate (-H2O)", "C6H11O8P", "242.0191538399"),
+    c("Adenosine 5'-monophosphate (-H2O)", "C10H12N5O6P", "329.0525196538"),
+    c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
+    c("Cytidine 5'-diphosphate (-H2O)", "C9H13N3O10P2", "385.0076166739"),
+    c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
+    c("Cytidine 5'-monophsophate (-H2O)", "C9H12N3O7P", "305.0412862655"),
+    c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"),
+    c("Cytosine (-H)", "C4H4N3O",  "110.0354367661"))
 
 functional_groups <- data.frame(name = functional_groups[,1], 
             formula = functional_groups[,2],

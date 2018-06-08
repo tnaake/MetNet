@@ -16,8 +16,9 @@ Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 
 \item{threshold_clr}{numeric, if the clr value exceeds the threshold 
 (clr$_{i,j}$ > threshold, where clr$_{i, j}$ is the clr value of the ith row 
-feature and of the jth column feature), the connection is defined as present, if 
-the clr value is lower than the threshold value (clr$_{i,j}$ <= threshold)
+feature and of the jth column feature), the connection is defined as 
+present, if the clr value is lower than the threshold value 
+(clr$_{i,j}$ \eqn{\leq} threshold)
 there is no statistical connection reported.}
 }
 \value{
@@ -26,8 +27,8 @@ Relatedness Network algorithm \code{clr}
 }
 \description{
 \code{clr} infers a statistical network using 
-context likelihood/relatedness network using the \code{clr} function from the 
-\code{parmigene} package. The presence/absence is based on if the 
+context likelihood/relatedness network using the \code{clr} function from 
+the \code{parmigene} package. The presence/absence is based on if the 
 returned value exceeds a user-defined threshold value. \code{clr} will 
 return the adjacency matrix containing the presence/absence value.
 }

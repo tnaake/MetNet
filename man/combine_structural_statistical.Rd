@@ -23,8 +23,9 @@ networks.
 The function \code{combine\_structural\_statistical} takes as 
 input the structural and statistical network, that were create in former 
 steps, adds them together and will report a connection between metabolites
-when the edge is reported in networks. \code{combine\_structural\_statistical}
-returns this consensus matrix of the structural and statistical network.
+when the edge is reported in networks. 
+\code{combine\_structural\_statistical} returns this consensus matrix of 
+the structural and statistical network.
 }
 \details{
 \code{combine\_structural\_statistical} will call internally the 

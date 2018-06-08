@@ -4,7 +4,8 @@
 \alias{correlation}
 \title{Create a statistical network based on correlation}
 \usage{
-correlation(x, adjust_correlation = "none", type = "pearson", threshold_correlation = 0.05, ...)
+correlation(x, adjust_correlation = "none", type = "pearson", 
+                                        threshold_correlation = 0.05, ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
@@ -19,7 +20,8 @@ passed to argument \code{method} in \code{corr.test}}
 (default: 0.05), if the (adjusted) p-values exceed this value, there 
 is no statistical connection between features}
 
-\item{...}{parameters passed to \code{corr.test} (argument \code{adjust} will be ignored)}
+\item{...}{parameters passed to \code{corr.test} (argument \code{adjust} 
+will be ignored)}
 }
 \value{
 matrix, matrix with edges inferred from correlation algorithm 

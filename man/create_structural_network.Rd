@@ -18,6 +18,9 @@ transformation of (functional) groups}
 
 \item{ppm}{numeric, mass accuracy of m/z features in parts per million (ppm)}
 }
+\value{
+matrix, matrix with edges inferred mass differences
+}
 \description{
 The function \code{create_structural_network} infers network 
 topologies using differences in m/z values that are matched against a 

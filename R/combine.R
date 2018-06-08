@@ -4,8 +4,9 @@
 #' @description The function \code{combine\_structural\_statistical} takes as 
 #' input the structural and statistical network, that were create in former 
 #' steps, adds them together and will report a connection between metabolites
-#' when the edge is reported in networks. \code{combine\_structural\_statistical}
-#' returns this consensus matrix of the structural and statistical network.
+#' when the edge is reported in networks. 
+#' \code{combine\_structural\_statistical} returns this consensus matrix of 
+#' the structural and statistical network.
 #' @usage combine_structural_statistical(structure, statistical, threshold = 1)
 #' @param structure matrix containing structural network
 #' @param statistical matrix containing statistical network

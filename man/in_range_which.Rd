@@ -13,6 +13,9 @@ in_range_which(m_1, m_2, functional_groups)
 
 \item{functional_groups}{numeric, m/z values of the functional groups}
 }
+\value{
+numeric
+}
 \description{
 The function \code{in_range_which} checks if a m/z feature
 (given as a range defined by \code{m_1} and \code{m_2}) is present in a 

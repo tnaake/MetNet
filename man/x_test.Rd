@@ -11,8 +11,8 @@ peaklist[, 3:dim(peaklist)[2]] <- apply(peaklist[, 3:dim(peaklist)[2]], 2,
     function(x) x / quantile(x, 0.75))
 peaklist[, 3:dim(peaklist)[2]] <- log2(peaklist[, 3:dim(peaklist)[2]] + 1)
 
-## function to add specific features of x (defined by m/z and retention time) 
-## to x_test 
+## function to add specific features of x (defined by m/z and retention 
+## time) to x_test 
 add_to_x_test <- function(x_test, x, mz, rt) {
     mzX <- x[, "mz"]
     rtX <- x[, "rt"]
@@ -74,7 +74,8 @@ x_test <- add_to_x_test(x_test, peaklist, mz = 322.21, rt = 104.13)
 x_test <- add_to_x_test(x_test, peaklist, mz = 322.21, rt = 147.98) 
 ## N'-N''-dicaffeoyl -spermidine [M+H+]+ 470.23
 x_test <- add_to_x_test(x_test, peaklist, mz = 470.23, rt = 247.15) 
-## N'-N''-diferuloyl-spermidine/ N#,N$-Coumaroyl,sinapoyl spermidine isomer [M+H+]+ 498.260/498.261
+## N'-N''-diferuloyl-spermidine/ 
+##N#,N$-Coumaroyl,sinapoyl spermidine isomer [M+H+]+ 498.260/498.261
 x_test <- add_to_x_test(x_test, peaklist, mz = 498.26, rt = 289.05) 
 ## N'-N''-dihydrated-diferuloyl-spermidine [M+H+]+ 502.25
 x_test <- add_to_x_test(x_test, peaklist, mz = 502.25, rt = 242.55) 
