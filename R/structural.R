@@ -18,6 +18,7 @@
 #' m_2 <- 180.157
 #' functional_groups <- c(164.16, 180.156)
 #' in_range_which(m_1, m_2, functional_groups)
+#' @export
 in_range_which <- function(m_1, m_2, functional_groups) {
     if (!is.numeric(m_1)) stop("m_1 is not numeric")
     if (!is.numeric(m_2)) stop("m_2 is not numeric")
@@ -41,32 +42,31 @@ in_range_which <- function(m_1, m_2, functional_groups) {
 #' @usage create_structural_network(x, functional_groups, ppm = 5)
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values, \code{x} contains the 
-#' column "mz" that has the m/z information (numerical values) for the 
+#' column \code{'mz'} that has the m/z information (numerical values) for the 
 #' calculation of mass differences between features 
-#' @param functional_groups data.frame, containing the columns "group", 
-#' "formula" and "mass" that will be used for detection of losses/addition of 
-#' (functional) groups
+#' @param functional_groups data.frame, containing the columns \code{"group"}, 
+#' \code{'formula'} and \code{'mass'} that will be used for detection of 
+#' transformation of (functional) groups
 #' @param ppm numeric, mass accuracy of m/z features in parts per million (ppm)
-#' @details \code{create_structural_network} accesses the column "mz" of 
+#' @details \code{create_structural_network} accesses the column \code{'mz'} of 
 #' \code{x} to infer structural topologies based on the functional groups 
 #' supplied by \code{functional_groups}. To account for the mass accuracy of 
 #' the dataset \code{x}, the user can specify the accuracy of m/z features 
 #' in parts per million (ppm) by the \code{ppm} argument. The m/z values in the 
-#' "mz" column of \code{x} will be converted to m/z ranges according to the 
-#' \code{ppm} argument (default \code{ppm = 5}). 
+#' \code{'mz'} column of \code{x} will be converted to m/z ranges according to 
+#' the \code{ppm} argument (default \code{ppm = 5}). 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- as.matrix(x)
 #' functional_groups <- rbind(
-#'     c("Hydroxylation (–H)", "O", "15.9949146221"),
-#'     c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
+#'     c("Hydroxylation (-H)", "O", "15.9949146221"),
+#'     c("Malonyl group (-H2O)", "C3H2O3", "86.0003939305"),
 #'     c("C6H10O6", "C6H10O6", "178.0477380536"),
-#'     c("D-ribose (–H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
-#'     c("Disaccharide (–H2O)", "C12H20O11", "340.1005614851"),
-#'     c("Glucuronic acid (–H2O)", "C6H8O6", "176.0320879894"),
-#'     c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"),
-#'     c("Trisaccharide (–H2O)", "C18H30O15", "486.1584702945"))
+#'     c("D-ribose (-H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
+#'     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
+#'     c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
+#'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
+#'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
 #' functional_groups <- data.frame(group = functional_groups[,1],
 #'                                 formula = functional_groups[,2],
 #'                                 mass = as.numeric(functional_groups[,3]))

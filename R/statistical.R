@@ -1,14 +1,17 @@
-#' @import glmnet
-#' @import stabs
-#' @import randomForest
-#' @import rfPermute
-#' @import mpmi
-#' @import parmigene
-#' @import psych
-#' @import bnlearn
+#' @importFrom stabs stabsel stabsel.matrix glmnet.lasso
+#' @importFrom rfPermute rfPermute rp.importance
+#' @importFrom mpmi cmi
+#' @importFrom parmigene clr aracne.a
+#' @importFrom psych corr.test
+#' @importFrom bnlearn fast.iamb arcs
+#' @importFrom sna consensus
+#' @importFrom parallel mclapply
+#' @importFrom stats formula p.adjust sd
+#' @importFrom methods formalArgs
 
 
 #' @name lasso
+#' @aliases lasso
 #' @title Create a statistical network based on LASSO
 #' @description  \code{lasso} infers a statistical network using 
 #' LASSO using the \code{stabsel} function from the 
@@ -34,6 +37,7 @@
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' \dontrun{lasso(x_z, PFER = 0.75, cutoff = 0.95)}
+#' @export
 lasso <- function(x, parallel = FALSE, ...) {
     ## x should be z-scaled
     if (parallel) {
@@ -42,7 +46,7 @@ lasso <- function(x, parallel = FALSE, ...) {
             ## lasso: alpha = 1
             ## allow for compatibility of arguments 
             l1 <- threeDots_call("stabsel.matrix", x = as.matrix(x_l1), y = y_l1, 
-                                  fitfun = glmnetlasso, 
+                                  fitfun = glmnet.lasso, 
                                   args.fitfun = list("alpha" = 1), ...)
             ## was l1 <- stabsel(as.matrix(x_l1), y_l1, fitfun = glmnetlasso, 
             ##          args.fitfun = list("alpha" = 1), ...)
@@ -54,7 +58,7 @@ lasso <- function(x, parallel = FALSE, ...) {
             ## lasso: alpha = 1
             ## allow for compatibility of arguments 
             l1 <- threeDots_call("stabsel.matrix", x = as.matrix(x_l1), y = y_l1, 
-                                  fitfun = glmnetlasso, 
+                                  fitfun = glmnet.lasso, 
                                   args.fitfun = list("alpha" = 1), ...)
             ## was l1 <- stabsel(as.matrix(x_l1), y_l1, fitfun = glmnetlasso, 
             ##          args.fitfun = list("alpha" = 1), ...)
@@ -70,19 +74,24 @@ lasso <- function(x, parallel = FALSE, ...) {
 }
 
 #' @name randomForest
+#' @aliases randomForest
 #' @title Create a statistical network based on random forest
 #' @description  \code{randomForest} infers a statistical network using 
 #' random forest using the \code{rfPermute} function from the 
 #' \code{rfPermute} package. \code{randomForest} extracts the p-values  
 #' by the function \code{rp.importance} and the presence/absence based on the 
-#' significance value (alpha $\leq$ 0.05) of this 
+#' significance value (\eqn{\alpha \leq 0.05}) of this 
 #' connection to a matrix that is returned. 
-#' @usage randomForest(x, parallel = FALSE, randomforest_adjust = NULL, ...)
+#' @usage randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
 #' @param parallel logical, should computation be parallelized? If 
 #' \code{parallel = TRUE} the \code{mclapply} will be applied if 
 #' \code{parallel = FALSE} the \code{lapply} function will be applied. 
+#' @param randomForest_adjust character, correction method for p-values from
+#' \code{rp.importance}, \code{randomForest_adjust} will be passed to the 
+#' \code{p.adjust} function and should be one of "holm", "hochberg", "hommel", 
+#' "bonferroni", "BH", "BY", "fdr", "none"
 #' @param ... parameters passed to \code{corr.test} and \code{mclapply} (if 
 #' \code{parallel = TRUE})
 #' @details For use of the parameters used in the \code{rfPermute} function, 
@@ -95,14 +104,16 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' \dontrun{randomForest(x)}
-randomForest <- function(x, parallel = FALSE, randomforest_adjust = "none", ...) {
+#' @export
+randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none", ...) {
     df_x <- data.matrix(t(x))
     
     if (parallel) {
-        rf <- mclapply(1:dim(x)[1], function(i) {
+        rf <- parallel::mclapply(1:dim(x)[1], function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDots_call("rfPermute.formula", formula = formula(formula_rf), data = df_x, ...)
+            rf <- threeDots_call(rfPermute::rfPermute, 
+                    formula = stats::formula(formula_rf), data = df_x, ...)
             ## was rf <- rfPermute(formula = formula(formula_rf), data = df_x, ...) 
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
@@ -111,7 +122,8 @@ randomForest <- function(x, parallel = FALSE, randomforest_adjust = "none", ...)
         rf <- lapply(1:dim(x)[1], function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDots_call("rfPermute.formula", formula = formula(formula_rf), data = df_x, ...)
+            rf <- threeDots_call(rfPermute::rfPermute, 
+                    formula = stats::formula(formula_rf), data = df_x, ...)
             ## was rf <- rfPermute(formula = formula(formula_rf), data = df_x, ...)   
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
@@ -121,7 +133,7 @@ randomForest <- function(x, parallel = FALSE, randomforest_adjust = "none", ...)
     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
     
     for (i in 1:length(rf)) {rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]}
-    rf_mat <- p.adjust(rf_mat, method = randomforest_adjust)     
+    rf_mat <- stats::p.adjust(rf_mat, method = randomForest_adjust)     
     rf_mat <- matrix(rf_mat, ncol = nrow(x), nrow = nrow(x), byrow = FALSE)
     rf_mat <- ifelse(rf_mat > 0.05, 0, 1)
     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
@@ -130,6 +142,7 @@ randomForest <- function(x, parallel = FALSE, randomforest_adjust = "none", ...)
 }
 
 #' @name clr
+#' @aliases clr
 #' @title Create a statistical network based on context likelihood or 
 #' relatedness network
 #' @description  \code{clr} infers a statistical network using 
@@ -160,6 +173,7 @@ randomForest <- function(x, parallel = FALSE, randomforest_adjust = "none", ...)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
 #' clr(mi_x_z, threshold_clr = 0)
+#' @export
 clr <- function(mi, threshold_clr = 0) {
     if (!is.numeric(threshold_clr)) stop("threshold_clr is not numeric")
     clr_mat <- parmigene::clr(mi)
@@ -169,6 +183,7 @@ clr <- function(mi, threshold_clr = 0) {
 }
 
 #' @name aracne
+#' @aliases aracne
 #' @title Create a statistical network based on algorithm for the reconstruction
 #' of accurate cellular networks 
 #' @description  \code{.information} infers a statistical network using 
@@ -177,12 +192,13 @@ clr <- function(mi, threshold_clr = 0) {
 #' \code{parmigene} package. The presence/absence is based on if the 
 #' returned value exceeds a user-defined threshold value. \code{aracne} will 
 #' return the adjacency matrix containing the presence/absence value.
-#' @usage aracne(mi = mi_x_z, eps = 0.05, threshold_aracne = 0)
+#' @usage aracne(mi, eps = 0.05, threshold_aracne = 0)
 #' @param mi matrix, where columns and the rows are features 
 #' (metabolites), cell entries are mutual information values between the 
 #' features. As input, the mutual information (e.g. raw MI estimates or 
 #' Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 #' \code{mpmi} package can be used.
+#' @param eps numeric, used to remove the weakest edge of each triple of nodes
 #' @param threshold_aracne numeric, if the aracne value exceeds the threshold 
 #' (aracne$_{i,j}$ > threshold, where aracne$_{i, j}$ is the aracne value of 
 #' the ith row feature and of the jth column feature), the connection is 
@@ -200,6 +216,7 @@ clr <- function(mi, threshold_clr = 0) {
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
 #' aracne(mi_x_z, eps = 0.05, threshold_aracne = 0)
+#' @export
 aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
     if (!is.numeric(threshold_aracne)) stop("threshold_aracne is not numeric")
     aracne_mat <- parmigene::aracne.a(mi, eps = eps)  
@@ -209,17 +226,20 @@ aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
 }
 
 #' @name correlation 
+#' @aliases correlation
 #' @title Create a statistical network based on correlation 
 #' @description  \code{correlation} infers a statistical network using 
 #' correlation using the \code{corr.test} function from the 
 #' \code{psych} package. \code{correlation} extracts the reported 
 #' p-values from the function \code{corr.test} that can be adjusted for 
 #' multiple testing (\code{adjust_correlation} parameter). 
-#' @usage correlation(x, adjust_correlation = "none", threshold_correlation = 0.05, ...) 
+#' @usage correlation(x, adjust_correlation = "none", type = "pearson", threshold_correlation = 0.05, ...) 
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
+#' @param type character, either "pearson" or "spearman", \code{type} will be 
+#' passed to argument \code{method} in \code{corr.test}
 #' @param adjust_correlation character 
-#' @param threshold_correlation numeric, significance level alpha
+#' @param threshold_correlation numeric, significance level \eqn{\alpha}
 #' (default: 0.05), if the (adjusted) p-values exceed this value, there 
 #' is no statistical connection between features 
 #' @param ... parameters passed to \code{corr.test} (argument \code{adjust} will be ignored) 
@@ -233,6 +253,7 @@ aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' correlation(x, adjust_correlation = "bonferroni", type = "pearson")
+#' @export
 correlation <- function(x, adjust_correlation = "none", type = "pearson", 
                          threshold_correlation = 0.05, ...) {
     if (!is.numeric(threshold_correlation)) 
@@ -240,7 +261,7 @@ correlation <- function(x, adjust_correlation = "none", type = "pearson",
     ## get character vector for p-value adjustment
     adjust <- adjust_correlation
     ## allow for compatibility of arguments 
-    cor_mat_p <- threeDots_call("corr.test", x = t(x), adjust = adjust, 
+    cor_mat_p <- threeDots_call(psych::corr.test, x = t(x), adjust = adjust, 
                                  method = type, ...)$p
     ## was cor_mat_p <- corr.test(t(x), adjust = adjust, ...)$p
     cor_mat <- ifelse(cor_mat_p > threshold_correlation, 0, 1)
@@ -249,6 +270,7 @@ correlation <- function(x, adjust_correlation = "none", type = "pearson",
 }
 
 #' @name bayes
+#' @aliases bayes
 #' @title Create a statistical network based on constraint-based structure 
 #' learning algorithm
 #' @description  \code{bayes} infers a statistical network using 
@@ -271,14 +293,15 @@ correlation <- function(x, adjust_correlation = "none", type = "pearson",
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' bayes(x)
+#' @export
 bayes <- function(x, ...) {
     x_df <- data.frame(t(x))
     ## allow for compatibility of arguments 
-    x_fast.iamb <- threeDots_call("fast.iamb", x = x_df, ...)
+    x_fast.iamb <- threeDots_call(bnlearn::fast.iamb, x = x_df, ...)
     ## was x_fast.iamb <- fast.iamb(x_df, ...) 
     bs_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(bs_mat) <- rownames(bs_mat) <- rownames(x)
-    arcs_fast.iamb <- arcs(x_fast.iamb)
+    arcs_fast.iamb <- bnlearn::arcs(x_fast.iamb)
     for(i in 1:dim(arcs_fast.iamb)[1]) {
         bs_mat[arcs_fast.iamb[i, "from"], arcs_fast.iamb[i, "to"] ] <- 1} 
     bs_mat <- as.matrix(bs_mat)
@@ -286,6 +309,7 @@ bayes <- function(x, ...) {
 }
 
 #' @name add_to_list
+#' @aliases add_to_list
 #' @title Add network to list
 #' @description This helper function used in the function
 #' \code{create_statistical_networks_list} adds a network to a list of networks.
@@ -296,7 +320,7 @@ bayes <- function(x, ...) {
 #' @details Used internally in \code{create_statistical_networks_list}
 #' @return list containing the existing networks and the added network 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples add_to_list(l, name, object) 
+#' @examples 
 #' data("x_test", package = "MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
@@ -318,6 +342,7 @@ add_to_list <- function(l, name, object) {
 
 
 #' @name create_statistical_networks_list
+#' @aliases create_statistical_networks_list
 #' @title Create a list of statistical networks
 #' @description The function infers network topologies from statistical 
 #' methods and returns matrices of these networks in a list. The function
@@ -378,7 +403,7 @@ create_statistical_networks_list <- function(x, model, ...) {
         l <- add_to_list(l, "randomForest", randomForest)
     }
     if (any(c("clr", "aracne") %in% model)) {
-        mi_x_z <- cmi(t(x_z))$bcmi
+        mi_x_z <- mpmi::cmi(t(x_z))$bcmi
         rownames(mi_x_z) <- colnames(mi_x_z) <- rownames(x)
     }
     
@@ -413,6 +438,7 @@ create_statistical_networks_list <- function(x, model, ...) {
 
 
 #' @name consensus_network
+#' @aliases consensus_network
 #' @title Create a consensus network of statistical networks
 #' @description The function takes a list of parameters (\code{l}) as input and
 #' creates a consensus network from these networks by calling the function 
@@ -422,7 +448,7 @@ create_statistical_networks_list <- function(x, model, ...) {
 #' statistical methods. 
 #' @usage consensus_network(l, threshold = 1, ...)
 #' @param l list, each entry of the list contains a network
-#' @param threshold numerical value, when combining the networks the threshold 
+#' @param threshold numeric, when combining the networks the threshold 
 #' parameter defines if an edge is reported or not. For 
 #' \code{method = "central.graph"} threshold is set to 1 by default. For other
 #' values of method, the value should be carefully defined by the user. If 
@@ -439,7 +465,7 @@ create_statistical_networks_list <- function(x, model, ...) {
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' stat_net_l <- create_statistical_networks_list(x, c("pearson", "spearman"))
-#' consensus_network(l)
+#' consensus_network(stat_net_l)
 #' @export
 consensus_network <- function(l, threshold = 1, ...) {
     
@@ -477,7 +503,7 @@ consensus_network <- function(l, threshold = 1, ...) {
     
     
     ## allow for compatibility of arguments 
-    consensus_mat <- threeDots_call(consensus, dat = l, ...)
+    consensus_mat <- threeDots_call(sna::consensus, dat = l, ...)
     ## was sna::consensus(dat = l, ...)
     
     ##if (method == "central.graph") threshold <- 1
@@ -488,6 +514,7 @@ consensus_network <- function(l, threshold = 1, ...) {
 }
 
 #' @name threeDots_call
+#' @aliases threeDots_call
 #' @title Check if passed arguments match the function's formal arguments and
 #' call the function with the checked arguments
 #' @description The function \code{threeDots_call} gets the formal arguments
@@ -502,10 +529,12 @@ consensus_network <- function(l, threshold = 1, ...) {
 #' \code{correlation}, \code{bayes}, \code{consensus_network}
 #' @return Function call with passed arguments 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @examples threeDots_call("sd", x = 1:10, y = 1:10)
+#' @examples 
+#' threeDots_call(stats::sd, x = 1:10, y = 1:10)
 #' ## in contrast to the above example, the following example will result in an 
 #' ## error
-#' \donotrun{sd(x = 1:10, y = 1:10)}
+#' \dontrun{stats::sd(x = 1:10, y = 1:10)}
+#' @export
 threeDots_call <- function(fun, ...) {
     formal_args <- formalArgs(fun)
     args <- list(...)
@@ -518,14 +547,20 @@ threeDots_call <- function(fun, ...) {
 }
 
 #' @name create_statistical_network
+#' @aliases create_statistical_network
 #' @title Create statistical network
 #' @description \code{create_statistical_network} creates a consensus network
 #' given the models to use. 
 #' @usage create_statistical_network(x, model, threshold = 1, ...)
 #' @param x matrix that contains intensity values of features/metabolites (rows)
 #' per sample (columns). 
-#' @param model, character vector containing the model that will be used 
+#' @param model, character, vector containing the model that will be used 
 #' ("lasso", "randomForest", "clr", "aracne", "pearson", "spearman", "bayes")
+#' @param threshold numeric, when combining the networks the threshold 
+#' parameter defines if an edge is reported or not. For 
+#' \code{method = "central.graph"} threshold is set to 1 by default. For other
+#' values of method, the value should be carefully defined by the user. If 
+#' threshold is set to NULL (default), it will be set to 1 internally. 
 #' @param ... parameters passed to the functions  \code{lasso}, 
 #' \code{randomForest}, \code{clr}, \code{aracne}, \code{correlation},
 #' \code{bayes} and/or \code{consensus_network}

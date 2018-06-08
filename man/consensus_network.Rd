@@ -9,7 +9,7 @@ consensus_network(l, threshold = 1, ...)
 \arguments{
 \item{l}{list, each entry of the list contains a network}
 
-\item{threshold}{numerical value, when combining the networks the threshold 
+\item{threshold}{numeric, when combining the networks the threshold 
 parameter defines if an edge is reported or not. For 
 \code{method = "central.graph"} threshold is set to 1 by default. For other
 values of method, the value should be carefully defined by the user. If 
@@ -39,7 +39,7 @@ data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 stat_net_l <- create_statistical_networks_list(x, c("pearson", "spearman"))
-consensus_network(l)
+consensus_network(stat_net_l)
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

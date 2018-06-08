@@ -4,7 +4,7 @@
 \alias{randomForest}
 \title{Create a statistical network based on random forest}
 \usage{
-randomForest(x, parallel = FALSE, randomForest_adjust = NULL, ...)
+randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
@@ -31,7 +31,7 @@ matrix, matrix with edges inferred from random forest algorithm
 random forest using the \code{rfPermute} function from the 
 \code{rfPermute} package. \code{randomForest} extracts the p-values  
 by the function \code{rp.importance} and the presence/absence based on the 
-significance value (\alpha \leq 0.05) of this 
+significance value (\eqn{\alpha \leq 0.05}) of this 
 connection to a matrix that is returned.
 }
 \details{

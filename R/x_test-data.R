@@ -3,6 +3,10 @@
 #' @description \code{x_test} contains 36 selected metabolic features of 
 #' \code{peaklist}. It will be used as an example data set in the vignette to 
 #' show the functionality of the packages. 
+#' @docType data
+#' @usage x_test
+#' @return \code{matrix}
+#' @format \code{matrix}
 #' @source 
 #' data("peaklist_example", package = "MetNet")
 #' peaklist[, 3:dim(peaklist)[2]] <- apply(peaklist[, 3:dim(peaklist)[2]], 2, 
@@ -96,4 +100,4 @@
 #' ## change rownames (that it is accepted by formulas)
 #' rownames(x_test) <- paste0("x", rownames(x_test))
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
- 
+NULL

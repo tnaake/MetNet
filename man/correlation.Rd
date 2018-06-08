@@ -12,7 +12,10 @@ correlation(x, adjust_correlation = "none", type = "pearson", threshold_correlat
 
 \item{adjust_correlation}{character}
 
-\item{threshold_correlation}{numeric, significance level \alpha
+\item{type}{character, either "pearson" or "spearman", \code{type} will be 
+passed to argument \code{method} in \code{corr.test}}
+
+\item{threshold_correlation}{numeric, significance level \eqn{\alpha}
 (default: 0.05), if the (adjusted) p-values exceed this value, there 
 is no statistical connection between features}
 

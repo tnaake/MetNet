@@ -24,7 +24,6 @@ This helper function used in the function
 Used internally in \code{create_statistical_networks_list}
 }
 \examples{
-add_to_list(l, name, object) 
 data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)

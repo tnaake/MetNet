@@ -30,7 +30,7 @@ Used internally in \code{lasso}, \code{randomForest},
 threeDots_call(stats::sd, x = 1:10, y = 1:10)
 ## in contrast to the above example, the following example will result in an 
 ## error
-\\donotrun{stats::sd(x = 1:10, y = 1:10)}
+\dontrun{stats::sd(x = 1:10, y = 1:10)}
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}
