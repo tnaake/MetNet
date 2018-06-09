@@ -13,13 +13,16 @@ column \code{'mz'} that has the m/z information (numerical values) for the
 calculation of mass differences between features}
 
 \item{functional_groups}{data.frame, containing the columns \code{"group"}, 
-\code{'formula'} and \code{'mass'} that will be used for detection of 
-transformation of (functional) groups}
+and \code{'mass'} that will be used for detection of transformation of 
+(functional) groups}
 
 \item{ppm}{numeric, mass accuracy of m/z features in parts per million (ppm)}
 }
 \value{
-matrix, matrix with edges inferred mass differences
+list containing two matrices, in the first list entry the 
+matrix with edges inferred mass differences is stored, in the second list 
+entry the matrix with the type (corresponding to the \code{"group"} column
+in \code{functional_groups}) is stored
 }
 \description{
 The function \code{create_structural_network} infers network 

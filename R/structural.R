@@ -46,8 +46,8 @@ in_range_which <- function(m_1, m_2, functional_groups) {
 #' column \code{'mz'} that has the m/z information (numerical values) for the 
 #' calculation of mass differences between features 
 #' @param functional_groups data.frame, containing the columns \code{"group"}, 
-#' \code{'formula'} and \code{'mass'} that will be used for detection of 
-#' transformation of (functional) groups
+#' and \code{'mass'} that will be used for detection of transformation of 
+#' (functional) groups
 #' @param ppm numeric, mass accuracy of m/z features in parts per million (ppm)
 #' @details \code{create_structural_network} accesses the column \code{'mz'} of 
 #' \code{x} to infer structural topologies based on the functional groups 
@@ -56,7 +56,10 @@ in_range_which <- function(m_1, m_2, functional_groups) {
 #' in parts per million (ppm) by the \code{ppm} argument. The m/z values in the 
 #' \code{'mz'} column of \code{x} will be converted to m/z ranges according to 
 #' the \code{ppm} argument (default \code{ppm = 5}). 
-#' @return matrix, matrix with edges inferred mass differences
+#' @return list containing two matrices, in the first list entry the 
+#' matrix with edges inferred mass differences is stored, in the second list 
+#' entry the matrix with the type (corresponding to the \code{"group"} column
+#' in \code{functional_groups}) is stored
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
 #' data("x_test", package = "MetNet")
@@ -78,9 +81,8 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
     
     if (!is.data.frame(functional_groups)) 
         stop("functional_groups is not a data.frame")
-    if (!all(c("group", "formula", "mass") %in% colnames(functional_groups))) {
-        stop("functional_groups doesn't contain the columns group, formula 
-            and mass")
+    if (!all(c("group", "mass") %in% colnames(functional_groups))) {
+        stop("functional_groups doesn't contain the columns group and mass")
     }
     if (!is.numeric(ppm)) stop("ppm is not numeric")
     

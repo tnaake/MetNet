@@ -8,6 +8,7 @@
 #' @importFrom parallel mclapply
 #' @importFrom stats formula p.adjust sd
 #' @importFrom methods formalArgs
+#' @importFrom ppcor pcor spcor
 
 
 #' @name lasso
@@ -145,13 +146,13 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
 #' the \code{parmigene} package. The presence/absence is based on if the 
 #' returned value exceeds a user-defined threshold value. \code{clr} will 
 #' return the adjacency matrix containing the presence/absence value.
-#' @usage clr(mi, threshold_clr = 0)
+#' @usage clr(mi, clr_threshold = 0)
 #' @param mi matrix, where columns and the rows are features 
 #' (metabolites), cell entries are mutual information values between the 
 #' features. As input, the mutual information (e.g. raw MI estimates or 
 #' Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 #' \code{mpmi} package can be used.
-#' @param threshold_clr numeric, if the clr value exceeds the threshold 
+#' @param clr_threshold numeric, if the clr value exceeds the threshold 
 #' (clr$_{i,j}$ > threshold, where clr$_{i, j}$ is the clr value of the ith row 
 #' feature and of the jth column feature), the connection is defined as 
 #' present, if the clr value is lower than the threshold value 
@@ -168,12 +169,12 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
-#' clr(mi_x_z, threshold_clr = 0)
+#' clr(mi_x_z, clr_threshold = 0)
 #' @export
-clr <- function(mi, threshold_clr = 0) {
-    if (!is.numeric(threshold_clr)) stop("threshold_clr is not numeric")
+clr <- function(mi, clr_threshold = 0) {
+    if (!is.numeric(clr_threshold)) stop("clr_threshold is not numeric")
     clr_mat <- parmigene::clr(mi)
-    clr_mat <- ifelse(clr_mat > threshold_clr, 1, 0)
+    clr_mat <- ifelse(clr_mat > clr_threshold, 1, 0)
     colnames(clr_mat) <- rownames(clr_mat) <- rownames(mi)
     return(clr_mat)
 }
@@ -188,14 +189,14 @@ clr <- function(mi, threshold_clr = 0) {
 #' \code{parmigene} package. The presence/absence is based on if the 
 #' returned value exceeds a user-defined threshold value. \code{aracne} will 
 #' return the adjacency matrix containing the presence/absence value.
-#' @usage aracne(mi, eps = 0.05, threshold_aracne = 0)
+#' @usage aracne(mi, eps = 0.05, aracne_threshold = 0)
 #' @param mi matrix, where columns and the rows are features 
 #' (metabolites), cell entries are mutual information values between the 
 #' features. As input, the mutual information (e.g. raw MI estimates or 
 #' Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 #' \code{mpmi} package can be used.
 #' @param eps numeric, used to remove the weakest edge of each triple of nodes
-#' @param threshold_aracne numeric, if the aracne value exceeds the threshold 
+#' @param aracne_threshold numeric, if the aracne value exceeds the threshold 
 #' (aracne$_{i,j}$ > threshold, where aracne$_{i, j}$ is the aracne value of 
 #' the ith row feature and of the jth column feature), the connection is 
 #' defined as present, if the aracne value is lower than the threshold value 
@@ -211,12 +212,12 @@ clr <- function(mi, threshold_clr = 0) {
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
-#' aracne(mi_x_z, eps = 0.05, threshold_aracne = 0)
+#' aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
 #' @export
-aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
-    if (!is.numeric(threshold_aracne)) stop("threshold_aracne is not numeric")
+aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
+    if (!is.numeric(aracne_threshold)) stop("aracne_threshold is not numeric")
     aracne_mat <- parmigene::aracne.a(mi, eps = eps)  
-    aracne_mat <- ifelse(aracne_mat > threshold_aracne, 1, 0)
+    aracne_mat <- ifelse(aracne_mat > aracne_threshold, 1, 0)
     colnames(aracne_mat) <- rownames(aracne_mat) <- rownames(mi)
     return(aracne_mat)
 }
@@ -228,15 +229,20 @@ aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
 #' correlation using the \code{corr.test} function from the 
 #' \code{psych} package. \code{correlation} extracts the reported 
 #' p-values from the function \code{corr.test} that can be adjusted for 
-#' multiple testing (\code{adjust_correlation} parameter). 
-#' @usage correlation(x, adjust_correlation = "none", type = "pearson", 
-#'                                         threshold_correlation = 0.05, ...) 
+#' multiple testing (\code{correlation_adjust} parameter). 
+#' @usage correlation(x, correlation_adjust = "none", type = "pearson", 
+#'                                         correlation_threshold = 0.05, ...) 
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
-#' @param type character, either "pearson" or "spearman", \code{type} will be 
-#' passed to argument \code{method} in \code{corr.test}
-#' @param adjust_correlation character 
-#' @param threshold_correlation numeric, significance level \eqn{\alpha}
+#' @param type character, either "pearson", "spearman", "pearson_partial",
+#' "spearman_partial", "pearson_semipartial" or "spearman_semipartial". 
+#' \code{type} will be passed to argument \code{method} in \code{corr.test} 
+#' (in the case of "pearson" or "spearman") or to \code{method} in \code{pcor} 
+#' ("pearson" and "spearman" for "pearson_partial" and "spearman_partial", 
+#' respectively) or to \code{method} in \code{spcor} ("pearson" or "spearman"
+#' for "pearson_semipartial" and "spearman_semipartial", respectively)
+#' @param correlation_adjust character 
+#' @param correlation_threshold numeric, significance level \eqn{\alpha}
 #' (default: 0.05), if the (adjusted) p-values exceed this value, there 
 #' is no statistical connection between features 
 #' @param ... parameters passed to \code{corr.test} (argument \code{adjust} 
@@ -250,19 +256,38 @@ aracne <- function(mi, eps = 0.05, threshold_aracne = 0) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' correlation(x, adjust_correlation = "bonferroni", type = "pearson")
+#' correlation(x, correlation_adjust = "bonferroni", type = "pearson")
 #' @export
-correlation <- function(x, adjust_correlation = "none", type = "pearson", 
-    threshold_correlation = 0.05, ...) {
-    if (!is.numeric(threshold_correlation)) 
-        stop("threshold_correlation is not numeric")
+correlation <- function(x, correlation_adjust = "none", type = "pearson", 
+    correlation_threshold = 0.05, ...) {
+    if (!is.numeric(correlation_threshold)) 
+        stop("correlation_threshold is not numeric")
     ## get character vector for p-value adjustment
-    adjust <- adjust_correlation
+    adjust <- correlation_adjust
     ## allow for compatibility of arguments 
-    cor_mat_p <- threeDots_call(psych::corr.test, x = t(x), adjust = adjust, 
-                                                        method = type, ...)$p
+    if (type %in% c("pearson", "spearman") {
+        cor_mat_p <- threeDots_call(psych::corr.test, x = t(x), 
+                                    adjust = adjust, method = type, ...)$p    
+    }
+    if (type %in% c("pearson_partial", "spearman_partial")) {
+        if (type == "pearson_partial") method <- "pearson"
+        if (type == "spearman_partial") method <- "spearman"
+        cor_mat_p <- ppcor::pcor(x, method = method)
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method = correlation_adjust)     
+        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
+                             nrow = nrow(x), byrow = FALSE)
+    }
+    if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
+        if (type == "pearson_semipartial") method <- "pearson"
+        if (type == "spearman_semipartial") method <- "spearman"
+        cor_mat_p <- ppcor::spcor(x, method = method)
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method = correlation_adjust)     
+        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
+                            nrow = nrow(x), byrow = FALSE)
+    }
+    
     ## was cor_mat_p <- corr.test(t(x), adjust = adjust, ...)$p
-    cor_mat <- ifelse(cor_mat_p > threshold_correlation, 0, 1)
+    cor_mat <- ifelse(cor_mat_p > correlation_threshold, 0, 1)
     colnames(cor_mat) <- rownames(cor_mat) <- rownames(x)
     return(cor_mat)
 }
@@ -379,7 +404,8 @@ create_statistical_networks_list <- function(x, model, ...) {
     ## check if model complies with the implemented model and return error 
     ## if not so
     if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne", 
-                            "pearson", "spearman", "bayes"))))
+            "pearson", "pearson_partial", "pearson_semipartial", 
+            "spearman", "spearman_partial", "spearman_semipartial", "bayes"))))
         stop("method not implemented in create_statistical_networks_list")
         
     ## check if x is numeric matrix and return error if not so
@@ -400,6 +426,8 @@ create_statistical_networks_list <- function(x, model, ...) {
         randomForest <- randomForest(x, ...)
         l <- add_to_list(l, "randomForest", randomForest)
     }
+    
+    ## calculate mutual information if "clr" or "aracne" is in model
     if (any(c("clr", "aracne") %in% model)) {
         mi_x_z <- mpmi::cmi(t(x_z))$bcmi
         rownames(mi_x_z) <- colnames(mi_x_z) <- rownames(x)
@@ -420,10 +448,30 @@ create_statistical_networks_list <- function(x, model, ...) {
         pearson <- correlation(x, type = "pearson", ...)
         l <- add_to_list(l, "pearson", pearson)
     }
+    ## add entry for pearson_partial if "pearson_partial" is in model
+    if ("pearson_partial" %in% model) {
+        pearson <- correlation(x, type = "pearson_partial", ...)
+        l <- add_to_list(l, "pearson_partial", pearson)
+    }
+    ## add entry for pearson_semipartial if "pearson_semipartial" is in model
+    if ("pearson_semipartial" %in% model) {
+        pearson <- correlation(x, type = "pearson_semipartial", ...)
+        l <- add_to_list(l, "pearson_semipartial", pearson)
+    }
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
         spearman <- correlation(x, type = "spearman", ...)
         l <- add_to_list(l, "spearman", spearman)
+    }
+    ## add entry for spearman_partial if "spearman_partial" is in model
+    if ("spearman_partial" %in% model) {
+        pearson <- correlation(x, type = "spearman_partial", ...)
+        l <- add_to_list(l, "spearman_partial", pearson)
+    }
+    ## add entry for spearman_semipartial if "spearman_semipartial" is in model
+    if ("spearman_semipartial" %in% model) {
+        pearson <- correlation(x, type = "spearman_semipartial", ...)
+        l <- add_to_list(l, "spearman_semipartial", pearson)
     }
     ## add entry for bayes if "bayes" is in model
     if ("bayes" %in% model) {

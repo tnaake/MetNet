@@ -12,4 +12,6 @@ CHANGES IN VERSION 0.9.0
    molecular weight differences and create a network [2018-05-19 Sat]
  o implement the function combine_structural_statistical to combine 
    the structurally-derived and statistically-derived network [2018-05-26 Sat]
+ o implement model partial and semi-partial pearson/spearman correlation
+   using the ppcor package [2018-06-08 Sat]
 

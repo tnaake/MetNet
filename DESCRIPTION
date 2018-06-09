@@ -13,15 +13,16 @@ Depends:
     R (>= 3.4.4),
     stats (>= 3.4.4)
 Imports:
+    bnlearn (>= 4.3),     
     methods (>= 3.4.4),
-    parallel (>= 3.4.4),
-    stabs (>= 0.6),
-    rfPermute (>= 2.1.5),
     mpmi (>= 0.42), 
+    parallel (>= 3.4.4),
     parmigene (>= 1.0.2),
+    ppcor (>= 1.1),
     psych (>= 1.7.8),
-    bnlearn (>= 4.3),
-    sna (>= 2.4)    
+    rfPermute (>= 2.1.5),
+    sna (>= 2.4),
+    stabs (>= 0.6)    
 Suggests:
     BiocGenerics,
     igraph (>= 1.1.2), 

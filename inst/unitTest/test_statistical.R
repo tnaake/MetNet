@@ -40,7 +40,7 @@ mi_mat_test_z <- mpmi::cmi(mat_test_z)$bcmi
 rownames(mi_mat_test_z) <- colnames(mi_mat_test_z) <- colnames(mat_test_z)
 clr_mat <- clr(mi_mat_test_z)
 test_clr <- function() {
-    checkException(clr(mi_mat_test_z, threshold_clr = "a"))
+    checkException(clr(mi_mat_test_z, clr_threshold = "a"))
     checkEquals(sum(clr_mat), 10)
     checkEquals(rownames(clr_mat), colnames(clr_mat))
     checkEquals(rownames(clr_mat), rownames(mat_test))
@@ -55,7 +55,7 @@ test_clr <- function() {
 ## START unit test aracne ##
 aracne_mat <- aracne(mi_mat_test_z)
 test_aracne <- function() {
-    checkException(aracne(mi_mat_test_z, threshold_aracne = "a"))
+    checkException(aracne(mi_mat_test_z, aracne_threshold = "a"))
     checkException(aracne(mi_mat_test_z, eps = "a"))
     checkEquals(sum(aracne_mat), 27)
     checkEquals(rownames(aracne_mat), colnames(aracne_mat))
@@ -72,10 +72,10 @@ test_aracne <- function() {
 correlation_p_mat <- correlation(mat_test, type = "pearson")
 correlation_s_mat <- correlation(mat_test, type = "spearman")
 test_correlation <- function() {
-    checkException(correlation(mat_test, threshold_correlation = "a"))
+    checkException(correlation(mat_test, correlation_threshold = "a"))
     checkEquals(sum(correlation_p_mat), 37)
-    checkEquals(sum(correlation(mat_test, adjust_correlation = "bonferroni", threshold_correlation = 1e-11)), 21)
-    checkEquals(sum(correlation(mat_test, adjust_correlation = "none", threshold_correlation = 1e-11)), 23)
+    checkEquals(sum(correlation(mat_test, correlation_adjust = "bonferroni", correlation_threshold = 1e-11)), 21)
+    checkEquals(sum(correlation(mat_test, correlation_adjust = "none", correlation_threshold = 1e-11)), 23)
     checkEquals(sum(correlation_s_mat), 37)
     checkEquals(rownames(correlation_p_mat), colnames(correlation_p_mat))
     checkEquals(rownames(correlation_s_mat), colnames(correlation_s_mat))
