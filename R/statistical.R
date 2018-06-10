@@ -226,10 +226,14 @@ aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
 #' @aliases correlation
 #' @title Create a statistical network based on correlation 
 #' @description  \code{correlation} infers a statistical network using 
-#' correlation using the \code{corr.test} function from the 
-#' \code{psych} package. \code{correlation} extracts the reported 
-#' p-values from the function \code{corr.test} that can be adjusted for 
-#' multiple testing (\code{correlation_adjust} parameter). 
+#' correlation using the \code{corr.test} function (from the 
+#' \code{psych} package), \code{pcor} (from \code{ppcor}) or 
+#' \code{spcor} (from \code{ppcor}). \code{correlation} extracts the reported 
+#' p-values from the function \code{corr.test}, \code{pcor} or \code{spcor} 
+#' that can be adjusted for 
+#' multiple testing (\code{correlation_adjust} parameter) and will return 
+#' an unweighted adjacency matrix containing edges if the (adjusted) p-value
+#' is below the value defined by \code{correlation_threshold}. 
 #' @usage correlation(x, correlation_adjust = "none", type = "pearson", 
 #'                                         correlation_threshold = 0.05, ...) 
 #' @param x matrix, where columns are the samples and the rows are features 
@@ -246,12 +250,19 @@ aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
 #' (default: 0.05), if the (adjusted) p-values exceed this value, there 
 #' is no statistical connection between features 
 #' @param ... parameters passed to \code{corr.test} (argument \code{adjust} 
-#' will be ignored) 
-#' @details For use of the parameters used in the \code{corr.test} function, 
+#' will be ignored)
+#' @details If "pearson" or "spearman" is used as a \code{method} the function 
+#' \code{corr.test} from \code{psych} will be employed. 
+#' If "pearson_partial" or "spearman_partial" is used as a \code{method} the 
+#' function \code{pcor} from \code{spcor} will be employed. 
+#' If "pearson_semipartial" or "spearman_semipartial" is used as a \code{method}
+#' the function \code{spcor} from \code{spcor} will be employed. 
+#' For use of the parameters used in the \code{corr.test} function, 
 #' refer to ?psych::corr.test. 
 #' @return matrix, matrix with edges inferred from correlation algorithm 
-#' \code{corr.test}
-#' @author Thomas Naake, \email{thomasnaake @googlemail.com}
+#' \code{corr.test}, \code{pcor} or \code{spcor} (depending on the chosen 
+#' method)
+#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
 #' data("x_test", package = "MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
@@ -265,14 +276,14 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
     ## get character vector for p-value adjustment
     adjust <- correlation_adjust
     ## allow for compatibility of arguments 
-    if (type %in% c("pearson", "spearman") {
+    if (type %in% c("pearson", "spearman")) {
         cor_mat_p <- threeDots_call(psych::corr.test, x = t(x), 
                                     adjust = adjust, method = type, ...)$p    
     }
     if (type %in% c("pearson_partial", "spearman_partial")) {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
-        cor_mat_p <- ppcor::pcor(x, method = method)
+        cor_mat_p <- ppcor::pcor(t(x), method = method)$p.value
         cor_mat_p <- stats::p.adjust(cor_mat_p, method = correlation_adjust)     
         cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
                              nrow = nrow(x), byrow = FALSE)
@@ -280,7 +291,7 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
-        cor_mat_p <- ppcor::spcor(x, method = method)
+        cor_mat_p <- ppcor::spcor(t(x), method = method)$p.value
         cor_mat_p <- stats::p.adjust(cor_mat_p, method = correlation_adjust)     
         cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
                             nrow = nrow(x), byrow = FALSE)
@@ -372,24 +383,28 @@ add_to_list <- function(l, name, object) {
 #' includes functionality to caluclate statistical networks based on 
 #' LASSO (L1 norm)-regression, random forests, context likelihood of 
 #' relatedness (CLR), the algorithm for the reconstruction of accurate 
-## cellular networks (ARACNE), Pearson correlation,
-#' Spearman correlation and Constraint-based structure learning (Bayes). 
+#' cellular networks (ARACNE), Pearson correlation (also partial and 
+#' semipartial), Spearman correlation (also partial and semipartial) 
+#' and Constraint-based structure learning (Bayes). 
 #' @usage create_statistical_networks_list(x, model, ...)
 #' @param x matrix that contains intensity values of features/metabolites (rows)
 #' per sample (columns). 
 #' @param model, character vector containing the methods that will be used 
-#' ("lasso", "randomForest", "clr", "aracne", "pearson", "spearman", "bayes")
+#' ("lasso", "randomForest", "clr", "aracne", "pearson", "pearson_partial", 
+#' "pearson_semipartial","spearman", "spearman_partial", "spearman_semipartial",
+#' "bayes")
 #' @param ... parameters passed to the functions  \code{lasso}, 
 #' \code{randomForest}, \code{clr}, \code{aracne}, \code{correlation} and/or
 #' \code{bayes}
 #' @details \code{create_statistical_networks_list} calls the function
 #' \code{lasso}, \code{randomForest}, \code{clr}, \code{aracne}, 
-#' \code{.pearson}, \code{.spearman} and/or \code{bayes} as specified by 
-#' \code{model}. It will create network(s) using the specified methods and will 
-#' return a list containing the binary network (if model is of length 1) or
-#' append these binary networks to a list (if model is of length > 1). 
-#' Internally x will be z-scaled and the z-scaled object will be used in 
-#' \code{lasso}, \code{clr} and/or \code{aracne}.
+#' \code{correlation} (for "pearson", "pearson_partial", "pearson_semipartial",
+#' "spearman", "spearman_partial", "spearman_semipartial") and/or \code{bayes} 
+#' as specified by \code{model}. It will create network(s) using the specified 
+#' methods and will return a list containing the binary network (if model is 
+#' of length 1) or append these binary networks to a list (if model is of 
+#' length > 1). Internally x will be z-scaled and the z-scaled object will 
+#' be used in \code{lasso}, \code{clr} and/or \code{aracne}.
 #' @return list containing the respective statistical networks specified by 
 #' \code{model}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -601,7 +616,9 @@ threeDots_call <- function(fun, ...) {
 #' @param x matrix that contains intensity values of features/metabolites (rows)
 #' per sample (columns). 
 #' @param model, character, vector containing the model that will be used 
-#' ("lasso", "randomForest", "clr", "aracne", "pearson", "spearman", "bayes")
+#' ("lasso", "randomForest", "clr", "aracne", "pearson", "pearson_partial", 
+#' "pearson_semipartial","spearman", "spearman_partial", "spearman_semipartial",
+#' "bayes")
 #' @param threshold numeric, when combining the networks the threshold 
 #' parameter defines if an edge is reported or not. For 
 #' \code{method = "central.graph"} threshold is set to 1 by default. For other
@@ -619,8 +636,9 @@ threeDots_call <- function(fun, ...) {
 #' includes functionality to caluclate statistical networks based on 
 #' LASSO (L1 norm)-regression, random forests, context likelihood of 
 #' relatedness (CLR), the algorithm for the reconstruction of accurate 
-## cellular networks (ARACNE), Pearson correlation,
-#' Spearman correlation and Constraint-based structure learning (Bayes). 
+#' cellular networks (ARACNE), Pearson correlation (also partial and 
+#' semipartial), Spearman correlation (also partial and semipartial)
+#' and Constraint-based structure learning (Bayes). 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
 #' data("x_test", package = "MetNet")
