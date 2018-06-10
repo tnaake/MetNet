@@ -11,7 +11,9 @@ create_statistical_networks_list(x, model, ...)
 per sample (columns).}
 
 \item{model, }{character vector containing the methods that will be used 
-("lasso", "randomForest", "clr", "aracne", "pearson", "spearman", "bayes")}
+("lasso", "randomForest", "clr", "aracne", "pearson", "pearson_partial", 
+"pearson_semipartial","spearman", "spearman_partial", "spearman_semipartial",
+"bayes")}
 
 \item{...}{parameters passed to the functions  \code{lasso}, 
 \code{randomForest}, \code{clr}, \code{aracne}, \code{correlation} and/or
@@ -27,17 +29,20 @@ methods and returns matrices of these networks in a list. The function
 includes functionality to caluclate statistical networks based on 
 LASSO (L1 norm)-regression, random forests, context likelihood of 
 relatedness (CLR), the algorithm for the reconstruction of accurate 
-Spearman correlation and Constraint-based structure learning (Bayes).
+cellular networks (ARACNE), Pearson correlation (also partial and 
+semipartial), Spearman correlation (also partial and semipartial) 
+and Constraint-based structure learning (Bayes).
 }
 \details{
 \code{create_statistical_networks_list} calls the function
 \code{lasso}, \code{randomForest}, \code{clr}, \code{aracne}, 
-\code{.pearson}, \code{.spearman} and/or \code{bayes} as specified by 
-\code{model}. It will create network(s) using the specified methods and will 
-return a list containing the binary network (if model is of length 1) or
-append these binary networks to a list (if model is of length > 1). 
-Internally x will be z-scaled and the z-scaled object will be used in 
-\code{lasso}, \code{clr} and/or \code{aracne}.
+\code{correlation} (for "pearson", "pearson_partial", "pearson_semipartial",
+"spearman", "spearman_partial", "spearman_semipartial") and/or \code{bayes} 
+as specified by \code{model}. It will create network(s) using the specified 
+methods and will return a list containing the binary network (if model is 
+of length 1) or append these binary networks to a list (if model is of 
+length > 1). Internally x will be z-scaled and the z-scaled object will 
+be used in \code{lasso}, \code{clr} and/or \code{aracne}.
 }
 \examples{
 data("x_test", package = "MetNet")

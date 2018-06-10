@@ -11,7 +11,9 @@ create_statistical_network(x, model, threshold = 1, ...)
 per sample (columns).}
 
 \item{model, }{character, vector containing the model that will be used 
-("lasso", "randomForest", "clr", "aracne", "pearson", "spearman", "bayes")}
+("lasso", "randomForest", "clr", "aracne", "pearson", "pearson_partial", 
+"pearson_semipartial","spearman", "spearman_partial", "spearman_semipartial",
+"bayes")}
 
 \item{threshold}{numeric, when combining the networks the threshold 
 parameter defines if an edge is reported or not. For 
@@ -39,7 +41,9 @@ functions \code{create_statistical_networks_list} and
 includes functionality to caluclate statistical networks based on 
 LASSO (L1 norm)-regression, random forests, context likelihood of 
 relatedness (CLR), the algorithm for the reconstruction of accurate 
-Spearman correlation and Constraint-based structure learning (Bayes).
+cellular networks (ARACNE), Pearson correlation (also partial and 
+semipartial), Spearman correlation (also partial and semipartial)
+and Constraint-based structure learning (Bayes).
 }
 \examples{
 data("x_test", package = "MetNet")

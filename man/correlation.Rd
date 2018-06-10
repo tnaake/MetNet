@@ -4,19 +4,24 @@
 \alias{correlation}
 \title{Create a statistical network based on correlation}
 \usage{
-correlation(x, adjust_correlation = "none", type = "pearson", 
-                                        threshold_correlation = 0.05, ...)
+correlation(x, correlation_adjust = "none", type = "pearson", 
+                                        correlation_threshold = 0.05, ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
-\item{adjust_correlation}{character}
+\item{correlation_adjust}{character}
 
-\item{type}{character, either "pearson" or "spearman", \code{type} will be 
-passed to argument \code{method} in \code{corr.test}}
+\item{type}{character, either "pearson", "spearman", "pearson_partial",
+"spearman_partial", "pearson_semipartial" or "spearman_semipartial". 
+\code{type} will be passed to argument \code{method} in \code{corr.test} 
+(in the case of "pearson" or "spearman") or to \code{method} in \code{pcor} 
+("pearson" and "spearman" for "pearson_partial" and "spearman_partial", 
+respectively) or to \code{method} in \code{spcor} ("pearson" or "spearman"
+for "pearson_semipartial" and "spearman_semipartial", respectively)}
 
-\item{threshold_correlation}{numeric, significance level \eqn{\alpha}
+\item{correlation_threshold}{numeric, significance level \eqn{\alpha}
 (default: 0.05), if the (adjusted) p-values exceed this value, there 
 is no statistical connection between features}
 
@@ -25,16 +30,27 @@ will be ignored)}
 }
 \value{
 matrix, matrix with edges inferred from correlation algorithm 
-\code{corr.test}
+\code{corr.test}, \code{pcor} or \code{spcor} (depending on the chosen 
+method)
 }
 \description{
 \code{correlation} infers a statistical network using 
-correlation using the \code{corr.test} function from the 
-\code{psych} package. \code{correlation} extracts the reported 
-p-values from the function \code{corr.test} that can be adjusted for 
-multiple testing (\code{adjust_correlation} parameter).
+correlation using the \code{corr.test} function (from the 
+\code{psych} package), \code{pcor} (from \code{ppcor}) or 
+\code{spcor} (from \code{ppcor}). \code{correlation} extracts the reported 
+p-values from the function \code{corr.test}, \code{pcor} or \code{spcor} 
+that can be adjusted for 
+multiple testing (\code{correlation_adjust} parameter) and will return 
+an unweighted adjacency matrix containing edges if the (adjusted) p-value
+is below the value defined by \code{correlation_threshold}.
 }
 \details{
+If "pearson" or "spearman" is used as a \code{method} the function 
+\code{corr.test} from \code{psych} will be employed. 
+If "pearson_partial" or "spearman_partial" is used as a \code{method} the 
+function \code{pcor} from \code{spcor} will be employed. 
+If "pearson_semipartial" or "spearman_semipartial" is used as a \code{method}
+the function \code{spcor} from \code{spcor} will be employed. 
 For use of the parameters used in the \code{corr.test} function, 
 refer to ?psych::corr.test.
 }
@@ -42,8 +58,8 @@ refer to ?psych::corr.test.
 data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-correlation(x, adjust_correlation = "bonferroni", type = "pearson")
+correlation(x, correlation_adjust = "bonferroni", type = "pearson")
 }
 \author{
-Thomas Naake, \email{thomasnaake @googlemail.com}
+Thomas Naake, \email{thomasnaake@googlemail.com}
 }

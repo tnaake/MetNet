@@ -284,15 +284,17 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
         cor_mat_p <- ppcor::pcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method = correlation_adjust)     
+        cor_mat_p <- stats::p.adjust(cor_mat_p, 
+                            method = correlation_adjust)     
         cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
-                             nrow = nrow(x), byrow = FALSE)
+                            nrow = nrow(x), byrow = FALSE)
     }
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
         cor_mat_p <- ppcor::spcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method = correlation_adjust)     
+        cor_mat_p <- stats::p.adjust(cor_mat_p, 
+                            method = correlation_adjust)     
         cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
                             nrow = nrow(x), byrow = FALSE)
     }

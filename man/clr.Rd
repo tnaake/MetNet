@@ -5,7 +5,7 @@
 \title{Create a statistical network based on context likelihood or 
 relatedness network}
 \usage{
-clr(mi, threshold_clr = 0)
+clr(mi, clr_threshold = 0)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
@@ -14,7 +14,7 @@ features. As input, the mutual information (e.g. raw MI estimates or
 Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 \code{mpmi} package can be used.}
 
-\item{threshold_clr}{numeric, if the clr value exceeds the threshold 
+\item{clr_threshold}{numeric, if the clr value exceeds the threshold 
 (clr$_{i,j}$ > threshold, where clr$_{i, j}$ is the clr value of the ith row 
 feature and of the jth column feature), the connection is defined as 
 present, if the clr value is lower than the threshold value 
@@ -42,7 +42,7 @@ x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
-clr(mi_x_z, threshold_clr = 0)
+clr(mi_x_z, clr_threshold = 0)
 }
 \author{
 Thomas Naake, \email{thomasnaake @googlemail.com}

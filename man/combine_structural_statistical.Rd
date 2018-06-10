@@ -50,7 +50,7 @@ functional_groups <- data.frame(group = functional_groups[,1],
 struct_net <- create_structural_network(x_test, functional_groups, ppm = 5)
 stat_net <- create_statistical_network(x_test, 
     model = c("pearson", "spearman","bayes"), 
-    adjust_correlation = "bonferroni")
+    correlation_adjust = "bonferroni")
 combine_structural_statistical(struct_net[[1]], stat_net)
 }
 \author{

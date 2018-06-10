@@ -5,7 +5,7 @@
 \title{Create a statistical network based on algorithm for the reconstruction
 of accurate cellular networks}
 \usage{
-aracne(mi, eps = 0.05, threshold_aracne = 0)
+aracne(mi, eps = 0.05, aracne_threshold = 0)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
@@ -16,7 +16,7 @@ Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 
 \item{eps}{numeric, used to remove the weakest edge of each triple of nodes}
 
-\item{threshold_aracne}{numeric, if the aracne value exceeds the threshold 
+\item{aracne_threshold}{numeric, if the aracne value exceeds the threshold 
 (aracne$_{i,j}$ > threshold, where aracne$_{i, j}$ is the aracne value of 
 the ith row feature and of the jth column feature), the connection is 
 defined as present, if the aracne value is lower than the threshold value 
@@ -44,7 +44,7 @@ x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
-aracne(mi_x_z, eps = 0.05, threshold_aracne = 0)
+aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
 }
 \author{
 Thomas Naake, \email{thomasnaake @googlemail.com}
