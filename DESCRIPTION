@@ -10,13 +10,13 @@ Author: Thomas Naake <thomasnaake@googlemail.com>
 Maintainer: Thomas Naake <thomasnaake@googlemail.com>
 VignetteBuilder: knitr
 Depends:
-    R (>= 3.4.4),
-    stats (>= 3.4.4)
+    R (>= 3.5),
+    stats (>= 3.5)
 Imports:
     bnlearn (>= 4.3),     
-    methods (>= 3.4.4),
+    methods (>= 3.5),
     mpmi (>= 0.42), 
-    parallel (>= 3.4.4),
+    parallel (>= 3.5),
     parmigene (>= 1.0.2),
     ppcor (>= 1.1),
     psych (>= 1.7.8),

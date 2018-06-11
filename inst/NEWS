@@ -1,3 +1,14 @@
+CHANGES IN VERSION 0.99.2
+-------------------------
+ o require R version >= 3.5 [2018-06-11 Mon]
+
+CHANGES IN VERSION 0.99.1
+-------------------------
+ o remove bugs that there are no WARNINGS and ERRORs when running 
+   R CMD check and R CMD BiocCheck [2018-06-11 Mon]
+ o reduce file size of peaklist_example.RData [2018-06-11 Mon]
+ o submit to Bioconductor [2018-06-11 Mon]
+
 CHANGES IN VERSION 0.99.0
 ------------------------
  o implement functionality to calculate statistical models of correlation 
