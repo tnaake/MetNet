@@ -1,3 +1,7 @@
+CHANGES IN VERSION 0.99.3
+-------------------------
+ o remove sum check for correlation [2018-06-11 Mon]
+
 CHANGES IN VERSION 0.99.2
 -------------------------
  o require R version >= 3.5 [2018-06-11 Mon]
