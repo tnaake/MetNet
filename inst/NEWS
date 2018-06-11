@@ -1,4 +1,4 @@
-CHANGES IN VERSION 0.9.0
+CHANGES IN VERSION 0.99.0
 ------------------------
  o implement functionality to calculate statistical models of correlation 
    (Pearson, Spearman), LASSO, Random Forest, Context likelihood or 
