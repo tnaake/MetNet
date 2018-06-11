@@ -110,7 +110,7 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
         rf <- parallel::mclapply(1:dim(x)[1], function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDots_call(rfPermute::rfPermute, 
+            rf <- threeDots_call(rfPermute::rfPermute.formula, 
                     formula = stats::formula(formula_rf), data = df_x, ...)
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
@@ -119,7 +119,7 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
         rf <- lapply(1:dim(x)[1], function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDots_call(rfPermute::rfPermute, 
+            rf <- threeDots_call(rfPermute::rfPermute.formula, 
                     formula = stats::formula(formula_rf), data = df_x, ...) 
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)

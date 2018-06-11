@@ -11,7 +11,7 @@ mat_test_z <- apply(mat_test, 1, function(x) (x - mean(x, na.rm=TRUE))/sd(x, na.
 lasso_mat <- lasso(t(mat_test_z), parallel = FALSE, PFER = 0.75, cutoff = 0.95)
 test_lasso <- function() {
     checkException(lasso(mat_test))
-    checkEquals(sum(lasso_mat), 6)
+    checkEquals(sum(lasso_mat), 2)
     checkEquals(rownames(lasso_mat), colnames(lasso_mat))
     checkEquals(rownames(lasso_mat), rownames(mat_test))
     checkEquals(ncol(lasso_mat), nrow(lasso_mat))
@@ -25,7 +25,7 @@ test_lasso <- function() {
 ## START unit test randomForest ## 
 randomForest_mat <- randomForest(mat_test)
 test_randomForest <- function() {
-    checkEquals(sum(randomForest_mat), 6)
+    checkEquals(sum(randomForest_mat), 30)
     checkEquals(rownames(randomForest_mat), colnames(randomForest_mat))
     checkEquals(rownames(randomForest_mat), rownames(mat_test))
     checkEquals(ncol(randomForest_mat), nrow(randomForest_mat))
@@ -42,7 +42,7 @@ rownames(mi_mat_test_z) <- colnames(mi_mat_test_z) <- colnames(mat_test_z)
 clr_mat <- clr(mi_mat_test_z)
 test_clr <- function() {
     checkException(clr(mi_mat_test_z, clr_threshold = "a"))
-    checkEquals(sum(clr_mat), 10)
+    checkEquals(sum(clr_mat), 30)
     checkEquals(rownames(clr_mat), colnames(clr_mat))
     checkEquals(rownames(clr_mat), rownames(mat_test))
     checkEquals(ncol(clr_mat), nrow(clr_mat))
@@ -58,7 +58,7 @@ aracne_mat <- aracne(mi_mat_test_z)
 test_aracne <- function() {
     checkException(aracne(mi_mat_test_z, aracne_threshold = "a"))
     checkException(aracne(mi_mat_test_z, eps = "a"))
-    checkEquals(sum(aracne_mat), 27)
+    checkEquals(sum(aracne_mat), 31)
     checkEquals(rownames(aracne_mat), colnames(aracne_mat))
     checkEquals(rownames(aracne_mat), rownames(mat_test))
     checkEquals(ncol(aracne_mat), nrow(aracne_mat))

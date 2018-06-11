@@ -33,7 +33,7 @@ test_in_range_which <- function() {
     checkEquals(in_range_which(m_1 = 162.0529, m_2 = 162.0527, 
         functional_groups = functional_groups[, "mass"]), 2)
     checkEquals(in_range_which(m_1 = 86.0002, m_2 = 162.0529, 
-        functional_groups = functional_groups[, "mass"]), 1)
+        functional_groups = functional_groups[, "mass"]), c(1, 2))
 }
 ## END unit test in_range_which ## 
 
@@ -55,9 +55,9 @@ test_create_structural_network <- function() {
     checkEquals(rownames(struct_net[[2]]), colnames(struct_net[[2]]))
     checkEquals(rownames(struct_net[[1]]), rownames(struct_net[[2]]))
     checkEquals(rownames(struct_net[[1]]), paste0("x", 1:7))
-    checkEquals(sum(struct_net[[1]]), 6)
+    checkEquals(sum(struct_net[[1]]), 4)
     checkEquals(unique(as.vector(struct_net[[2]])), 
-                c(NA, "Monosaccharide (–H2O)", "Malonyl group (–H2O)" ))
+                c("", "Monosaccharide (–H2O)", "Malonyl group (–H2O)" ))
     checkTrue(is.matrix(struct_net[[1]]))
     checkTrue(is.matrix(struct_net[[2]]))
     checkTrue(is.numeric(struct_net[[1]]))
