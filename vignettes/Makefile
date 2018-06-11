@@ -14,7 +14,7 @@ LATEXFILES = *.aux\
 	*.dep\
 	*.dpth\
 	*.makefile\
-	MetCirc.tex\
+	MetNet.tex\
 
 	
 all: 
