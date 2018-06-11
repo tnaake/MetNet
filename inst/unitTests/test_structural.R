@@ -1,9 +1,5 @@
 ## create toy example data set
-set.seed(1)
-mat_test <- matrix(rnorm(140, mean = 10, sd = 2), nrow = 7)
-mat_test[1:3, ] <- t(apply(mat_test[1:3, ], 1, sort))
-mat_test[5:7, ] <- t(apply(mat_test[5:7, ], 1, sort, decreasing = TRUE))
-rownames(mat_test) <- paste("x", 1:7, sep = "")
+data("mat_test", package = "MetNet")
 colnames(mat_test) <- paste0("intensity_", 1:20)
 mz <- c(100, 150, 200, 200, 262.0528, 348.0532, 448.0532)
 mat_test <- cbind(mz = mz, mat_test)
@@ -44,7 +40,6 @@ test_create_structural_network <- function() {
     checkException(create_structural_network(mat_test[, -1], functional_groups))
     checkException(create_structural_network(NULL, functional_groups))
     checkException(create_structural_network(mat_test, functional_groups[,-1]))
-    checkException(create_structural_network(mat_test, functional_groups[,-2]))
     checkException(create_structural_network(mat_test, functional_groups[,-3]))
     checkException(create_structural_network(mat_test, matrix()))
     checkException(create_structural_network(mat_test, functional_groups, ppm = "a"))

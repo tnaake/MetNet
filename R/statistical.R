@@ -1,5 +1,5 @@
 #' @importFrom stabs stabsel stabsel.matrix glmnet.lasso
-#' @importFrom rfPermute rfPermute rp.importance
+#' @importFrom rfPermute rfPermute rfPermute.formula rp.importance
 #' @importFrom mpmi cmi
 #' @importFrom parmigene clr aracne.a
 #' @importFrom psych corr.test
@@ -497,7 +497,6 @@ create_statistical_networks_list <- function(x, model, ...) {
     }
     return(l)
 }
-
 
 #' @name consensus_network
 #' @aliases consensus_network
