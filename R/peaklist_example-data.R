@@ -10,8 +10,9 @@
 #' after W+OS and MeJA treatment. The data was processed by \code{xcms} and 
 #' \code{CAMERA} scripts. All unncessary information is removed, keeping only 
 #' the columns "mz", "rt" and the respective columns containing the 
-#' intensity values. All row entries with retention time < 99 s and > 450 s 
-#' were removed, as well as entries with m/z values < 220 and > 1300 to 
-#' reduce the file size. 
+#' intensity values. All row entries with retention time < 103 s and > 440 s 
+#' were removed. Wntries with m/z values < 250 and > 1200 were removed 
+#' as well as entries with m/z values between 510 and 600 to reduce the file 
+#' size. 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 NULL
