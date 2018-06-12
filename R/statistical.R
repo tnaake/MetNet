@@ -65,7 +65,7 @@ lasso <- function(x, parallel = FALSE, ...) {
     
     l1_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(l1_mat) <- rownames(l1_mat) <- rownames(x)
-    for (i in seq_len((l1))) {l1_mat[names(l1[[i]]), i] <- 1} 
+    for (i in seq_len(length(l1))) {l1_mat[names(l1[[i]]), i] <- 1} 
     ## ; l1_mat[i, l1[[i]]] <- 1}
     return(l1_mat)
 }

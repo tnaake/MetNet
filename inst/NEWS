@@ -1,3 +1,7 @@
+CHANGES IN VERSION 0.99.6
+-------------------------
+ o fix typo in lasso function [2018-06-12 Tue]
+
 CHANGES IN VERSION 0.99.5
 -------------------------
  o change 1:... to seq_len() [2018-06-12 Tue]
