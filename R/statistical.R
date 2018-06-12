@@ -42,7 +42,7 @@
 lasso <- function(x, parallel = FALSE, ...) {
     ## x should be z-scaled
     if (parallel) {
-        l1 <- mclapply(1:dim(x)[1], function(i) {
+        l1 <- mclapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
             ## lasso: alpha = 1
             ## allow for compatibility of arguments 
@@ -52,7 +52,7 @@ lasso <- function(x, parallel = FALSE, ...) {
             return(l1$selected)
         }, ...)    
     } else {
-        l1 <- lapply(1:dim(x)[1], function(i) {
+        l1 <- lapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
             ## lasso: alpha = 1
             ## allow for compatibility of arguments 
@@ -107,7 +107,7 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
     df_x <- data.matrix(t(x))
     
     if (parallel) {
-        rf <- parallel::mclapply(1:dim(x)[1], function(i) {
+        rf <- parallel::mclapply(seq_len(nrow(x)), function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
             rf <- threeDots_call(rfPermute::rfPermute.formula, 
@@ -116,7 +116,7 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
             return(rf_p)
         }, mc.cores = 4)
     } else {
-        rf <- lapply(1:dim(x)[1], function(i) {
+        rf <- lapply(seq_len(nrow(x)), function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
             rf <- threeDots_call(rfPermute::rfPermute.formula, 
@@ -128,7 +128,9 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
     rf_mat <- matrix(1, nrow = nrow(x), ncol = nrow(x))    
     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
     
-    for (i in 1:length(rf)) {rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]}
+    for (i in seq_len(length(rf))) {
+        rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]
+    }
     rf_mat <- stats::p.adjust(rf_mat, method = randomForest_adjust)     
     rf_mat <- matrix(rf_mat, ncol = nrow(x), nrow = nrow(x), byrow = FALSE)
     rf_mat <- ifelse(rf_mat > 0.05, 0, 1)
@@ -338,7 +340,7 @@ bayes <- function(x, ...) {
     bs_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(bs_mat) <- rownames(bs_mat) <- rownames(x)
     arcs_fast.iamb <- bnlearn::arcs(x_fast.iamb)
-    for(i in 1:dim(arcs_fast.iamb)[1]) {
+    for(i in seq_len(nrow(arcs_fast.iamb))) {
         bs_mat[arcs_fast.iamb[i, "from"], arcs_fast.iamb[i, "to"] ] <- 1} 
     bs_mat <- as.matrix(bs_mat)
     return(bs_mat)

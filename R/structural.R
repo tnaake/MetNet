@@ -97,8 +97,8 @@ create_structural_network <- function(x, functional_groups, ppm = 5) {
     
     mass_fg <- functional_groups[, "mass"]
     ## iterate through columns 
-    for (i in 1:dim(mat)[2]) {
-        functional_group_vec <- lapply(1:length(mass_1), 
+    for (i in seq_len(ncol(mat))) {
+        functional_group_vec <- lapply(seq_len(length(mass_1)), 
             function(x, z = i) {
                 m_1 <- abs(mass_1[z] - mass_2[x])
                 m_2 <- abs(mass_2[z] - mass_1[x])

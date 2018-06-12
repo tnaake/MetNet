@@ -11,7 +11,7 @@
 #' \code{CAMERA} scripts. All unncessary information is removed, keeping only 
 #' the columns "mz", "rt" and the respective columns containing the 
 #' intensity values. All row entries with retention time < 103 s and > 440 s 
-#' were removed. Wntries with m/z values < 250 and > 1200 were removed 
+#' were removed. Entries with m/z values < 250 and > 1200 were removed 
 #' as well as entries with m/z values between 510 and 600 to reduce the file 
 #' size. 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
