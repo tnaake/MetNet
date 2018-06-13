@@ -2,10 +2,10 @@
 % Please edit documentation in R/statistical.R
 \name{aracne}
 \alias{aracne}
-\title{Create a statistical network based on algorithm for the reconstruction
+\title{Create an adjacency matrix based on algorithm for the reconstruction
 of accurate cellular networks}
 \usage{
-aracne(mi, eps = 0.05, aracne_threshold = 0)
+aracne(mi, eps=0.05, aracne_threshold=0)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
@@ -27,8 +27,8 @@ matrix, matrix with edges inferred from Reconstruction of accurate
 cellular networks algorithm \code{aracne}
 }
 \description{
-\code{.information} infers a statistical network using 
-the algortihm for the reconstruction of accurate cellular networks 
+\code{.information} infers an adjacency matrix using 
+the algorithm for the reconstruction of accurate cellular networks 
 using the \code{aracne.a} function from the 
 \code{parmigene} package. The presence/absence is based on if the 
 returned value exceeds a user-defined threshold value. \code{aracne} will 
@@ -39,12 +39,12 @@ For more details on the \code{aracne.a} function,
 refer to ?parmigene::aracne.a.
 }
 \examples{
-data("x_test", package = "MetNet")
+data("x_test", package="MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
-aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
+aracne(mi_x_z, eps=0.05, aracne_threshold=0)
 }
 \author{
 Thomas Naake, \email{thomasnaake @googlemail.com}

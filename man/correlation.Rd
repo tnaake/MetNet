@@ -2,10 +2,10 @@
 % Please edit documentation in R/statistical.R
 \name{correlation}
 \alias{correlation}
-\title{Create a statistical network based on correlation}
+\title{Create an adjacency matrix based on correlation}
 \usage{
-correlation(x, correlation_adjust = "none", type = "pearson", 
-                                        correlation_threshold = 0.05, ...)
+correlation(x, correlation_adjust="none", type="pearson", 
+                                        correlation_threshold=0.05, ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
@@ -34,7 +34,7 @@ matrix, matrix with edges inferred from correlation algorithm
 method)
 }
 \description{
-\code{correlation} infers a statistical network using 
+\code{correlation} infers an adjacency matrix using 
 correlation using the \code{corr.test} function (from the 
 \code{psych} package), \code{pcor} (from \code{ppcor}) or 
 \code{spcor} (from \code{ppcor}). \code{correlation} extracts the reported 
@@ -55,10 +55,10 @@ For use of the parameters used in the \code{corr.test} function,
 refer to ?psych::corr.test.
 }
 \examples{
-data("x_test", package = "MetNet")
+data("x_test", package="MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-correlation(x, correlation_adjust = "bonferroni", type = "pearson")
+correlation(x, correlation_adjust="bonferroni", type="pearson")
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

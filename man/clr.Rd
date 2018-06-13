@@ -2,10 +2,10 @@
 % Please edit documentation in R/statistical.R
 \name{clr}
 \alias{clr}
-\title{Create a statistical network based on context likelihood or 
+\title{Create an adjacency matrix based on context likelihood or 
 relatedness network}
 \usage{
-clr(mi, clr_threshold = 0)
+clr(mi, clr_threshold=0)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
@@ -26,7 +26,7 @@ matrix, matrix with edges inferred from Context Likelihood or
 Relatedness Network algorithm \code{clr}
 }
 \description{
-\code{clr} infers a statistical network using 
+\code{clr} infers an adjacency matrix using 
 context likelihood/relatedness network using the \code{clr} function from 
 the \code{parmigene} package. The presence/absence is based on if the 
 returned value exceeds a user-defined threshold value. \code{clr} will 
@@ -37,12 +37,12 @@ For more details on the \code{clr} function,
 refer to ?parmigene::clr.
 }
 \examples{
-data("x_test", package = "MetNet")
+data("x_test", package="MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
-clr(mi_x_z, clr_threshold = 0)
+clr(mi_x_z, clr_threshold=0)
 }
 \author{
 Thomas Naake, \email{thomasnaake @googlemail.com}

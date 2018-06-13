@@ -2,42 +2,42 @@
 % Please edit documentation in R/statistical.R
 \name{lasso}
 \alias{lasso}
-\title{Create a statistical network based on LASSO}
+\title{Create a adjacency matrix based on LASSO}
 \usage{
-lasso(x, parallel = FALSE, ...)
+lasso(x, parallel=FALSE, ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
 \item{parallel}{logical, should computation be parallelized? If 
-\code{parallel = TRUE} the \code{mclapply} will be applied if 
-\code{parallel = FALSE} the \code{lapply} function will be applied.}
+\code{parallel=TRUE} the \code{mclapply} will be applied if 
+\code{parallel=FALSE} the \code{lapply} function will be applied.}
 
 \item{...}{parameters passed to \code{corr.test} and \code{mclapply} (if 
-\code{parallel = TRUE})}
+\code{parallel=TRUE})}
 }
 \value{
 matrix, matrix with edges inferred from LASSO algorithm 
 \code{stabsel}
 }
 \description{
-\code{lasso} infers a statistical network using 
+\code{lasso} infers a adjacency matrix using 
 LASSO using the \code{stabsel} function from the 
 \code{stabs} package. \code{lasso} extracts the  
-predictors from the function \code{stabsel} and the presence/absence of this 
-connection to a matrix that is returned.
+predictors from the function \code{stabsel} and writes the presence/absence 
+of this connection to a matrix that is returned.
 }
 \details{
 For use of the parameters used in the \code{corr.test} function, 
 refer to ?psych::corr.test.
 }
 \examples{
-data("x_test", package = "MetNet")
+data("x_test", package="MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-\dontrun{lasso(x_z, PFER = 0.75, cutoff = 0.95)}
+\dontrun{lasso(x_z, PFER=0.75, cutoff=0.95)}
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/statistical.R
 \name{bayes}
 \alias{bayes}
-\title{Create a statistical network based on constraint-based structure 
+\title{Create an adjacency matrix based on constraint-based structure 
 learning algorithm}
 \usage{
 bayes(x, ...)
@@ -18,19 +18,19 @@ matrix, matrix with edges inferred from constraint-based structure
 learning algorithm \code{fast.iamb}
 }
 \description{
-\code{bayes} infers a statistical network using 
+\code{bayes} infers an adjacency matrix using 
 constraint-based structure learning algorithm \code{fast.iamb} from the 
 \code{bnlearn} package. \code{bayes} extracts then the reported 
 connections from running the \code{fast.iamb} function and assigns the
-arcs of the discrete Bayesian network to binary values into a matrix that is 
-returned by \code{bayes}.
+arcs of the discrete Bayesian connections to binary values. The 
+adjacency matrix is returned by \code{bayes}.
 }
 \details{
 For use of the parameters used in the \code{fast.iamb} function, 
 refer to ?bnlearn::fast.iamb.
 }
 \examples{
-data("x_test", package = "MetNet")
+data("x_test", package="MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 bayes(x)

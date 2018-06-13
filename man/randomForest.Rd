@@ -2,17 +2,17 @@
 % Please edit documentation in R/statistical.R
 \name{randomForest}
 \alias{randomForest}
-\title{Create a statistical network based on random forest}
+\title{Create a adjacency matrix based on random forest}
 \usage{
-randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
+randomForest(x, parallel=FALSE, randomForest_adjust="none", ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
 \item{parallel}{logical, should computation be parallelized? If 
-\code{parallel = TRUE} the \code{mclapply} will be applied if 
-\code{parallel = FALSE} the \code{lapply} function will be applied.}
+\code{parallel=TRUE} the \code{mclapply} will be applied if 
+\code{parallel=FALSE} the \code{lapply} function will be applied.}
 
 \item{randomForest_adjust}{character, correction method for p-values from
 \code{rp.importance}, \code{randomForest_adjust} will be passed to the 
@@ -20,26 +20,26 @@ randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
 "bonferroni", "BH", "BY", "fdr", "none"}
 
 \item{...}{parameters passed to \code{corr.test} and \code{mclapply} (if 
-\code{parallel = TRUE})}
+\code{parallel=TRUE})}
 }
 \value{
 matrix, matrix with edges inferred from random forest algorithm 
 \code{rfPermute} and \code{rp.importance}
 }
 \description{
-\code{randomForest} infers a statistical network using 
+\code{randomForest} infers an adjacency matrix using 
 random forest using the \code{rfPermute} function from the 
 \code{rfPermute} package. \code{randomForest} extracts the p-values  
-by the function \code{rp.importance} and the presence/absence based on the 
-significance value (\eqn{\alpha \leq 0.05}) of this 
-connection to a matrix that is returned.
+by the function \code{rp.importance} and writes the presence/absence based 
+on the significance value (\eqn{\alpha \leq 0.05}) of this 
+connection to a matrix. The adjacency matrix is returned.
 }
 \details{
 For use of the parameters used in the \code{rfPermute} function, 
 refer to ?rfPermute::rfPermute.
 }
 \examples{
-data("x_test", package = "MetNet")
+data("x_test", package="MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 \dontrun{randomForest(x)}

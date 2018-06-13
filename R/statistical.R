@@ -13,57 +13,57 @@
 
 #' @name lasso
 #' @aliases lasso
-#' @title Create a statistical network based on LASSO
-#' @description  \code{lasso} infers a statistical network using 
+#' @title Create a adjacency matrix based on LASSO
+#' @description  \code{lasso} infers a adjacency matrix using 
 #' LASSO using the \code{stabsel} function from the 
 #' \code{stabs} package. \code{lasso} extracts the  
-#' predictors from the function \code{stabsel} and the presence/absence of this 
-#' connection to a matrix that is returned. 
-#' @usage lasso(x, parallel = FALSE, ...)
+#' predictors from the function \code{stabsel} and writes the presence/absence 
+#' of this connection to a matrix that is returned. 
+#' @usage lasso(x, parallel=FALSE, ...)
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
 #' @param parallel logical, should computation be parallelized? If 
-#' \code{parallel = TRUE} the \code{mclapply} will be applied if 
-#' \code{parallel = FALSE} the \code{lapply} function will be applied. 
+#' \code{parallel=TRUE} the \code{mclapply} will be applied if 
+#' \code{parallel=FALSE} the \code{lapply} function will be applied. 
 #' @param ... parameters passed to \code{corr.test} and \code{mclapply} (if 
-#' \code{parallel = TRUE})
+#' \code{parallel=TRUE})
 #' @details For use of the parameters used in the \code{corr.test} function, 
 #' refer to ?psych::corr.test.
 #' @return matrix, matrix with edges inferred from LASSO algorithm 
 #' \code{stabsel}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-#' \dontrun{lasso(x_z, PFER = 0.75, cutoff = 0.95)}
+#' \dontrun{lasso(x_z, PFER=0.75, cutoff=0.95)}
 #' @export
-lasso <- function(x, parallel = FALSE, ...) {
+lasso <- function(x, parallel=FALSE, ...) {
     ## x should be z-scaled
     if (parallel) {
         l1 <- mclapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
-            ## lasso: alpha = 1
+            ## lasso: alpha=1
             ## allow for compatibility of arguments 
-            l1 <- threeDots_call("stabsel.matrix", x = as.matrix(x_l1), 
-                    y = y_l1, fitfun = glmnet.lasso, 
-                    args.fitfun = list("alpha" = 1), ...)
+            l1 <- threeDotsCall("stabsel.matrix", x=as.matrix(x_l1), 
+                    y=y_l1, fitfun=glmnet.lasso, 
+                    args.fitfun=list("alpha"=1), ...)
             return(l1$selected)
         }, ...)    
     } else {
         l1 <- lapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
-            ## lasso: alpha = 1
+            ## lasso: alpha=1
             ## allow for compatibility of arguments 
-            l1 <- threeDots_call("stabsel.matrix", x = as.matrix(x_l1),
-                    y = y_l1, fitfun = glmnet.lasso, 
-                    args.fitfun = list("alpha" = 1), ...)
+            l1 <- threeDotsCall("stabsel.matrix", x=as.matrix(x_l1),
+                    y=y_l1, fitfun=glmnet.lasso, 
+                    args.fitfun=list("alpha"=1), ...)
             return(l1$selected)
         })   
     }
     
-    l1_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
+    l1_mat <- matrix(0, nrow=nrow(x), ncol=nrow(x))
     colnames(l1_mat) <- rownames(l1_mat) <- rownames(x)
     for (i in seq_len(length(l1))) {l1_mat[names(l1[[i]]), i] <- 1} 
     ## ; l1_mat[i, l1[[i]]] <- 1}
@@ -72,37 +72,37 @@ lasso <- function(x, parallel = FALSE, ...) {
 
 #' @name randomForest
 #' @aliases randomForest
-#' @title Create a statistical network based on random forest
-#' @description  \code{randomForest} infers a statistical network using 
+#' @title Create a adjacency matrix based on random forest
+#' @description  \code{randomForest} infers an adjacency matrix using 
 #' random forest using the \code{rfPermute} function from the 
 #' \code{rfPermute} package. \code{randomForest} extracts the p-values  
-#' by the function \code{rp.importance} and the presence/absence based on the 
-#' significance value (\eqn{\alpha \leq 0.05}) of this 
-#' connection to a matrix that is returned. 
-#' @usage randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
+#' by the function \code{rp.importance} and writes the presence/absence based 
+#' on the significance value (\eqn{\alpha \leq 0.05}) of this 
+#' connection to a matrix. The adjacency matrix is returned. 
+#' @usage randomForest(x, parallel=FALSE, randomForest_adjust="none", ...)
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
 #' @param parallel logical, should computation be parallelized? If 
-#' \code{parallel = TRUE} the \code{mclapply} will be applied if 
-#' \code{parallel = FALSE} the \code{lapply} function will be applied. 
+#' \code{parallel=TRUE} the \code{mclapply} will be applied if 
+#' \code{parallel=FALSE} the \code{lapply} function will be applied. 
 #' @param randomForest_adjust character, correction method for p-values from
 #' \code{rp.importance}, \code{randomForest_adjust} will be passed to the 
 #' \code{p.adjust} function and should be one of "holm", "hochberg", "hommel", 
 #' "bonferroni", "BH", "BY", "fdr", "none"
 #' @param ... parameters passed to \code{corr.test} and \code{mclapply} (if 
-#' \code{parallel = TRUE})
+#' \code{parallel=TRUE})
 #' @details For use of the parameters used in the \code{rfPermute} function, 
 #' refer to ?rfPermute::rfPermute.
 #' @return matrix, matrix with edges inferred from random forest algorithm 
 #' \code{rfPermute} and \code{rp.importance}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' \dontrun{randomForest(x)}
 #' @export
-randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none", 
+randomForest <- function(x, parallel=FALSE, randomForest_adjust="none", 
                                                                         ...) {
     df_x <- data.matrix(t(x))
     
@@ -110,29 +110,29 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
         rf <- parallel::mclapply(seq_len(nrow(x)), function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDots_call(rfPermute::rfPermute.formula, 
-                    formula = stats::formula(formula_rf), data = df_x, ...)
+            rf <- threeDotsCall(rfPermute::rfPermute.formula, 
+                    formula=stats::formula(formula_rf), data=df_x, ...)
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
-        }, mc.cores = 4)
+        }, mc.cores=4)
     } else {
         rf <- lapply(seq_len(nrow(x)), function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDots_call(rfPermute::rfPermute.formula, 
-                    formula = stats::formula(formula_rf), data = df_x, ...) 
+            rf <- threeDotsCall(rfPermute::rfPermute.formula, 
+                    formula=stats::formula(formula_rf), data=df_x, ...) 
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
         })
     }
-    rf_mat <- matrix(1, nrow = nrow(x), ncol = nrow(x))    
+    rf_mat <- matrix(1, nrow=nrow(x), ncol=nrow(x))    
     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
     
     for (i in seq_len(length(rf))) {
         rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]
     }
-    rf_mat <- stats::p.adjust(rf_mat, method = randomForest_adjust)     
-    rf_mat <- matrix(rf_mat, ncol = nrow(x), nrow = nrow(x), byrow = FALSE)
+    rf_mat <- stats::p.adjust(rf_mat, method=randomForest_adjust)     
+    rf_mat <- matrix(rf_mat, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     rf_mat <- ifelse(rf_mat > 0.05, 0, 1)
     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
     
@@ -141,14 +141,14 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
 
 #' @name clr
 #' @aliases clr
-#' @title Create a statistical network based on context likelihood or 
+#' @title Create an adjacency matrix based on context likelihood or 
 #' relatedness network
-#' @description  \code{clr} infers a statistical network using 
+#' @description  \code{clr} infers an adjacency matrix using 
 #' context likelihood/relatedness network using the \code{clr} function from 
 #' the \code{parmigene} package. The presence/absence is based on if the 
 #' returned value exceeds a user-defined threshold value. \code{clr} will 
 #' return the adjacency matrix containing the presence/absence value.
-#' @usage clr(mi, clr_threshold = 0)
+#' @usage clr(mi, clr_threshold=0)
 #' @param mi matrix, where columns and the rows are features 
 #' (metabolites), cell entries are mutual information values between the 
 #' features. As input, the mutual information (e.g. raw MI estimates or 
@@ -166,14 +166,14 @@ randomForest <- function(x, parallel = FALSE, randomForest_adjust = "none",
 #' Relatedness Network algorithm \code{clr}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
-#' clr(mi_x_z, clr_threshold = 0)
+#' clr(mi_x_z, clr_threshold=0)
 #' @export
-clr <- function(mi, clr_threshold = 0) {
+clr <- function(mi, clr_threshold=0) {
     if (!is.numeric(clr_threshold)) stop("clr_threshold is not numeric")
     clr_mat <- parmigene::clr(mi)
     clr_mat <- ifelse(clr_mat > clr_threshold, 1, 0)
@@ -183,15 +183,15 @@ clr <- function(mi, clr_threshold = 0) {
 
 #' @name aracne
 #' @aliases aracne
-#' @title Create a statistical network based on algorithm for the reconstruction
+#' @title Create an adjacency matrix based on algorithm for the reconstruction
 #' of accurate cellular networks 
-#' @description  \code{.information} infers a statistical network using 
-#' the algortihm for the reconstruction of accurate cellular networks 
+#' @description  \code{.information} infers an adjacency matrix using 
+#' the algorithm for the reconstruction of accurate cellular networks 
 #' using the \code{aracne.a} function from the 
 #' \code{parmigene} package. The presence/absence is based on if the 
 #' returned value exceeds a user-defined threshold value. \code{aracne} will 
 #' return the adjacency matrix containing the presence/absence value.
-#' @usage aracne(mi, eps = 0.05, aracne_threshold = 0)
+#' @usage aracne(mi, eps=0.05, aracne_threshold=0)
 #' @param mi matrix, where columns and the rows are features 
 #' (metabolites), cell entries are mutual information values between the 
 #' features. As input, the mutual information (e.g. raw MI estimates or 
@@ -209,16 +209,16 @@ clr <- function(mi, clr_threshold = 0) {
 #' cellular networks algorithm \code{aracne}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
-#' aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
+#' aracne(mi_x_z, eps=0.05, aracne_threshold=0)
 #' @export
-aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
+aracne <- function(mi, eps=0.05, aracne_threshold=0) {
     if (!is.numeric(aracne_threshold)) stop("aracne_threshold is not numeric")
-    aracne_mat <- parmigene::aracne.a(mi, eps = eps)  
+    aracne_mat <- parmigene::aracne.a(mi, eps=eps)  
     aracne_mat <- ifelse(aracne_mat > aracne_threshold, 1, 0)
     colnames(aracne_mat) <- rownames(aracne_mat) <- rownames(mi)
     return(aracne_mat)
@@ -226,8 +226,8 @@ aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
 
 #' @name correlation 
 #' @aliases correlation
-#' @title Create a statistical network based on correlation 
-#' @description  \code{correlation} infers a statistical network using 
+#' @title Create an adjacency matrix based on correlation 
+#' @description  \code{correlation} infers an adjacency matrix using 
 #' correlation using the \code{corr.test} function (from the 
 #' \code{psych} package), \code{pcor} (from \code{ppcor}) or 
 #' \code{spcor} (from \code{ppcor}). \code{correlation} extracts the reported 
@@ -236,8 +236,8 @@ aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
 #' multiple testing (\code{correlation_adjust} parameter) and will return 
 #' an unweighted adjacency matrix containing edges if the (adjusted) p-value
 #' is below the value defined by \code{correlation_threshold}. 
-#' @usage correlation(x, correlation_adjust = "none", type = "pearson", 
-#'                                         correlation_threshold = 0.05, ...) 
+#' @usage correlation(x, correlation_adjust="none", type="pearson", 
+#'                                         correlation_threshold=0.05, ...) 
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
 #' @param type character, either "pearson", "spearman", "pearson_partial",
@@ -266,42 +266,38 @@ aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
 #' method)
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' correlation(x, correlation_adjust = "bonferroni", type = "pearson")
+#' correlation(x, correlation_adjust="bonferroni", type="pearson")
 #' @export
-correlation <- function(x, correlation_adjust = "none", type = "pearson", 
-    correlation_threshold = 0.05, ...) {
+correlation <- function(x, correlation_adjust="none", type="pearson", 
+    correlation_threshold=0.05, ...) {
     if (!is.numeric(correlation_threshold)) 
         stop("correlation_threshold is not numeric")
     ## get character vector for p-value adjustment
     adjust <- correlation_adjust
     ## allow for compatibility of arguments 
     if (type %in% c("pearson", "spearman")) {
-        cor_mat_p <- threeDots_call(psych::corr.test, x = t(x), 
-                                    adjust = adjust, method = type, ...)$p    
+        cor_mat_p <- threeDotsCall(psych::corr.test, x=t(x), 
+                                    adjust=adjust, method=type, ...)$p    
     }
     if (type %in% c("pearson_partial", "spearman_partial")) {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
-        cor_mat_p <- ppcor::pcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, 
-                            method = correlation_adjust)     
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
-                            nrow = nrow(x), byrow = FALSE)
+        cor_mat_p <- ppcor::pcor(t(x), method=method)$p.value
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method=correlation_adjust)     
+        cor_mat_p <- matrix(cor_mat_p, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     }
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
-        cor_mat_p <- ppcor::spcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, 
-                            method = correlation_adjust)     
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), 
-                            nrow = nrow(x), byrow = FALSE)
+        cor_mat_p <- ppcor::spcor(t(x), method=method)$p.value
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method=correlation_adjust)     
+        cor_mat_p <- matrix(cor_mat_p, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     }
     
-    ## was cor_mat_p <- corr.test(t(x), adjust = adjust, ...)$p
+    ## was cor_mat_p <- corr.test(t(x), adjust=adjust, ...)$p
     cor_mat <- ifelse(cor_mat_p > correlation_threshold, 0, 1)
     colnames(cor_mat) <- rownames(cor_mat) <- rownames(x)
     return(cor_mat)
@@ -309,14 +305,14 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
 
 #' @name bayes
 #' @aliases bayes
-#' @title Create a statistical network based on constraint-based structure 
+#' @title Create an adjacency matrix based on constraint-based structure 
 #' learning algorithm
-#' @description  \code{bayes} infers a statistical network using 
+#' @description  \code{bayes} infers an adjacency matrix using 
 #' constraint-based structure learning algorithm \code{fast.iamb} from the 
 #' \code{bnlearn} package. \code{bayes} extracts then the reported 
 #' connections from running the \code{fast.iamb} function and assigns the
-#' arcs of the discrete Bayesian network to binary values into a matrix that is 
-#' returned by \code{bayes}. 
+#' arcs of the discrete Bayesian connections to binary values. The 
+#' adjacency matrix is returned by \code{bayes}. 
 #' @usage bayes(x, ...)
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
@@ -327,7 +323,7 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
 #' learning algorithm \code{fast.iamb}
 #' @author Thomas Naake, \email{thomasnaake @googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' bayes(x)
@@ -335,39 +331,42 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
 bayes <- function(x, ...) {
     x_df <- data.frame(t(x))
     ## allow for compatibility of arguments 
-    x_fast.iamb <- threeDots_call(bnlearn::fast.iamb, x = x_df, ...)
-    ## was x_fast.iamb <- fast.iamb(x_df, ...) 
-    bs_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
+    x_fast.iamb <- threeDotsCall(bnlearn::fast.iamb, x=x_df, ...)
+    ## create empty bs_mat to be filled with connections
+    bs_mat <- matrix(0, nrow=nrow(x), ncol=nrow(x))
     colnames(bs_mat) <- rownames(bs_mat) <- rownames(x)
     arcs_fast.iamb <- bnlearn::arcs(x_fast.iamb)
+    
     for(i in seq_len(nrow(arcs_fast.iamb))) {
         bs_mat[arcs_fast.iamb[i, "from"], arcs_fast.iamb[i, "to"] ] <- 1} 
     bs_mat <- as.matrix(bs_mat)
     return(bs_mat)
 }
 
-#' @name add_to_list
-#' @aliases add_to_list
-#' @title Add network to list
+#' @name addToList
+#' @aliases addToList
+#' @title Add adjacency matrix to list
 #' @description This helper function used in the function
-#' \code{create_statistical_networks_list} adds a network to a list of networks.
-#' @usage add_to_list(l, name, object)
-#' @param l list of networks
+#' \code{createStatisticalAdjacencyList} adds a adjacency matrix to a list of 
+#' adjacency matrices.
+#' @usage addToList(l, name, object)
+#' @param l list of adjacency matrices
 #' @param name character, name of newly created entry
-#' @param object matrix containing the network to be added
-#' @details Used internally in \code{create_statistical_networks_list}
-#' @return list containing the existing networks and the added network 
+#' @param object matrix containing the adjacency matrix to be added
+#' @details Used internally in \code{createStatisticalAdjacencyList}
+#' @return list containing the existing adjacency matrices and the added 
+#' adjacency matrix
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' cor_pearson <- correlation(x, type = "pearson")
-#' cor_spearman <- correlation(x, type = "spearman")
-#' l <- list(pearson = cor_pearson)
-#' add_to_list(l, "spearman", cor_spearman)
+#' cor_pearson <- correlation(x, type="pearson")
+#' cor_spearman <- correlation(x, type="spearman")
+#' l <- list(pearson=cor_pearson)
+#' addToList(l, "spearman", cor_spearman)
 #' @export
-add_to_list <- function(l, name, object) {
+addToList <- function(l, name, object) {
     if (!is.list(l)) stop("l is not a list")
     if (!is.character(name)) stop("name is not a character")
     if (!is.matrix(object)) stop("object is not a matrix")
@@ -377,20 +376,19 @@ add_to_list <- function(l, name, object) {
     return(l)
 }
 
-
-
-#' @name create_statistical_networks_list
-#' @aliases create_statistical_networks_list
-#' @title Create a list of statistical networks
-#' @description The function infers network topologies from statistical 
-#' methods and returns matrices of these networks in a list. The function
-#' includes functionality to caluclate statistical networks based on 
+#' @name createStatisticalAdjacencyList
+#' @aliases createStatisticalAdjacencyList
+#' @title Create a list of statistical adjacency matrices
+#' @description The function infers adjacency matrix topologies from 
+#' statistical methods and returns matrices of these networks in a list. The 
+#' function includes functionality to caluclate adjacency matrices based on 
 #' LASSO (L1 norm)-regression, random forests, context likelihood of 
 #' relatedness (CLR), the algorithm for the reconstruction of accurate 
 #' cellular networks (ARACNE), Pearson correlation (also partial and 
 #' semipartial), Spearman correlation (also partial and semipartial) 
-#' and Constraint-based structure learning (Bayes). 
-#' @usage create_statistical_networks_list(x, model, ...)
+#' and Constraint-based structure learning (Bayes). The function returns a 
+#' list of adjacency matrices that are defined by \code{model}. 
+#' @usage createStatisticalAdjacencyList(x, model, ...)
 #' @param x matrix that contains intensity values of features/metabolites (rows)
 #' per sample (columns). 
 #' @param model, character vector containing the methods that will be used 
@@ -400,32 +398,33 @@ add_to_list <- function(l, name, object) {
 #' @param ... parameters passed to the functions  \code{lasso}, 
 #' \code{randomForest}, \code{clr}, \code{aracne}, \code{correlation} and/or
 #' \code{bayes}
-#' @details \code{create_statistical_networks_list} calls the function
+#' @details \code{createStatisticalAdjacencyList} calls the function
 #' \code{lasso}, \code{randomForest}, \code{clr}, \code{aracne}, 
 #' \code{correlation} (for "pearson", "pearson_partial", "pearson_semipartial",
 #' "spearman", "spearman_partial", "spearman_semipartial") and/or \code{bayes} 
-#' as specified by \code{model}. It will create network(s) using the specified 
-#' methods and will return a list containing the binary network (if model is 
-#' of length 1) or append these binary networks to a list (if model is of 
-#' length > 1). Internally x will be z-scaled and the z-scaled object will 
-#' be used in \code{lasso}, \code{clr} and/or \code{aracne}.
-#' @return list containing the respective statistical networks specified by 
+#' as specified by \code{model}. It will create adjacency matrices using the 
+#' specified methods and will return a list containing the unweighted
+#' adjacency matrix (if \code{model} is of length 1) or append these 
+#' unweighted adjacency matrices to a list (if \code{model} is of 
+#' length > 1). Internally \code{x} will be z-scaled and the z-scaled object 
+#' will be used in \code{lasso}, \code{clr} and/or \code{aracne}.
+#' @return list containing the respective adjacency matrices specified by 
 #' \code{model}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' create_statistical_networks_list(x, c("pearson", "spearman"))
+#' createStatisticalAdjacencyList(x, c("pearson", "spearman"))
 #' @export
-create_statistical_networks_list <- function(x, model, ...) {
+createStatisticalAdjacencyList <- function(x, model, ...) {
     
     ## check if model complies with the implemented model and return error 
     ## if not so
     if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne", 
             "pearson", "pearson_partial", "pearson_semipartial", 
             "spearman", "spearman_partial", "spearman_semipartial", "bayes"))))
-        stop("method not implemented in create_statistical_networks_list")
+        stop("method not implemented in createStatisticalAdjacencyList")
         
     ## check if x is numeric matrix and return error if not so
     if (mode(x) != "numeric") stop("x is not a numerical matrix")
@@ -438,12 +437,12 @@ create_statistical_networks_list <- function(x, model, ...) {
     ## add entry for lasso if "lasso" is in model
     if ("lasso" %in% model) {
         lasso <- lasso(x_z, ...)
-        l <- add_to_list(l, "lasso", lasso)
+        l <- addToList(l, "lasso", lasso)
     }
     ## add entry for randomForest if "randomForest" is in model
     if ("randomForest" %in% model) {
         randomForest <- randomForest(x, ...)
-        l <- add_to_list(l, "randomForest", randomForest)
+        l <- addToList(l, "randomForest", randomForest)
     }
     
     ## calculate mutual information if "clr" or "aracne" is in model
@@ -454,83 +453,84 @@ create_statistical_networks_list <- function(x, model, ...) {
     
     ## add entry for clr if "clr" is in model
     if ("clr" %in% model) {
-        clr <- threeDots_call("clr", mi = mi_x_z, ...)
-        l <- add_to_list(l, "clr", clr)
+        clr <- threeDotsCall("clr", mi=mi_x_z, ...)
+        l <- addToList(l, "clr", clr)
     }
     ## add entry for aracne if "aracne" is in model
     if ("aracne" %in% model) {
-        aracne <- threeDots_call("aracne", mi = mi_x_z, ...)
-        l <- add_to_list(l, "aracne", aracne)
+        aracne <- threeDotsCall("aracne", mi=mi_x_z, ...)
+        l <- addToList(l, "aracne", aracne)
     }
     ## add entry for pearson if "pearson" is in model
     if ("pearson" %in% model) {
-        pearson <- correlation(x, type = "pearson", ...)
-        l <- add_to_list(l, "pearson", pearson)
+        pearson <- correlation(x, type="pearson", ...)
+        l <- addToList(l, "pearson", pearson)
     }
     ## add entry for pearson_partial if "pearson_partial" is in model
     if ("pearson_partial" %in% model) {
-        pearson <- correlation(x, type = "pearson_partial", ...)
-        l <- add_to_list(l, "pearson_partial", pearson)
+        pearson <- correlation(x, type="pearson_partial", ...)
+        l <- addToList(l, "pearson_partial", pearson)
     }
     ## add entry for pearson_semipartial if "pearson_semipartial" is in model
     if ("pearson_semipartial" %in% model) {
-        pearson <- correlation(x, type = "pearson_semipartial", ...)
-        l <- add_to_list(l, "pearson_semipartial", pearson)
+        pearson <- correlation(x, type="pearson_semipartial", ...)
+        l <- addToList(l, "pearson_semipartial", pearson)
     }
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
-        spearman <- correlation(x, type = "spearman", ...)
-        l <- add_to_list(l, "spearman", spearman)
+        spearman <- correlation(x, type="spearman", ...)
+        l <- addToList(l, "spearman", spearman)
     }
     ## add entry for spearman_partial if "spearman_partial" is in model
     if ("spearman_partial" %in% model) {
-        pearson <- correlation(x, type = "spearman_partial", ...)
-        l <- add_to_list(l, "spearman_partial", pearson)
+        pearson <- correlation(x, type="spearman_partial", ...)
+        l <- addToList(l, "spearman_partial", pearson)
     }
     ## add entry for spearman_semipartial if "spearman_semipartial" is in model
     if ("spearman_semipartial" %in% model) {
-        pearson <- correlation(x, type = "spearman_semipartial", ...)
-        l <- add_to_list(l, "spearman_semipartial", pearson)
+        pearson <- correlation(x, type="spearman_semipartial", ...)
+        l <- addToList(l, "spearman_semipartial", pearson)
     }
     ## add entry for bayes if "bayes" is in model
     if ("bayes" %in% model) {
         bayes <- bayes(x, ...)
-        l <- add_to_list(l, "bayes", bayes)
+        l <- addToList(l, "bayes", bayes)
     }
     return(l)
 }
 
-#' @name consensus_network
-#' @aliases consensus_network
-#' @title Create a consensus network of statistical networks
+#' @name consensusAdjacency
+#' @aliases consensusAdjacency
+#' @title Create a consensus adjacency matrix of statistical adjacency 
+#' matrices
 #' @description The function takes a list of parameters (\code{l}) as input and
-#' creates a consensus network from these networks by calling the function 
-#' \code{consensus} from the \code{sna} package. Depending on the chosen 
-#' \code{method } in \code{consensus}, the threshold of the consensus network
-#' should be chosen accordingly to report a connection by different 
-#' statistical methods. 
-#' @usage consensus_network(l, threshold = 1, ...)
-#' @param l list, each entry of the list contains a network
-#' @param threshold numeric, when combining the networks the threshold 
-#' parameter defines if an edge is reported or not. For 
-#' \code{method = "central.graph"} threshold is set to 1 by default. For other
+#' creates a consensus adjacency matrix from these adjacency matrices by 
+#' calling the function \code{consensus} from the \code{sna} package. Depending 
+#' on the chosen \code{method} in \code{consensus}, the threshold of the 
+#' consensus adjacency matrix should be chosen accordingly to report a 
+#' connection by different statistical methods. 
+#' @usage consensusAdjacency(l, threshold=1, ...)
+#' @param l list, each entry of the list contains an adjacency matrix
+#' @param threshold numeric, when combining the adjacency matrices the 
+#' \code{threshold} parameter defines if an edge is reported or not. For 
+#' \code{method="central.graph"} threshold is set to 1 by default. For other
 #' values of method, the value should be carefully defined by the user. If 
-#' threshold is set to NULL (default), it will be set to 1 internally. 
+#' threshold is set to \code{NULL} (default), it will be set to 1 internally. 
 #' @param ... parameters passed to the function \code{consensus} in the
 #' \code{sna} package 
-#' @details \code{consensus_network} is a wrapper function of the 
+#' @details \code{consensusAdjacency} is a wrapper function of the 
 #' \code{consensus} function of the \code{sna} package. For use of the 
 #' parameters used in the \code{consensus} function, refer to ?sna::consensus.
-#' @return matrix, consensus matrix from statistical networks
+#' @return matrix, consensus matrix from adjacency matrices
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' stat_net_l <- create_statistical_networks_list(x, c("pearson", "spearman"))
-#' consensus_network(stat_net_l)
+#' stat_adj_l <- createStatisticalAdjacencyList(x, c("pearson", "spearman"))
+#' consensusAdjacency(stat_adj_l)
 #' @export
-consensus_network <- function(l, threshold = 1, ...) {
+consensusAdjacency <- function(l, threshold=1, ...) {
     
     if (!is.numeric(threshold)) stop("threshold is not numeric")
     if (!is.list(l)) stop("l is not a list")
@@ -567,8 +567,8 @@ consensus_network <- function(l, threshold = 1, ...) {
     
     
     ## allow for compatibility of arguments 
-    consensus_mat <- threeDots_call(sna::consensus, dat = l, ...)
-    ## was sna::consensus(dat = l, ...)
+    consensus_mat <- threeDotsCall(sna::consensus, dat=l, ...)
+    ## was sna::consensus(dat=l, ...)
     
     ##if (method == "central.graph") threshold <- 1
     consensus_mat <- ifelse(consensus_mat >= threshold, 1, 0)
@@ -577,29 +577,29 @@ consensus_network <- function(l, threshold = 1, ...) {
     return(consensus_mat)
 }
 
-#' @name threeDots_call
-#' @aliases threeDots_call
+#' @name threeDotsCall
+#' @aliases threeDotsCall
 #' @title Check if passed arguments match the function's formal arguments and
 #' call the function with the checked arguments
-#' @description The function \code{threeDots_call} gets the formal arguments
+#' @description The function \code{threeDotsCall} gets the formal arguments
 #' of a function \code{fun} and checks if the passed arguments \code{...} 
-#' matches the formal arguments. \code{threeDots_call} will remove 
-#' duplicated arguments. \code{threeDots_call} will call the function 
+#' matches the formal arguments. \code{threeDotsCall} will remove 
+#' duplicated arguments. \code{threeDotsCall} will call the function 
 #' \code{fun} with the filtered arguments and will return the result. 
-#' @usage threeDots_call(fun, ...)
+#' @usage threeDotsCall(fun, ...)
 #' @param fun function to check for arguments and to call
 #' @param ... arguments to be tested to be passed to fun
 #' @details Used internally in \code{lasso}, \code{randomForest}, 
-#' \code{correlation}, \code{bayes}, \code{consensus_network}
+#' \code{correlation}, \code{bayes}, \code{consensusAdjacency}
 #' @return Function call with passed arguments 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' threeDots_call(stats::sd, x = 1:10, y = 1:10)
+#' threeDotsCall(stats::sd, x=1:10, y=1:10)
 #' ## in contrast to the above example, the following example will result in an 
 #' ## error
-#' \dontrun{stats::sd(x = 1:10, y = 1:10)}
+#' \dontrun{stats::sd(x=1:10, y=1:10)}
 #' @export
-threeDots_call <- function(fun, ...) {
+threeDotsCall <- function(fun, ...) {
     formal_args <- formalArgs(fun)
     args <- list(...)
     if (any(duplicated(names(args)))) stop("duplicated args in ...")
@@ -610,33 +610,33 @@ threeDots_call <- function(fun, ...) {
     return(res)
 }
 
-#' @name create_statistical_network
-#' @aliases create_statistical_network
-#' @title Create statistical network
-#' @description \code{create_statistical_network} creates a consensus network
-#' given the models to use. 
-#' @usage create_statistical_network(x, model, threshold = 1, ...)
-#' @param x matrix that contains intensity values of features/metabolites (rows)
-#' per sample (columns). 
+#' @name createStatisticalAdjacency
+#' @aliases createStatisticalAdjacency
+#' @title Create statistical adjacency matrix
+#' @description \code{createStatisticalAdjacency} creates a consensus 
+#' adjacency matrix given the models to use. 
+#' @usage createStatisticalAdjacency(x, model, threshold=1, ...)
+#' @param x matrix that contains intensity values of features/metabolites 
+#' (rows) per sample (columns). 
 #' @param model, character, vector containing the model that will be used 
 #' ("lasso", "randomForest", "clr", "aracne", "pearson", "pearson_partial", 
-#' "pearson_semipartial","spearman", "spearman_partial", "spearman_semipartial",
-#' "bayes")
-#' @param threshold numeric, when combining the networks the threshold 
-#' parameter defines if an edge is reported or not. For 
-#' \code{method = "central.graph"} threshold is set to 1 by default. For other
+#' "pearson_semipartial","spearman", "spearman_partial", 
+#' "spearman_semipartial", "bayes")
+#' @param threshold numeric, when combining the adjacency matrices the 
+#' threshold parameter defines if an edge is reported or not. For 
+#' \code{method="central.graph"} threshold is set to 1 by default. For other
 #' values of method, the value should be carefully defined by the user. If 
 #' threshold is set to NULL (default), it will be set to 1 internally. 
 #' @param ... parameters passed to the functions  \code{lasso}, 
 #' \code{randomForest}, \code{clr}, \code{aracne}, \code{correlation},
-#' \code{bayes} and/or \code{consensus_network}
+#' \code{bayes} and/or \code{consensusAdjacency}
 #' @return matrix, containing binary values if a connection is present or not
-#' @details \code{create_statistical_network} is a wrapper function for the 
-#' functions \code{create_statistical_networks_list} and 
-#' \code{consensus_network}. See \code{?create_statistical_networks_list} and 
-#' \code{?consensus_network} for further details. The function 
-#' \code{create_statistical_networks_list}
-#' includes functionality to caluclate statistical networks based on 
+#' @details \code{createStatisticalAdjacency} is a wrapper function for the 
+#' functions \code{createStatisticalAdjacencyList} and 
+#' \code{consensusAdjacency}. See \code{?createStatisticalAdjacencyList} and 
+#' \code{?consensusAdjacency} for further details. The function 
+#' \code{createStatisticalAdjacencyList}
+#' includes functionality to caluclate adjacency matrices based on 
 #' LASSO (L1 norm)-regression, random forests, context likelihood of 
 #' relatedness (CLR), the algorithm for the reconstruction of accurate 
 #' cellular networks (ARACNE), Pearson correlation (also partial and 
@@ -644,16 +644,17 @@ threeDots_call <- function(fun, ...) {
 #' and Constraint-based structure learning (Bayes). 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package = "MetNet")
+#' data("x_test", package="MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' create_statistical_network(x, c("pearson", "spearman"))
+#' createStatisticalAdjacency(x, c("pearson", "spearman"))
 #' @export
-create_statistical_network <- function(x, model, threshold = 1, ...) {
-    ## first use function create_statistical_network_list
-    l <- create_statistical_networks_list(x = x, model = model, ...)
-    ## combine statistical networks by the function consensus_network
-    consensus_mat <- consensus_network(l = l, threshold = threshold, ...)
+createStatisticalAdjacency <- function(x, model, threshold=1, ...) {
+    ## first use function createStatisticalAdjacency_list
+    l <- createStatisticalAdjacencyList(x=x, model=model, ...)
+    ## combine statistical adjacency matrices by the function 
+    ## consensusAdjacency
+    consensus_mat <- consensusAdjacency(l=l, threshold=threshold, ...)
     return(consensus_mat)
 }
 

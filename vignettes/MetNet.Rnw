@@ -125,8 +125,8 @@ and correlation (Pearson correlation and partial correlation).
 Inspired of the paper by \citet{Marbach2012} we decided to implement in 
 \Rpackage{MetNet} different algorithms for network inference to account for 
 biases that are inherent in these statistical methods, followed by the 
-calculation of a consensus network using the differently computed individual 
-networks. \newline
+calculation of a consensus adjacency matrix using the differently computed 
+individual adjacency matrices. \newline
 
 The two main functionalities of the package include the creation of an
 adjacency matrix from structual properties, based on losses/addition of
@@ -145,10 +145,10 @@ advantages and disadvantages, the user has the possibility to select
 several of these methods, compute adjacency matrices from these models and
 create a consensus matrix from the different statistical frameworks. \newline
 
-After creating the statistical and structural network these two matrices
-will be combined to form a consensus matrix that has both information from
-structural and statistical properties of the data. This can be followed by
-further network analyses (e.g. calculation of topological parameters),
+After creating the statistical and structural adjaceny matrices these two 
+matrices will be combined to form a consensus matrix that has both information 
+from structural and statistical properties of the data. This can be followed 
+by further network analyses (e.g. calculation of topological parameters),
 integration with other data sources (e.g. genomic information or
 transcriptomic data) and/or visualization. \newline
 
@@ -198,20 +198,20 @@ We will load here the object \Robject{x\_test} that contains m/z values
 \Robject{x\_test} for guidance through the workflow of \Rpackage{MetNet}.
 
 <<data,eval=TRUE,echo=TRUE>>=
-data("x_test", package = "MetNet")
+data("x_test", package="MetNet")
 x_test <- as.matrix(x_test)
 @
 
 \section{Creating the structural matrix}
 
-The function \Rfunction{create\_structural\_network} will create the adjacency
+The function \Rfunction{createStructuralAdjacency} will create the adjacency
 matrix based on structual properties (m/z values) of the features.
 The function expects a matrix with a column \code{"mz"} that contains the 
 mass information of a feature (typically the m/z value). Furthermore,
-\Rfunction{create\_structural\_network} takes a \Robject{data.frame}
+\Rfunction{createStructuralAdjacency} takes a \Robject{data.frame}
 object as argument \Robject{functional\_groups} with the \code{colnames}
 \code{"mass"}, \code{"name"} and additional columns (e.g. \code{"formula"}). 
-\Rfunction{create\_structural\_network} looks for transformation (in the 
+\Rfunction{createStructuralAdjacency} looks for transformation (in the 
 sense of additions/losses of functional groups mediated by biochemical,
 enzymatic reactions) in the data using the mass information. \newline
 
@@ -228,9 +228,9 @@ between metabolic features.
 
 The search space for these transformation is adjustable by the 
 \Robject{functional\_groups} argument in 
-\Rfunction{create\_structural\_network} allowing to look for specific 
+\Rfunction{createStructuralAdjacency} allowing to look for specific 
 enzymatic transformations in mind. Hereby,
-\Rfunction{create\_structural\_network} will take into account the 
+\Rfunction{createStructuralAdjacency} will take into account the 
 \Robject{ppm} value, to adjust for inaccuracies in m/z values due to technical 
 reasons according to the formula
 
@@ -250,7 +250,7 @@ connection (derived from the column \code{"name"} in the
 \Robject{functional\_groups}) will be written to a character matrix. These
 two matrices will be returned as a list (first entry: numerical adjacency
 matrix, second entry: character matrix) by the function
-\Rfunction{create\_structural\_network}. \newline
+\Rfunction{createStructuralAdjacency}. \newline
 
 Before calculating the structural matrix, we will define the search space, 
 i.e. these transformation that will be looked for in the mass spectrometric
@@ -269,30 +269,30 @@ functional_groups <- rbind(
     c("Trisaccharide (-H2O)", "C18H30O15", 486.1584702945))
 
 ## convert to data frame
-functional_groups <- data.frame(group = functional_groups[,1],
-                            formula = functional_groups[,2],
-                            mass = as.numeric(functional_groups[,3]))
+functional_groups <- data.frame(group=functional_groups[,1],
+                            formula=functional_groups[,2],
+                            mass=as.numeric(functional_groups[,3]))
 @
 
-The function \Rfunction{create\_structural\_network} will then check for those 
+The function \Rfunction{createStructuralAdjacency} will then check for those 
 m/z differences that are stored in the column \code{"mass"} in the 
 object \Robject{functional\_groups}. To create the adjacency matrix derived 
 from these structural information we enter
 
 <<structure,eval=TRUE,echo=TRUE>>=
-struct_adj <- create_structural_network(x = x_test, 
-                                functional_groups = functional_groups, ppm = 3)
+struct_adj <- createStructuralAdjacency(x=x_test, 
+                                functional_groups=functional_groups, ppm=3)
 @
 
 in the \R~console. 
 
 \section{Creating the statistical matrix}
 
-The function \Rfunction{create\_statistical\_network} will create the adjacency
+The function \Rfunction{createStatisticalAdjacency} will create the adjacency
 matrix based on statistical associations. 
-\Rfunction{create\_statistical\_network} is a wrapper function for the 
-functions \Rfunction{create\_statistical\_networks\_list} and 
-\Rfunction{consensus\_network}. The former function will create a 
+\Rfunction{createStatisticalAdjacency} is a wrapper function for the 
+functions \Rfunction{createStatisticalAdjacencyList} and 
+\Rfunction{consensusAdjacency}. The former function will create a 
 list of adjacency matrices using the statistical models defined by the 
 \Robject{model} argument. Currently, the models LASSO (using \Rpackage{stabs}
 \citep{Hofner2015,Thomas2017}), Random Forest (using 
@@ -314,27 +314,27 @@ For further information on the different models
 take a look on the respective help pages of \code{lasso}, \code{randomForest}, 
 \code{clr}, \code{aracne}, \code{correlation} and/or \code{bayes}. Arguments
 that are accepted by the respective underlying functions can be passed directly 
-to the \Rfunction{create\_statistical\_networks} and 
-\Rfunction{create\_statistical\_networks\_list} functions. In addition, 
+to the \Rfunction{createStatisticalAdjacency} and 
+\Rfunction{createStatisticalAdjacencyList} functions. In addition, 
 arguments that are defined in the functions \code{lasso}, \code{randomForest}, 
 \code{clr}, \code{aracne}, \code{correlation} and/or \code{bayes} can 
 be passed like-wise to the functions. \newline
 
-From the list of adjacency matrices the function \Rfunction{consensus\_network}
+From the list of adjacency matrices the function \Rfunction{consensusAdjacency}
 will create a consensus adjacency matrix using the employed statistical models.
 The reasoning behind this step is to circumvent disadvantages arising from each 
 model and creating a statistically reliable topology that reflects the actual 
 metabolic relations. To calculate the consensus adjacency matrix, the 
 \Rfunction{consensus} function from the \Rpackage{sna} \citep{Butts2016} is 
 employed. The arguments that are accepted by this function can be passed to the 
-\Rfunction{consensus\_network} and \Rfunction{create\_statistical\_networks} 
+\Rfunction{consensusAdjacency} and \Rfunction{createStatisticalAdjacency} 
 function, respectively. Furthermore, in case another method than 
 \code{"central.graph"} is used the argument \Robject{threshold} will define if 
 the value $a_{i,j}$ of the consensus adjacency matrix 
 will be reported as a connection in the returned matrix 
 (if $a_{i,j} \geq$ \code{threshold})
-or not. \Rfunction{create\_statistical\_networks} and 
-\Rfunction{consensus\_network} will return an unweighted adjancency matrix 
+or not. \Rfunction{createStatisticalAdjacency} and 
+\Rfunction{consensusAdjacency} will return an unweighted adjancency matrix 
 with connections inferred from the respective models. \newline
 
 In the following example, we will create a consensus adjacency matrix using 
@@ -344,17 +344,17 @@ adjacency matrix will be adjusted by the Benjamini \& Hochberg (False Discovery
 rate) method and the default q-value of 0.05. 
 <<statistical,eval=TRUE,echo=TRUE>>=
 x_int <- x_test[,3:dim(x_test)[2]]
-stat_adj <- create_statistical_network(x_int, 
-                model = c("pearson", "spearman"), correlation_adjust = "BH")
+stat_adj <- createStatisticalAdjacency(x_int, 
+                model=c("pearson", "spearman"), correlation_adjust="BH")
 @
 
 To create the same adjacency matrix without using the wrapper function, you can
-call the two functions \Rfunction{create\_statistical\_networks\_list} and 
-\Rfunction{consensus\_network} individually: 
+call the two functions \Rfunction{createStatisticalAdjacencyList} and 
+\Rfunction{consensusAdjacency} individually: 
 <<statistical_stepwise,eval=TRUE,echo=TRUE>>= 
-l <- create_statistical_networks_list(x_int, 
-                model = c("pearson", "spearman"), correlation_adjust = "BH")
-stat_adj <- consensus_network(l = l)
+l <- createStatisticalAdjacencyList(x_int, 
+                model=c("pearson", "spearman"), correlation_adjust="BH")
+stat_adj <- consensusAdjacency(l=l)
 @
 
 \section{Combining the structural and statistical matrix}
@@ -363,16 +363,16 @@ these two matrices. The function \Rfunction{combine\_structural\_statistical}
 will combine the matrices to the consensus matrix. The function accepts 
 the arguments \code{structure} and \code{statistical} for the two matrices,
 respectively, and the argument \code{threshold}, that is a numerical value 
-(default = 1). After adding the matrices, the entries will be checked if 
+(default=1). After adding the matrices, the entries will be checked if 
 they are greater or equal than \code{threshold} and 1 or 0 will be returned,
 respectively. The argument \code{threshold} needs to be adjusted by the user 
 if another \code{method} than \code{"central.graph"} in 
-\Rfunction{create\_statistical\_networks}/\Rfunction{consensus\_network} is 
+\Rfunction{createStatisticalAdjacency}/\Rfunction{consensusAdjacency} is 
 used. 
 
 <<combine,eval=TRUE,echo=TRUE>>=
-cons_adj <- combine_structural_statistical(structure = struct_adj[[1]],
-                                    statistical = stat_adj)
+cons_adj <- combineStructuralStatistical(structure=struct_adj[[1]],
+                                    statistical=stat_adj)
 @
 
 \section{Visualization and further analyses}
@@ -383,7 +383,7 @@ we will use the \Rpackage{igraph} \citep{Csardi2006} package to visualize the
 adjacency matrix. 
 
 <<visualisation,eval=TRUE,echo=TRUE,fig.show='hide'>>=
-g <- igraph::graph_from_adjacency_matrix(cons_adj, mode = "directed")
+g <- igraph::graph_from_adjacency_matrix(cons_adj, mode="directed")
 plot(g)
 @
 
@@ -505,9 +505,9 @@ functional_groups <- rbind(
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"),
     c("Cytosine (-H)", "C4H4N3O",  "110.0354367661"))
 
-functional_groups <- data.frame(name = functional_groups[,1], 
-            formula = functional_groups[,2],
-            mass = as.numeric(functional_groups[,3]))
+functional_groups <- data.frame(name=functional_groups[,1], 
+            formula=functional_groups[,2],
+            mass=as.numeric(functional_groups[,3]))
 @
 
 \end{document}

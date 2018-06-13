@@ -1,5 +1,10 @@
 CHANGES IN VERSION 0.99.6
 -------------------------
+ o use camelCaps for functions [2018-06-13 Wed]
+ o use no spaces between '=' and named arguments [2018-06-13 Wed]
+
+CHANGES IN VERSION 0.99.6
+-------------------------
  o fix typo in lasso function [2018-06-12 Tue]
 
 CHANGES IN VERSION 0.99.5

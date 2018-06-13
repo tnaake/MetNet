@@ -40,9 +40,9 @@ functional_groups <- rbind(
 functional_groups <- data.frame(group = functional_groups[,1],
     formula = functional_groups[,2],
     mass = as.numeric(functional_groups[,3]))
-struct_net <- create_structural_network(x_test, functional_groups, ppm = 5)
-stat_net <- create_statistical_network(x_test, 
+struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
+stat_adj <- createStatisticalAdjacency(x_test, 
     model = c("pearson", "spearman","bayes"), 
     adjust_correlation = "bonferroni")
-cons_net <- combine_structural_statistical(struct_net[[1]], stat_net)
+cons_adj <- combineStructuralStatistical(struct_adj[[1]], stat_adj)
 }

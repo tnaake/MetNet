@@ -15,7 +15,7 @@
 #' 
 #' ## function to add specific features of x (defined by m/z and retention 
 #' ## time) to x_test 
-#' add_to_x_test <- function(x_test, x, mz, rt) {
+#' addTo_x_test <- function(x_test, x, mz, rt) {
 #'     mzX <- x[, "mz"]
 #'     rtX <- x[, "rt"]
 #'     new <- x[mzX>(mz-0.01) & mzX<(mz+0.01) & rtX>(rt-0.01) & rtX<(rt+0.01), ]
@@ -27,76 +27,76 @@
 #' x_test <- peaklist[peaklist[, "mz"] > 739.35 & peaklist[, "mz"] < 739.36 & 
 #'     peaklist[, "rt"] > 426.18 & peaklist[, "rt"] < 426.2, ] 
 #' ## Lyciumoside I M+Na+ 653.3497
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 653.3497, rt = 417.46) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 653.3497, rt = 417.46) 
 #' ## LyciumosideII M+Na+  815.4043
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 815.40, rt = 383.60) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 815.40, rt = 383.60) 
 #' ## Nicotianoside X M+Na+ 825.3503
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 825.35, rt = 434.38) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 825.35, rt = 434.38) 
 #' ## Nicotianoside XI M+Na+  901.39913 
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 901.40, rt = 391.15) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 901.40, rt = 391.15) 
 #' ## NicotianosideXII M+Na+ 987.4037  
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 987.40, rt = 398.46) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 987.40, rt = 398.46) 
 #' ## NicotianosideXIII M+Na+ 1074.4042 
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 1074.40, rt = 404.92)
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 1074.40, rt = 404.92)
 #' ## Lyciumoside IV  M+Na+ 799.4091
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 799.40, rt = 411.23) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 799.40, rt = 411.23) 
 #' ## Nicotianoside I M+Na+ 885.4084
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 885.41, rt = 420.12) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 885.41, rt = 420.12) 
 #' ## Nicotianoside II  M+Na+ 971.4074 
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 971.41, rt = 428.81) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 971.41, rt = 428.81) 
 #' ## Nicotianoside III  M+Na+ 945.4653
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 945.46, rt = 402.75)
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 945.46, rt = 402.75)
 #' ## Nicotianoside IV M+Na+ 1031.4645
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 1031.46, rt = 412.40) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 1031.46, rt = 412.40) 
 #' ## Nicotianoside V M+Na+ 1117.4681
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 1117.46, rt = 422.19) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 1117.46, rt = 422.19) 
 #' ## Attenoside (or DTG956) M+Na+ 961.4601
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 961.46, rt = 380.46) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 961.46, rt = 380.46) 
 #' ## DTG1042/Nicotianoside VI M+Na+ 1047.4525
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 1047.46, rt = 387.28) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 1047.46, rt = 387.28) 
 #' ## NicotianosideVII M+Na+ 1133.4624
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 1133.46, rt = 394.70) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 1133.46, rt = 394.70) 
 #' ## NicotianosideVIII M+Na+ 1219.4619
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 1219.46, rt = 400.99) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 1219.46, rt = 400.99) 
 #' ## N-coumaroylputrescine [M+H+]+ 235.143
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 235.14, rt = 193.85) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 235.14, rt = 193.85) 
 #' ## N',N''-coumaroyl,caffeoylspermidine [M+H+]+ 454.23
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 454.23, rt = 264.43) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 454.23, rt = 264.43) 
 #' ## N-caffeoylputrescine isomer 1 [M+H+]+ 251.14
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 251.14, rt = 108.34) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 251.14, rt = 108.34) 
 #' ## N-caffeoylputrescine isomer 2 [M+H+]+ 251.14
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 251.14, rt = 143.11) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 251.14, rt = 143.11) 
 #' ## N-caffeoylspermidine [M+H+]+ 308.2
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 308.2, rt = 246.71) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 308.2, rt = 246.71) 
 #' ## N-feruloylputrescine [M+H+]+ 265.153
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 265.15, rt = 191.55) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 265.15, rt = 191.55) 
 #' ## N-feruloyl-spermidine iso1 [M+H+]+ 322.212
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 322.21, rt = 104.13) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 322.21, rt = 104.13) 
 #' ## N-feruloyl-spermidine iso2 [M+H+]+ 322.212 
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 322.21, rt = 147.98) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 322.21, rt = 147.98) 
 #' ## N'-N''-dicaffeoyl -spermidine [M+H+]+ 470.23
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 470.23, rt = 247.15) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 470.23, rt = 247.15) 
 #' ## N'-N''-diferuloyl-spermidine/ 
 #' ##N#,N$-Coumaroyl,sinapoyl spermidine isomer [M+H+]+ 498.260/498.261
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 498.26, rt = 289.05) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 498.26, rt = 289.05) 
 #' ## N'-N''-dihydrated-diferuloyl-spermidine [M+H+]+ 502.25
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 502.25, rt = 242.55) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 502.25, rt = 242.55) 
 #' ## unknown conjugate [M+H+]+ 411.2012
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 411.20, rt = 211.67) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 411.20, rt = 211.67) 
 #' ## N'-N''-caffeoyl,feruloyl spermidine iso1 [M+H+]+ 484.245
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 484.24, rt = 264.44) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 484.24, rt = 264.44) 
 #' ## N'-N''-caffeoyl,feruloyl spermidine iso2 [M+H+]+ 484.245 
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 484.24, rt = 270.65) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 484.24, rt = 270.65) 
 #' ## O -Coumaroylquinic acid isomer 1 [M+H+]+  339.109
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 339.11, rt = 248.79) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 339.11, rt = 248.79) 
 #' ## O -Coumaroylquinic acid isomer 1 [M+H+]+  339.109 
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 339.11, rt = 268.97) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 339.11, rt = 268.97) 
 #' ## O-caffeoylquinic acid isomer 1 [M+H+]+ 355.1014
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 355.10, rt = 175.75) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 355.10, rt = 175.75) 
 #' ## O-caffeoylquinic acid isomer 2 [M+H+]+ 355.1014
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 355.10, rt = 215.85) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 355.10, rt = 215.85) 
 #' ## O-caffeoylquinic acid isomer 3 [M+H+]+ 355.1014
-#' x_test <- add_to_x_test(x_test, peaklist, mz = 355.10, rt = 241.04) 
+#' x_test <- addTo_x_test(x_test, peaklist, mz = 355.10, rt = 241.04) 
 #' 
 #' ## change rownames (that it is accepted by formulas)
 #' rownames(x_test) <- paste0("x", rownames(x_test))
