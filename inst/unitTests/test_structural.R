@@ -1,48 +1,51 @@
 ## create toy example data set
 data("mat_test", package="MetNet")
 colnames(mat_test) <- paste0("intensity_", 1:20)
-mz <- c(100, 150, 200, 200, 262.0528, 348.0532, 448.0532)
-mat_test <- cbind(mz=mz, mat_test)
+mz <- c(100, 150, 262.0528, 262.0528, 262.0528, 348.0532, 448.0532)
+rt <- c(100, 100, 50, 150, 150, 150, 150)
+rt <- c(100, 100, 50, 150, 150, 150, 150)
+mat_test <- cbind(mz=mz, rt=rt, mat_test)
 
-## functional_groups object for structual calculation
-functional_groups <- rbind(
-    c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
-    c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"))
-functional_groups <- data.frame(group=as.character(functional_groups[, 1]),
-                            formula=as.character(functional_groups[, 2]),
-                            mass=as.numeric(functional_groups[, 3]))
+## transformations object for structual calculation
+transformations <- rbind(
+    c("Malonyl group (–H2O)", "C3H2O3", 86.0003939305, "?"),
+    c("Monosaccharide (–H2O)", "C6H10O5", 162.0528234315, "-"))
+transformations <- data.frame(group=transformations[, 1],
+                            formula=transformations[, 2],
+                            mass=as.numeric(transformations[, 3]),
+                            rt=transformations[,4])
 
 ## START unit test inRangeWhich ##
 test_inRangeWhich <- function() {
     checkException(inRangeWhich(m_1=NULL, m_2=100, 
-                                   functional_groups=99.9))
+                                transformation=99.9))
     checkException(inRangeWhich(m_1=99.8, m_2=NULL, 
-                                   functional_groups=99.9))
+                                transformation=99.9))
     checkException(inRangeWhich(m_1=99.8, m_2=100, 
-                                   functional_groups=NULL))
+                                transformation=NULL))
     checkEquals(inRangeWhich(m_1=86.0002, m_2=86.0004, 
-        functional_groups=functional_groups[, "mass"]), 1)
+                             transformation=transformations[, "mass"]), 1)
     checkEquals(inRangeWhich(m_1=86.0004, m_2=86.0002, 
-        functional_groups=functional_groups[, "mass"]), 1)
+                             transformation=transformations[, "mass"]), 1)
     checkEquals(inRangeWhich(m_1=162.0527, m_2=162.0529, 
-        functional_groups=functional_groups[, "mass"]), 2)
+                             transformation=transformations[, "mass"]), 2)
     checkEquals(inRangeWhich(m_1=162.0529, m_2=162.0527, 
-        functional_groups=functional_groups[, "mass"]), 2)
+                             transformation=transformations[, "mass"]), 2)
     checkEquals(inRangeWhich(m_1=86.0002, m_2=162.0529, 
-        functional_groups=functional_groups[, "mass"]), c(1, 2))
+        transformation=transformations[, "mass"]), c(1, 2))
 }
 ## END unit test inRangeWhich ## 
 
 ## START unit test createStructuralAdjacency ##
 struct_adj <- createStructuralAdjacency(mat_test, 
-        functional_groups=functional_groups, ppm=5)
+        transformation=transformations, ppm=5)
 test_createStructuralAdjacency <- function() {
-    checkException(createStructuralAdjacency(mat_test[, -1], functional_groups))
-    checkException(createStructuralAdjacency(NULL, functional_groups))
-    checkException(createStructuralAdjacency(mat_test, functional_groups[,-1]))
-    checkException(createStructuralAdjacency(mat_test, functional_groups[,-3]))
+    checkException(createStructuralAdjacency(mat_test[, -1], transformations))
+    checkException(createStructuralAdjacency(NULL, transformations))
+    checkException(createStructuralAdjacency(mat_test, transformations[,-1]))
+    checkException(createStructuralAdjacency(mat_test, transformations[,-3]))
     checkException(createStructuralAdjacency(mat_test, matrix()))
-    checkException(createStructuralAdjacency(mat_test, functional_groups, ppm="a"))
+    checkException(createStructuralAdjacency(mat_test, transformations, ppm="a"))
     checkEquals(length(struct_adj), 2)
     checkEquals(dim(struct_adj[[1]]), c(7, 7))
     checkEquals(dim(struct_adj[[2]]), c(7, 7))
@@ -50,7 +53,7 @@ test_createStructuralAdjacency <- function() {
     checkEquals(rownames(struct_adj[[2]]), colnames(struct_adj[[2]]))
     checkEquals(rownames(struct_adj[[1]]), rownames(struct_adj[[2]]))
     checkEquals(rownames(struct_adj[[1]]), paste0("x", 1:7))
-    checkEquals(sum(struct_adj[[1]]), 4)
+    checkEquals(sum(struct_adj[[1]]), 12)
     checkEquals(unique(as.vector(struct_adj[[2]])), 
                 c("", "Monosaccharide (–H2O)", "Malonyl group (–H2O)" ))
     checkTrue(is.matrix(struct_adj[[1]]))
@@ -59,3 +62,34 @@ test_createStructuralAdjacency <- function() {
     checkTrue(is.character(struct_adj[[2]]))
 }
 ## END unit test createStructuralAdjacency ## 
+
+## START unit test rtCorrection ##
+struct_adj_rt <- rtCorrection(struct_adj, mat_test, transformations)
+test_rtCorrection <- function() {
+    checkException(rtCorrection(struct_adj[[1]], mat_test, transformations))
+    checkException(
+        rtCorrection(list(struct_adj[[1]]), mat_test, transformations))
+    checkException(rtCorrection(list(struct_adj[[2]], struct_adj[[2]]), 
+        mat_test, transformations))
+    checkException(rtCorrection(list(struct_adj[[1]], struct_adj[[1]]), 
+        mat_test, transformations))
+    checkException(rtCorrection(struct_adj, NULL, transformations))
+    checkException(rtCorrection(struct_adj, mat_test[,-1], transformations))
+    checkException(rtCorrection(struct_adj, mat_test[,-2], transformations))
+    checkException(rtCorrection(struct_adj, mat_test, NULL))
+    checkException(rtCorrection(struct_adj, mat_test, transformations[,-1]))
+    checkException(rtCorrection(struct_adj, mat_test, transformations[,-4]))
+    checkException(rtCorrection(struct_adj, mat_test, 
+        cbind(transformations[,-4], rt=rep("a", 4))))
+    checkTrue(is.matrix(struct_adj_rt[[1]]))
+    checkTrue(is.numeric(struct_adj_rt[[1]]))
+    checkTrue(is.matrix(struct_adj_rt[[2]]))
+    checkTrue(is.character(struct_adj_rt[[2]]))
+    checkEquals(colnames(struct_adj_rt[[1]]), paste0("x", 1:7))
+    checkEquals(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[1]]))
+    checkEquals(colnames(struct_adj_rt[[1]]), colnames(struct_adj_rt[[2]]))
+    checkEquals(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[2]]))
+    checkTrue(table(struct_adj_rt)[1] == 41)
+    checkTrue(table(struct_adj_rt[[1]])[1] == 41)
+}
+## END unit test rtCorrection ## 

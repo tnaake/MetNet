@@ -209,7 +209,7 @@ matrix based on structual properties (m/z values) of the features.
 The function expects a matrix with a column \code{"mz"} that contains the 
 mass information of a feature (typically the m/z value). Furthermore,
 \Rfunction{createStructuralAdjacency} takes a \Robject{data.frame}
-object as argument \Robject{functional\_groups} with the \code{colnames}
+object as argument \Robject{transformations} with the \code{colnames}
 \code{"mass"}, \code{"name"} and additional columns (e.g. \code{"formula"}). 
 \Rfunction{createStructuralAdjacency} looks for transformation (in the 
 sense of additions/losses of functional groups mediated by biochemical,
@@ -227,7 +227,7 @@ will result in a mass difference of 43.98983 (molecular weight of CO$_2$)
 between metabolic features. 
 
 The search space for these transformation is adjustable by the 
-\Robject{functional\_groups} argument in 
+\Robject{transformation} argument in 
 \Rfunction{createStructuralAdjacency} allowing to look for specific 
 enzymatic transformations in mind. Hereby,
 \Rfunction{createStructuralAdjacency} will take into account the 
@@ -242,49 +242,78 @@ with $m_{exp}$ the experimentally determined m/z value and $m_{calc}$ the
 calculated accurate mass of a molecule. Within the function, a lower and upper
 range is calculated depending on the supplied \Robject{ppm} value, differences
 between the m/z feature values are calculated and matched against the
-\code{"mass"}es of the \Robject{functional\_groups} argument. If any
-of the additions/losses defined in \Robject{functional\_groups} is found in the
+\code{"mass"}es of the \Robject{transformations} argument. If any
+of the additions/losses defined in \Robject{transformations} is found in the
 data, it will be reported as an (unweighted) connection in the
 returned adjacency matrix. Together with the adjacency matrix the type of
 connection (derived from the column \code{"name"} in the
-\Robject{functional\_groups}) will be written to a character matrix. These
+\Robject{transformations}) will be written to a character matrix. These
 two matrices will be returned as a list (first entry: numerical adjacency
 matrix, second entry: character matrix) by the function
 \Rfunction{createStructuralAdjacency}. \newline
 
 Before calculating the structural matrix, we will define the search space, 
 i.e. these transformation that will be looked for in the mass spectrometric
-data by creating the \Robject{functional\_groups} object. 
+data by creating the \Robject{transformations} object. 
 
-<<functionalgroups_example,echo=TRUE,eval=TRUE>>=
+<<transformation_example,echo=TRUE,eval=TRUE>>=
 ## define the search space for biochemical transformation 
-functional_groups <- rbind(
-    c("Hydroxylation (-H)", "O", 15.9949146221),
-    c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305),
-    c("C6H10O6", "C6H10O6", 178.0477380536),
-    c("D-ribose (-H2O) (ribosylation)", "C5H8O4", 132.0422587452),
-    c("Disaccharide (-H2O)", "C12H20O11", 340.1005614851),
-    c("Glucuronic acid (-H2O)", "C6H8O6", 176.0320879894),
-    c("Monosaccharide (-H2O)", "C6H10O5", 162.0528234315),
-    c("Trisaccharide (-H2O)", "C18H30O15", 486.1584702945))
+transformations <- rbind(
+    c("Hydroxylation (-H)", "O", 15.9949146221, "-"),
+    c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "?"),
+    c("C6H10O6", "C6H10O6", 178.0477380536, "-"),
+    c("D-ribose (-H2O) (ribosylation)", "C5H8O4", 132.0422587452, "-"),
+    c("Disaccharide (-H2O)", "C12H20O11", 340.1005614851, "-"),
+    c("Glucuronic acid (-H2O)", "C6H8O6", 176.0320879894, "?"),
+    c("Monosaccharide (-H2O)", "C6H10O5", 162.0528234315, "-"),
+    c("Trisaccharide (-H2O)", "C18H30O15", 486.1584702945, "-"))
 
 ## convert to data frame
-functional_groups <- data.frame(group=functional_groups[,1],
-                            formula=functional_groups[,2],
-                            mass=as.numeric(functional_groups[,3]))
+transformations <- data.frame(group=transformations[,1],
+                            formula=transformations[,2],
+                            mass=as.numeric(transformations[,3]),
+                            rt=transformations[,4])
 @
 
 The function \Rfunction{createStructuralAdjacency} will then check for those 
 m/z differences that are stored in the column \code{"mass"} in the 
-object \Robject{functional\_groups}. To create the adjacency matrix derived 
+object \Robject{transformations}. To create the adjacency matrix derived 
 from these structural information we enter
 
 <<structure,eval=TRUE,echo=TRUE>>=
 struct_adj <- createStructuralAdjacency(x=x_test, 
-                                functional_groups=functional_groups, ppm=3)
+                                transformation=transformations, ppm=3)
 @
-
 in the \R~console. 
+
+\subsection*{Refining the structural adjacency matrix (optional)}
+Depending on the chemical group added the retention time will differ depending
+on the chemical group added, e.g. an addition of a glycosyl group will 
+usually result in a lower retentiom time in reverse-phase chromatography-
+This information can be used in refining the adjacency matrix derived from 
+the structural matrix. The \Rfunction{rtCorrection} does this checking, if
+predicted transformation correspond to the expected retention time shift, 
+in an automated fashion. It requires information about the expected retention
+time shift in the \Robject{data.frame} passed to the \Robject{transformation}
+argument (in the \code{"rt"} column). Within this columns, information about
+retention time shifts is encoded by \code{"-"}, \code{"+"} and \code{"?"}, 
+which means the feature with higher m/z value has lower, higher or unknown 
+retention time than the feature with the lower m/z value. The values for 
+m/z and retention time will be taken from the object passed to the 
+\Robject{x} argument. In case there is a discrepancy between the transformation
+and the retention time shift the adjacency matrix at the specific position
+will be set to 0. \Rfunction{rtCorrection} will return the 
+updated adjacency matrix and the updated character matrix with the descriptions 
+of the transformation. 
+
+To account for retention time shifts we enter
+
+<<rt_correction,eval=TRUE,echo=TRUE>>=
+struct_adj <- rtCorrection(struct_adj=struct_adj, 
+                                x=x_test, transformation=transformations)
+@
+in the \R~console. 
+
 
 \section{Creating the statistical matrix}
 
@@ -413,14 +442,14 @@ sessionInfo()
 @
 
 \newpage
-\subsection*{Functional groups}
+\subsection*{Transformations}
 
-The list of functional groups is taken from \citet{Breitling2006}. 
+The list of transformations is taken from \citet{Breitling2006}. 
 The numerical m/z values were calculated by using the structural formula and 
 the Biological Magnetic Resonance Data Bank
 \href{http://www.bmrb.wisc.edu/metabolomics/mol_mass.php}{web tool}. 
-<<functional_groups,eval=TRUE,echo=TRUE>>=
-functional_groups <- rbind(
+<<transformations,eval=TRUE,echo=TRUE>>=
+transformations <- rbind(
     c("Alanine", "C3H5NO", "71.0371137878"),
     c("Arginine", "C6H12N4O", "156.1011110281"),
     c("Asparagine", "C4H6N2O2", "114.0429274472"),
@@ -505,9 +534,9 @@ functional_groups <- rbind(
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"),
     c("Cytosine (-H)", "C4H4N3O",  "110.0354367661"))
 
-functional_groups <- data.frame(name=functional_groups[,1], 
-            formula=functional_groups[,2],
-            mass=as.numeric(functional_groups[,3]))
+transformations <- data.frame(name=transformations[,1], 
+            formula=transformations[,2],
+            mass=as.numeric(transformations[,3]))
 @
 
 \end{document}

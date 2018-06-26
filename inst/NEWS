@@ -1,3 +1,7 @@
+CHANGES IN VERSION 0.99.8
+-------------------------
+ o implement function rtCorrection [2018-06-26 Tue]
+
 CHANGES IN VERSION 0.99.6
 -------------------------
  o use camelCaps for functions [2018-06-13 Wed]

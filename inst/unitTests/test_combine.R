@@ -4,20 +4,20 @@ colnames(mat_test) <- paste0("intensity_", 1:20)
 mz <- c(100, 150, 200, 200, 262.0528, 348.0532, 448.0532)
 mat_test <- cbind(mz=mz, mat_test)
 
-## functional_groups object for structual calculation
-functional_groups <- rbind(
+## transformations object for structual calculation
+transformations <- rbind(
     c("Malonyl group (–H2O)", "C3H2O3", "86.0003939305"),
     c("Monosaccharide (–H2O)", "C6H10O5", "162.0528234315"))
-functional_groups <- data.frame(group=as.character(functional_groups[, 1]),
-                                formula=as.character(functional_groups[, 2]),
-                                mass=as.numeric(functional_groups[, 3]))
+transformations <- data.frame(group=as.character(transformations[, 1]),
+                                formula=as.character(transformations[, 2]),
+                                mass=as.numeric(transformations[, 3]))
 
 ## create statistical network
 stat_adj <- createStatisticalAdjacency(mat_test[, -1], 
         model=c("clr", "aracne","pearson", "spearman", "bayes"))
 ## create structural network
 struct_adj <- createStructuralAdjacency(mat_test, 
-        functional_groups=functional_groups, ppm=5)
+        transformation=transformations, ppm=5)
 
 ## START unit test combineStructuralStatistical ## 
 cons_adj <- combineStructuralStatistical(struct_adj[[1]], stat_adj)
