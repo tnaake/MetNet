@@ -3,7 +3,6 @@ data("mat_test", package="MetNet")
 colnames(mat_test) <- paste0("intensity_", 1:20)
 mz <- c(100, 150, 262.0528, 262.0528, 262.0528, 348.0532, 448.0532)
 rt <- c(100, 100, 50, 150, 150, 150, 150)
-rt <- c(100, 100, 50, 150, 150, 150, 150)
 mat_test <- cbind(mz=mz, rt=rt, mat_test)
 
 ## transformations object for structual calculation

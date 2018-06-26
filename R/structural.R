@@ -238,17 +238,17 @@ rtCorrection <- function(struct_adj, x, transformation) {
         stop("struct_adj[[2]] is not a character matrix")
     
     ## get indices of matching items
-    ind <- lapply(1:dim(transformation)[1], function(x) 
+    ind <- lapply(seq_len(dim(transformation)[1]), function(x) 
         apply(group, c(1,2), function(y) grep(x=as.vector(y), 
                 pattern=as.character(transformation[x,1]), fixed=TRUE)))
     ## get row and col indices where matrix == 1
     ind <- lapply(ind, function(x) which(x == 1, arr.ind=TRUE))
     
     ## iterate through transformation rows
-    for (j in 1:nrow(transformation)) { 
+    for (j in seq_len(nrow(transformation))) { 
         ##  iterate within each entry of transformation rows
         if (!is.null(nrow(ind[[j]]))) {
-        for (i in 1:nrow(ind[[j]])) { 
+        for (i in seq_len(nrow(ind[[j]]))) { 
             x_1 <- x[rownames(adj)[ind[[j]][i,1]], ]
             x_2 <- x[rownames(adj)[ind[[j]][i,2]], ]
             
