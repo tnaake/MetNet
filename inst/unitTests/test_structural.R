@@ -14,27 +14,6 @@ transformations <- data.frame(group=transformations[, 1],
                             mass=as.numeric(transformations[, 3]),
                             rt=transformations[,4])
 
-## START unit test inRangeWhich ##
-test_inRangeWhich <- function() {
-    checkException(inRangeWhich(m_1=NULL, m_2=100, 
-                                transformation=99.9))
-    checkException(inRangeWhich(m_1=99.8, m_2=NULL, 
-                                transformation=99.9))
-    checkException(inRangeWhich(m_1=99.8, m_2=100, 
-                                transformation=NULL))
-    checkEquals(inRangeWhich(m_1=86.0002, m_2=86.0004, 
-                             transformation=transformations[, "mass"]), 1)
-    checkEquals(inRangeWhich(m_1=86.0004, m_2=86.0002, 
-                             transformation=transformations[, "mass"]), 1)
-    checkEquals(inRangeWhich(m_1=162.0527, m_2=162.0529, 
-                             transformation=transformations[, "mass"]), 2)
-    checkEquals(inRangeWhich(m_1=162.0529, m_2=162.0527, 
-                             transformation=transformations[, "mass"]), 2)
-    checkEquals(inRangeWhich(m_1=86.0002, m_2=162.0529, 
-        transformation=transformations[, "mass"]), c(1, 2))
-}
-## END unit test inRangeWhich ## 
-
 ## START unit test createStructuralAdjacency ##
 struct_adj <- createStructuralAdjacency(mat_test, 
         transformation=transformations, ppm=5)

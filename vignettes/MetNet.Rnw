@@ -133,13 +133,13 @@ adjacency matrix from structual properties, based on losses/addition of
 functional groups defined by the user, and statistical associations. Currently,
 the following statistical models are implemented to infer a statistical
 adjacency matrix: Least absolute shrinkage and selection operator
-(LASSO, L1-norm regression, \citet{Tibshirani1996}), Random Forest 
+(LASSO, L1-norm regression, \citet{Tibshirani1994}), Random Forest 
 \citep{Breiman2001}, Pearson and Spearman correlation (including partial and
 semipartial correlation, see \citet{Steuer2006} 
 for a discussion on correlation-based metabolic networks), context likelihood 
-of relatedness (CLR, \citet{Faith2007}), the algorithm for the reconstruction 
-of accurate cellular networks (ARACNE, \citet{Margolin2006}) and 
-constraint-based structure learning (Bayes, \citep{Scutari2010}). 
+of relatedness (CLR, \citealp{Faith2007}), the algorithm for the reconstruction 
+of accurate cellular networks (ARACNE, \citealp{Margolin2006}) and 
+constraint-based structure learning (Bayes, \citealp{Scutari2010}). 
 Since all of these methods have
 advantages and disadvantages, the user has the possibility to select
 several of these methods, compute adjacency matrices from these models and
@@ -323,8 +323,8 @@ matrix based on statistical associations.
 functions \Rfunction{createStatisticalAdjacencyList} and 
 \Rfunction{consensusAdjacency}. The former function will create a 
 list of adjacency matrices using the statistical models defined by the 
-\Robject{model} argument. Currently, the models LASSO (using \Rpackage{stabs}
-\citep{Hofner2015,Thomas2017}), Random Forest (using 
+\Robject{model} argument. Currently, the models LASSO (using \Rpackage{stabs},
+\citealt{Hofner2015,Thomas2017}), Random Forest (using 
 \href{https://CRAN.R-project.org/package=rfPermute)}{\Rpackage{rfPermute}}, 
 CLR, ARACNE (the two latter using the package 
 \href{https://CRAN.R-project.org/package=mpmi}{\Rpackage{mpmi}} to calculate
@@ -333,11 +333,11 @@ Bias Corrected Mutual Information, and the functions \Rfunction{clr} and
 \Rfunction{aracne.a} from the 
 \href{https://CRAN.R-project.org/package=parmigene}{\Rpackage{parmigene}} 
 package), Pearson and Spearman correlation (based on the 
-\Rpackage{psych} package; \citet{Revelle2018}), partial and semipartial 
+\Rpackage{psych} package; \citealt{Revelle2018}), partial and semipartial 
 Pearson and Spearman correlation (using the \code{ppcor} package, 
 https://CRAN.R-project.org/package=ppcor ) and constraint-based structure 
 learning based on the Fast Incremental Association (Fast-IAMB, algorithm 
-from the \Rpackage{bnlearn} package; \citet{Scutari2010}). 
+from the \Rpackage{bnlearn} package; \citealt{Scutari2010}). 
 
 For further information on the different models 
 take a look on the respective help pages of \code{lasso}, \code{randomForest}, 

@@ -1,35 +1,3 @@
-#' @name inRangeWhich
-#' @aliases inRangeWhich
-#' @title inRangeWhich
-#' @description The function \code{inRangeWhich} checks if a m/z feature
-#' (given as a range defined by \code{m_1} and \code{m_2}) is present in a 
-#' list of m/z features given by the \code{transformation} argument. 
-#' @usage inRangeWhich(m_1, m_2, transformation)
-#' @param m_1 numeric, value of the first m/z range
-#' @param m_2 numeric, value of the second m/z range
-#' @param transformation numeric, m/z values of the functional groups
-#' @details The function \code{inRangeWhich} is a helper function for 
-#' \code{createStructuralAdjacency}. \code{inRangeWhich} returns the index of
-#' the element in \code{transformation} that is in the range defined by 
-#' \code{m_1} and \code{m_2}. 
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' @return numeric
-#' @examples 
-#' m_1 <- 180.155
-#' m_2 <- 180.157
-#' transformation <- c(164.16, 180.156)
-#' inRangeWhich(m_1, m_2, transformation)
-#' @export
-inRangeWhich <- function(m_1, m_2, transformation) {
-    if (!is.numeric(m_1)) stop("m_1 is not numeric")
-    if (!is.numeric(m_2)) stop("m_2 is not numeric")
-    if (!is.numeric(transformation)) stop("transformation is not numeric")
-    lower_n <- if(m_1 < m_2) m_1 else m_2
-    higher_n <- if(m_1 >= m_2) m_1 else m_2
-    in_range <- which(lower_n <= transformation & higher_n >= transformation)
-    return(in_range)
-}
-
 #' @name createStructuralAdjacency
 #' @aliases createStructuralAdjacency
 #' @title Create adjacency matrix based on m/z (molecular weight) difference
@@ -81,53 +49,52 @@ createStructuralAdjacency <- function(x, transformation, ppm=5) {
     if (!is.data.frame(transformation)) 
         stop("transformation is not a data.frame")
     if (!"group" %in% colnames(transformation))
-        stop("transformation doesn't contain the column group")
+        stop("transformation does not contain the column group")
     if (!"mass" %in% colnames(transformation))
-        stop("transformation doesn't contain the column mass")
+        stop("transformation does not contain the column mass")
+    if (!"mz" %in% colnames(x)) stop("x does not contain the column mz")
     
     if (!is.numeric(ppm)) stop("ppm is not numeric")
     
-    mass <- x[, "mz"]
+    mass <- x[, "mz"]    
+    mat <- matrix(0, nrow=length(mass), ncol=length(mass))
+    rownames(mat) <- colnames(mat) <- mass
     
-    ## calculate according to 
-    ## ppm=(mass_measured - mass_theoretical) / mass_theoretical * 10^6
-    mass_1 <- mass / abs(ppm / 10 ^ 6  + 1 ) 
-    mass_2 <- mass / abs(ppm / 10 ^ 6 - 1)
-    mat <- matrix(0, nrow=dim(x)[1], ncol=dim(x)[1])
-    mat_type <- matrix("", ncol=nrow(mat), nrow(mat))
+    ## create matrix which has rownmames per row
+    mat <- apply(mat, 1, function(x) as.numeric(rownames(mat)))
+    ## calculate difference between rownames and colnames 
+    ## (difference between features)
+    mat <- mat - t(mat)
+    mat <- abs(mat)
+    ## calculate ppm deviation
+    mat_1 <- mat / abs(ppm / 10 ^ 6  - 1 ) 
+    mat_2 <- mat / abs(ppm / 10 ^ 6  + 1 ) 
     
-    mass_t <- transformation[, "mass"]
-    ## iterate through columns 
-    for (i in seq_len(ncol(mat))) {
-        transformation_vec <- lapply(seq_len(length(mass_1)), 
-            function(x, z=i) {
-                m_1 <- abs(mass_1[z] - mass_2[x])
-                m_2 <- abs(mass_2[z] - mass_1[x])
-                ## use inRangeWhich to find the indices of the mass 
-                ## differences, that are in range with the masses 
-                presence_l <- inRangeWhich(m_1, m_2, mass_t)
-                presence_l <- transformation[presence_l, "group"]
-                presence_l <- as.character(presence_l)
-                
-                if(length(presence_l) > 0) {
-                    ## if there are several possible groups mapped, return the
-                    ## names separated by "/"
-                    if (length(presence_l) > 1) {
-                        return(paste(presence_l, collapse="/"))
-                    ## if only one possible groups is mapped, return only this 
-                    ## name
-                    } else {return(presence_l)}
-                } else {return("")}
-            }
-        )
-        transformation_vec <- unlist(transformation_vec)
-        mat_type[,i] <- transformation_vec
+    ## create two matrices to store result
+    mat <- matrix(0, nrow=length(mass), ncol=length(mass))
+    mat_type <- matrix("", nrow=length(mass), ncol=length(mass))
+    
+    ## iterate through each column and check if the "mass" is in the interval
+    ## defined by the m/z value and ppm 
+    for (i in seq_along(transformation[, "mass"])) {
+
+        ind_mat_1 <- which(mat_1 >= transformation[i, "mass"])
+        ind_mat_2 <- which(mat_2 <= transformation[i, "mass"])
+
+        ## get intersect from the two (indices where "mass" is in the interval)
+        ind_hit <- intersect(ind_mat_1, ind_mat_2)
+        ## write to these indices 1 and the "group"
+        mat[ind_hit] <- 1
+        mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) !=0 , 
+            yes=paste(mat_type[ind_hit], transformation[i, "group"], sep="/"), 
+            no=as.character(transformation[i, "group"]))
     }
-    ## use mat_type to assign 0 or 1 to the adjacency matrix
-    mat <- ifelse(mat_type == "", 0, 1)
+    
     rownames(mat) <- colnames(mat) <- rownames(x)
     rownames(mat_type) <- colnames(mat_type) <- rownames(x)
+    
     return(list(mat, mat_type))
+
 }
 
 #' @name rtCorrection

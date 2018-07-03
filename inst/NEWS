@@ -1,3 +1,11 @@
+CHANGES IN VERSION 0.99.10
+--------------------------
+ o speed up function createStructuralAdjacencyMatrix [2018-07-03 Tue]
+
+CHANGES IN VERSION 0.99.9
+-------------------------
+ o change 1:... to seq_len() [2018-06-26 Tue]
+
 CHANGES IN VERSION 0.99.9
 -------------------------
  o change 1:... to seq_len() [2018-06-26 Tue]
