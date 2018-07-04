@@ -194,63 +194,59 @@ rtCorrection <- function(struct_adj, x, transformation) {
     if (!all(colnames(struct_adj[[2]]) == rownames(struct_adj[[2]])))
         stop("colnames of struct_adj[[2]] is not identical to 
                 rownames of struct_adj[[2]]")
-    if (!all(rownames(x) == rownames(struct_adj[[1]]))) 
-        stop("rownames(x) do not fit rownames(struct_adj[[1]])")
-    if (!all(rownames(x) == colnames(struct_adj[[1]]))) 
-        stop("rownames(x) do not fit colnames(struct_adj[[1]])")
+    if (!all(rownames(struct_adj[[1]]) %in% rownames(x))) 
+        stop("rownames(struct_adj[[1]]) do not fit rownames(x) ")
+    if (!all(colnames(struct_adj[[1]]) %in% rownames(x))) 
+        stop("colnames(struct_adj[[1]]) do not fit rownames(x)")
     if (!is.matrix(adj)) stop("struct_adj[[1]] is not a matrix")
     if (!is.matrix(group)) stop("struct_adj[[2]] is not a matrix")
     if (!is.numeric(adj)) stop("struct_adj[[1]] is not a numeric matrix")
     if (!is.character(group)) 
         stop("struct_adj[[2]] is not a character matrix")
     
+    mat_rt <- matrix(0, nrow=nrow(adj), ncol=ncol(adj))
+    colnames(mat_rt) <- rownames(mat_rt) <- x[rownames(adj), "rt"]
+    ## create matrix which has rownmames per row
+    mat_rt <- apply(mat_rt, 1, function(x) as.numeric(rownames(mat_rt)))
+    ## calculate difference between rownames and colnames 
+    ## (difference between features)
+    mat_rt <- mat_rt - t(mat_rt)
+    colnames(mat_rt) <- rownames(mat_rt) <- colnames(adj)
+    
+    mat_mz <- matrix(0, nrow=nrow(adj), ncol=ncol(adj))
+    colnames(mat_mz) <- rownames(mat_mz) <- x[rownames(adj), "mz"]
+    ## create matrix which has rownmames per row
+    mat_mz <- apply(mat_mz, 1, function(x) as.numeric(rownames(mat_mz)))
+    ## calculate difference between rownames and colnames 
+    ## (difference between features)
+    mat_mz <- mat_mz - t(mat_mz)
+    colnames(mat_mz) <- rownames(mat_mz) <- colnames(adj)
+    
     ## get indices of matching items
     ind <- lapply(seq_len(dim(transformation)[1]), function(x) 
-        apply(group, c(1,2), function(y) grep(x=as.vector(y), 
-                pattern=as.character(transformation[x,1]), fixed=TRUE)))
-    ## get row and col indices where matrix == 1
-    ind <- lapply(ind, function(x) which(x == 1, arr.ind=TRUE))
+        grep(group, pattern=transformation[x, 1], fixed=TRUE))
     
     ## iterate through transformation rows
     for (j in seq_len(nrow(transformation))) { 
-        ##  iterate within each entry of transformation rows
-        if (!is.null(nrow(ind[[j]]))) {
-        for (i in seq_len(nrow(ind[[j]]))) { 
-            x_1 <- x[rownames(adj)[ind[[j]][i,1]], ]
-            x_2 <- x[rownames(adj)[ind[[j]][i,2]], ]
-            
-            ## check if the groups match to the predicted retention time 
-            ## shift and change the connection accordingly
-            if (x_1["mz"] - x_2["mz"] > 0) {
-                if (transformation[j, "rt"] == "-") {
-                    if (x_2["rt"] - x_1["rt"] < 0) {
-                        adj[ind[[j]][i,1], ind[[j]][i, 2]] <- 0
-                        group[ind[[j]][i,1], ind[[j]][i, 2]] <- ""
-                    }
-                }
-                if (transformation[j, "rt"] == "+") {
-                    if (x_1["rt"] - x_2["rt"] < 0) {
-                        adj[ind[[j]][i,1], ind[[j]][i, 2]] <- 0
-                        group[ind[[j]][i,1], ind[[j]][i, 2]] <- ""
-                    }
-                }
-            }
-            if (x_2["mz"] - x_1["mz"] > 0) {
-                if (transformation[j, "rt"] == "-") {
-                    if (x_1["rt"] - x_2["rt"] < 0) {
-                        adj[ind[[j]][i,1], ind[[j]][i, 2]] <- 0
-                        group[ind[[j]][i,1], ind[[j]][i, 2]] <- ""
-                    }
-                }
-                if (transformation[j, "rt"] == "+") {
-                    if (x_2["rt"] - x_1["rt"] < 0) {
-                        adj[ind[[j]][i,1], ind[[j]][i, 2]] <- 0
-                        group[ind[[j]][i,1], ind[[j]][i, 2]] <- ""
-                    }
-                }
-            }
+        
+        ## check if observed rt shift corresponds to expected one and 
+        ## remove connection if necessary
+        if (transformation[j, "rt"] == "+") {
+            adj[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- 0
+            group[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
+            adj[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- 0
+            group[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
         }
+        
+        if (transformation[j, "rt"] == "-") {
+            adj[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- 0
+            group[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
+            adj[ind[[j]]][ mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- 0
+            group[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
         }
+        
+        
+
     }
     return(list(adj, group))
 }

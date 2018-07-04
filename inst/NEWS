@@ -1,6 +1,11 @@
+CHANGES IN VERSION 0.99.11
+--------------------------
+ o speed up function rtCorrection by vectorizing [2018-07-03 Tue]
+
 CHANGES IN VERSION 0.99.10
 --------------------------
- o speed up function createStructuralAdjacencyMatrix [2018-07-03 Tue]
+ o speed up function createStructuralAdjacencyMatrix by vectorizing 
+  [2018-07-03 Tue]
 
 CHANGES IN VERSION 0.99.9
 -------------------------
