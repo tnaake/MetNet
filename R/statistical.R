@@ -366,8 +366,7 @@ bayes <- function(x, ...) {
 #' cor_pearson <- correlation(x, type="pearson")
 #' cor_spearman <- correlation(x, type="spearman")
 #' l <- list(pearson=cor_pearson)
-#' addToList(l, "spearman", cor_spearman)
-#' @export
+#' MetNet:::addToList(l, "spearman", cor_spearman)
 addToList <- function(l, name, object) {
     if (!is.list(l)) stop("l is not a list")
     if (!is.character(name)) stop("name is not a character")

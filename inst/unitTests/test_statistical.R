@@ -18,7 +18,7 @@ test_lasso <- function() {
 ## END unit test lasso ##
 
 ## START unit test randomForest ## 
-randomForest_mat <- randomForest(mat_test)
+randomForest_mat <- randomForest(mat_test, parallel=FALSE)
 test_randomForest <- function() {
     ## do not test sum since this can change ##
     ## checkEquals(sum(randomForest_mat), 31) ## 
@@ -146,11 +146,11 @@ test_bayes <- function() {
 
 ## START unit test addToList ## 
 l <- list()
-l <- addToList(l, "newEntry", matrix())
+l <- MetNet:::addToList(l, "newEntry", matrix())
 test_addToList <- function() {
-    checkException(addToList(l, "newEntry", NULL))
-    checkException(addToList(l, NULL, matrix()))
-    checkException(addToList(NULL, "newEntry", matrix()))
+    checkException(MetNet:::addToList(l, "newEntry", NULL))
+    checkException(MetNet:::addToList(l, NULL, matrix()))
+    checkException(MetNet:::addToList(NULL, "newEntry", matrix()))
     checkEquals(length(l), 1)
     checkTrue(is.matrix(l[[1]]))
     checkEquals(l[[1]], matrix())
