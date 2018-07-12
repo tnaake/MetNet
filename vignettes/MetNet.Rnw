@@ -4,92 +4,111 @@
 %\VignettePackage{MetNet-vignette}
 
 \documentclass[11pt,a4paper,english,arial,twoside]{article}
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@    
+
+
+% 
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{geometry}
-\geometry{verbose,
-    tmargin=25mm,
-    bmargin=25mm,
-    lmargin=25mm,
-    rmargin=25mm}
-\setlength\parindent{0pt}
+% \usepackage{geometry}
+% \geometry{verbose,
+%     tmargin=25mm,
+%     bmargin=25mm,
+%     lmargin=25mm,
+%     rmargin=25mm}
+% \setlength\parindent{0pt}
 
 \usepackage{amsmath,amsfonts,amssymb,amsthm}
 \usepackage{mathtools}
 \usepackage{textcomp}
 \usepackage{longtable}
-
+\usepackage{cite}
 %\definecolor{red}{rgb}{1,0,0}
 %\definecolor{blue}{rgb}{0,0,1}
 
 %\usepackage{breakurl}
-\usepackage{hyperref}
-\hypersetup{%
-    pdfusetitle,
-    bookmarks = {true},
-    bookmarksnumbered = {true},
-    bookmarksopen = {true},
-    bookmarksopenlevel = 2,
-    unicode = {true},
-    breaklinks = {false},
-    hyperindex = {true},
-    colorlinks = {true},
-    linktocpage = {true},
-    plainpages = {false},
-    linkcolor = {blue},
-    citecolor = {blue},
-    urlcolor = {red},
-    pdfstartview = {Fit},
-    pdfpagemode = {UseOutlines},
-    pdfview = {XYZ null null null}
-}
+%\usepackage{hyperref}
+% \hypersetup{%
+%     pdfusetitle,
+%   bookmarks = {true},
+%     bookmarksnumbered = {true},
+%     bookmarksopen = {true},
+%     bookmarksopenlevel = 2,
+%     unicode = {true},
+%     breaklinks = {false},
+%     hyperindex = {true},
+%     colorlinks = {true},
+%     linktocpage = {true},
+%     plainpages = {false},
+%     linkcolor = {blue},
+%     citecolor = {blue},
+%     urlcolor = {red},
+%     pdfstartview = {Fit},
+%     pdfpagemode = {UseOutlines},
+%     pdfview = {XYZ null null null}
+% }
 
 \widowpenalty100000
 \clubpenalty100000
 
-\newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
-\newcommand{\R}{\texttt{R}}
-\newcommand{\code}[1]{{\texttt{#1}}}
-\newcommand{\Rfunction}[1]{{\texttt{#1}}}
-\newcommand{\Robject}[1]{{\texttt{#1}}}
-\newcommand{\Rpackage}[1]{{\mbox{\normalfont\textsf{#1}}}}
 
+% \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
-\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+%\usepackage[nottoc]{tocbibind}
 
-\usepackage[nottoc]{tocbibind}
+% \usepackage[utf8]{inputenc}
+% \usepackage{fancyhdr}
 
-\usepackage[utf8]{inputenc}
-\usepackage{fancyhdr}
-
-\usepackage{graphicx}
+%\usepackage{graphicx}
 %\usepackage[font=footnotesize]{subfig}
 
 \usepackage[english]{babel}
 \usepackage{color}
 
-\usepackage[backend=bibtex,natbib,style=authoryear,maxcitenames=2]{biblatex}
-\addbibresource{MetNet-citations}
+%\usepackage[backend=bibtex,natbib,style=authoryear,maxcitenames=2]{biblatex}
+% \usepackage[backend=bibtex]{biblatex}
+% \addbibresource{MetNet-citations.bib}
 
-\usepackage{setspace}
-\onehalfspacing
+% \usepackage{setspace}
+% \onehalfspacing
 
-\usepackage{authblk} 
-\author{Thomas Naake}
-
-
-
-\affil{
+\author{Thomas Naake\thanks{\email{thomasnaake@googlemail.com}}\\
     Max Planck Institute of Molecular Plant Physiology 
     14476 Potsdam-Golm, Germany 
 }
 
-\title{MetNet: Inferring metabolic networks from untargeted mass spectrometry 
-                                                                        data}
+
+\bioctitle[MetNet: Inferring metabolic networks from untargeted 
+high-resolution MS data]{MetNet: Inferring metabolic networks from untargeted 
+high-resolution mass spectrometry data}
     
+
+
 \begin{document}
 
+
+
 \maketitle
+
+\abstract{
+A major bottleneck of mass spectrometry metabolomic analysis is 
+still the rapid detection and annotation of unknown m/z features across 
+biological matrices. Traditionally, the annotation was done manually 
+imposing constraints in reproducibility and automatization. 
+Furthermore, different analysis tools are typically used at different steps of 
+analyses which requires parsing of data and changing of environments.
+We present here \Rpackage{MetNet}, a novel \R{} package, that is compatible 
+with the output of the \Biocpkg{xcms}/\Biocpkg{CAMERA} suite and that uses the 
+data-rich output of mass spectrometry metabolomics to putatively 
+link features on their relation to other features in the data set. 
+\Rpackage{MetNet} uses both structural and quantitative information of 
+metabolomics data for network inference that will guide metabolite annotation.
+
+\packageVersion{\Sexpr{BiocStyle::pkg_ver("MetNet")}}
+}
 
 \section{Introduction}
 Among the main challenges in mass spectrometry analysis is the high-throughput
@@ -100,11 +119,11 @@ features is often cumbersome and requires a lot of manual work, lagging
 the biological information retrieval of these data.
 High-resolution mass spectrometric data is often very rich in information
 content and metabolic conversions, and reactions can be derived from structural
-properties of features \citep{Breitling2006}. 
+properties of features \cite{Breitling2006}. 
 In addition to that, statistical associations between
 features (based on their intensity values) can be a valuable ressource to find 
 co-synthesised or co-regulated metabolites, that are synthesised in the same
-biosynthetic pathways. Since any analysis tool within the \R~framework 
+biosynthetic pathways. Since any analysis tool within the \R{}~framework 
 is still lacking that is
 integrating the two natures of mass spectrometric information commonly
 acquired with mass spectrometers (m/z and intensity values), we developped
@@ -117,12 +136,12 @@ sample) to propose putative metabolic networks that can be used for further
 exploration. \newline
 
 The idea of using high-resolution mass spectrometry data for network 
-construction was first proposed in \citet{Breitling2006} and followed soon 
-afterwards by a Cytoscape plugin, MetaNetter \citep{Jourdan2007}, that 
+construction was first proposed in \cite{Breitling2006} and followed soon 
+afterwards by a Cytoscape plugin, MetaNetter \cite{Jourdan2007}, that 
 is based on the inference of metabolic networks on molecular weight differences
 and correlation (Pearson correlation and partial correlation). 
 
-Inspired of the paper by \citet{Marbach2012} we decided to implement in 
+Inspired of the paper by \cite{Marbach2012} we decided to implement in 
 \Rpackage{MetNet} different algorithms for network inference to account for 
 biases that are inherent in these statistical methods, followed by the 
 calculation of a consensus adjacency matrix using the differently computed 
@@ -133,13 +152,13 @@ adjacency matrix from structual properties, based on losses/addition of
 functional groups defined by the user, and statistical associations. Currently,
 the following statistical models are implemented to infer a statistical
 adjacency matrix: Least absolute shrinkage and selection operator
-(LASSO, L1-norm regression, \citet{Tibshirani1994}), Random Forest 
-\citep{Breiman2001}, Pearson and Spearman correlation (including partial and
-semipartial correlation, see \citet{Steuer2006} 
+(LASSO, L1-norm regression, \cite{Tibshirani1994}), Random Forest 
+\cite{Breiman2001}, Pearson and Spearman correlation (including partial and
+semipartial correlation, see \cite{Steuer2006} 
 for a discussion on correlation-based metabolic networks), context likelihood 
-of relatedness (CLR, \citealp{Faith2007}), the algorithm for the reconstruction 
-of accurate cellular networks (ARACNE, \citealp{Margolin2006}) and 
-constraint-based structure learning (Bayes, \citealp{Scutari2010}). 
+of relatedness (CLR, \cite{Faith2007}), the algorithm for the reconstruction 
+of accurate cellular networks (ARACNE, \cite{Margolin2006}) and 
+constraint-based structure learning (Bayes, \cite{Scutari2010}). 
 Since all of these methods have
 advantages and disadvantages, the user has the possibility to select
 several of these methods, compute adjacency matrices from these models and
@@ -163,38 +182,38 @@ library("knitr")
 @
 
 \section{Prepare the environment and load the data}
-To install \Rpackage{MetNet} enter the following to the \R~console
+To install \Rpackage{MetNet} enter the following to the \R{}~console
 <<install,eval=FALSE>>=
 source("https://bioconductor.org/biocLite.R")
 biocLite("MetNet")
 @
 
 Before starting with the analysis, load the \Rpackage{MetNet} package. This 
-will also load the required packages \Rpackage{glmnet}, \Rpackage{stabs},
-\Rpackage{randomForest}, \Rpackage{rfPermute}, \Rpackage{mpmi},
-\Rpackage{parmigene}, \Rpackage{psych} and \Rpackage{bnlearn} that are needed
+will also load the required packages \CRANpkg{glmnet}, \CRANpkg{stabs},
+\CRANpkg{randomForest}, \CRANpkg{rfPermute}, \CRANpkg{mpmi},
+\CRANpkg{parmigene}, \CRANpkg{psych} and \CRANpkg{bnlearn} that are needed
 for functions in the statistical adjacency matrix inference.
 <<load_MetNet,eval=TRUE>>=
 library(MetNet)
 @
 
 The data format that is compatible with the \Rpackage{MetNet} framework is
-in the \Rpackage{xcms}/\Rpackage{CAMERA} output-like $m~x~n$ matrix, where
+in the \Biocpkg{xcms}/\Biocpkg{CAMERA} output-like $m~x~n$ matrix, where
 columns denote the different samples $n$ and where $m$ features are present.
 In such a matrix, information about the masses of the features and quantitative
 information of the features (intensity or concentration values) are needed. 
 The information about the m/z values has to be stored in a vector of
-length $\vert m \vert$ in the column \code{"mz"}. \newline
+length $\vert m \vert$ in the column \Rcode{"mz"}. \newline
 
 \Rpackage{MetNet} does not impose any requirements for
 data normalization, filtering, etc. However, the user has to make sure that
 the data is properly preprocessed. These include division by internal standard,
-\code{log2} transformation, noise filtering, removal of features that do not 
+\Rcode{log2} transformation, noise filtering, removal of features that do not 
 represent mass features/metabolites, removal of isotopes, etc. \newline
 
 We will load here the object \Robject{x\_test} that contains m/z values
-(in the column \code{"mz"}), together with the corresponding retention time
-(in the column \code{"rt"}) and intensity values. We will use here the object
+(in the column \Rcode{"mz"}), together with the corresponding retention time
+(in the column \Rcode{"rt"}) and intensity values. We will use here the object
 \Robject{x\_test} for guidance through the workflow of \Rpackage{MetNet}.
 
 <<data,eval=TRUE,echo=TRUE>>=
@@ -206,22 +225,25 @@ x_test <- as.matrix(x_test)
 
 The function \Rfunction{createStructuralAdjacency} will create the adjacency
 matrix based on structual properties (m/z values) of the features.
-The function expects a matrix with a column \code{"mz"} that contains the 
+The function expects a matrix with a column \Rcode{"mz"} that contains the 
 mass information of a feature (typically the m/z value). Furthermore,
 \Rfunction{createStructuralAdjacency} takes a \Robject{data.frame}
-object as argument \Robject{transformations} with the \code{colnames}
-\code{"mass"}, \code{"name"} and additional columns (e.g. \code{"formula"}). 
+object as argument \Robject{transformations} with the \Rcode{colnames}
+\Rcode{"mass"}, \Rcode{"name"} and additional columns (e.g. \Rcode{"formula"}). 
 \Rfunction{createStructuralAdjacency} looks for transformation (in the 
 sense of additions/losses of functional groups mediated by biochemical,
 enzymatic reactions) in the data using the mass information. \newline
 
-Following the work of \citet{Breitling2006} and \citet{Jourdan2007}, 
+Following the work of \cite{Breitling2006} and \cite{Jourdan2007}, 
 molecular weight difference w$_{X}$ is defined by 
-\(w_{X} = \vert w_{A} - w_{B} \vert \), where w$_{A}$ is the molecular weight
+\begin{equation}
+    w_X = \vert w_A - w_B \vert 
+\end{equation}
+where w$_{A}$ is the molecular weight
 of substrate A, and w$_{B}$ is the molecular weight of product B 
 (typically, m/z values will be used as a proxy for the molecular weight since 
 the molecular weight is not directly derivable from mass spectrometric data). 
-As examplified in \citet{Jourdan2007} specific enzymatic reactions refer to 
+As examplified in \cite{Jourdan2007} specific enzymatic reactions refer to 
 specific changes in the molecular weight, e.g. carboxylation reactions 
 will result in a mass difference of 43.98983 (molecular weight of CO$_2$) 
 between metabolic features. 
@@ -242,11 +264,11 @@ with $m_{exp}$ the experimentally determined m/z value and $m_{calc}$ the
 calculated accurate mass of a molecule. Within the function, a lower and upper
 range is calculated depending on the supplied \Robject{ppm} value, differences
 between the m/z feature values are calculated and matched against the
-\code{"mass"}es of the \Robject{transformations} argument. If any
+\Rcode{"mass"}es of the \Robject{transformations} argument. If any
 of the additions/losses defined in \Robject{transformations} is found in the
 data, it will be reported as an (unweighted) connection in the
 returned adjacency matrix. Together with the adjacency matrix the type of
-connection (derived from the column \code{"name"} in the
+connection (derived from the column \Rcode{"name"} in the
 \Robject{transformations}) will be written to a character matrix. These
 two matrices will be returned as a list (first entry: numerical adjacency
 matrix, second entry: character matrix) by the function
@@ -266,7 +288,12 @@ transformations <- rbind(
     c("Disaccharide (-H2O)", "C12H20O11", 340.1005614851, "-"),
     c("Glucuronic acid (-H2O)", "C6H8O6", 176.0320879894, "?"),
     c("Monosaccharide (-H2O)", "C6H10O5", 162.0528234315, "-"),
-    c("Trisaccharide (-H2O)", "C18H30O15", 486.1584702945, "-"))
+    c("Rhamnose (-H20)", "C6H12O5", 146.057910, "-"),
+    c("Trisaccharide (-H2O)", "C18H30O15", 486.1584702945, "-"),
+    c("coumaroyl (-H2O)", "C9H6O2", 146.0367794368, "?"),
+    c("feruloyl (-H2O)", "C9H6O2OCH2", 176.0473441231, "?"),
+    c("sinapoyl (-H2O)", "C9H6O2OCH2OCH2", 206.0579088094, "?"),
+    c("putrescine to spermidine (+C3H7N)", "C3H7N", 57.0578492299, "?"))
 
 ## convert to data frame
 transformations <- data.frame(group=transformations[,1],
@@ -276,13 +303,13 @@ transformations <- data.frame(group=transformations[,1],
 @
 
 The function \Rfunction{createStructuralAdjacency} will then check for those 
-m/z differences that are stored in the column \code{"mass"} in the 
+m/z differences that are stored in the column \Rcode{"mass"} in the 
 object \Robject{transformations}. To create the adjacency matrix derived 
 from these structural information we enter
 
 <<structure,eval=TRUE,echo=TRUE>>=
 struct_adj <- createStructuralAdjacency(x=x_test, 
-                                transformation=transformations, ppm=3)
+                                transformation=transformations, ppm=10)
 @
 in the \R~console. 
 
@@ -295,8 +322,8 @@ the structural matrix. The \Rfunction{rtCorrection} does this checking, if
 predicted transformation correspond to the expected retention time shift, 
 in an automated fashion. It requires information about the expected retention
 time shift in the \Robject{data.frame} passed to the \Robject{transformation}
-argument (in the \code{"rt"} column). Within this columns, information about
-retention time shifts is encoded by \code{"-"}, \code{"+"} and \code{"?"}, 
+argument (in the \Rcode{"rt"} column). Within this columns, information about
+retention time shifts is encoded by \Rcode{"-"}, \Rcode{"+"} and \Rcode{"?"}, 
 which means the feature with higher m/z value has lower, higher or unknown 
 retention time than the feature with the lower m/z value. The values for 
 m/z and retention time will be taken from the object passed to the 
@@ -323,45 +350,42 @@ matrix based on statistical associations.
 functions \Rfunction{createStatisticalAdjacencyList} and 
 \Rfunction{consensusAdjacency}. The former function will create a 
 list of adjacency matrices using the statistical models defined by the 
-\Robject{model} argument. Currently, the models LASSO (using \Rpackage{stabs},
-\citealt{Hofner2015,Thomas2017}), Random Forest (using 
-\href{https://CRAN.R-project.org/package=rfPermute)}{\Rpackage{rfPermute}}, 
-CLR, ARACNE (the two latter using the package 
-\href{https://CRAN.R-project.org/package=mpmi}{\Rpackage{mpmi}} to calculate
+\Robject{model} argument. Currently, the models LASSO (using \CRANpkg{stabs},
+\cite{Hofner2015,Thomas2017}), Random Forest (using \CRANpkg{rfPermute}, 
+CLR, ARACNE (the two latter using the package \CRANpkg{mpmi} to calculate
 Mutual Information using a nonparametric bias correction by 
 Bias Corrected Mutual Information, and the functions \Rfunction{clr} and 
-\Rfunction{aracne.a} from the 
-\href{https://CRAN.R-project.org/package=parmigene}{\Rpackage{parmigene}} 
-package), Pearson and Spearman correlation (based on the 
-\Rpackage{psych} package; \citealt{Revelle2018}), partial and semipartial 
-Pearson and Spearman correlation (using the \code{ppcor} package, 
-https://CRAN.R-project.org/package=ppcor ) and constraint-based structure 
+\Rfunction{aracne.a} from the \CRANpkg{parmigene} package), Pearson and 
+Spearman correlation (based on the 
+\CRANpkg{psych} package, \cite{Revelle2018}), partial and semipartial 
+Pearson and Spearman correlation (using the \CRANpkg{ppcor} package) and 
+constraint-based structure 
 learning based on the Fast Incremental Association (Fast-IAMB, algorithm 
-from the \Rpackage{bnlearn} package; \citealt{Scutari2010}). 
+from the \CRANpkg{bnlearn} package, \cite{Scutari2010}). 
 
 For further information on the different models 
-take a look on the respective help pages of \code{lasso}, \code{randomForest}, 
-\code{clr}, \code{aracne}, \code{correlation} and/or \code{bayes}. Arguments
-that are accepted by the respective underlying functions can be passed directly 
-to the \Rfunction{createStatisticalAdjacency} and 
-\Rfunction{createStatisticalAdjacencyList} functions. In addition, 
-arguments that are defined in the functions \code{lasso}, \code{randomForest}, 
-\code{clr}, \code{aracne}, \code{correlation} and/or \code{bayes} can 
-be passed like-wise to the functions. \newline
+take a look on the respective help pages of \Rcode{lasso}, 
+\Rcode{randomForest}, \Rcode{clr}, \Rcode{aracne}, \Rcode{correlation} and/or 
+\Rcode{bayes}. Arguments that are accepted by the respective underlying 
+functions can be passed directly to the \Rfunction{createStatisticalAdjacency} 
+and \Rfunction{createStatisticalAdjacencyList} functions. In addition, 
+arguments that are defined in the functions \Rcode{lasso}, 
+\Rcode{randomForest}, \Rcode{clr}, \Rcode{aracne}, \Rcode{correlation} and/or 
+\Rcode{bayes} can be passed like-wise to the functions. \newline
 
 From the list of adjacency matrices the function \Rfunction{consensusAdjacency}
 will create a consensus adjacency matrix using the employed statistical models.
 The reasoning behind this step is to circumvent disadvantages arising from each 
 model and creating a statistically reliable topology that reflects the actual 
 metabolic relations. To calculate the consensus adjacency matrix, the 
-\Rfunction{consensus} function from the \Rpackage{sna} \citep{Butts2016} is 
+\Rfunction{consensus} function from the \CRANpkg{sna} \cite{Butts2016} is 
 employed. The arguments that are accepted by this function can be passed to the 
 \Rfunction{consensusAdjacency} and \Rfunction{createStatisticalAdjacency} 
 function, respectively. Furthermore, in case another method than 
-\code{"central.graph"} is used the argument \Robject{threshold} will define if 
+\Rcode{"central.graph"} is used the argument \Robject{threshold} will define if 
 the value $a_{i,j}$ of the consensus adjacency matrix 
 will be reported as a connection in the returned matrix 
-(if $a_{i,j} \geq$ \code{threshold})
+(if $a_{i,j} \geq$ \Rcode{threshold})
 or not. \Rfunction{createStatisticalAdjacency} and 
 \Rfunction{consensusAdjacency} will return an unweighted adjancency matrix 
 with connections inferred from the respective models. \newline
@@ -382,7 +406,7 @@ call the two functions \Rfunction{createStatisticalAdjacencyList} and
 \Rfunction{consensusAdjacency} individually: 
 <<statistical_stepwise,eval=TRUE,echo=TRUE>>= 
 l <- createStatisticalAdjacencyList(x_int, 
-                model=c("pearson", "spearman"), correlation_adjust="BH")
+    model=c("pearson", "spearman", "aracne", "clr"), correlation_adjust="BH")
 stat_adj <- consensusAdjacency(l=l)
 @
 
@@ -390,12 +414,12 @@ stat_adj <- consensusAdjacency(l=l)
 After creating the structural and statistical matrix, it is time to combine 
 these two matrices. The function \Rfunction{combine\_structural\_statistical} 
 will combine the matrices to the consensus matrix. The function accepts 
-the arguments \code{structure} and \code{statistical} for the two matrices,
-respectively, and the argument \code{threshold}, that is a numerical value 
+the arguments \Rcode{structure} and \Rcode{statistical} for the two matrices,
+respectively, and the argument \Rcode{threshold}, that is a numerical value 
 (default=1). After adding the matrices, the entries will be checked if 
-they are greater or equal than \code{threshold} and 1 or 0 will be returned,
-respectively. The argument \code{threshold} needs to be adjusted by the user 
-if another \code{method} than \code{"central.graph"} in 
+they are greater or equal than \Rcode{threshold} and 1 or 0 will be returned,
+respectively. The argument \Rcode{threshold} needs to be adjusted by the user 
+if another \Rcode{method} than \Rcode{"central.graph"} in 
 \Rfunction{createStatisticalAdjacency}/\Rfunction{consensusAdjacency} is 
 used. 
 
@@ -408,28 +432,33 @@ cons_adj <- combineStructuralStatistical(structure=struct_adj[[1]],
 To display the createed consensus adjacency matrix, existing visualisation 
 tools available in the \R~framework can be employed or any other visualisation 
 tool after exporting the consensus matrix as a text file. In this example 
-we will use the \Rpackage{igraph} \citep{Csardi2006} package to visualize the 
+we will use the \CRANpkg{igraph} \cite{Csardi2006} package to visualize the 
 adjacency matrix. 
 
 <<visualisation,eval=TRUE,echo=TRUE,fig.show='hide'>>=
-g <- igraph::graph_from_adjacency_matrix(cons_adj, mode="directed")
-plot(g)
+g <- igraph::graph_from_adjacency_matrix(cons_adj, mode="undirected")
+plot(g, edge.width=5, vertex.label.cex=0.5, edge.color="grey")
 @
 
-\begin{figure}[h!]
+\begin{figure}[t!]
     \center
     \includegraphics{./figure/visualisation-1}
-    \caption{}
+    \caption{\textbf{\textit{Ab inition} network inferred from structural 
+    and quantitative mass spectrometry data.} Verteces are connected 
+    that are separated by given metabolic transformation and statistical 
+    association.}
 \end{figure}
 
 Furthermore, the network can be analysed by network analysis techniques
 (topological parameters such as centrality, degree, clustering indices) that 
 are implemented in different packages in \R 
-(e.g. \Rpackage{igraph} or \Rpackage{sna}) or other software tools outside of 
+(e.g. \CRANpkg{igraph} or \CRANpkg{sna}) or other software tools outside of 
 the \R~environment. 
 
 \newpage
-\printbibliography
+\newpage
+
+\bibliography{MetNet-citations}
 
 \newpage 
 \section*{Appendix}
@@ -442,9 +471,10 @@ sessionInfo()
 @
 
 \newpage
+
 \subsection*{Transformations}
 
-The list of transformations is taken from \citet{Breitling2006}. 
+The list of transformations is taken from \cite{Breitling2006}. 
 The numerical m/z values were calculated by using the structural formula and 
 the Biological Magnetic Resonance Data Bank
 \href{http://www.bmrb.wisc.edu/metabolomics/mol_mass.php}{web tool}. 

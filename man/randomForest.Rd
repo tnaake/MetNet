@@ -11,7 +11,7 @@ randomForest(x, parallel=FALSE, randomForest_adjust="none", ...)
 (metabolites), cell entries are intensity values}
 
 \item{parallel}{logical, should computation be parallelized? If 
-\code{parallel=TRUE} the \code{mclapply} will be applied if 
+\code{parallel=TRUE} the \code{bplapply} will be applied if 
 \code{parallel=FALSE} the \code{lapply} function will be applied.}
 
 \item{randomForest_adjust}{character, correction method for p-values from

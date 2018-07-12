@@ -27,7 +27,7 @@ Used internally in \code{lasso}, \code{randomForest},
 \code{correlation}, \code{bayes}, \code{consensusAdjacency}
 }
 \examples{
-threeDotsCall(stats::sd, x=1:10, y=1:10)
+MetNet:::threeDotsCall(stats::sd, x=1:10, y=1:10)
 ## in contrast to the above example, the following example will result in an 
 ## error
 \dontrun{stats::sd(x=1:10, y=1:10)}

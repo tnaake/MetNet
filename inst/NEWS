@@ -1,3 +1,10 @@
+CHANGES IN VERSION 0.99.12
+--------------------------
+ o use BiocStyle package for vignette [2018-07-12 Thu]
+ o remove Makefile [2018-07-12 Thu]
+ o use BiocParallel instead of parallel, for instance use bplapply instead
+   of mclapply [2018-07-12 Thu]
+
 CHANGES IN VERSION 0.99.11
 --------------------------
  o speed up function rtCorrection by vectorizing [2018-07-03 Tue]
