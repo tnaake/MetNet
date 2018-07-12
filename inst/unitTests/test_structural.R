@@ -67,7 +67,7 @@ test_rtCorrection <- function() {
     checkEquals(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[1]]))
     checkEquals(colnames(struct_adj_rt[[1]]), colnames(struct_adj_rt[[2]]))
     checkEquals(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[2]]))
-    checkTrue(table(struct_adj_rt)[1] == 39)
-    checkTrue(table(struct_adj_rt[[1]])[1] == 39)
+    checkTrue(table(struct_adj_rt)[1] == 41)
+    checkTrue(table(struct_adj_rt[[1]])[1] == 41)
 }
 ## END unit test rtCorrection ## 

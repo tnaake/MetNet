@@ -5,7 +5,7 @@
 #' @importFrom psych corr.test
 #' @importFrom bnlearn fast.iamb arcs
 #' @importFrom sna consensus
-#' @importFrom parallel mclapply
+#' @importFrom BiocParallel bplapply
 #' @importFrom stats formula p.adjust sd
 #' @importFrom methods formalArgs
 #' @importFrom ppcor pcor spcor
@@ -23,7 +23,7 @@
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
 #' @param parallel logical, should computation be parallelized? If 
-#' \code{parallel=TRUE} the \code{mclapply} will be applied if 
+#' \code{parallel=TRUE} the \code{bplapply} will be applied if 
 #' \code{parallel=FALSE} the \code{lapply} function will be applied. 
 #' @param ... parameters passed to \code{corr.test} and \code{mclapply} (if 
 #' \code{parallel=TRUE})
@@ -42,7 +42,7 @@
 lasso <- function(x, parallel=FALSE, ...) {
     ## x should be z-scaled
     if (parallel) {
-        l1 <- mclapply(seq_len(nrow(x)), function(i) {
+        l1 <- bplapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
             ## lasso: alpha=1
             ## allow for compatibility of arguments 
@@ -50,7 +50,7 @@ lasso <- function(x, parallel=FALSE, ...) {
                     y=y_l1, fitfun=glmnet.lasso, 
                     args.fitfun=list("alpha"=1), ...)
             return(l1$selected)
-        }, ...)    
+        })    
     } else {
         l1 <- lapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
@@ -83,7 +83,7 @@ lasso <- function(x, parallel=FALSE, ...) {
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values 
 #' @param parallel logical, should computation be parallelized? If 
-#' \code{parallel=TRUE} the \code{mclapply} will be applied if 
+#' \code{parallel=TRUE} the \code{bplapply} will be applied if 
 #' \code{parallel=FALSE} the \code{lapply} function will be applied. 
 #' @param randomForest_adjust character, correction method for p-values from
 #' \code{rp.importance}, \code{randomForest_adjust} will be passed to the 
@@ -107,14 +107,14 @@ randomForest <- function(x, parallel=FALSE, randomForest_adjust="none",
     df_x <- data.matrix(t(x))
     
     if (parallel) {
-        rf <- parallel::mclapply(seq_len(nrow(x)), function(i) {
+        rf <- bplapply(seq_len(nrow(x)), function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
             rf <- threeDotsCall(rfPermute::rfPermute.formula, 
                     formula=stats::formula(formula_rf), data=df_x, ...)
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
-        }, mc.cores=4)
+        })
     } else {
         rf <- lapply(seq_len(nrow(x)), function(i) {
             formula_rf <- paste(rownames(x)[i], "~", ".")    
@@ -280,20 +280,22 @@ correlation <- function(x, correlation_adjust="none", type="pearson",
     ## allow for compatibility of arguments 
     if (type %in% c("pearson", "spearman")) {
         cor_mat_p <- threeDotsCall(psych::corr.test, x=t(x), 
-                                    adjust=adjust, method=type, ...)$p    
+                                    adjust="none", method=type, ...)$p    
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method=adjust)
+        cor_mat_p <- matrix(cor_mat_p, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     }
     if (type %in% c("pearson_partial", "spearman_partial")) {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
         cor_mat_p <- ppcor::pcor(t(x), method=method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method=correlation_adjust)     
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method=adjust)     
         cor_mat_p <- matrix(cor_mat_p, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     }
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
         cor_mat_p <- ppcor::spcor(t(x), method=method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method=correlation_adjust)     
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method=adjust)     
         cor_mat_p <- matrix(cor_mat_p, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     }
     
@@ -594,11 +596,10 @@ consensusAdjacency <- function(l, threshold=1, ...) {
 #' @return Function call with passed arguments 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' threeDotsCall(stats::sd, x=1:10, y=1:10)
+#' MetNet:::threeDotsCall(stats::sd, x=1:10, y=1:10)
 #' ## in contrast to the above example, the following example will result in an 
 #' ## error
 #' \dontrun{stats::sd(x=1:10, y=1:10)}
-#' @export
 threeDotsCall <- function(fun, ...) {
     formal_args <- formalArgs(fun)
     args <- list(...)

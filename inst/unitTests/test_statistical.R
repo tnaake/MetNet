@@ -77,7 +77,7 @@ test_correlation <- function() {
     checkException(correlation(mat_test, correlation_threshold="a"))
     checkEquals(sum(correlation_p_mat), 47)
     checkEquals(sum(correlation(mat_test, 
-        correlation_adjust="bonferroni", correlation_threshold=1e-11)), 28)
+        correlation_adjust="bonferroni", correlation_threshold=1e-11)), 21)
     checkEquals(sum(correlation(mat_test, 
         correlation_adjust="none", correlation_threshold=1e-11)), 33)
     ##checkEquals(sum(correlation_p_p_mat), 9)
@@ -159,8 +159,8 @@ test_addToList <- function() {
 
 ## START unit test threeDotsCall ##
 test_threeDots_call <- function() {
-    checkException(threeDotsCall("mean", x=1:10, x=1:10))
-    checkEquals(threeDotsCall("mean", x=1:10, foo=1), mean(1:10))
+    checkException(MetNet:::threeDotsCall("mean", x=1:10, x=1:10))
+    checkEquals(MetNet:::threeDotsCall("mean", x=1:10, foo=1), mean(1:10))
 }
 ## END unit test threeDotsCall ## 
 
