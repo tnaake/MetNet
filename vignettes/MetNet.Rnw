@@ -184,8 +184,8 @@ library("knitr")
 \section{Prepare the environment and load the data}
 To install \Rpackage{MetNet} enter the following to the \R{}~console
 <<install,eval=FALSE>>=
-source("https://bioconductor.org/biocLite.R")
-biocLite("MetNet")
+install.packages("BiocManager")
+BiocManager::install("MetNet") 
 @
 
 Before starting with the analysis, load the \Rpackage{MetNet} package. This 

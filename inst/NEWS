@@ -1,3 +1,7 @@
+CHANGES IN VERSION 0.99.14
+--------------------------
+ o use BiocManager instead of BiocLite for installation [2018-07-14 Sat]
+
 CHANGES IN VERSION 0.99.13
 --------------------------
  o do not export functions threeDotsCall and addToList [2018-07-12 Thu]
