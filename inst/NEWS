@@ -1,3 +1,7 @@
+CHANGES IN VERSION 0.99.15
+--------------------------
+ o do not import stabsel from stabs [2018-07-16 Mon]
+
 CHANGES IN VERSION 0.99.14
 --------------------------
  o use BiocManager instead of BiocLite for installation [2018-07-14 Sat]
