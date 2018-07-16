@@ -1,23 +1,33 @@
-#' @importFrom stabs stabsel stabsel.matrix glmnet.lasso
+#' @importFrom stabs stabsel.matrix glmnet.lasso
+NULL
 #' @importFrom rfPermute rfPermute rfPermute.formula rp.importance
+NULL
 #' @importFrom mpmi cmi
+NULL
 #' @importFrom parmigene clr aracne.a
+NULL
 #' @importFrom psych corr.test
+NULL
 #' @importFrom bnlearn fast.iamb arcs
+NULL
 #' @importFrom sna consensus
+NULL
 #' @importFrom BiocParallel bplapply
+NULL
 #' @importFrom stats formula p.adjust sd
+NULL
 #' @importFrom methods formalArgs
+NULL
 #' @importFrom ppcor pcor spcor
-
+NULL
 
 #' @name lasso
 #' @aliases lasso
 #' @title Create a adjacency matrix based on LASSO
 #' @description  \code{lasso} infers a adjacency matrix using 
-#' LASSO using the \code{stabsel} function from the 
-#' \code{stabs} package. \code{lasso} extracts the  
-#' predictors from the function \code{stabsel} and writes the presence/absence 
+#' LASSO using the \code{stabsel.matrix} function from the 
+#' \code{stabs} package. \code{lasso} extracts the  predictors from the 
+#' function \code{stabsel.matrix} and writes the presence/absence 
 #' of this connection to a matrix that is returned. 
 #' @usage lasso(x, parallel=FALSE, ...)
 #' @param x matrix, where columns are the samples and the rows are features 
@@ -30,7 +40,7 @@
 #' @details For use of the parameters used in the \code{corr.test} function, 
 #' refer to ?psych::corr.test.
 #' @return matrix, matrix with edges inferred from LASSO algorithm 
-#' \code{stabsel}
+#' \code{stabsel.matrix}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
 #' data("x_test", package="MetNet")

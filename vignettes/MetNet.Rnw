@@ -94,13 +94,13 @@ high-resolution mass spectrometry data}
 \maketitle
 
 \abstract{
-A major bottleneck of mass spectrometry metabolomic analysis is 
+A major bottleneck of mass spectrometry-based metabolomic analysis is 
 still the rapid detection and annotation of unknown m/z features across 
 biological matrices. Traditionally, the annotation was done manually 
 imposing constraints in reproducibility and automatization. 
 Furthermore, different analysis tools are typically used at different steps of 
 analyses which requires parsing of data and changing of environments.
-We present here \Rpackage{MetNet}, a novel \R{} package, that is compatible 
+I present here \Rpackage{MetNet}, a novel \R{} package, that is compatible 
 with the output of the \Biocpkg{xcms}/\Biocpkg{CAMERA} suite and that uses the 
 data-rich output of mass spectrometry metabolomics to putatively 
 link features on their relation to other features in the data set. 
@@ -111,22 +111,23 @@ metabolomics data for network inference that will guide metabolite annotation.
 }
 
 \section{Introduction}
-Among the main challenges in mass spectrometry analysis is the high-throughput
-analysis of metabolic features, their fast detection and annotation.
-In contrast to the screening of known, previously characterized,
+Among the main challenges in mass spectrometric metabolomic analysis is the 
+high-throughput analysis of metabolic features, their fast detection and 
+annotation.
+By contrast to the screening of known, previously characterized,
 metabolic features in these data, the putative annotation of unknown
-features is often cumbersome and requires a lot of manual work, lagging
+features is often cumbersome and requires a lot of manual work, hindering
 the biological information retrieval of these data.
 High-resolution mass spectrometric data is often very rich in information
 content and metabolic conversions, and reactions can be derived from structural
 properties of features \cite{Breitling2006}. 
 In addition to that, statistical associations between
 features (based on their intensity values) can be a valuable ressource to find 
-co-synthesised or co-regulated metabolites, that are synthesised in the same
-biosynthetic pathways. Since any analysis tool within the \R{}~framework 
+co-synthesised or co-regulated metabolites, which are synthesised in the same
+biosynthetic pathways. Given that an analysis tool within the \R{}~framework 
 is still lacking that is
-integrating the two natures of mass spectrometric information commonly
-acquired with mass spectrometers (m/z and intensity values), we developped
+integrating the two features of mass spectrometric information commonly
+acquired with mass spectrometers (m/z and intensity values), I developed
 \Rpackage{MetNet} to close this gap.
 The \Rpackage{MetNet} package comprises functionalities to infer network
 topologies from high-resolution mass spectrometry data. \Rpackage{MetNet}
@@ -141,8 +142,8 @@ afterwards by a Cytoscape plugin, MetaNetter \cite{Jourdan2007}, that
 is based on the inference of metabolic networks on molecular weight differences
 and correlation (Pearson correlation and partial correlation). 
 
-Inspired of the paper by \cite{Marbach2012} we decided to implement in 
-\Rpackage{MetNet} different algorithms for network inference to account for 
+Inspired by the paper of \cite{Marbach2012} different algorithms for network 
+were implemented in \Rpackage{MetNet} to account for 
 biases that are inherent in these statistical methods, followed by the 
 calculation of a consensus adjacency matrix using the differently computed 
 individual adjacency matrices. \newline
@@ -165,7 +166,7 @@ several of these methods, compute adjacency matrices from these models and
 create a consensus matrix from the different statistical frameworks. \newline
 
 After creating the statistical and structural adjaceny matrices these two 
-matrices will be combined to form a consensus matrix that has both information 
+matrices can be combined to form a consensus matrix that has both information 
 from structural and statistical properties of the data. This can be followed 
 by further network analyses (e.g. calculation of topological parameters),
 integration with other data sources (e.g. genomic information or
@@ -274,7 +275,7 @@ two matrices will be returned as a list (first entry: numerical adjacency
 matrix, second entry: character matrix) by the function
 \Rfunction{createStructuralAdjacency}. \newline
 
-Before calculating the structural matrix, we will define the search space, 
+Before calculating the structural matrix, one must define the search space, 
 i.e. these transformation that will be looked for in the mass spectrometric
 data by creating the \Robject{transformations} object. 
 
@@ -371,7 +372,7 @@ functions can be passed directly to the \Rfunction{createStatisticalAdjacency}
 and \Rfunction{createStatisticalAdjacencyList} functions. In addition, 
 arguments that are defined in the functions \Rcode{lasso}, 
 \Rcode{randomForest}, \Rcode{clr}, \Rcode{aracne}, \Rcode{correlation} and/or 
-\Rcode{bayes} can be passed like-wise to the functions. \newline
+\Rcode{bayes} can be passed to the functions. \newline
 
 From the list of adjacency matrices the function \Rfunction{consensusAdjacency}
 will create a consensus adjacency matrix using the employed statistical models.
@@ -381,7 +382,7 @@ metabolic relations. To calculate the consensus adjacency matrix, the
 \Rfunction{consensus} function from the \CRANpkg{sna} \cite{Butts2016} is 
 employed. The arguments that are accepted by this function can be passed to the 
 \Rfunction{consensusAdjacency} and \Rfunction{createStatisticalAdjacency} 
-function, respectively. Furthermore, in case another method than 
+function, respectively. Furthermore, in case a method other than 
 \Rcode{"central.graph"} is used the argument \Robject{threshold} will define if 
 the value $a_{i,j}$ of the consensus adjacency matrix 
 will be reported as a connection in the returned matrix 
@@ -401,7 +402,7 @@ stat_adj <- createStatisticalAdjacency(x_int,
                 model=c("pearson", "spearman"), correlation_adjust="BH")
 @
 
-To create the same adjacency matrix without using the wrapper function, you can
+To create the same adjacency matrix without using the wrapper function, one can
 call the two functions \Rfunction{createStatisticalAdjacencyList} and 
 \Rfunction{consensusAdjacency} individually: 
 <<statistical_stepwise,eval=TRUE,echo=TRUE>>= 
@@ -429,10 +430,10 @@ cons_adj <- combineStructuralStatistical(structure=struct_adj[[1]],
 @
 
 \section{Visualization and further analyses}
-To display the createed consensus adjacency matrix, existing visualisation 
+To display the created consensus adjacency matrix, existing visualisation 
 tools available in the \R~framework can be employed or any other visualisation 
 tool after exporting the consensus matrix as a text file. In this example 
-we will use the \CRANpkg{igraph} \cite{Csardi2006} package to visualize the 
+We will use the \CRANpkg{igraph} \cite{Csardi2006} package to visualize the 
 adjacency matrix. 
 
 <<visualisation,eval=TRUE,echo=TRUE,fig.show='hide'>>=
@@ -443,7 +444,7 @@ plot(g, edge.width=5, vertex.label.cex=0.5, edge.color="grey")
 \begin{figure}[t!]
     \center
     \includegraphics{./figure/visualisation-1}
-    \caption{\textbf{\textit{Ab inition} network inferred from structural 
+    \caption{\textbf{\textit{Ab initio} network inferred from structural 
     and quantitative mass spectrometry data.} Verteces are connected 
     that are separated by given metabolic transformation and statistical 
     association.}

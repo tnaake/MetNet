@@ -19,13 +19,13 @@ lasso(x, parallel=FALSE, ...)
 }
 \value{
 matrix, matrix with edges inferred from LASSO algorithm 
-\code{stabsel}
+\code{stabsel.matrix}
 }
 \description{
 \code{lasso} infers a adjacency matrix using 
-LASSO using the \code{stabsel} function from the 
-\code{stabs} package. \code{lasso} extracts the  
-predictors from the function \code{stabsel} and writes the presence/absence 
+LASSO using the \code{stabsel.matrix} function from the 
+\code{stabs} package. \code{lasso} extracts the  predictors from the 
+function \code{stabsel.matrix} and writes the presence/absence 
 of this connection to a matrix that is returned.
 }
 \details{
