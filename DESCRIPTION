@@ -1,7 +1,7 @@
 Package: MetNet
 Type: Package
 Title: Inferring metabolic networks from untargeted high-resolution mass spectrometry data
-Version: 0.99.13
+Version: 0.99.14
 Date: 2018-07-12
 Authors@R: c(person(given = "Thomas", family = "Naake",
     email = "thomasnaake@googlemail.com",
