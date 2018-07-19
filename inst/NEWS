@@ -1,6 +1,12 @@
 CHANGES IN VERSION 0.99.17
 --------------------------
- o set num.cores to 1 in test_statistical for randomForest
+ o set rfPermute.formula to rfPermute.default in order to use num.cores 
+   [2018-07-19 Thu]
+
+CHANGES IN VERSION 0.99.17
+--------------------------
+ o set num.cores to 1 in test_statistical for randomForest [2018-07-19 Thu]
+
 CHANGES IN VERSION 0.99.15
 --------------------------
  o do not import stabsel from stabs [2018-07-16 Mon]

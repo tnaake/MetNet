@@ -112,25 +112,29 @@ lasso <- function(x, parallel=FALSE, ...) {
 #' x <- as.matrix(x)
 #' \dontrun{randomForest(x)}
 #' @export
-randomForest <- function(x, parallel=FALSE, randomForest_adjust="none", 
-                                                                        ...) {
+randomForest <- function(x, parallel=FALSE, randomForest_adjust="none", ...) {
+    
     df_x <- data.matrix(t(x))
     
     if (parallel) {
         rf <- bplapply(seq_len(nrow(x)), function(i) {
-            formula_rf <- paste(rownames(x)[i], "~", ".")    
+            x_rf <- df_x[, -i]
+            y_rf <- df_x[, i]
+            ##formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDotsCall(rfPermute::rfPermute.formula, 
-                    formula=stats::formula(formula_rf), data=df_x, ...)
+            rf <- threeDotsCall(rfPermute::rfPermute.default,
+                    x=x_rf, y=y_rf, ...)
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
         })
     } else {
         rf <- lapply(seq_len(nrow(x)), function(i) {
-            formula_rf <- paste(rownames(x)[i], "~", ".")    
+            x_rf <- df_x[, -i]
+            y_rf <- df_x[, i]
+            ##formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
-            rf <- threeDotsCall(rfPermute::rfPermute.formula, 
-                    formula=stats::formula(formula_rf), data=df_x, ...) 
+            rf <- threeDotsCall(rfPermute::rfPermute.default, 
+                    x=x_rf, y=y_rf, ...) 
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
         })
