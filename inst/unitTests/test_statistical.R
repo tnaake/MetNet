@@ -18,7 +18,7 @@ test_lasso <- function() {
 ## END unit test lasso ##
 
 ## START unit test randomForest ## 
-randomForest_mat <- randomForest(mat_test, parallel=FALSE)
+randomForest_mat <- randomForest(mat_test, parallel=FALSE, num.cores=1)
 test_randomForest <- function() {
     ## do not test sum since this can change ##
     ## checkEquals(sum(randomForest_mat), 31) ## 

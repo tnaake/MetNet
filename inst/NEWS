@@ -1,3 +1,6 @@
+CHANGES IN VERSION 0.99.17
+--------------------------
+ o set num.cores to 1 in test_statistical for randomForest
 CHANGES IN VERSION 0.99.15
 --------------------------
  o do not import stabsel from stabs [2018-07-16 Mon]
