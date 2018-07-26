@@ -1,3 +1,8 @@
+CHANGES IN VERSION 0.99.19
+--------------------------
+ o print message when model calculation in createStatisticalAdjacency is 
+   finished [2018-07-26 Thu]
+
 CHANGES IN VERSION 0.99.17
 --------------------------
  o set rfPermute.formula to rfPermute.default in order to use num.cores 

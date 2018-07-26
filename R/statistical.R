@@ -123,7 +123,7 @@ randomForest <- function(x, parallel=FALSE, randomForest_adjust="none", ...) {
             ##formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
             rf <- threeDotsCall(rfPermute::rfPermute.default,
-                    x=x_rf, y=y_rf, ...)
+                                x=x_rf, y=y_rf, ...)
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
         })
@@ -134,7 +134,7 @@ randomForest <- function(x, parallel=FALSE, randomForest_adjust="none", ...) {
             ##formula_rf <- paste(rownames(x)[i], "~", ".")    
             ## allow for compatibility of arguments 
             rf <- threeDotsCall(rfPermute::rfPermute.default, 
-                    x=x_rf, y=y_rf, ...) 
+                                x=x_rf, y=y_rf, ...) 
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
         })
@@ -152,7 +152,6 @@ randomForest <- function(x, parallel=FALSE, randomForest_adjust="none", ...) {
     
     return(rf_mat)
 }
-
 #' @name clr
 #' @aliases clr
 #' @title Create an adjacency matrix based on context likelihood or 
@@ -453,11 +452,13 @@ createStatisticalAdjacencyList <- function(x, model, ...) {
     if ("lasso" %in% model) {
         lasso <- lasso(x_z, ...)
         l <- addToList(l, "lasso", lasso)
+        print("lasso finished")
     }
     ## add entry for randomForest if "randomForest" is in model
     if ("randomForest" %in% model) {
         randomForest <- randomForest(x, ...)
         l <- addToList(l, "randomForest", randomForest)
+        print("randomForest finished.")
     }
     
     ## calculate mutual information if "clr" or "aracne" is in model
@@ -470,46 +471,55 @@ createStatisticalAdjacencyList <- function(x, model, ...) {
     if ("clr" %in% model) {
         clr <- threeDotsCall("clr", mi=mi_x_z, ...)
         l <- addToList(l, "clr", clr)
+        print("clr finished.")
     }
     ## add entry for aracne if "aracne" is in model
     if ("aracne" %in% model) {
         aracne <- threeDotsCall("aracne", mi=mi_x_z, ...)
         l <- addToList(l, "aracne", aracne)
+        print("aracne finished.")
     }
     ## add entry for pearson if "pearson" is in model
     if ("pearson" %in% model) {
         pearson <- correlation(x, type="pearson", ...)
         l <- addToList(l, "pearson", pearson)
+        print("pearson finished.")
     }
     ## add entry for pearson_partial if "pearson_partial" is in model
     if ("pearson_partial" %in% model) {
-        pearson <- correlation(x, type="pearson_partial", ...)
-        l <- addToList(l, "pearson_partial", pearson)
+        pearson_partial <- correlation(x, type="pearson_partial", ...)
+        l <- addToList(l, "pearson_partial", pearson_partial)
+        print("pearson_partial finished.")
     }
     ## add entry for pearson_semipartial if "pearson_semipartial" is in model
     if ("pearson_semipartial" %in% model) {
-        pearson <- correlation(x, type="pearson_semipartial", ...)
-        l <- addToList(l, "pearson_semipartial", pearson)
+        pearson_sp <- correlation(x, type="pearson_semipartial", ...)
+        l <- addToList(l, "pearson_semipartial", pearson_sp)
+        print("pearson_semipartial finished.")
     }
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
         spearman <- correlation(x, type="spearman", ...)
         l <- addToList(l, "spearman", spearman)
+        print("spearman finished.")
     }
     ## add entry for spearman_partial if "spearman_partial" is in model
     if ("spearman_partial" %in% model) {
-        pearson <- correlation(x, type="spearman_partial", ...)
-        l <- addToList(l, "spearman_partial", pearson)
+        spearman_partial <- correlation(x, type="spearman_partial", ...)
+        l <- addToList(l, "spearman_partial", spearman_partial)
+        print("spearman_partial finished.")
     }
     ## add entry for spearman_semipartial if "spearman_semipartial" is in model
     if ("spearman_semipartial" %in% model) {
-        pearson <- correlation(x, type="spearman_semipartial", ...)
-        l <- addToList(l, "spearman_semipartial", pearson)
+        spearman_sp <- correlation(x, type="spearman_semipartial", ...)
+        l <- addToList(l, "spearman_semipartial", spearman_sp)
+        print("spearman_semipartial finished.")
     }
     ## add entry for bayes if "bayes" is in model
     if ("bayes" %in% model) {
         bayes <- bayes(x, ...)
         l <- addToList(l, "bayes", bayes)
+        print("bayes finished.")
     }
     return(l)
 }
