@@ -14,8 +14,7 @@ lasso(x, parallel=FALSE, ...)
 \code{parallel=TRUE} the \code{bplapply} will be applied if 
 \code{parallel=FALSE} the \code{lapply} function will be applied.}
 
-\item{...}{parameters passed to \code{corAndPvalue} and \code{mclapply} (if 
-\code{parallel=TRUE})}
+\item{...}{parameters passed to \code{stabsel.matrix}}
 }
 \value{
 matrix, matrix with edges inferred from LASSO algorithm 
@@ -29,8 +28,8 @@ function \code{stabsel.matrix} and writes the presence/absence
 of this connection to a matrix that is returned.
 }
 \details{
-For use of the parameters used in the \code{corAndPvalue} function, 
-refer to ?WGCNA::corAndPValue.
+For use of the parameters used in the \code{stabsel.matrix} function, 
+refer to ?stabs::stabsel.matrix.
 }
 \examples{
 data("x_test", package="MetNet")

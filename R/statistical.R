@@ -35,10 +35,9 @@ NULL
 #' @param parallel logical, should computation be parallelized? If 
 #' \code{parallel=TRUE} the \code{bplapply} will be applied if 
 #' \code{parallel=FALSE} the \code{lapply} function will be applied. 
-#' @param ... parameters passed to \code{corAndPvalue} and \code{mclapply} (if 
-#' \code{parallel=TRUE})
-#' @details For use of the parameters used in the \code{corAndPvalue} function, 
-#' refer to ?WGCNA::corAndPValue.
+#' @param ... parameters passed to \code{stabsel.matrix} 
+#' @details For use of the parameters used in the \code{stabsel.matrix} function, 
+#' refer to ?stabs::stabsel.matrix.
 #' @return matrix, matrix with edges inferred from LASSO algorithm 
 #' \code{stabsel.matrix}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -99,10 +98,9 @@ lasso <- function(x, parallel=FALSE, ...) {
 #' \code{rp.importance}, \code{randomForest_adjust} will be passed to the 
 #' \code{p.adjust} function and should be one of "holm", "hochberg", "hommel", 
 #' "bonferroni", "BH", "BY", "fdr", "none"
-#' @param ... parameters passed to \code{corAndPvalue} and \code{mclapply} (if 
-#' \code{parallel=TRUE})
+#' @param ... parameters passed to \code{rfPermute.default} 
 #' @details For use of the parameters used in the \code{rfPermute} function, 
-#' refer to ?rfPermute::rfPermute.
+#' refer to ?rfPermute::rfPermute.default.
 #' @return matrix, matrix with edges inferred from random forest algorithm 
 #' \code{rfPermute} and \code{rp.importance}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}

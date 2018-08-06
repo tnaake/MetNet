@@ -19,8 +19,7 @@ randomForest(x, parallel=FALSE, randomForest_adjust="none", ...)
 \code{p.adjust} function and should be one of "holm", "hochberg", "hommel", 
 "bonferroni", "BH", "BY", "fdr", "none"}
 
-\item{...}{parameters passed to \code{corAndPvalue} and \code{mclapply} (if 
-\code{parallel=TRUE})}
+\item{...}{parameters passed to \code{rfPermute.default}}
 }
 \value{
 matrix, matrix with edges inferred from random forest algorithm 
@@ -36,7 +35,7 @@ connection to a matrix. The adjacency matrix is returned.
 }
 \details{
 For use of the parameters used in the \code{rfPermute} function, 
-refer to ?rfPermute::rfPermute.
+refer to ?rfPermute::rfPermute.default.
 }
 \examples{
 data("x_test", package="MetNet")
