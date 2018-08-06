@@ -82,7 +82,7 @@ test_correlation <- function() {
         correlation_adjust="none", correlation_threshold=1e-11)), 33)
     ##checkEquals(sum(correlation_p_p_mat), 9)
     ##checkEquals(sum(correlation_p_sp_mat), 7)
-    checkEquals(sum(correlation_s_mat), 49)
+    checkEquals(sum(correlation_s_mat), 47)
     ##checkEquals(sum(correlation_s_p_mat, na.rm=TRUE), 19)
     ##checkEquals(sum(correlation_s_sp_mat, na.rm=TRUE), 7)
     checkEquals(rownames(correlation_p_mat), colnames(correlation_p_mat))

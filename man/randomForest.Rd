@@ -19,7 +19,7 @@ randomForest(x, parallel=FALSE, randomForest_adjust="none", ...)
 \code{p.adjust} function and should be one of "holm", "hochberg", "hommel", 
 "bonferroni", "BH", "BY", "fdr", "none"}
 
-\item{...}{parameters passed to \code{corr.test} and \code{mclapply} (if 
+\item{...}{parameters passed to \code{corAndPvalue} and \code{mclapply} (if 
 \code{parallel=TRUE})}
 }
 \value{

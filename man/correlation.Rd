@@ -15,7 +15,7 @@ correlation(x, correlation_adjust="none", type="pearson",
 
 \item{type}{character, either "pearson", "spearman", "pearson_partial",
 "spearman_partial", "pearson_semipartial" or "spearman_semipartial". 
-\code{type} will be passed to argument \code{method} in \code{corr.test} 
+\code{type} will be passed to argument \code{method} in \code{corAndPvalue} 
 (in the case of "pearson" or "spearman") or to \code{method} in \code{pcor} 
 ("pearson" and "spearman" for "pearson_partial" and "spearman_partial", 
 respectively) or to \code{method} in \code{spcor} ("pearson" or "spearman"
@@ -25,20 +25,20 @@ for "pearson_semipartial" and "spearman_semipartial", respectively)}
 (default: 0.05), if the (adjusted) p-values exceed this value, there 
 is no statistical connection between features}
 
-\item{...}{parameters passed to \code{corr.test} (argument \code{adjust} 
+\item{...}{parameters passed to \code{corAndPvalue} (argument \code{adjust} 
 will be ignored)}
 }
 \value{
 matrix, matrix with edges inferred from correlation algorithm 
-\code{corr.test}, \code{pcor} or \code{spcor} (depending on the chosen 
+\code{corAndPvalue}, \code{pcor} or \code{spcor} (depending on the chosen 
 method)
 }
 \description{
 \code{correlation} infers an adjacency matrix using 
-correlation using the \code{corr.test} function (from the 
-\code{psych} package), \code{pcor} (from \code{ppcor}) or 
+correlation using the \code{corAndPvalue} function (from the 
+\code{WGCNA} package), \code{pcor} (from \code{ppcor}) or 
 \code{spcor} (from \code{ppcor}). \code{correlation} extracts the reported 
-p-values from the function \code{corr.test}, \code{pcor} or \code{spcor} 
+p-values from the function \code{corAndPvalue}, \code{pcor} or \code{spcor} 
 that can be adjusted for 
 multiple testing (\code{correlation_adjust} parameter) and will return 
 an unweighted adjacency matrix containing edges if the (adjusted) p-value
@@ -46,13 +46,13 @@ is below the value defined by \code{correlation_threshold}.
 }
 \details{
 If "pearson" or "spearman" is used as a \code{method} the function 
-\code{corr.test} from \code{psych} will be employed. 
+\code{corAndPvalue} from \code{WGCNA} will be employed. 
 If "pearson_partial" or "spearman_partial" is used as a \code{method} the 
 function \code{pcor} from \code{spcor} will be employed. 
-If "pearson_semipartial" or "spearman_semipartial" is used as a \code{method}
-the function \code{spcor} from \code{spcor} will be employed. 
-For use of the parameters used in the \code{corr.test} function, 
-refer to ?psych::corr.test.
+If "pearson_semipartial" or "spearman_semipartial" is used as a 
+\code{method} the function \code{spcor} from \code{spcor} will be employed. 
+For use of the parameters used in the \code{corAndPvalue} function, 
+refer to ?WGCNA::corAndPvalue.
 }
 \examples{
 data("x_test", package="MetNet")

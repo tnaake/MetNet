@@ -192,7 +192,7 @@ BiocManager::install("MetNet")
 Before starting with the analysis, load the \Rpackage{MetNet} package. This 
 will also load the required packages \CRANpkg{glmnet}, \CRANpkg{stabs},
 \CRANpkg{randomForest}, \CRANpkg{rfPermute}, \CRANpkg{mpmi},
-\CRANpkg{parmigene}, \CRANpkg{psych} and \CRANpkg{bnlearn} that are needed
+\CRANpkg{parmigene}, \CRANpkg{WGCNA} and \CRANpkg{bnlearn} that are needed
 for functions in the statistical adjacency matrix inference.
 <<load_MetNet,eval=TRUE>>=
 library(MetNet)
@@ -358,7 +358,7 @@ Mutual Information using a nonparametric bias correction by
 Bias Corrected Mutual Information, and the functions \Rfunction{clr} and 
 \Rfunction{aracne.a} from the \CRANpkg{parmigene} package), Pearson and 
 Spearman correlation (based on the 
-\CRANpkg{psych} package, \cite{Revelle2018}), partial and semipartial 
+\CRANpkg{WGCNA} package, \cite{Revelle2018}), partial and semipartial 
 Pearson and Spearman correlation (using the \CRANpkg{ppcor} package) and 
 constraint-based structure 
 learning based on the Fast Incremental Association (Fast-IAMB, algorithm 

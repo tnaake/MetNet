@@ -6,7 +6,7 @@ NULL
 NULL
 #' @importFrom parmigene clr aracne.a
 NULL
-#' @importFrom psych corr.test
+#' @importFrom WGCNA corAndPvalue
 NULL
 #' @importFrom bnlearn fast.iamb arcs
 NULL
@@ -35,10 +35,10 @@ NULL
 #' @param parallel logical, should computation be parallelized? If 
 #' \code{parallel=TRUE} the \code{bplapply} will be applied if 
 #' \code{parallel=FALSE} the \code{lapply} function will be applied. 
-#' @param ... parameters passed to \code{corr.test} and \code{mclapply} (if 
+#' @param ... parameters passed to \code{corAndPvalue} and \code{mclapply} (if 
 #' \code{parallel=TRUE})
-#' @details For use of the parameters used in the \code{corr.test} function, 
-#' refer to ?psych::corr.test.
+#' @details For use of the parameters used in the \code{corAndPvalue} function, 
+#' refer to ?WGCNA::corAndPValue.
 #' @return matrix, matrix with edges inferred from LASSO algorithm 
 #' \code{stabsel.matrix}
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -99,7 +99,7 @@ lasso <- function(x, parallel=FALSE, ...) {
 #' \code{rp.importance}, \code{randomForest_adjust} will be passed to the 
 #' \code{p.adjust} function and should be one of "holm", "hochberg", "hommel", 
 #' "bonferroni", "BH", "BY", "fdr", "none"
-#' @param ... parameters passed to \code{corr.test} and \code{mclapply} (if 
+#' @param ... parameters passed to \code{corAndPvalue} and \code{mclapply} (if 
 #' \code{parallel=TRUE})
 #' @details For use of the parameters used in the \code{rfPermute} function, 
 #' refer to ?rfPermute::rfPermute.
@@ -241,10 +241,10 @@ aracne <- function(mi, eps=0.05, aracne_threshold=0) {
 #' @aliases correlation
 #' @title Create an adjacency matrix based on correlation 
 #' @description  \code{correlation} infers an adjacency matrix using 
-#' correlation using the \code{corr.test} function (from the 
-#' \code{psych} package), \code{pcor} (from \code{ppcor}) or 
+#' correlation using the \code{corAndPvalue} function (from the 
+#' \code{WGCNA} package), \code{pcor} (from \code{ppcor}) or 
 #' \code{spcor} (from \code{ppcor}). \code{correlation} extracts the reported 
-#' p-values from the function \code{corr.test}, \code{pcor} or \code{spcor} 
+#' p-values from the function \code{corAndPvalue}, \code{pcor} or \code{spcor} 
 #' that can be adjusted for 
 #' multiple testing (\code{correlation_adjust} parameter) and will return 
 #' an unweighted adjacency matrix containing edges if the (adjusted) p-value
@@ -255,7 +255,7 @@ aracne <- function(mi, eps=0.05, aracne_threshold=0) {
 #' (metabolites), cell entries are intensity values 
 #' @param type character, either "pearson", "spearman", "pearson_partial",
 #' "spearman_partial", "pearson_semipartial" or "spearman_semipartial". 
-#' \code{type} will be passed to argument \code{method} in \code{corr.test} 
+#' \code{type} will be passed to argument \code{method} in \code{corAndPvalue} 
 #' (in the case of "pearson" or "spearman") or to \code{method} in \code{pcor} 
 #' ("pearson" and "spearman" for "pearson_partial" and "spearman_partial", 
 #' respectively) or to \code{method} in \code{spcor} ("pearson" or "spearman"
@@ -264,18 +264,18 @@ aracne <- function(mi, eps=0.05, aracne_threshold=0) {
 #' @param correlation_threshold numeric, significance level \eqn{\alpha}
 #' (default: 0.05), if the (adjusted) p-values exceed this value, there 
 #' is no statistical connection between features 
-#' @param ... parameters passed to \code{corr.test} (argument \code{adjust} 
+#' @param ... parameters passed to \code{corAndPvalue} (argument \code{adjust} 
 #' will be ignored)
 #' @details If "pearson" or "spearman" is used as a \code{method} the function 
-#' \code{corr.test} from \code{psych} will be employed. 
+#' \code{corAndPvalue} from \code{WGCNA} will be employed. 
 #' If "pearson_partial" or "spearman_partial" is used as a \code{method} the 
 #' function \code{pcor} from \code{spcor} will be employed. 
-#' If "pearson_semipartial" or "spearman_semipartial" is used as a \code{method}
-#' the function \code{spcor} from \code{spcor} will be employed. 
-#' For use of the parameters used in the \code{corr.test} function, 
-#' refer to ?psych::corr.test. 
+#' If "pearson_semipartial" or "spearman_semipartial" is used as a 
+#' \code{method} the function \code{spcor} from \code{spcor} will be employed. 
+#' For use of the parameters used in the \code{corAndPvalue} function, 
+#' refer to ?WGCNA::corAndPvalue. 
 #' @return matrix, matrix with edges inferred from correlation algorithm 
-#' \code{corr.test}, \code{pcor} or \code{spcor} (depending on the chosen 
+#' \code{corAndPvalue}, \code{pcor} or \code{spcor} (depending on the chosen 
 #' method)
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
@@ -292,8 +292,8 @@ correlation <- function(x, correlation_adjust="none", type="pearson",
     adjust <- correlation_adjust
     ## allow for compatibility of arguments 
     if (type %in% c("pearson", "spearman")) {
-        cor_mat_p <- threeDotsCall(psych::corr.test, x=t(x), 
-                                    adjust="none", method=type, ...)$p    
+        cor_mat_p <- threeDotsCall(WGCNA::corAndPvalue, x=t(x), 
+                                   method=type, ...)$p    
         cor_mat_p <- stats::p.adjust(cor_mat_p, method=adjust)
         cor_mat_p <- matrix(cor_mat_p, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     }
@@ -312,7 +312,6 @@ correlation <- function(x, correlation_adjust="none", type="pearson",
         cor_mat_p <- matrix(cor_mat_p, ncol=nrow(x), nrow=nrow(x), byrow=FALSE)
     }
     
-    ## was cor_mat_p <- corr.test(t(x), adjust=adjust, ...)$p
     cor_mat <- ifelse(cor_mat_p > correlation_threshold, 0, 1)
     colnames(cor_mat) <- rownames(cor_mat) <- rownames(x)
     return(cor_mat)
