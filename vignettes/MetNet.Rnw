@@ -358,7 +358,7 @@ Mutual Information using a nonparametric bias correction by
 Bias Corrected Mutual Information, and the functions \Rfunction{clr} and 
 \Rfunction{aracne.a} from the \CRANpkg{parmigene} package), Pearson and 
 Spearman correlation (based on the 
-\CRANpkg{WGCNA} package, \cite{Revelle2018}), partial and semipartial 
+\CRANpkg{WGCNA} package, \cite{Langfelder2008}), partial and semipartial 
 Pearson and Spearman correlation (using the \CRANpkg{ppcor} package) and 
 constraint-based structure 
 learning based on the Fast Incremental Association (Fast-IAMB, algorithm 
