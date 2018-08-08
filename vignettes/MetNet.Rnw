@@ -289,7 +289,7 @@ transformations <- rbind(
     c("Disaccharide (-H2O)", "C12H20O11", 340.1005614851, "-"),
     c("Glucuronic acid (-H2O)", "C6H8O6", 176.0320879894, "?"),
     c("Monosaccharide (-H2O)", "C6H10O5", 162.0528234315, "-"),
-    c("Rhamnose (-H20)", "C6H12O5", 146.057910, "-"),
+    c("Rhamnose (-H20)", "C6H10O4", 146.057910, "-"),
     c("Trisaccharide (-H2O)", "C18H30O15", 486.1584702945, "-"),
     c("coumaroyl (-H2O)", "C9H6O2", 146.0367794368, "?"),
     c("feruloyl (-H2O)", "C9H6O2OCH2", 176.0473441231, "?"),
