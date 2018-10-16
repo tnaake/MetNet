@@ -1,7 +1,12 @@
+CHANGES IN VERSION 0.99.23
+--------------------------
+ o improve createStructuralAdjacency function [2018-10-16 Mon]
+
 CHANGES IN VERSION 0.99.20
 --------------------------
  o replace psych::corr.test by WGCNA::corAndPvalue to improve speed 
    [2018-08-06 Mon]
+
 CHANGES IN VERSION 0.99.19
 --------------------------
  o print message when model calculation in createStatisticalAdjacency is 
