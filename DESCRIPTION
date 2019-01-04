@@ -1,7 +1,7 @@
 Package: MetNet
 Type: Package
 Title: Inferring metabolic networks from untargeted high-resolution mass spectrometry data
-Version: 1.1.0
+Version: 1.1.1
 Date: 2018-10-22
 Authors@R: c(person(given = "Thomas", family = "Naake",
     email = "thomasnaake@googlemail.com",
@@ -26,7 +26,7 @@ Suggests:
     BiocStyle (>= 2.6.1), 
     igraph (>= 1.1.2), 
     knitr (>= 1.11)    
-biocViews: Metabolomics, MassSpectrometry, Network, Regression
+biocViews: ImmunoOncology, Metabolomics, MassSpectrometry, Network, Regression
 Description: MetNet contains functionality to infer metabolic network topologies from 
   quantitative data and high-resolution mass/charge information. Using statistical models
   (including correlation, mutual information, regression and Bayes statistics) and 
