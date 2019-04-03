@@ -1,7 +1,10 @@
+Changes in version 1.1.0 (2019-04-03)
++ correct typo in vignette
+
 Changes in version 0.99.24 (2018-10-22)
 + adjust NEWS file to new format according to ?news: 
   o entries are grouped according to version, with version header 
-    “Changes in version” at the beginning of a line, followed by a version 
+    'Changes in version' at the beginning of a line, followed by a version 
     number, optionally followed by an ISO 8601 format date, possibly 
     parenthesized
   o entries may be grouped according to category, with a category header 

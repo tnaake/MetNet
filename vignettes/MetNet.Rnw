@@ -407,7 +407,7 @@ call the two functions \Rfunction{createStatisticalAdjacencyList} and
 \Rfunction{consensusAdjacency} individually: 
 <<statistical_stepwise,eval=TRUE,echo=TRUE>>= 
 l <- createStatisticalAdjacencyList(x_int, 
-    model=c("pearson", "spearman", "aracne", "clr"), correlation_adjust="BH")
+    model=c("pearson", "spearman"), correlation_adjust="BH")
 stat_adj <- consensusAdjacency(l=l)
 @
 
