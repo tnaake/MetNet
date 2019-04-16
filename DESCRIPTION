@@ -26,7 +26,7 @@ Suggests:
     BiocStyle (>= 2.6.1), 
     igraph (>= 1.1.2), 
     knitr (>= 1.11)    
-biocViews: Metabolomics, MassSpectrometry, Network, Regression
+biocViews: ImmunoOncology, Metabolomics, MassSpectrometry, Network, Regression
 Description: MetNet contains functionality to infer metabolic network topologies from 
   quantitative data and high-resolution mass/charge information. Using statistical models
   (including correlation, mutual information, regression and Bayes statistics) and 
