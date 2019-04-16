@@ -1,4 +1,7 @@
-Changes in version 1.1.0 (2019-04-03)
+Changes in version 1.1.2 (2019-04-16)
++ check that MetNet passes all builds without any errors or warnings
+
+Changes in version 1.1.1 (2019-04-03)
 + correct typo in vignette
 
 Changes in version 0.99.24 (2018-10-22)
