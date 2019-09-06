@@ -23,6 +23,7 @@ Imports:
 Suggests:
     BiocGenerics (>= 0.24.0),
     BiocStyle (>= 2.6.1), 
+    glmnet (>= 2.0-18),
     igraph (>= 1.1.2), 
     knitr (>= 1.11), 
     RUnit (>= 0.4.32),
