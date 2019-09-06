@@ -1,0 +1,5 @@
+*.Rhistory
+*.swp
+*.so
+*.o
+*.rds
