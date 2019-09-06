@@ -8,8 +8,7 @@ Authors@R: c(person(given = "Thomas", family = "Naake",
     role = c("aut","cre")))
 VignetteBuilder: knitr
 Depends:
-    R (>= 3.5),
-    stats (>= 3.5)
+    R (>= 3.5)
 Imports:
     bnlearn (>= 4.3), 
     BiocParallel (>= 1.12.0),  
@@ -25,7 +24,9 @@ Suggests:
     BiocGenerics (>= 0.24.0),
     BiocStyle (>= 2.6.1), 
     igraph (>= 1.1.2), 
-    knitr (>= 1.11)    
+    knitr (>= 1.11), 
+    RUnit (>= 0.4.32),
+    stats (>= 3.5)
 biocViews: ImmunoOncology, Metabolomics, MassSpectrometry, Network, Regression
 Description: MetNet contains functionality to infer metabolic network topologies from 
   quantitative data and high-resolution mass/charge information. Using statistical models
