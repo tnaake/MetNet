@@ -1,0 +1,15 @@
+citHeader("To cite the MetNet package in publications use:")
+
+citEntry(entry="article",  
+         title  = "MetNet: Metabolite Network Prediction from High-Resolution Mass Spectrometry Data in R Aiding Metabolite Annotation",
+         author = personList(
+           person(given="Thomas", family="Naake"),
+           person(given="Alisdair R.", family="Fernie")),
+         journal = "Analytical Chemistry",
+         year = "2019",
+         volume = "91",
+         pages = "1768-1772",
+         textVersion = paste("Thomas Naake and Alisdair R. Fernie.",
+           "MetNet: Metabolite Network Prediction from High-Resolution Mass Spectrometry Data in R Aiding Metabolite Annotation.",
+           "Analytical Chemistry 91, 1768-1772 (2019).")
+         )
