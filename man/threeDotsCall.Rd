@@ -23,7 +23,7 @@ duplicated arguments. \code{threeDotsCall} will call the function
 \code{fun} with the filtered arguments and will return the result.
 }
 \details{
-Used internally in \code{lasso}, \code{randomForest}, 
+Used internally in \code{lasso}, \code{randomForest},
 \code{correlation}, \code{bayes}, \code{consensusAdjacency}
 }
 \examples{

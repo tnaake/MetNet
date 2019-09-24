@@ -26,7 +26,7 @@ test_createStructuralAdjacency <- function() {
     checkException(createStructuralAdjacency(mat_test, transformations[,-1]))
     checkException(createStructuralAdjacency(mat_test, transformations[,-3]))
     checkException(createStructuralAdjacency(mat_test, matrix()))
-    checkException(createStructuralAdjacency(mat_test, transformations, 
+    checkException(createStructuralAdjacency(mat_test, transformations,
                                              ppm = "a"))
     checkEquals(length(struct_adj), 2)
     checkEquals(dim(struct_adj[[1]]), c(7, 7))
@@ -51,9 +51,9 @@ test_rtCorrection <- function() {
     checkException(rtCorrection(struct_adj[[1]], mat_test, transformations))
     checkException(
         rtCorrection(list(struct_adj[[1]]), mat_test, transformations))
-    checkException(rtCorrection(list(struct_adj[[2]], struct_adj[[2]]), 
+    checkException(rtCorrection(list(struct_adj[[2]], struct_adj[[2]]),
         mat_test, transformations))
-    checkException(rtCorrection(list(struct_adj[[1]], struct_adj[[1]]), 
+    checkException(rtCorrection(list(struct_adj[[1]], struct_adj[[1]]),
         mat_test, transformations))
     checkException(rtCorrection(struct_adj, NULL, transformations))
     checkException(rtCorrection(struct_adj, mat_test[,-1], transformations))
@@ -61,7 +61,7 @@ test_rtCorrection <- function() {
     checkException(rtCorrection(struct_adj, mat_test, NULL))
     checkException(rtCorrection(struct_adj, mat_test, transformations[,-1]))
     checkException(rtCorrection(struct_adj, mat_test, transformations[,-4]))
-    checkException(rtCorrection(struct_adj, mat_test, 
+    checkException(rtCorrection(struct_adj, mat_test,
         cbind(transformations[,-4], rt = rep("a", 4))))
     checkTrue(is.matrix(struct_adj_rt[[1]]))
     checkTrue(is.numeric(struct_adj_rt[[1]]))

@@ -55,8 +55,8 @@ lasso <- function(x, parallel = FALSE, ...) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
             ## lasso: alpha = 1
             ## allow for compatibility of arguments 
-            l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1), 
-                    y = y_l1, fitfun = glmnet.lasso, 
+            l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
+                    y = y_l1, fitfun = glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
             return(l1$selected)
         })    
@@ -64,9 +64,9 @@ lasso <- function(x, parallel = FALSE, ...) {
         l1 <- lapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
             ## lasso: alpha = 1
-            ## allow for compatibility of arguments 
+            ## allow for compatibility of arguments
             l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
-                    y = y_l1, fitfun = glmnet.lasso, 
+                    y = y_l1, fitfun = glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
             return(l1$selected)
         })   
@@ -74,7 +74,7 @@ lasso <- function(x, parallel = FALSE, ...) {
     
     l1_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(l1_mat) <- rownames(l1_mat) <- rownames(x)
-    for (i in seq_len(length(l1))) {l1_mat[names(l1[[i]]), i] <- 1} 
+    for (i in seq_len(length(l1))) {l1_mat[names(l1[[i]]), i] <- 1}
     ## ; l1_mat[i, l1[[i]]] <- 1}
     return(l1_mat)
 }
@@ -119,8 +119,8 @@ randomForest <- function(x, parallel = FALSE,
         rf <- bplapply(seq_len(nrow(x)), function(i) {
             x_rf <- df_x[, -i]
             y_rf <- df_x[, i]
-            ##formula_rf <- paste(rownames(x)[i], "~", ".")    
-            ## allow for compatibility of arguments 
+            ##formula_rf <- paste(rownames(x)[i], "~", ".")
+            ## allow for compatibility of arguments
             rf <- threeDotsCall(rfPermute::rfPermute.default,
                                 x = x_rf, y = y_rf, ...)
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
@@ -130,21 +130,21 @@ randomForest <- function(x, parallel = FALSE,
         rf <- lapply(seq_len(nrow(x)), function(i) {
             x_rf <- df_x[, -i]
             y_rf <- df_x[, i]
-            ##formula_rf <- paste(rownames(x)[i], "~", ".")    
+            ##formula_rf <- paste(rownames(x)[i], "~", ".")
             ## allow for compatibility of arguments 
-            rf <- threeDotsCall(rfPermute::rfPermute.default, 
-                                x = x_rf, y = y_rf, ...) 
+            rf <- threeDotsCall(rfPermute::rfPermute.default,
+                                x = x_rf, y = y_rf, ...)
             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
             return(rf_p)
         })
     }
-    rf_mat <- matrix(1, nrow = nrow(x), ncol = nrow(x))    
+    rf_mat <- matrix(1, nrow = nrow(x), ncol = nrow(x))
     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
     
     for (i in seq_len(length(rf))) {
         rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]
     }
-    rf_mat <- stats::p.adjust(rf_mat, method = randomForest_adjust)     
+    rf_mat <- stats::p.adjust(rf_mat, method = randomForest_adjust)
     rf_mat <- matrix(rf_mat, ncol = nrow(x), nrow = nrow(x), byrow = FALSE)
     rf_mat <- ifelse(rf_mat > 0.05, 0, 1)
     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
@@ -230,7 +230,7 @@ clr <- function(mi, clr_threshold = 0) {
 #' @export
 aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
     if (!is.numeric(aracne_threshold)) stop("aracne_threshold is not numeric")
-    aracne_mat <- parmigene::aracne.a(mi, eps = eps)  
+    aracne_mat <- parmigene::aracne.a(mi, eps = eps)
     aracne_mat <- ifelse(aracne_mat > aracne_threshold, 1, 0)
     colnames(aracne_mat) <- rownames(aracne_mat) <- rownames(mi)
     return(aracne_mat)
@@ -285,32 +285,32 @@ aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
 #' @export
 correlation <- function(x, correlation_adjust = "none", type = "pearson", 
     correlation_threshold = 0.05, ...) {
-    if (!is.numeric(correlation_threshold)) 
+    if (!is.numeric(correlation_threshold))
         stop("correlation_threshold is not numeric")
     ## get character vector for p-value adjustment
     adjust <- correlation_adjust
-    ## allow for compatibility of arguments 
+    ## allow for compatibility of arguments
     if (type %in% c("pearson", "spearman")) {
-        cor_mat_p <- threeDotsCall(WGCNA::corAndPvalue, x = t(x), 
-                                   method = type, ...)$p    
+        cor_mat_p <- threeDotsCall(WGCNA::corAndPvalue, x = t(x),
+                                   method = type, ...)$p
         cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x), 
+        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x),
                             byrow = FALSE)
     }
     if (type %in% c("pearson_partial", "spearman_partial")) {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
         cor_mat_p <- ppcor::pcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)     
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x), 
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)
+        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x),
                             byrow = FALSE)
     }
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
         cor_mat_p <- ppcor::spcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)     
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x), 
+        cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)
+        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x),
                             byrow = FALSE)
     }
     
@@ -354,7 +354,7 @@ bayes <- function(x, ...) {
     arcs_fast.iamb <- bnlearn::arcs(x_fast.iamb)
     
     for(i in seq_len(nrow(arcs_fast.iamb))) {
-        bs_mat[arcs_fast.iamb[i, "from"], arcs_fast.iamb[i, "to"] ] <- 1} 
+        bs_mat[arcs_fast.iamb[i, "from"], arcs_fast.iamb[i, "to"] ] <- 1}
     bs_mat <- as.matrix(bs_mat)
     return(bs_mat)
 }
@@ -567,32 +567,32 @@ consensusAdjacency <- function(l, threshold = 1, ...) {
     rownames_1 <- rownames(l[[1]])
     colnames_1 <- colnames(l[[1]])
     
-    if (!all(rownames_1 == colnames_1)) 
+    if (!all(rownames_1 == colnames_1))
         stop("colnames and rownames are not identical")
     
     if (length(l) > 1) {
         for (i in 2:length(l)) {
             ## check if number of columns and rows are identical for 
             ## all matrices
-            if (ncol(l[[i]]) != ncol_1) 
+            if (ncol(l[[i]]) != ncol_1)
                 stop("ncol of matrices are not identical")
-            if (nrow(l[[i]]) != nrow_1) 
+            if (nrow(l[[i]]) != nrow_1)
                 stop("nrow of matrices are not identical")
             ## check if colnames and rownames are identical for all matrices
-            if (!all(colnames(l[[i]]) == colnames_1)) 
+            if (!all(colnames(l[[i]]) == colnames_1))
                 stop("matrices have different colnames")
-            if (!all(rownames(l[[i]]) == rownames_1)) 
+            if (!all(rownames(l[[i]]) == rownames_1))
                 stop("matrices have different rownames")
-            if (!is.null(colnames_1) & is.null(colnames(l[[i]]))) 
+            if (!is.null(colnames_1) & is.null(colnames(l[[i]])))
                 stop("matrices have different colnames")
-            if (!is.null(rownames_1) & is.null(rownames(l[[i]]))) 
+            if (!is.null(rownames_1) & is.null(rownames(l[[i]])))
                 stop("matrices have different rownames")
         }
     }
-    ## end check compatibility 
+    ## end check compatibility
     
     
-    ## allow for compatibility of arguments 
+    ## allow for compatibility of arguments
     consensus_mat <- threeDotsCall(sna::consensus, dat = l, ...)
     ## was sna::consensus(dat = l, ...)
     
@@ -611,11 +611,11 @@ consensusAdjacency <- function(l, threshold = 1, ...) {
 #' of a function \code{fun} and checks if the passed arguments \code{...} 
 #' matches the formal arguments. \code{threeDotsCall} will remove 
 #' duplicated arguments. \code{threeDotsCall} will call the function 
-#' \code{fun} with the filtered arguments and will return the result. 
+#' \code{fun} with the filtered arguments and will return the result.
 #' @usage threeDotsCall(fun, ...)
 #' @param fun function to check for arguments and to call
 #' @param ... arguments to be tested to be passed to fun
-#' @details Used internally in \code{lasso}, \code{randomForest}, 
+#' @details Used internally in \code{lasso}, \code{randomForest},
 #' \code{correlation}, \code{bayes}, \code{consensusAdjacency}
 #' @return Function call with passed arguments 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -677,7 +677,7 @@ threeDotsCall <- function(fun, ...) {
 createStatisticalAdjacency <- function(x, model, threshold = 1, ...) {
     ## first use function createStatisticalAdjacency_list
     l <- createStatisticalAdjacencyList(x = x, model = model, ...)
-    ## combine statistical adjacency matrices by the function 
+    ## combine statistical adjacency matrices by the function
     ## consensusAdjacency
     consensus_mat <- consensusAdjacency(l = l, threshold = threshold, ...)
     return(consensus_mat)

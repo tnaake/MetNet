@@ -46,7 +46,7 @@
 #' @export
 createStructuralAdjacency <- function(x, transformation, ppm = 5) {
     
-    if (!is.data.frame(transformation)) 
+    if (!is.data.frame(transformation))
         stop("transformation is not a data.frame")
     if (!"group" %in% colnames(transformation))
         stop("transformation does not contain the column group")
@@ -56,19 +56,19 @@ createStructuralAdjacency <- function(x, transformation, ppm = 5) {
     
     if (!is.numeric(ppm)) stop("ppm is not numeric")
     
-    mass <- x[, "mz"]    
+    mass <- x[, "mz"]
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
     rownames(mat) <- colnames(mat) <- mass
     
     ## create matrix which has rownmames per row
     mat <- apply(mat, 1, function(x) as.numeric(rownames(mat)))
-    ## calculate difference between rownames and colnames 
+    ## calculate difference between rownames and colnames
     ## (difference between features)
     mat <- mat - t(mat)
     mat <- abs(mat)
     ## calculate ppm deviation
-    mat_1 <- mat / abs(ppm / 10 ^ 6  - 1 ) 
-    mat_2 <- mat / abs(ppm / 10 ^ 6  + 1 ) 
+    mat_1 <- mat / abs(ppm / 10 ^ 6  - 1 )
+    mat_2 <- mat / abs(ppm / 10 ^ 6  + 1 )
     
     ## create two matrices to store result
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
@@ -86,7 +86,7 @@ createStructuralAdjacency <- function(x, transformation, ppm = 5) {
         ## write to these indices 1 and the "group"
         mat[ind_hit] <- 1
         mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) != 0, 
-            yes = paste(mat_type[ind_hit], transformation[i, "group"], sep = "/"), 
+            yes = paste(mat_type[ind_hit], transformation[i, "group"], sep = "/"),
             no = as.character(transformation[i, "group"]))
     }
     
@@ -179,11 +179,11 @@ rtCorrection <- function(struct_adj, x, transformation) {
     if (any(dim(adj) != dim(group))) 
         stop("dim(struct_adj[[1]] is not equal to dim(struct_adj[[2]]")
     if (!"rt" %in% colnames(x)) stop("x does not contain the column rt")
-    if (!"group" %in% colnames(transformation)) 
+    if (!"group" %in% colnames(transformation))
         stop("transformation does not contain the column group")
-    if (!"rt" %in% colnames(transformation)) 
+    if (!"rt" %in% colnames(transformation))
         stop("transformation does not contain the column rt")
-    if (!"mass" %in% colnames(transformation)) 
+    if (!"mass" %in% colnames(transformation))
         stop("transformation does not contain the column mz")
     if (!all(levels(transformation[, "rt"]) %in% c("+", "-", "?")))
         stop('in transformation[, "rt"] does contain other levels than 
@@ -194,7 +194,7 @@ rtCorrection <- function(struct_adj, x, transformation) {
     if (!all(colnames(struct_adj[[2]]) == rownames(struct_adj[[2]])))
         stop("colnames of struct_adj[[2]] is not identical to 
                 rownames of struct_adj[[2]]")
-    if (!all(rownames(struct_adj[[1]]) %in% rownames(x))) 
+    if (!all(rownames(struct_adj[[1]]) %in% rownames(x)))
         stop("rownames(struct_adj[[1]]) do not fit rownames(x) ")
     if (!all(colnames(struct_adj[[1]]) %in% rownames(x))) 
         stop("colnames(struct_adj[[1]]) do not fit rownames(x)")
@@ -208,7 +208,7 @@ rtCorrection <- function(struct_adj, x, transformation) {
     colnames(mat_rt) <- rownames(mat_rt) <- x[rownames(adj), "rt"]
     ## create matrix which has rownmames per row
     mat_rt <- apply(mat_rt, 1, function(x) as.numeric(rownames(mat_rt)))
-    ## calculate difference between rownames and colnames 
+    ## calculate difference between rownames and colnames
     ## (difference between features)
     mat_rt <- mat_rt - t(mat_rt)
     colnames(mat_rt) <- rownames(mat_rt) <- colnames(adj)
@@ -217,19 +217,19 @@ rtCorrection <- function(struct_adj, x, transformation) {
     colnames(mat_mz) <- rownames(mat_mz) <- x[rownames(adj), "mz"]
     ## create matrix which has rownmames per row
     mat_mz <- apply(mat_mz, 1, function(x) as.numeric(rownames(mat_mz)))
-    ## calculate difference between rownames and colnames 
+    ## calculate difference between rownames and colnames
     ## (difference between features)
     mat_mz <- mat_mz - t(mat_mz)
     colnames(mat_mz) <- rownames(mat_mz) <- colnames(adj)
     
     ## get indices of matching items
-    ind <- lapply(seq_len(dim(transformation)[1]), function(x) 
+    ind <- lapply(seq_len(dim(transformation)[1]), function(x)
         grep(group, pattern = transformation[x, 1], fixed = TRUE))
     
     ## iterate through transformation rows
     for (j in seq_len(nrow(transformation))) { 
         
-        ## check if observed rt shift corresponds to expected one and 
+        ## check if observed rt shift corresponds to expected one and
         ## remove connection if necessary
         if (transformation[j, "rt"] == "+") {
             adj[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- 0

@@ -193,9 +193,9 @@ test_consensusAdjacency <- function() {
     checkException(consensusAdjacency(list_foo))
     checkEquals(ncol(stat_adj_cons), 7)
     checkEquals(nrow(stat_adj_cons), 7)
-    checkEquals(rownames(stat_adj_cons), 
+    checkEquals(rownames(stat_adj_cons),
         c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
-    checkEquals(colnames(stat_adj_cons), 
+    checkEquals(colnames(stat_adj_cons),
         c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
     checkTrue(is.numeric(stat_adj_cons))
     checkTrue(is.matrix(stat_adj_cons))
@@ -203,10 +203,10 @@ test_consensusAdjacency <- function() {
 ## END unit test consensusAdjacency ##
 
 ## START unit test createStatisticalAdjacency ##
-stat_adj_l <- createStatisticalAdjacencyList(mat_test, 
+stat_adj_l <- createStatisticalAdjacencyList(mat_test,
         model = c("clr", "aracne","pearson", "spearman", "bayes"))
 stat_adj_cons <- consensusAdjacency(stat_adj_l)
-stat_adj <- createStatisticalAdjacency(mat_test, 
+stat_adj <- createStatisticalAdjacency(mat_test,
         model = c("clr", "aracne","pearson", "spearman", "bayes"))
 test_createStatisticalAdjacency <- function() {
     checkEquals(stat_adj, stat_adj_cons)

@@ -19,7 +19,7 @@ transformations <- data.frame(group = as.character(transformations[, 1]),
 stat_adj <- createStatisticalAdjacency(mat_test[, -1], 
         model = c("clr", "aracne", "pearson", "spearman", "bayes"))
 ## create structural network
-struct_adj <- createStructuralAdjacency(mat_test, 
+struct_adj <- createStructuralAdjacency(mat_test,
         transformation = transformations, ppm = 5)
 
 ## START unit test combineStructuralStatistical ##
@@ -27,7 +27,7 @@ cons_adj <- combineStructuralStatistical(struct_adj[[1]], stat_adj)
 test_combine_structural_statistical <- function() {
     checkException(combineStructuralStatistical(NULL, stat_adj))
     checkException(combineStructuralStatistical(struct_adj[[1]], NULL))
-    checkException(combineStructuralStatistical(struct_adj[[1]], 
+    checkException(combineStructuralStatistical(struct_adj[[1]],
         stat_adj, threshold = "a"))
     checkEquals(sum(cons_adj), 4)
     checkEquals(dim(cons_adj), c(7, 7))

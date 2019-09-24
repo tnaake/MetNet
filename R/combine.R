@@ -42,13 +42,13 @@
 combineStructuralStatistical <- function(structure, statistical, 
                     threshold = 1) {
     
-    if (!is.matrix(structure) & !is.numeric(structure)) 
+    if (!is.matrix(structure) & !is.numeric(structure))
         stop("structure is not a numeric matrix")
-    if (!is.matrix(statistical) & !is.numeric(statistical)) 
+    if (!is.matrix(statistical) & !is.numeric(statistical))
         stop("statistical is not a numeric matrix")
-    if (!all(rownames(structure) == rownames(statistical))) 
+    if (!all(rownames(structure) == rownames(statistical)))
         stop("rownames are not identical")
-    if (!all(colnames(structure) == colnames(statistical))) 
+    if (!all(colnames(structure) == colnames(statistical)))
         stop("colnames are not identical")
     if (!is.numeric(threshold)) stop("threshold is not numeric")
     
