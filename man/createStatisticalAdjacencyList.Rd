@@ -47,7 +47,7 @@ length > 1). Internally \code{x} will be z-scaled and the z-scaled object
 will be used in \code{lasso}, \code{clr} and/or \code{aracne}.
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 createStatisticalAdjacencyList(x, c("pearson", "spearman"))

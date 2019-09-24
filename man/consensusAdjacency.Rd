@@ -5,14 +5,14 @@
 \title{Create a consensus adjacency matrix of statistical adjacency 
 matrices}
 \usage{
-consensusAdjacency(l, threshold=1, ...)
+consensusAdjacency(l, threshold = 1, ...)
 }
 \arguments{
 \item{l}{list, each entry of the list contains an adjacency matrix}
 
 \item{threshold}{numeric, when combining the adjacency matrices the 
 \code{threshold} parameter defines if an edge is reported or not. For 
-\code{method="central.graph"} threshold is set to 1 by default. For other
+\code{method = "central.graph"} threshold is set to 1 by default. For other
 values of method, the value should be carefully defined by the user. If 
 threshold is set to \code{NULL} (default), it will be set to 1 internally.}
 
@@ -36,7 +36,7 @@ connection by different statistical methods.
 parameters used in the \code{consensus} function, refer to ?sna::consensus.
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 stat_adj_l <- createStatisticalAdjacencyList(x, c("pearson", "spearman"))

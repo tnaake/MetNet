@@ -26,12 +26,12 @@ adjacency matrices.
 Used internally in \code{createStatisticalAdjacencyList}
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-cor_pearson <- correlation(x, type="pearson")
-cor_spearman <- correlation(x, type="spearman")
-l <- list(pearson=cor_pearson)
+cor_pearson <- correlation(x, type = "pearson")
+cor_spearman <- correlation(x, type = "spearman")
+l <- list(pearson = cor_pearson)
 MetNet:::addToList(l, "spearman", cor_spearman)
 }
 \author{

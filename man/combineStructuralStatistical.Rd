@@ -4,7 +4,7 @@
 \alias{combineStructuralStatistical}
 \title{Combine structural and statistical adjacency matrix}
 \usage{
-combineStructuralStatistical(structure, statistical, threshold=1)
+combineStructuralStatistical(structure, statistical, threshold = 1)
 }
 \arguments{
 \item{structure}{matrix containing structural adjacency matrix}
@@ -32,7 +32,7 @@ The matrices will be added and a unweighted connection will
 be reported when the value exceeds a certain value.
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x_test <- as.matrix(x_test)
 functional_groups <- rbind(
     c("Hydroxylation (-H)", "O", "15.9949146221"),
@@ -43,13 +43,13 @@ functional_groups <- rbind(
     c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
-functional_groups <- data.frame(group=functional_groups[,1],
-                                formula=functional_groups[,2],
-                                mass=as.numeric(functional_groups[,3]))
-struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm=5)
+functional_groups <- data.frame(group = functional_groups[,1],
+                                formula = functional_groups[,2],
+                                mass = as.numeric(functional_groups[,3]))
+struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
 stat_adj <- createStatisticalAdjacency(x_test, 
-    model=c("pearson", "spearman","bayes"), 
-    correlation_adjust="bonferroni")
+    model = c("pearson", "spearman", "bayes"), 
+    correlation_adjust = "bonferroni")
 combineStructuralStatistical(struct_adj[[1]], stat_adj)
 }
 \author{

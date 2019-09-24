@@ -1,12 +1,13 @@
+## load RUnit
+library(RUnit)
+
 ## create toy example data set
-data("mat_test", package="MetNet")
+data("mat_test", package = "MetNet")
 
 ## START unit test lasso ##
-lasso_mat <- lasso(t(mat_test_z), parallel=FALSE, PFER=0.75, cutoff=0.95)
+lasso_mat <- lasso(t(mat_test_z), parallel = FALSE, PFER = 0.75, cutoff = 0.95)
 test_lasso <- function() {
     checkException(lasso(mat_test))
-    ## do not test sum since this can change ##
-    ## checkEquals(sum(lasso_mat), 2) ## 
     checkEquals(rownames(lasso_mat), colnames(lasso_mat))
     checkEquals(rownames(lasso_mat), rownames(mat_test))
     checkEquals(ncol(lasso_mat), nrow(lasso_mat))
@@ -17,27 +18,25 @@ test_lasso <- function() {
 }
 ## END unit test lasso ##
 
-## START unit test randomForest ## 
-randomForest_mat <- randomForest(mat_test, parallel=FALSE, num.cores=1)
+## START unit test randomForest ##
+rf_mat <- randomForest(mat_test, parallel = FALSE, num.cores = 1)
 test_randomForest <- function() {
-    ## do not test sum since this can change ##
-    ## checkEquals(sum(randomForest_mat), 31) ## 
-    checkEquals(rownames(randomForest_mat), colnames(randomForest_mat))
-    checkEquals(rownames(randomForest_mat), rownames(mat_test))
-    checkEquals(ncol(randomForest_mat), nrow(randomForest_mat))
-    checkEquals(nrow(randomForest_mat), nrow(mat_test))
-    checkTrue(is.numeric(randomForest_mat))
-    checkTrue(is.matrix(randomForest_mat))
-    checkTrue(all(randomForest_mat %in% c(0, 1)))
+    checkEquals(rownames(rf_mat), colnames(rf_mat))
+    checkEquals(rownames(rf_mat), rownames(mat_test))
+    checkEquals(ncol(rf_mat), nrow(rf_mat))
+    checkEquals(nrow(rf_mat), nrow(mat_test))
+    checkTrue(is.numeric(rf_mat))
+    checkTrue(is.matrix(rf_mat))
+    checkTrue(all(rf_mat %in% c(0, 1)))
 }
-## END unit test randomForest ## 
+## END unit test randomForest ##
 
-## START unit test clr ## 
+## START unit test clr ##
 mi_mat_test_z <- mpmi::cmi(mat_test_z)$bcmi
 rownames(mi_mat_test_z) <- colnames(mi_mat_test_z) <- colnames(mat_test_z)
 clr_mat <- clr(mi_mat_test_z)
 test_clr <- function() {
-    checkException(clr(mi_mat_test_z, clr_threshold="a"))
+    checkException(clr(mi_mat_test_z, clr_threshold = "a"))
     checkEquals(sum(clr_mat), 30)
     checkEquals(rownames(clr_mat), colnames(clr_mat))
     checkEquals(rownames(clr_mat), rownames(mat_test))
@@ -52,8 +51,8 @@ test_clr <- function() {
 ## START unit test aracne ##
 aracne_mat <- aracne(mi_mat_test_z)
 test_aracne <- function() {
-    checkException(aracne(mi_mat_test_z, aracne_threshold="a"))
-    checkException(aracne(mi_mat_test_z, eps="a"))
+    checkException(aracne(mi_mat_test_z, aracne_threshold = "a"))
+    checkException(aracne(mi_mat_test_z, eps = "a"))
     checkEquals(sum(aracne_mat), 31)
     checkEquals(rownames(aracne_mat), colnames(aracne_mat))
     checkEquals(rownames(aracne_mat), rownames(mat_test))
@@ -63,28 +62,24 @@ test_aracne <- function() {
     checkTrue(is.matrix(aracne_mat))
     checkTrue(all(aracne_mat %in% c(0, 1)))
 }
-## END unit test aracne ## 
+## END unit test aracne ##
 
 ## START unit test correlation ##
-correlation_p_mat <- correlation(mat_test, type="pearson")
-correlation_p_p_mat <- correlation(mat_test, type="pearson_partial")
-correlation_p_sp_mat <- correlation(mat_test, type="pearson_semipartial")
-correlation_s_mat <- correlation(mat_test, type="spearman")
-correlation_s_p_mat <- correlation(mat_test, type="spearman_partial")
-correlation_s_sp_mat <- correlation(mat_test, type="spearman_semipartial")
+correlation_p_mat <- correlation(mat_test, type = "pearson")
+correlation_p_p_mat <- correlation(mat_test, type = "pearson_partial")
+correlation_p_sp_mat <- correlation(mat_test, type = "pearson_semipartial")
+correlation_s_mat <- correlation(mat_test, type = "spearman")
+correlation_s_p_mat <- correlation(mat_test, type = "spearman_partial")
+correlation_s_sp_mat <- correlation(mat_test, type = "spearman_semipartial")
 
 test_correlation <- function() {
-    checkException(correlation(mat_test, correlation_threshold="a"))
+    checkException(correlation(mat_test, correlation_threshold = "a"))
     checkEquals(sum(correlation_p_mat), 47)
-    checkEquals(sum(correlation(mat_test, 
-        correlation_adjust="bonferroni", correlation_threshold=1e-11)), 21)
-    checkEquals(sum(correlation(mat_test, 
-        correlation_adjust="none", correlation_threshold=1e-11)), 33)
-    ##checkEquals(sum(correlation_p_p_mat), 9)
-    ##checkEquals(sum(correlation_p_sp_mat), 7)
+    checkEquals(sum(correlation(mat_test,
+        correlation_adjust = "bonferroni", correlation_threshold = 1e-11)), 21)
+    checkEquals(sum(correlation(mat_test,
+        correlation_adjust = "none", correlation_threshold = 1e-11)), 33)
     checkEquals(sum(correlation_s_mat), 47)
-    ##checkEquals(sum(correlation_s_p_mat, na.rm=TRUE), 19)
-    ##checkEquals(sum(correlation_s_sp_mat, na.rm=TRUE), 7)
     checkEquals(rownames(correlation_p_mat), colnames(correlation_p_mat))
     checkEquals(rownames(correlation_p_p_mat), colnames(correlation_p_p_mat))
     checkEquals(rownames(correlation_p_sp_mat), colnames(correlation_p_sp_mat))
@@ -142,9 +137,9 @@ test_bayes <- function() {
     checkTrue(is.matrix(bayes_mat))
     checkTrue(all(bayes_mat %in% c(0, 1)))
 }
-## END unit test bayes ## 
+## END unit test bayes ##
 
-## START unit test addToList ## 
+## START unit test addToList ##
 l <- list()
 l <- MetNet:::addToList(l, "newEntry", matrix())
 test_addToList <- function() {
@@ -159,18 +154,18 @@ test_addToList <- function() {
 
 ## START unit test threeDotsCall ##
 test_threeDots_call <- function() {
-    checkException(MetNet:::threeDotsCall("mean", x=1:10, x=1:10))
-    checkEquals(MetNet:::threeDotsCall("mean", x=1:10, foo=1), mean(1:10))
+    checkException(MetNet:::threeDotsCall("mean", x = 1:10, x = 1:10))
+    checkEquals(MetNet:::threeDotsCall("mean", x = 1:10, foo = 1), mean(1:10))
 }
-## END unit test threeDotsCall ## 
+## END unit test threeDotsCall ##
 
 ## START unit test createStatisticalAdjacencyList ##
-stat_adj_l <- createStatisticalAdjacencyList(mat_test, 
-    model=c("clr", "aracne", "pearson", "spearman", "bayes"))
+stat_adj_l <- createStatisticalAdjacencyList(mat_test,
+    model = c("clr", "aracne", "pearson", "spearman", "bayes"))
 test_createStatisticalAdjacencyList <- function() {
-    checkException(createStatisticalAdjacencyList(NULL, model="lasso"))
-    checkException(createStatisticalAdjacencyList(mat_test, model="foo"))
-    checkException(createStatisticalAdjacencyList(mat_test, model=c("lasso")))
+    checkException(createStatisticalAdjacencyList(NULL, model = "lasso"))
+    checkException(createStatisticalAdjacencyList(mat_test, model = "foo"))
+    checkException(createStatisticalAdjacencyList(mat_test, model = c("lasso")))
     checkEquals(length(stat_adj_l), 5)
     checkEquals(as.numeric(lapply(stat_adj_l, nrow)), rep(7, 5))
     checkEquals(as.numeric(lapply(stat_adj_l, ncol)), rep(7, 5))
@@ -182,19 +177,19 @@ test_createStatisticalAdjacencyList <- function() {
         c("clr", "aracne", "pearson", "spearman", "bayes"))
     checkTrue(all(unlist(lapply(stat_adj_l, function(x) is.numeric(x)))))
 }
-## END unit test createStatisticalAdjacencyList ## 
+## END unit test createStatisticalAdjacencyList ##
 
 ## START unit test consensusAdjacency ##
 stat_adj_cons <- consensusAdjacency(stat_adj_l)
-list_foo <- list(matrix(1:49, ncol=7), matrix(1:49, ncol=7))
+list_foo <- list(matrix(1:49, ncol = 7), matrix(1:49, ncol = 7))
 rownames(list_foo[[1]]) <- rownames(stat_adj_l[[1]][])
 colnames(list_foo[[1]]) <- rownames(stat_adj_l[[1]][])
 test_consensusAdjacency <- function() {
     checkException(consensusAdjacency(NULL))
-    checkException(consensusAdjacency(stat_adj_l, threshold="a"))
-    checkException(consensusAdjacency(stat_adj_l, method="foo"))
+    checkException(consensusAdjacency(stat_adj_l, threshold = "a"))
+    checkException(consensusAdjacency(stat_adj_l, method = "foo"))
     checkException(consensusAdjacency(
-        list(matrix(1:25, ncol=5), matrix(1:36, ncol=6))))
+        list(matrix(1:25, ncol = 5), matrix(1:36, ncol = 6))))
     checkException(consensusAdjacency(list_foo))
     checkEquals(ncol(stat_adj_cons), 7)
     checkEquals(nrow(stat_adj_cons), 7)
@@ -205,14 +200,14 @@ test_consensusAdjacency <- function() {
     checkTrue(is.numeric(stat_adj_cons))
     checkTrue(is.matrix(stat_adj_cons))
 }
-## END unit test consensusAdjacency ## 
+## END unit test consensusAdjacency ##
 
-## START unit test createStatisticalAdjacency ## 
+## START unit test createStatisticalAdjacency ##
 stat_adj_l <- createStatisticalAdjacencyList(mat_test, 
-        model=c("clr", "aracne","pearson", "spearman", "bayes"))
+        model = c("clr", "aracne","pearson", "spearman", "bayes"))
 stat_adj_cons <- consensusAdjacency(stat_adj_l)
 stat_adj <- createStatisticalAdjacency(mat_test, 
-        model=c("clr", "aracne","pearson", "spearman", "bayes"))
+        model = c("clr", "aracne","pearson", "spearman", "bayes"))
 test_createStatisticalAdjacency <- function() {
     checkEquals(stat_adj, stat_adj_cons)
 }

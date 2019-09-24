@@ -30,7 +30,7 @@ For use of the parameters used in the \code{fast.iamb} function,
 refer to ?bnlearn::fast.iamb.
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 bayes(x)

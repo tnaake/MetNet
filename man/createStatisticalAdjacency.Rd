@@ -4,7 +4,7 @@
 \alias{createStatisticalAdjacency}
 \title{Create statistical adjacency matrix}
 \usage{
-createStatisticalAdjacency(x, model, threshold=1, ...)
+createStatisticalAdjacency(x, model, threshold = 1, ...)
 }
 \arguments{
 \item{x}{matrix that contains intensity values of features/metabolites 
@@ -17,7 +17,7 @@ createStatisticalAdjacency(x, model, threshold=1, ...)
 
 \item{threshold}{numeric, when combining the adjacency matrices the 
 threshold parameter defines if an edge is reported or not. For 
-\code{method="central.graph"} threshold is set to 1 by default. For other
+\code{method = "central.graph"} threshold is set to 1 by default. For other
 values of method, the value should be carefully defined by the user. If 
 threshold is set to NULL (default), it will be set to 1 internally.}
 
@@ -46,7 +46,7 @@ semipartial), Spearman correlation (also partial and semipartial)
 and Constraint-based structure learning (Bayes).
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 createStatisticalAdjacency(x, c("pearson", "spearman"))

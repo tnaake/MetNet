@@ -4,7 +4,7 @@
 \alias{createStructuralAdjacency}
 \title{Create adjacency matrix based on m/z (molecular weight) difference}
 \usage{
-createStructuralAdjacency(x, transformation, ppm=5)
+createStructuralAdjacency(x, transformation, ppm = 5)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
@@ -39,10 +39,10 @@ supplied by \code{transformation}. To account for the mass accuracy of
 the dataset \code{x}, the user can specify the accuracy of m/z features 
 in parts per million (ppm) by the \code{ppm} argument. The m/z values in the 
 \code{'mz'} column of \code{x} will be converted to m/z ranges according to 
-the \code{ppm} argument (default \code{ppm=5}).
+the \code{ppm} argument (default \code{ppm = 5}).
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 transformation <- rbind(
     c("Hydroxylation (-H)", "O", "15.9949146221"),
     c("Malonyl group (-H2O)", "C3H2O3", "86.0003939305"),
@@ -52,10 +52,10 @@ transformation <- rbind(
     c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
-transformation <- data.frame(group=transformation[,1],
-                                formula=transformation[,2],
-                                mass=as.numeric(transformation[,3]))
-struct_adj <- createStructuralAdjacency(x_test, transformation, ppm=5)
+transformation <- data.frame(group = transformation[,1],
+                                formula = transformation[,2],
+                                mass = as.numeric(transformation[,3]))
+struct_adj <- createStructuralAdjacency(x_test, transformation, ppm = 5)
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

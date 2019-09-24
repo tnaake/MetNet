@@ -5,7 +5,7 @@
 \title{Create an adjacency matrix based on algorithm for the reconstruction
 of accurate cellular networks}
 \usage{
-aracne(mi, eps=0.05, aracne_threshold=0)
+aracne(mi, eps = 0.05, aracne_threshold = 0)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
@@ -20,7 +20,7 @@ Jackknife bias corrected MI estimates) from the \code{cmi} function of the
 (aracne$_{i,j}$ > threshold, where aracne$_{i, j}$ is the aracne value of 
 the ith row feature and of the jth column feature), the connection is 
 defined as present, if the aracne value is lower than the threshold value 
-(aracne$_{i,j}$ <= threshold) there is no statistical connection reported.}
+(aracne$_{i,j}$ <=  threshold) there is no statistical connection reported.}
 }
 \value{
 matrix, matrix with edges inferred from Reconstruction of accurate
@@ -39,12 +39,12 @@ For more details on the \code{aracne.a} function,
 refer to ?parmigene::aracne.a.
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
-aracne(mi_x_z, eps=0.05, aracne_threshold=0)
+aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
 }
 \author{
 Thomas Naake, \email{thomasnaake @googlemail.com}

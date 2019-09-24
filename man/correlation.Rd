@@ -4,8 +4,8 @@
 \alias{correlation}
 \title{Create an adjacency matrix based on correlation}
 \usage{
-correlation(x, correlation_adjust="none", type="pearson", 
-                                        correlation_threshold=0.05, ...)
+correlation(x, correlation_adjust = "none", type = "pearson", 
+                                        correlation_threshold = 0.05, ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
@@ -55,10 +55,10 @@ For use of the parameters used in the \code{corAndPvalue} function,
 refer to ?WGCNA::corAndPvalue.
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-correlation(x, correlation_adjust="bonferroni", type="pearson")
+correlation(x, correlation_adjust = "bonferroni", type = "pearson")
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

@@ -7,7 +7,7 @@
 #' loss/addition of functional groups. \code{createStructuralAdjacency} returns 
 #' the unweighted adjacency matrix together with a character matrix with the 
 #' type of loss/addition as a list at the specific positions.  
-#' @usage createStructuralAdjacency(x, transformation, ppm=5)
+#' @usage createStructuralAdjacency(x, transformation, ppm = 5)
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values, \code{x} contains the 
 #' column \code{'mz'} that has the m/z information (numerical values) for the 
@@ -22,14 +22,14 @@
 #' the dataset \code{x}, the user can specify the accuracy of m/z features 
 #' in parts per million (ppm) by the \code{ppm} argument. The m/z values in the 
 #' \code{'mz'} column of \code{x} will be converted to m/z ranges according to 
-#' the \code{ppm} argument (default \code{ppm=5}). 
+#' the \code{ppm} argument (default \code{ppm = 5}). 
 #' @return list containing two matrices, in the first list entry the 
 #' matrix with edges inferred mass differences is stored, in the second list 
 #' entry the matrix with the type (corresponding to the \code{"group"} column
 #' in \code{transformation}) is stored
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package="MetNet")
+#' data("x_test", package = "MetNet")
 #' transformation <- rbind(
 #'     c("Hydroxylation (-H)", "O", "15.9949146221"),
 #'     c("Malonyl group (-H2O)", "C3H2O3", "86.0003939305"),
@@ -39,12 +39,12 @@
 #'     c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
 #'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
 #'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
-#' transformation <- data.frame(group=transformation[,1],
-#'                                 formula=transformation[,2],
-#'                                 mass=as.numeric(transformation[,3]))
-#' struct_adj <- createStructuralAdjacency(x_test, transformation, ppm=5)
+#' transformation <- data.frame(group = transformation[,1],
+#'                                 formula = transformation[,2],
+#'                                 mass = as.numeric(transformation[,3]))
+#' struct_adj <- createStructuralAdjacency(x_test, transformation, ppm = 5)
 #' @export
-createStructuralAdjacency <- function(x, transformation, ppm=5) {
+createStructuralAdjacency <- function(x, transformation, ppm = 5) {
     
     if (!is.data.frame(transformation)) 
         stop("transformation is not a data.frame")
@@ -57,7 +57,7 @@ createStructuralAdjacency <- function(x, transformation, ppm=5) {
     if (!is.numeric(ppm)) stop("ppm is not numeric")
     
     mass <- x[, "mz"]    
-    mat <- matrix(0, nrow=length(mass), ncol=length(mass))
+    mat <- matrix(0, nrow = length(mass), ncol = length(mass))
     rownames(mat) <- colnames(mat) <- mass
     
     ## create matrix which has rownmames per row
@@ -71,8 +71,8 @@ createStructuralAdjacency <- function(x, transformation, ppm=5) {
     mat_2 <- mat / abs(ppm / 10 ^ 6  + 1 ) 
     
     ## create two matrices to store result
-    mat <- matrix(0, nrow=length(mass), ncol=length(mass))
-    mat_type <- matrix("", nrow=length(mass), ncol=length(mass))
+    mat <- matrix(0, nrow = length(mass), ncol = length(mass))
+    mat_type <- matrix("", nrow = length(mass), ncol = length(mass))
     
     ## iterate through each column and check if the "mass" is in the interval
     ## defined by the m/z value and ppm 
@@ -85,9 +85,9 @@ createStructuralAdjacency <- function(x, transformation, ppm=5) {
         ind_hit <- intersect(ind_mat_1, ind_mat_2)
         ## write to these indices 1 and the "group"
         mat[ind_hit] <- 1
-        mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) !=0 , 
-            yes=paste(mat_type[ind_hit], transformation[i, "group"], sep="/"), 
-            no=as.character(transformation[i, "group"]))
+        mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) != 0, 
+            yes = paste(mat_type[ind_hit], transformation[i, "group"], sep = "/"), 
+            no = as.character(transformation[i, "group"]))
     }
     
     rownames(mat) <- colnames(mat) <- rownames(x)
@@ -150,7 +150,7 @@ createStructuralAdjacency <- function(x, transformation, ppm=5) {
 #' in \code{transformation}) is stored
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
-#' data("x_test", package="MetNet")
+#' data("x_test", package = "MetNet")
 #' transformation <- rbind(
 #'     c("Hydroxylation (-H)", "O", "15.9949146221", "-"),
 #'     c("Malonyl group (-H2O)", "C3H2O3", "86.0003939305", "?"),
@@ -160,11 +160,11 @@ createStructuralAdjacency <- function(x, transformation, ppm=5) {
 #'     c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894", "?"),
 #'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315", "-"),
 #'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945", "-"))
-#' transformation <- data.frame(group=transformation[,1],
-#'                                 formula=transformation[,2],
-#'                                 mass=as.numeric(transformation[,3]),
-#'                                 rt=transformation[,4])
-#' struct_adj <- createStructuralAdjacency(x_test, transformation, ppm=5)
+#' transformation <- data.frame(group = transformation[,1],
+#'                                 formula = transformation[,2],
+#'                                 mass = as.numeric(transformation[,3]),
+#'                                 rt = transformation[,4])
+#' struct_adj <- createStructuralAdjacency(x_test, transformation, ppm = 5)
 #' struct_adj_rt <- rtCorrection(struct_adj, x_test, transformation)
 #' @export
 rtCorrection <- function(struct_adj, x, transformation) {
@@ -204,7 +204,7 @@ rtCorrection <- function(struct_adj, x, transformation) {
     if (!is.character(group)) 
         stop("struct_adj[[2]] is not a character matrix")
     
-    mat_rt <- matrix(0, nrow=nrow(adj), ncol=ncol(adj))
+    mat_rt <- matrix(0, nrow = nrow(adj), ncol = ncol(adj))
     colnames(mat_rt) <- rownames(mat_rt) <- x[rownames(adj), "rt"]
     ## create matrix which has rownmames per row
     mat_rt <- apply(mat_rt, 1, function(x) as.numeric(rownames(mat_rt)))
@@ -213,7 +213,7 @@ rtCorrection <- function(struct_adj, x, transformation) {
     mat_rt <- mat_rt - t(mat_rt)
     colnames(mat_rt) <- rownames(mat_rt) <- colnames(adj)
     
-    mat_mz <- matrix(0, nrow=nrow(adj), ncol=ncol(adj))
+    mat_mz <- matrix(0, nrow = nrow(adj), ncol = ncol(adj))
     colnames(mat_mz) <- rownames(mat_mz) <- x[rownames(adj), "mz"]
     ## create matrix which has rownmames per row
     mat_mz <- apply(mat_mz, 1, function(x) as.numeric(rownames(mat_mz)))
@@ -224,7 +224,7 @@ rtCorrection <- function(struct_adj, x, transformation) {
     
     ## get indices of matching items
     ind <- lapply(seq_len(dim(transformation)[1]), function(x) 
-        grep(group, pattern=transformation[x, 1], fixed=TRUE))
+        grep(group, pattern = transformation[x, 1], fixed = TRUE))
     
     ## iterate through transformation rows
     for (j in seq_len(nrow(transformation))) { 

@@ -39,4 +39,4 @@ Description: MetNet contains functionality to infer metabolic network topologies
   the two matrices are combined to form a adjacency matrix inferred from both quantitative 
   and structure information. 
 License: GPL (>= 3)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

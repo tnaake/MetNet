@@ -4,15 +4,15 @@
 \alias{randomForest}
 \title{Create a adjacency matrix based on random forest}
 \usage{
-randomForest(x, parallel=FALSE, randomForest_adjust="none", ...)
+randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
 \item{parallel}{logical, should computation be parallelized? If 
-\code{parallel=TRUE} the \code{bplapply} will be applied if 
-\code{parallel=FALSE} the \code{lapply} function will be applied.}
+\code{parallel = TRUE} the \code{bplapply} will be applied if 
+\code{parallel = FALSE} the \code{lapply} function will be applied.}
 
 \item{randomForest_adjust}{character, correction method for p-values from
 \code{rp.importance}, \code{randomForest_adjust} will be passed to the 
@@ -38,7 +38,7 @@ For use of the parameters used in the \code{rfPermute} function,
 refer to ?rfPermute::rfPermute.default.
 }
 \examples{
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 \dontrun{randomForest(x)}

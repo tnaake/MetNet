@@ -1,29 +1,33 @@
+## load RUnit
+library(RUnit)
+
 ## create toy example data set
-data("mat_test", package="MetNet")
+data("mat_test", package = "MetNet")
 colnames(mat_test) <- paste0("intensity_", 1:20)
 mz <- c(100, 150, 262.0528, 262.0528, 262.0528, 348.0532, 448.0532)
 rt <- c(100, 100, 50, 150, 150, 150, 150)
-mat_test <- cbind(mz=mz, rt=rt, mat_test)
+mat_test <- cbind(mz = mz, rt = rt, mat_test)
 
 ## transformations object for structual calculation
 transformations <- rbind(
     c("Malonyl group (–H2O)", "C3H2O3", 86.0003939305, "?"),
     c("Monosaccharide (–H2O)", "C6H10O5", 162.0528234315, "-"))
-transformations <- data.frame(group=transformations[, 1],
-                            formula=transformations[, 2],
-                            mass=as.numeric(transformations[, 3]),
-                            rt=transformations[,4])
+transformations <- data.frame(group = transformations[, 1],
+                            formula = transformations[, 2],
+                            mass = as.numeric(transformations[, 3]),
+                            rt = transformations[,4])
 
 ## START unit test createStructuralAdjacency ##
-struct_adj <- createStructuralAdjacency(mat_test, 
-        transformation=transformations, ppm=5)
+struct_adj <- createStructuralAdjacency(mat_test,
+        transformation = transformations, ppm = 5)
 test_createStructuralAdjacency <- function() {
     checkException(createStructuralAdjacency(mat_test[, -1], transformations))
     checkException(createStructuralAdjacency(NULL, transformations))
     checkException(createStructuralAdjacency(mat_test, transformations[,-1]))
     checkException(createStructuralAdjacency(mat_test, transformations[,-3]))
     checkException(createStructuralAdjacency(mat_test, matrix()))
-    checkException(createStructuralAdjacency(mat_test, transformations, ppm="a"))
+    checkException(createStructuralAdjacency(mat_test, transformations, 
+                                             ppm = "a"))
     checkEquals(length(struct_adj), 2)
     checkEquals(dim(struct_adj[[1]]), c(7, 7))
     checkEquals(dim(struct_adj[[2]]), c(7, 7))
@@ -39,7 +43,7 @@ test_createStructuralAdjacency <- function() {
     checkTrue(is.numeric(struct_adj[[1]]))
     checkTrue(is.character(struct_adj[[2]]))
 }
-## END unit test createStructuralAdjacency ## 
+## END unit test createStructuralAdjacency ##
 
 ## START unit test rtCorrection ##
 struct_adj_rt <- rtCorrection(struct_adj, mat_test, transformations)
@@ -58,7 +62,7 @@ test_rtCorrection <- function() {
     checkException(rtCorrection(struct_adj, mat_test, transformations[,-1]))
     checkException(rtCorrection(struct_adj, mat_test, transformations[,-4]))
     checkException(rtCorrection(struct_adj, mat_test, 
-        cbind(transformations[,-4], rt=rep("a", 4))))
+        cbind(transformations[,-4], rt = rep("a", 4))))
     checkTrue(is.matrix(struct_adj_rt[[1]]))
     checkTrue(is.numeric(struct_adj_rt[[1]]))
     checkTrue(is.matrix(struct_adj_rt[[2]]))
@@ -70,4 +74,4 @@ test_rtCorrection <- function() {
     checkTrue(table(struct_adj_rt)[1] == 41)
     checkTrue(table(struct_adj_rt[[1]])[1] == 41)
 }
-## END unit test rtCorrection ## 
+## END unit test rtCorrection ##
