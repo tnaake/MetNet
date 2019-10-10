@@ -30,9 +30,28 @@ test_combine <- function() {
     checkEquals(sum(cons_adj[[1]]), 4)
     checkEquals(dim(cons_adj[[1]]), c(7, 7))
     checkEquals(rownames(cons_adj[[1]]), paste0("x", 1:7))
+    checkEquals(rownames(cons_adj[[2]]), paste0("x", 1:7))
     checkEquals(colnames(cons_adj[[1]]), paste0("x", 1:7))
+    checkEquals(colnames(cons_adj[[2]]), paste0("x", 1:7))
     checkEquals(rownames(cons_adj[[1]]), colnames(cons_adj[[1]]))
+    checkEquals(rownames(cons_adj[[2]]), colnames(cons_adj[[2]]))
     checkTrue(is.matrix(cons_adj[[1]]))
+    checkTrue(is.matrix(cons_adj[[2]]))
     checkTrue(is.numeric(cons_adj[[1]]))
+    checkTrue(is.character(cons_adj[[2]]))
+    
+    mock <- stat_adj
+    colnames(mock)[1] <- "foo"
+    checkException(combine(struct_adj, mock))
+    
+    mock <- stat_adj
+    rownames(mock)[1] <- "foo"
+    checkException(combine(struct_adj, mock))
+    
+    ## check for structure
+    l <- list(1, cons_adj[[2]])
+    checkException(combine(structure=l, statistical=stat_adj))
+    l <- list(cons_adj[[1]], 1)
+    checkException(combine(structure=l, statistical=stat_adj))
 }
 ## END unit test combine ##

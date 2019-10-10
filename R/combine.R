@@ -56,17 +56,32 @@
 #' @export
 combine <- function(structure, statistical, threshold = 1) {
     
-    if (!is.list(structure)) stop("structure is not a list")
-    if (!is.matrix(structure[[1]]) & !is.numeric(structure[[1]]))
+    if (!is.list(structure) | length(structure) != 2) 
+        stop("structure is not a list of length 2")
+    
+    if (!is.matrix(structure[[1]]) | !is.numeric(structure[[1]]))
         stop("structure[[1]] is not a numeric matrix")
-    if (!is.matrix(structure[[2]]) & !is.numeric(structure[[2]]))
+    
+    if (!is.matrix(structure[[2]]) | !is.character(structure[[2]]))
         stop("strcture[[2]] is not a character matrix")
-    if (!is.matrix(statistical) & !is.numeric(statistical))
+    
+    if (!is.matrix(statistical) | !is.numeric(statistical))
         stop("statistical is not a numeric matrix")
-    if (!all(rownames(structure) == rownames(statistical)))
+    
+    if (!all(rownames(structure[[1]]) == rownames(structure[[2]]))) 
+        stop("rownames of structure[[1]] are not identical to rownames of 
+             structure[[2]]")
+        
+    if (!all(colnames(structure[[1]]) == colnames(structure[[2]])))
+            stop("colnames of structure[[1]] are not identical to colnames of 
+                 structure[[2]]")
+    
+    if (!all(rownames(structure[[1]]) == rownames(statistical)))
         stop("rownames are not identical")
-    if (!all(colnames(structure) == colnames(statistical)))
+    
+    if (!all(colnames(structure[[1]]) == colnames(statistical)))
         stop("colnames are not identical")
+    
     if (!is.numeric(threshold)) stop("threshold is not numeric")
     
     ## create list to store results
@@ -89,3 +104,4 @@ combine <- function(structure, statistical, threshold = 1) {
     
     return(res)
 }
+
