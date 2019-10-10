@@ -9,7 +9,8 @@
 Inferring metabolic networks from untargeted high-resolution mass spectrometry data
 
 ## Description
-Please visit [MetNet](https://bioconductor.org/packages/MetNet) for further information. 
+Please visit the Bioconductor page of 
+[MetNet](https://bioconductor.org/packages/MetNet) for further information. 
 
 ## Contact 
 
