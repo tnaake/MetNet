@@ -1,23 +1,37 @@
-#' @name combineStructuralStatistical
-#' @aliases combineStructuralStatistical
+#' @name combine
+#' 
+#' @aliases combine
+#' 
 #' @title Combine structural and statistical adjacency matrix
-#' @description The function \code{combineStructuralStatistical} takes as 
+#' 
+#' @description 
+#' The function \code{combine} takes as 
 #' input the structural and statistical adjacency matrix, created in former 
 #' steps, adds them together and will report a connection between metabolites
 #' in the returned when the sum exceeds the \code{threshold} . 
-#' \code{combineStructuralStatistical} returns this consensus matrix supported
+#' \code{combine} returns this consensus matrix supported
 #' by the structural and statistical adjacency matrices.
-#' @usage combineStructuralStatistical(structure, statistical, threshold = 1)
-#' @param structure matrix containing structural adjacency matrix
-#' @param statistical matrix containing statistical adjacency matrix
+#' 
+#' @param structure list containing `numeric` structural adjacency matrix in 
+#' the first entry and `character` structural adjanceny matrix in the second 
+#' entry
+#' 
+#' @param statistical matrix containing `numeric` statistical adjacency matrix
+#' 
 #' @param threshold numeric, threshold value to be applied to define a 
 #' connection as present 
+#' 
 #' @details The matrices will be added and a unweighted connection will 
 #' be reported when the value exceeds a certain value. 
-#' @return a matrix containing the consensus adjacency matrix as described 
+#' 
+#' @return `list`, in the first entry `matrix` of type `numeric`containing the
+#' consensus adjacency matrix as described 
 #' above harbouring connections reported by the structual and 
-#' statistcal adjacency matrices. 
+#' statistcal adjacency matrices. In the second entry a `matrix` of type 
+#' `character` the corresonding type/putative link at this position. 
+#' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' 
 #' @examples 
 #' data("x_test", package = "MetNet")
 #' x_test <- as.matrix(x_test)
@@ -30,20 +44,23 @@
 #'     c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
 #'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
 #'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
-#' functional_groups <- data.frame(group = functional_groups[,1],
-#'                                 formula = functional_groups[,2],
-#'                                 mass = as.numeric(functional_groups[,3]))
+#' functional_groups <- data.frame(group = functional_groups[, 1],
+#'      formula = functional_groups[, 2],
+#'      mass = as.numeric(functional_groups[, 3]))
 #' struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
 #' stat_adj <- createStatisticalAdjacency(x_test, 
 #'     model = c("pearson", "spearman", "bayes"), 
 #'     correlation_adjust = "bonferroni")
-#' combineStructuralStatistical(struct_adj[[1]], stat_adj)
+#' combine(struct_adj, stat_adj)
+#' 
 #' @export
-combineStructuralStatistical <- function(structure, statistical, 
-                    threshold = 1) {
+combine <- function(structure, statistical, threshold = 1) {
     
-    if (!is.matrix(structure) & !is.numeric(structure))
-        stop("structure is not a numeric matrix")
+    if (!is.list(structure)) stop("structure is not a list")
+    if (!is.matrix(structure[[1]]) & !is.numeric(structure[[1]]))
+        stop("structure[[1]] is not a numeric matrix")
+    if (!is.matrix(structure[[2]]) & !is.numeric(structure[[2]]))
+        stop("strcture[[2]] is not a character matrix")
     if (!is.matrix(statistical) & !is.numeric(statistical))
         stop("statistical is not a numeric matrix")
     if (!all(rownames(structure) == rownames(statistical)))
@@ -52,8 +69,23 @@ combineStructuralStatistical <- function(structure, statistical,
         stop("colnames are not identical")
     if (!is.numeric(threshold)) stop("threshold is not numeric")
     
-    ## sum the matrices
-    consensus_mat <- structure + statistical
-    consensus_mat <- ifelse(consensus_mat > threshold, 1, 0)
-    return(consensus_mat)
+    ## create list to store results
+    res <- list()
+    
+    ## create the first entry of the list
+    ## sum the matrices structure and statistical, if the value is above
+    ## threshold then assign 1, otherwise 0
+    cons_num <- structure[[1]] + statistical
+    cons_num <- ifelse(cons_num > threshold, 1, 0)
+    
+    ## create the second entry of the list
+    ## if element in cons_num is equal to 1, take the element in structure[[2]]
+    ## (the type of link), otherwise ""
+    cons_char <- ifelse(cons_num == 1, structure[[2]], "")
+    
+    ## assign to list
+    res[[1]] <- cons_num
+    res[[2]] <- cons_char
+    
+    return(res)
 }
