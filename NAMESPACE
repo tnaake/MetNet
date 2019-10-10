@@ -3,7 +3,7 @@
 export(aracne)
 export(bayes)
 export(clr)
-export(combineStructuralStatistical)
+export(combine)
 export(consensusAdjacency)
 export(correlation)
 export(createStatisticalAdjacency)

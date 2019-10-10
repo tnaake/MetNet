@@ -413,9 +413,11 @@ stat_adj <- consensusAdjacency(l=l)
 
 \section{Combining the structural and statistical matrix}
 After creating the structural and statistical matrix, it is time to combine 
-these two matrices. The function \Rfunction{combine\_structural\_statistical} 
+these two matrices. The function \Rfunction{combine} 
 will combine the matrices to the consensus matrix. The function accepts 
-the arguments \Rcode{structure} and \Rcode{statistical} for the two matrices,
+the arguments \Rcode{structure} and \Rcode{statistical} for the list returned 
+by \Rfunction{createStructuralAdjacency} and the matrix returned 
+by \Rfunction{createStatisticalAdjacency},
 respectively, and the argument \Rcode{threshold}, that is a numerical value 
 (default=1). After adding the matrices, the entries will be checked if 
 they are greater or equal than \Rcode{threshold} and 1 or 0 will be returned,
@@ -425,8 +427,7 @@ if another \Rcode{method} than \Rcode{"central.graph"} in
 used. 
 
 <<combine,eval=TRUE,echo=TRUE>>=
-cons_adj <- combineStructuralStatistical(structure=struct_adj[[1]],
-                                    statistical=stat_adj)
+cons_adj <- combine(structure=struct_adj, statistical=stat_adj)
 @
 
 \section{Visualization and further analyses}
@@ -437,7 +438,7 @@ We will use the \CRANpkg{igraph} \cite{Csardi2006} package to visualize the
 adjacency matrix. 
 
 <<visualisation,eval=TRUE,echo=TRUE,fig.show='hide'>>=
-g <- igraph::graph_from_adjacency_matrix(cons_adj, mode="undirected")
+g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode="undirected")
 plot(g, edge.width=5, vertex.label.cex=0.5, edge.color="grey")
 @
 
