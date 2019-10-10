@@ -69,12 +69,12 @@ combine <- function(structure, statistical, threshold = 1) {
         stop("statistical is not a numeric matrix")
     
     if (!all(rownames(structure[[1]]) == rownames(structure[[2]]))) 
-        stop("rownames of structure[[1]] are not identical to rownames of 
-             structure[[2]]")
+        stop(c("rownames of structure[[1]] are not identical to rownames of ", 
+             "structure[[2]]"))
         
     if (!all(colnames(structure[[1]]) == colnames(structure[[2]])))
-            stop("colnames of structure[[1]] are not identical to colnames of 
-                 structure[[2]]")
+        stop(c("colnames of structure[[1]] are not identical to colnames of ", 
+                 "structure[[2]]"))
     
     if (!all(rownames(structure[[1]]) == rownames(statistical)))
         stop("rownames are not identical")

@@ -40,6 +40,19 @@ test_combine <- function() {
     checkTrue(is.numeric(cons_adj[[1]]))
     checkTrue(is.character(cons_adj[[2]]))
     
+    ## check rownames/colnames
+    mock <- struct_adj
+    mock_num <- mock[[1]]
+    colnames(mock_num)[1] <- "foo"
+    mock[[1]] <- mock_num
+    checkException(combine(mock, stat_adj))
+    
+    mock <- struct_adj
+    mock_num <- mock[[1]]
+    rownames(mock_num)[1] <- "foo"
+    mock[[1]] <- mock_num
+    checkException(combine(mock, stat_adj))
+    
     mock <- stat_adj
     colnames(mock)[1] <- "foo"
     checkException(combine(struct_adj, mock))
