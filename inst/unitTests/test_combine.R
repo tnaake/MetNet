@@ -1,6 +1,3 @@
-## load RUnit
-library(RUnit)
-
 ## create toy example data set
 data("mat_test", package = "MetNet")
 colnames(mat_test) <- paste0("intensity_", 1:20)
@@ -16,25 +13,26 @@ transformations <- data.frame(group = as.character(transformations[, 1]),
                                 mass = as.numeric(transformations[, 3]))
 
 ## create statistical network
-stat_adj <- createStatisticalAdjacency(mat_test[, -1], 
+stat_adj <- createStatisticalAdjacency(mat_test[, -1],
         model = c("clr", "aracne", "pearson", "spearman", "bayes"))
 ## create structural network
 struct_adj <- createStructuralAdjacency(mat_test,
         transformation = transformations, ppm = 5)
 
-## START unit test combineStructuralStatistical ##
-cons_adj <- combineStructuralStatistical(struct_adj[[1]], stat_adj)
-test_combine_structural_statistical <- function() {
-    checkException(combineStructuralStatistical(NULL, stat_adj))
-    checkException(combineStructuralStatistical(struct_adj[[1]], NULL))
-    checkException(combineStructuralStatistical(struct_adj[[1]],
+## START unit test combine ##
+cons_adj <- combine(struct_adj, stat_adj)
+
+test_combine <- function() {
+    checkException(combine(NULL, stat_adj))
+    checkException(combine(struct_adj, NULL))
+    checkException(combine(struct_adj,
         stat_adj, threshold = "a"))
-    checkEquals(sum(cons_adj), 4)
-    checkEquals(dim(cons_adj), c(7, 7))
-    checkEquals(rownames(cons_adj), paste0("x", 1:7))
-    checkEquals(colnames(cons_adj), paste0("x", 1:7))
-    checkEquals(rownames(cons_adj), colnames(cons_adj))
-    checkTrue(is.matrix(cons_adj))
-    checkTrue(is.numeric(cons_adj))
+    checkEquals(sum(cons_adj[[1]]), 4)
+    checkEquals(dim(cons_adj[[1]]), c(7, 7))
+    checkEquals(rownames(cons_adj[[1]]), paste0("x", 1:7))
+    checkEquals(colnames(cons_adj[[1]]), paste0("x", 1:7))
+    checkEquals(rownames(cons_adj[[1]]), colnames(cons_adj[[1]]))
+    checkTrue(is.matrix(cons_adj[[1]]))
+    checkTrue(is.numeric(cons_adj[[1]]))
 }
-## END unit test combineStructuralStatistical ##
+## END unit test combine ##
