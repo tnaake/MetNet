@@ -44,5 +44,5 @@ struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
 stat_adj <- createStatisticalAdjacency(x_test, 
     model = c("pearson", "spearman","bayes"), 
     adjust_correlation = "bonferroni")
-cons_adj <- combineStructuralStatistical(struct_adj[[1]], stat_adj)
+cons_adj <- combine(struct_adj, stat_adj)
 }
