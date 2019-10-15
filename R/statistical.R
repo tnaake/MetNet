@@ -136,8 +136,7 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' x <- as.matrix(x)
 #' randomForest(x)
 #' @export
-randomForest <- function(x, ...) {#parallel = FALSE, 
-                         #randomForest_adjust = "none", ...) {
+randomForest <- function(x, ...) {
     
     ## GENIE3 returns the importance of the link from "regulator gene" i to 
     ## target gene "j" in the form of a weighted adjacency matrix
@@ -194,7 +193,7 @@ randomForest <- function(x, ...) {#parallel = FALSE,
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
-#' clr(mi_x_z, clr_threshold = 0)
+#' clr(mi_x_z)
 #' 
 #' @export
 clr <- function(mi) {
@@ -253,7 +252,7 @@ clr <- function(mi) {
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
-#' aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
+#' aracne(mi_x_z, eps = 0.05)
 #' 
 #' @export
 aracne <- function(mi, eps = 0.05) {
@@ -367,9 +366,11 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson", ...) {
 }
 
 #' @name bayes
+#' 
 #' @aliases bayes
-#' @title 
-#' Create an adjacency matrix based on score-based structure learning algorithm
+#' 
+#' @title Create an adjacency matrix based on score-based structure learning 
+#' algorithm
 #' 
 #' @description  
 #' `bayes` infers an adjacency matrix using score-based structure learning 
@@ -377,13 +378,14 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson", ...) {
 #' `bnlearn` package. `bayes` extracts then the reported 
 #' connections from running the `boot.strength` function and assigns the
 #' strengths of the arcs of the Bayesian connections to an adjacency matrix. 
-#' The weighted adjacency matrix is returned by `bayes`.
+#' `bayes` returns this weighted adjacency matrix.
 #'
-#' @param 
-#' x `matrix`, where columns are the samples and the rows are features 
+#' @param x `matrix` 
+#' where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values
 #' 
-#' @param algorithm `character`, structure learning to be applied to the 
+#' @param algorithm `character`, 
+#' structure learning to be applied to the 
 #' bootstrap replicates (default is `"tabu"`)
 #' 
 #' @param R `numeric`, number of bootstrap replicates
@@ -403,12 +405,12 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson", ...) {
 #' @references 
 #' Friedman et al. (1999): Data Analysis with Bayesian Networks: A Bootstrap 
 #' Approach. Proceedings of the 15th Annual Conference on Uncertainty in 
-#' Artificial Intelligence, 196–201.
+#' Artificial Intelligence, 196-201.
 #' 
 #' Scutari and Nagarajan (2011): On Identifying Significant Edges in Graphical 
-#' Models. Proceedings of the Workshop 'Probabilistic Problem Solving in
-#' Biomedicine' of the 13th Artificial Intelligence in Medicine Conference, 
-#' 15–27.
+#' Models. Proceedings of the Workshop Probabilistic Problem Solving in
+#' Biomedicine of the 13th Artificial Intelligence in Medicine Conference, 
+#' 15-27.
 #' 
 #' @return 
 #' `matrix` with edges inferred from score-based structure 
@@ -565,7 +567,7 @@ addToList <- function(l, name, object) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' createStatisticalAdjacencyList(x, c("pearson", "spearman"))
+#' statistical(x = x, model = c("pearson", "spearman"))
 #' 
 #' @export
 statistical <- function(x, model, ...) {
@@ -839,7 +841,8 @@ threshold <- function(statistical, type, args, ...) {
     }
     
     if (type %in% c("top1", "top2", "mean")) {
-        if (! ("n"  %in% names(args) && length(n) == 1) )
+        if (! ("n"  %in% names(args) && length(args$n) == 1 && 
+            is.numeric(args$n)) )
             stop("args does not contain the entry `n` of length 1")
     }
     
@@ -893,12 +896,12 @@ threshold <- function(statistical, type, args, ...) {
                 ## for pearson/spearman correlation models (incl. partial and 
                 ## semi-partial), low values correspond to higher confidence
                 ## set values that are equal to 0 to NaN
-                MetNet:::getLinks(l_x, decreasing = FALSE, exclude = "== 0")   
+                getLinks(l_x, decreasing = FALSE, exclude = "== 0")   
                 
             } else {
                 ## for lasso, randomForest, clr, aracne and bayes higher values 
                 ## corresond to higher confidence 
-                MetNet:::getLinks(l_x, decreasing = TRUE, exclude = NULL)
+                getLinks(l_x, decreasing = TRUE, exclude = NULL)
             }
         })
         
@@ -912,7 +915,7 @@ threshold <- function(statistical, type, args, ...) {
         ## calculate the consensus information, i.e. either get the first or 
         ## second top rank per row or calculate the average across rows
         ## depending on the type argument
-        cons_val <- MetNet:::topKnet(ranks, type)
+        cons_val <- topKnet(ranks, type)
         
         ## bind row and col information with cons information
         row_col <- l_df[[1]][, c("row", "col")]

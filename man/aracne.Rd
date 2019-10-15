@@ -40,7 +40,7 @@ x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
-aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
+aracne(mi_x_z, eps = 0.05)
 
 }
 \references{

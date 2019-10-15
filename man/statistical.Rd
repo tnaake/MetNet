@@ -57,7 +57,7 @@ will be used in `lasso`, `clr` and/or `aracne`.
 data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-createStatisticalAdjacencyList(x, c("pearson", "spearman"))
+statistical(x = x, model = c("pearson", "spearman"))
 
 }
 \author{

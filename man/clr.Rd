@@ -42,7 +42,7 @@ x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
-clr(mi_x_z, clr_threshold = 0)
+clr(mi_x_z)
 
 }
 \references{

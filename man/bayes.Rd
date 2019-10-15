@@ -2,15 +2,18 @@
 % Please edit documentation in R/statistical.R
 \name{bayes}
 \alias{bayes}
-\title{Create an adjacency matrix based on score-based structure learning algorithm}
+\title{Create an adjacency matrix based on score-based structure learning 
+algorithm}
 \usage{
 bayes(x, algorithm = "tabu", R = 100, ...)
 }
 \arguments{
-\item{x}{`matrix`, where columns are the samples and the rows are features 
+\item{x}{`matrix` 
+where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
-\item{algorithm}{`character`, structure learning to be applied to the 
+\item{algorithm}{`character`, 
+structure learning to be applied to the 
 bootstrap replicates (default is `"tabu"`)}
 
 \item{R}{`numeric`, number of bootstrap replicates}
@@ -27,7 +30,7 @@ algorithm `boot.strength` from the
 `bnlearn` package. `bayes` extracts then the reported 
 connections from running the `boot.strength` function and assigns the
 strengths of the arcs of the Bayesian connections to an adjacency matrix. 
-The weighted adjacency matrix is returned by `bayes`.
+`bayes` returns this weighted adjacency matrix.
 }
 \details{
 `boot.strength` measures the strength of the 
@@ -49,12 +52,12 @@ bayes(x, algorithm = "tabu", R = 100)
 \references{
 Friedman et al. (1999): Data Analysis with Bayesian Networks: A Bootstrap 
 Approach. Proceedings of the 15th Annual Conference on Uncertainty in 
-Artificial Intelligence, 196–201.
+Artificial Intelligence, 196-201.
 
 Scutari and Nagarajan (2011): On Identifying Significant Edges in Graphical 
-Models. Proceedings of the Workshop 'Probabilistic Problem Solving in
-Biomedicine' of the 13th Artificial Intelligence in Medicine Conference, 
-15–27.
+Models. Proceedings of the Workshop Probabilistic Problem Solving in
+Biomedicine of the 13th Artificial Intelligence in Medicine Conference, 
+15-27.
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

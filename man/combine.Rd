@@ -51,9 +51,10 @@ functional_groups <- data.frame(group = functional_groups[, 1],
      formula = functional_groups[, 2],
      mass = as.numeric(functional_groups[, 3]))
 struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
-stat_adj <- createStatisticalAdjacency(x_test, 
+stat_adj_l <- statistical(x_test, 
     model = c("pearson", "spearman", "bayes"), 
     correlation_adjust = "bonferroni")
+stat_adj <- threshold(stat_adj_l, type = "top2", args = list(n = 10))
 combine(struct_adj, stat_adj)
 
 }

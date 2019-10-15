@@ -48,9 +48,10 @@
 #'      formula = functional_groups[, 2],
 #'      mass = as.numeric(functional_groups[, 3]))
 #' struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
-#' stat_adj <- createStatisticalAdjacency(x_test, 
+#' stat_adj_l <- statistical(x_test, 
 #'     model = c("pearson", "spearman", "bayes"), 
 #'     correlation_adjust = "bonferroni")
+#' stat_adj <- threshold(stat_adj_l, type = "top2", args = list(n = 10))
 #' combine(struct_adj, stat_adj)
 #' 
 #' @export
@@ -63,7 +64,7 @@ combine <- function(structure, statistical, threshold = 1) {
         stop("structure[[1]] is not a numeric matrix")
     
     if (!is.matrix(structure[[2]]) | !is.character(structure[[2]]))
-        stop("strcture[[2]] is not a character matrix")
+        stop("structure[[2]] is not a character matrix")
     
     if (!is.matrix(statistical) | !is.numeric(statistical))
         stop("statistical is not a numeric matrix")
