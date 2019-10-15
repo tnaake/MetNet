@@ -12,11 +12,11 @@ Depends:
 Imports:
     bnlearn (>= 4.3), 
     BiocParallel (>= 1.12.0),  
+    GENIE3 (>= 1.7.0),
     methods (>= 3.5),
     mpmi (>= 0.42), 
     parmigene (>= 1.0.2),
     ppcor (>= 1.1),
-    rfPermute (>= 2.1.5),
     sna (>= 2.4),
     stabs (>= 0.6),
     WGCNA (>= 1.61)
