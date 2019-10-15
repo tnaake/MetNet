@@ -1,6 +1,6 @@
 #' @importFrom stabs stabsel.matrix glmnet.lasso
 NULL
-#' @importFrom rfPermute rfPermute rfPermute.formula rp.importance
+#' @importFrom GENIE3 GENIE3 ##rfPermute rfPermute rfPermute.formula rp.importance
 NULL
 #' @importFrom mpmi cmi
 NULL
@@ -43,39 +43,48 @@ NULL
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-#' \dontrun{lasso(x_z, PFER = 0.75, cutoff = 0.95)}
+#' \dontrun{lasso(x_z, PFER = 0.95, cutoff = 0.95)}
 #' @export
 lasso <- function(x, parallel = FALSE, ...) {
     ## x should be z-scaled
     if (parallel) {
         l1 <- bplapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
+            
             ## lasso: alpha = 1
             ## allow for compatibility of arguments 
             l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
                     y = y_l1, fitfun = glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
-            return(l1$selected)
+            
+            ## return selection probabilities of features that are not 0
+            return(l1$max[l1$max != 0])
         })    
     } else {
         l1 <- lapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
+            
             ## lasso: alpha = 1
             ## allow for compatibility of arguments
             l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
                     y = y_l1, fitfun = glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
-            return(l1$selected)
+            
+            ## return selection probabilities of features that are not 0
+            return(l1$max[l1$max != 0])
         })   
     }
     
+    ## create a matrix to store the values
     l1_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(l1_mat) <- rownames(l1_mat) <- rownames(x)
-    for (i in seq_len(length(l1))) {l1_mat[names(l1[[i]]), i] <- 1}
-    ## ; l1_mat[i, l1[[i]]] <- 1}
+    
+    ## write the selection probabilitiy values in l1 to l1_mat
+    for (i in seq_len(length(l1))) {l1_mat[names(l1[[i]]), i] <- l1[[i]]}
+    
     return(l1_mat)
 }
 
@@ -108,49 +117,56 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' \dontrun{randomForest(x)}
+#' randomForest(x)
 #' @export
-randomForest <- function(x, parallel = FALSE, 
-                         randomForest_adjust = "none", ...) {
+randomForest <- function(x, ...) {#parallel = FALSE, 
+                         #randomForest_adjust = "none", ...) {
     
-    df_x <- data.matrix(t(x))
+    ## GENIE3 returns the importance of the link from "regulator gene" i to 
+    ## target gene "j" in the form of a weighted adjacency matrix
+    ## set regulators and targets to NULL that they cannot be changed
+    rf <- threeDotsCall(GENIE3, exprMatrix = x, regulators = NULL, 
+        targets = NULL, ...)
     
-    if (parallel) {
-        rf <- bplapply(seq_len(nrow(x)), function(i) {
-            x_rf <- df_x[, -i]
-            y_rf <- df_x[, i]
-            ##formula_rf <- paste(rownames(x)[i], "~", ".")
-            ## allow for compatibility of arguments
-            rf <- threeDotsCall(rfPermute::rfPermute.default,
-                                x = x_rf, y = y_rf, ...)
-            rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
-            return(rf_p)
-        })
-    } else {
-        rf <- lapply(seq_len(nrow(x)), function(i) {
-            x_rf <- df_x[, -i]
-            y_rf <- df_x[, i]
-            ##formula_rf <- paste(rownames(x)[i], "~", ".")
-            ## allow for compatibility of arguments 
-            rf <- threeDotsCall(rfPermute::rfPermute.default,
-                                x = x_rf, y = y_rf, ...)
-            rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
-            return(rf_p)
-        })
-    }
-    rf_mat <- matrix(1, nrow = nrow(x), ncol = nrow(x))
-    colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
-    
-    for (i in seq_len(length(rf))) {
-        rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]
-    }
-    rf_mat <- stats::p.adjust(rf_mat, method = randomForest_adjust)
-    rf_mat <- matrix(rf_mat, ncol = nrow(x), nrow = nrow(x), byrow = FALSE)
-    rf_mat <- ifelse(rf_mat > 0.05, 0, 1)
-    colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
-    
-    return(rf_mat)
+    return(rf)
 }
+#     if (parallel) {
+#         rf <- bplapply(seq_len(nrow(x)), function(i) {
+#             x_rf <- df_x[, -i]
+#             y_rf <- df_x[, i]
+#             ##formula_rf <- paste(rownames(x)[i], "~", ".")
+#             ## allow for compatibility of arguments
+#             rf <- threeDotsCall(rfPermute::rfPermute.default,
+#                                 x = x_rf, y = y_rf, ...)
+#             GENIE3(x)
+#             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
+#             return(rf_p)
+#         })
+#     } else {
+#         rf <- lapply(seq_len(nrow(x)), function(i) {
+#             x_rf <- df_x[, -i]
+#             y_rf <- df_x[, i]
+#             ##formula_rf <- paste(rownames(x)[i], "~", ".")
+#             ## allow for compatibility of arguments 
+#             rf <- threeDotsCall(rfPermute::rfPermute.default,
+#                                 x = x_rf, y = y_rf, ...)
+#             rf_p <- rp.importance(rf)[,"IncNodePurity.pval"]
+#             return(rf_p)
+#         })
+#     }
+#     rf_mat <- matrix(1, nrow = nrow(x), ncol = nrow(x))
+#     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
+#     
+#     for (i in seq_len(length(rf))) {
+#         rf_mat[names(rf[[i]]), rownames(x)[i]] <- rf[[i]]
+#     }
+#     rf_mat <- stats::p.adjust(rf_mat, method = randomForest_adjust)
+#     rf_mat <- matrix(rf_mat, ncol = nrow(x), nrow = nrow(x), byrow = FALSE)
+#     ##rf_mat <- ifelse(rf_mat > 0.05, 0, 1)
+#     colnames(rf_mat) <- rownames(rf_mat) <- rownames(x)
+#     
+#     return(rf_mat)
+# }
 #' @name clr
 #' @aliases clr
 #' @title Create an adjacency matrix based on context likelihood or 
@@ -185,10 +201,10 @@ randomForest <- function(x, parallel = FALSE,
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
 #' clr(mi_x_z, clr_threshold = 0)
 #' @export
-clr <- function(mi, clr_threshold = 0) {
-    if (!is.numeric(clr_threshold)) stop("clr_threshold is not numeric")
+clr <- function(mi) {#, clr_threshold = 0) {
+    ##if (!is.numeric(clr_threshold)) stop("clr_threshold is not numeric")
     clr_mat <- parmigene::clr(mi)
-    clr_mat <- ifelse(clr_mat > clr_threshold, 1, 0)
+    ##clr_mat <- ifelse(clr_mat > clr_threshold, 1, 0)
     colnames(clr_mat) <- rownames(clr_mat) <- rownames(mi)
     return(clr_mat)
 }
@@ -228,10 +244,10 @@ clr <- function(mi, clr_threshold = 0) {
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
 #' aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
 #' @export
-aracne <- function(mi, eps = 0.05, aracne_threshold = 0) {
-    if (!is.numeric(aracne_threshold)) stop("aracne_threshold is not numeric")
+aracne <- function(mi, eps = 0.05) {#, aracne_threshold = 0) {
+    #if (!is.numeric(aracne_threshold)) stop("aracne_threshold is not numeric")
     aracne_mat <- parmigene::aracne.a(mi, eps = eps)
-    aracne_mat <- ifelse(aracne_mat > aracne_threshold, 1, 0)
+    #aracne_mat <- ifelse(aracne_mat > aracne_threshold, 1, 0)
     colnames(aracne_mat) <- rownames(aracne_mat) <- rownames(mi)
     return(aracne_mat)
 }
@@ -289,32 +305,33 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
         stop("correlation_threshold is not numeric")
     ## get character vector for p-value adjustment
     adjust <- correlation_adjust
+    
     ## allow for compatibility of arguments
     if (type %in% c("pearson", "spearman")) {
-        cor_mat_p <- threeDotsCall(WGCNA::corAndPvalue, x = t(x),
-                                   method = type, ...)$p
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x),
-                            byrow = FALSE)
+        cor_mat <- threeDotsCall(WGCNA::corAndPvalue, x = t(x),
+            method = type, ...)$p
+        cor_mat <- stats::p.adjust(cor_mat, method = adjust)
+        cor_mat <- matrix(cor_mat, ncol = nrow(x), nrow = nrow(x),
+            byrow = FALSE)
     }
     if (type %in% c("pearson_partial", "spearman_partial")) {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
-        cor_mat_p <- ppcor::pcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x),
-                            byrow = FALSE)
+        cor_mat <- ppcor::pcor(t(x), method = method)$p.value
+        cor_mat <- stats::p.adjust(cor_mat, method = adjust)
+        cor_mat <- matrix(cor_mat, ncol = nrow(x), nrow = nrow(x),
+            byrow = FALSE)
     }
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
-        cor_mat_p <- ppcor::spcor(t(x), method = method)$p.value
-        cor_mat_p <- stats::p.adjust(cor_mat_p, method = adjust)
-        cor_mat_p <- matrix(cor_mat_p, ncol = nrow(x), nrow = nrow(x),
-                            byrow = FALSE)
+        cor_mat <- ppcor::spcor(t(x), method = method)$p.value
+        cor_mat <- stats::p.adjust(cor_mat, method = adjust)
+        cor_mat <- matrix(cor_mat, ncol = nrow(x), nrow = nrow(x), 
+            byrow = FALSE)
     }
     
-    cor_mat <- ifelse(cor_mat_p > correlation_threshold, 0, 1)
+    #cor_mat <- ifelse(cor_mat_p > correlation_threshold, 0, 1)
     colnames(cor_mat) <- rownames(cor_mat) <- rownames(x)
     return(cor_mat)
 }
@@ -344,18 +361,24 @@ correlation <- function(x, correlation_adjust = "none", type = "pearson",
 #' x <- as.matrix(x)
 #' bayes(x)
 #' @export
-bayes <- function(x, ...) {
+bayes <- function(x, algorithm = "tabu", R = 100, ...) {
     x_df <- data.frame(t(x))
+    
     ## allow for compatibility of arguments 
-    x_fast.iamb <- threeDotsCall(bnlearn::fast.iamb, x = x_df, ...)
+    strength <- threeDotsCall(bnlearn::boot.strength, data = x_df, ...)
+    
     ## create empty bs_mat to be filled with connections
     bs_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
     colnames(bs_mat) <- rownames(bs_mat) <- rownames(x)
-    arcs_fast.iamb <- bnlearn::arcs(x_fast.iamb)
     
-    for(i in seq_len(nrow(arcs_fast.iamb))) {
-        bs_mat[arcs_fast.iamb[i, "from"], arcs_fast.iamb[i, "to"] ] <- 1}
-    bs_mat <- as.matrix(bs_mat)
+    ## write to bs_mat
+    for(i in seq_len(nrow(x_strength))) {
+        tmp <- as.character(strength[i, ])
+        names(tmp) <- names(strength[i, ])
+        bs_mat[tmp["from"], tmp["to"] ] <- tmp["strength"]
+    }
+    mode(bs_mat) <- "numeric"
+    
     return(bs_mat)
 }
 
@@ -432,32 +455,35 @@ addToList <- function(l, name, object) {
 #' x <- as.matrix(x)
 #' createStatisticalAdjacencyList(x, c("pearson", "spearman"))
 #' @export
-createStatisticalAdjacencyList <- function(x, model, ...) {
+statistical <- function(x, model, ...) {
     
     ## check if model complies with the implemented model and return error 
     ## if not so
     if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne", 
             "pearson", "pearson_partial", "pearson_semipartial", 
             "spearman", "spearman_partial", "spearman_semipartial", "bayes"))))
-        stop("method not implemented in createStatisticalAdjacencyList")
+        stop("method not implemented in createModelList")
         
     ## check if x is numeric matrix and return error if not so
     if (mode(x) != "numeric") stop("x is not a numerical matrix")
     
-    x_z <- apply(x, 1, function(x) (x - mean(x, na.rm = TRUE))/sd(x, na.rm = TRUE))
+    ## z-scale
+    x_z <- apply(x, 1, function(x) {
+        (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+    })
     x_z <- t(x_z)
     
     l <- list()
     
     ## add entry for lasso if "lasso" is in model
     if ("lasso" %in% model) {
-        lasso <- lasso(x_z, ...)
+        lasso <- threeDotsCall("lasso", x_z, ...)
         l <- addToList(l, "lasso", lasso)
         print("lasso finished")
     }
     ## add entry for randomForest if "randomForest" is in model
     if ("randomForest" %in% model) {
-        randomForest <- randomForest(x, ...)
+        randomForest <- threeDotsCall("randomForest", x, ...)
         l <- addToList(l, "randomForest", randomForest)
         print("randomForest finished.")
     }
@@ -525,28 +551,224 @@ createStatisticalAdjacencyList <- function(x, model, ...) {
     return(l)
 }
 
+#' @name matrixToDataFrame
+#' @aliases matrixToList
+#' @title Write an adjacency matrix to a data.frame
+#' @description 
+#' @param mat
+#' @details 
+#' @return 
+#' @author
+#' @examples 
+#' @export
+getLinks <- function(mat, decreasing = TRUE) {
+    
+    ## replace 0 by NaN
+    mat[which(mat == 0)] <- NaN
+    df <- data.frame(row = c(row(mat)), col = c(col(mat)), confidence = c(mat))
+    
+    ## treat confidence values depending on decreasing parameter
+    ## if TRUE, then the highest confidence value should get the first rank
+    ## if TRUE, recalculate the confidence values that the values with highest
+    ## support have low values
+    if (decreasing) {
+        conf <- max(df$confidence, na.rm = TRUE) - df$confidence
+    } else {
+        conf <- df$confidence - min(df$confidence, na.rm = TRUE)
+    }
+    
+    ## calculate rank and add to data.frame
+    df <- data.frame(df, rank = rank(conf, na.last = TRUE))
+    
+    ## return
+    return(df)
+}
+
+#' 
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- as.matrix(x)
+#' model <- c("pearson", "spearman")
+#' args <- list("pearson" = 0.05, "spearman" = 0.05)
+
+l <- statistical(x, model = model)
+
+threshold(statistical, method, args) {
+    
+    l <- statistical
+    ## args, either N for tops
+    ## or a list of threshold
+    if (!method %in% c("top1", "top2", "mean", "threshold"))
+        stop("method not in 'top1', 'top2', 'mean', 'threshold'")
+    
+    ## check args
+    if (method %in% c("top1", "top2", "mean")) {
+        if (!all(model %in% names(args))) {
+            stop()
+        }
+    }
+    
+    if (method %in% threshold) {
+        if (! "n"  %in% names(args))
+            stop()
+    }
+    
+    if (method == "threshold") {
+        ## iterate through the list and remove the links below or above the threshold
+        ## write to list
+        l <- lapply(seq_along(l), function(x) {
+            
+            ## find corresponding model in l 
+            name_x <- names(l)[x]
+            
+            ## get corresponding threshold in args
+            threshold_x <- args[[names(l)[x]]]
+            
+            ## get corresponding adjacency matrix in l
+            l_x <- l[[name_x]]
+            
+            ## for pearson/spearman correlation methods (incl. partial and 
+            ## semi-partial), low values correspond to higher confidence,
+            ## only assign 1 to values that are below the threshold
+            if (grepl(name_x, pattern = "pearson|spearman")) {
+                ifelse(l_x < threshold_x, 1, 0)    
+                ## for lasso, randomForest, clr, aracne and bayes higher values 
+                ## corresond to higher confidence 
+                ## only assign 1 to values that are above the threshold
+            } else {
+                ifelse(l_x > threshold_x, 1, 0)
+            }
+        })
+
+        ## allow for compatibility of arguments 
+        ## calculate consenses from the binary matrices
+        cons <- threeDotsCall(sna::consensus, dat = l, ...)
+        
+        ##if (method == "central.graph") threshold <- 1
+        ## threshold consensus that it is a binary matrix
+        cons <- ifelse(cons >= threshold, 1, 0)
+        
+        rownames(cons) <- colnames(cons) <- colnames(l[[1]])
+        
+    } else { ## if method %in% c("top1", "top2", "mean")
+        l_df <- lapply(seq_along(l), function(x) {
+            
+            ## find corresponding model in l
+            name_x <- names(l)[x]
+            
+            ## get corresponding adjacency matrix in l
+            l_x <- l[[name_x]]
+            
+            ## for pearson/spearman correlation methods (incl. partial and 
+            ## semi-partial), low values correspond to higher confidence
+            if (grepl(name_x, pattern = "pearson|spearman")) {
+                getLinks(l_x, decreasing = FALSE)   
+            ## for lasso, randomForest, clr, aracne and bayes higher values 
+            ## corresond to higher confidence 
+              
+            } else {
+                getLinks(l_x, decreasing = TRUE)
+            }
+        })
+        
+        names(l_df) <- names(l)
+        
+        ## bind together the ranks of the models, stored in l_df
+        ranks <- lapply(l_df, function(x) x$rank)
+        ranks <- do.call("cbind", ranks)
+        colnames(ranks) <- names(l_df)
+        
+        ## calculate the consensus information, i.e. either get the first or 
+        ## second top rank per row or calculate the average across rows
+        ## depending on the method argument
+        cons_val <- topKnet(ranks, method)
+        
+        ## bind row and col information with cons information
+        row_col <- l_df[[1]][, c("row", "col")]
+        ranks <- cbind(row_col, cons_val)
+        
+        ## get the top N features
+        n <- args$n
+        top_n <- sort(unique(cons_val))[1:n]
+        ranks_top <- ranks[cons_val %in% top_n, ]
+        
+        ## write links in ranks_top to binary adjacency matrix cons
+        cons <- matrix(0, nrow = ncol(l[[1]]), ncol = ncol(l[[1]]))
+        rownames(cons) <- colnames(cons) <- colnames(l[[1]])
+        cons[as.numeric(rownames(ranks_top))] <- 1
+        
+    }
+    
+    return(cons)
+    
+}
+    
+#' statistical()
+#' l_df <- getLinks()
+#' getRanks
+getRanks <- function(l_df) {
+    
+}
+
+#' 
+topKnet <- function(ranks, method) {
+    
+    if (!is.matrix(ranks) && is.numeric(ranks)) {
+        stop("ranks is not a numerical matrix")
+    }
+    if (! method %in% c("top1", "top2", "mean")) {
+        stop("method neither 'top1', 'top2' or 'mean'")
+    }
+    ## calculate the consensus information, i.e. either get the first or 
+    ## second top rank per row or calculate the average across rows
+    ## depending on the method argument
+    if (method == "top1") {
+        ## get the lowest rank
+        cons_val <- apply(ranks, 1, min)
+    }
+    if (method == "top2") {
+        ## get the second lowest rank
+        cons_val <- apply(ranks, 1, function(x) sort(x)[2])
+    }
+    if (method == "mean") {
+        ## get the average of all ranks
+        cons_val <- apply(ranks, 1, mean, na.rm = TRUE)
+    }
+    
+    return(cons_val)
+}
+
+
+
+
+
 #' @name consensusAdjacency
 #' @aliases consensusAdjacency
-#' @title Create a consensus adjacency matrix of statistical adjacency 
-#' matrices
-#' @description The function takes a list of parameters (\code{l}) as input and
+#' @title 
+#' Create a consensus adjacency matrix of statistical adjacency matrices
+#' 
+#' @description 
+#' The function takes a list of parameters (\code{l}) as input and
 #' creates a consensus adjacency matrix from these adjacency matrices by 
 #' calling the function \code{consensus} from the \code{sna} package. Depending 
 #' on the chosen \code{method} in \code{consensus}, the threshold of the 
 #' consensus adjacency matrix should be chosen accordingly to report a 
 #' connection by different statistical methods. 
-#' @usage consensusAdjacency(l, threshold = 1, ...)
+#' 
 #' @param l list, each entry of the list contains an adjacency matrix
 #' @param threshold numeric, when combining the adjacency matrices the 
 #' \code{threshold} parameter defines if an edge is reported or not. For 
 #' \code{method = "central.graph"} threshold is set to 1 by default. For other
 #' values of method, the value should be carefully defined by the user. If 
 #' threshold is set to \code{NULL} (default), it will be set to 1 internally. 
+#' 
 #' @param ... parameters passed to the function \code{consensus} in the
 #' \code{sna} package 
+#' 
 #' @details \code{consensusAdjacency} is a wrapper function of the 
 #' \code{consensus} function of the \code{sna} package. For use of the 
 #' parameters used in the \code{consensus} function, refer to ?sna::consensus.
+#' 
 #' @return matrix, consensus matrix from adjacency matrices
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples 
@@ -555,6 +777,7 @@ createStatisticalAdjacencyList <- function(x, model, ...) {
 #' x <- as.matrix(x)
 #' stat_adj_l <- createStatisticalAdjacencyList(x, c("pearson", "spearman"))
 #' consensusAdjacency(stat_adj_l)
+#' 
 #' @export
 consensusAdjacency <- function(l, threshold = 1, ...) {
     
