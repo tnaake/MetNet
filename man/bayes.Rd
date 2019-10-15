@@ -2,39 +2,60 @@
 % Please edit documentation in R/statistical.R
 \name{bayes}
 \alias{bayes}
-\title{Create an adjacency matrix based on constraint-based structure 
-learning algorithm}
+\title{Create an adjacency matrix based on score-based structure learning algorithm}
 \usage{
-bayes(x, ...)
+bayes(x, algorithm = "tabu", R = 100, ...)
 }
 \arguments{
-\item{x}{matrix, where columns are the samples and the rows are features 
+\item{x}{`matrix`, where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
-\item{...}{parameters passed to \code{fast.iamb}}
+\item{algorithm}{`character`, structure learning to be applied to the 
+bootstrap replicates (default is `"tabu"`)}
+
+\item{R}{`numeric`, number of bootstrap replicates}
+
+\item{...}{parameters passed to `boot.strength`}
 }
 \value{
-matrix, matrix with edges inferred from constraint-based structure 
-learning algorithm \code{fast.iamb}
+`matrix` with edges inferred from score-based structure 
+learning algorithm `boot.strength`
 }
 \description{
-\code{bayes} infers an adjacency matrix using 
-constraint-based structure learning algorithm \code{fast.iamb} from the 
-\code{bnlearn} package. \code{bayes} extracts then the reported 
-connections from running the \code{fast.iamb} function and assigns the
-arcs of the discrete Bayesian connections to binary values. The 
-adjacency matrix is returned by \code{bayes}.
+`bayes` infers an adjacency matrix using score-based structure learning 
+algorithm `boot.strength` from the 
+`bnlearn` package. `bayes` extracts then the reported 
+connections from running the `boot.strength` function and assigns the
+strengths of the arcs of the Bayesian connections to an adjacency matrix. 
+The weighted adjacency matrix is returned by `bayes`.
 }
 \details{
-For use of the parameters used in the \code{fast.iamb} function, 
-refer to ?bnlearn::fast.iamb.
+`boot.strength` measures the strength of the 
+probabilistic relationnships by the arcs of a Bayesian network, as learned 
+from bootstrapped data. By default `bayes` uses the 
+Tabu search greedy search.
+
+For use of the parameters used in the `boot.strength` function, 
+refer to `?bnlearn::boot.strength`. For further information see also 
+Friedman et al. (1999) and Scutari and Nagarajan (2001).
 }
 \examples{
 data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-bayes(x)
+bayes(x, algorithm = "tabu", R = 100)
+
+}
+\references{
+Friedman et al. (1999): Data Analysis with Bayesian Networks: A Bootstrap 
+Approach. Proceedings of the 15th Annual Conference on Uncertainty in 
+Artificial Intelligence, 196–201.
+
+Scutari and Nagarajan (2011): On Identifying Significant Edges in Graphical 
+Models. Proceedings of the Workshop 'Probabilistic Problem Solving in
+Biomedicine' of the 13th Artificial Intelligence in Medicine Conference, 
+15–27.
 }
 \author{
-Thomas Naake, \email{thomasnaake @googlemail.com}
+Thomas Naake, \email{thomasnaake@googlemail.com}
 }

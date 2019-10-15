@@ -48,8 +48,8 @@ functional_groups <- rbind(
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
 functional_groups <- data.frame(group = functional_groups[, 1],
-                                formula = functional_groups[, 2],
-                                mass = as.numeric(functional_groups[, 3]))
+     formula = functional_groups[, 2],
+     mass = as.numeric(functional_groups[, 3]))
 struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
 stat_adj <- createStatisticalAdjacency(x_test, 
     model = c("pearson", "spearman", "bayes"), 

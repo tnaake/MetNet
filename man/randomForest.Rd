@@ -2,46 +2,37 @@
 % Please edit documentation in R/statistical.R
 \name{randomForest}
 \alias{randomForest}
-\title{Create a adjacency matrix based on random forest}
+\title{Create an adjacency matrix based on random forest}
 \usage{
-randomForest(x, parallel = FALSE, randomForest_adjust = "none", ...)
+randomForest(x, ...)
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
-\item{parallel}{logical, should computation be parallelized? If 
-\code{parallel = TRUE} the \code{bplapply} will be applied if 
-\code{parallel = FALSE} the \code{lapply} function will be applied.}
-
-\item{randomForest_adjust}{character, correction method for p-values from
-\code{rp.importance}, \code{randomForest_adjust} will be passed to the 
-\code{p.adjust} function and should be one of "holm", "hochberg", "hommel", 
-"bonferroni", "BH", "BY", "fdr", "none"}
-
-\item{...}{parameters passed to \code{rfPermute.default}}
+\item{...}{parameters passed to `GENIE3`}
 }
 \value{
-matrix, matrix with edges inferred from random forest algorithm 
-\code{rfPermute} and \code{rp.importance}
+matrix, matrix with the importance of the links inferred from 
+random forest algorithm implemented by `GENIE3`
 }
 \description{
-\code{randomForest} infers an adjacency matrix using 
-random forest using the \code{rfPermute} function from the 
-\code{rfPermute} package. \code{randomForest} extracts the p-values  
-by the function \code{rp.importance} and writes the presence/absence based 
-on the significance value (\eqn{\alpha \leq 0.05}) of this 
-connection to a matrix. The adjacency matrix is returned.
+`randomForest` infers an adjacency matrix using 
+random forest using the `GENIE3` function from the 
+`GENIE3` package. `randomForest` returns the importance of the link
+between features in the form of an adjacency matrix.
 }
 \details{
-For use of the parameters used in the \code{rfPermute} function, 
-refer to ?rfPermute::rfPermute.default.
+For use of the parameters used in the `GENIE3` function, 
+refer to `?GENIE3::GENIE3`. The arguments `regulators` and `targets` are
+set to `NULL`. Element \eqn{w_{i,j}} (row i, column j) gives the importance
+of the link from i to j.
 }
 \examples{
 data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-\dontrun{randomForest(x)}
+randomForest(x)
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

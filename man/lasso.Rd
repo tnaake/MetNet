@@ -2,7 +2,7 @@
 % Please edit documentation in R/statistical.R
 \name{lasso}
 \alias{lasso}
-\title{Create a adjacency matrix based on LASSO}
+\title{Create an adjacency matrix based on LASSO}
 \usage{
 lasso(x, parallel = FALSE, ...)
 }
@@ -11,32 +11,33 @@ lasso(x, parallel = FALSE, ...)
 (metabolites), cell entries are intensity values}
 
 \item{parallel}{logical, should computation be parallelized? If 
-\code{parallel = TRUE} the \code{bplapply} will be applied if 
-\code{parallel = FALSE} the \code{lapply} function will be applied.}
+`parallel = TRUE` the `bplapply` will be applied if 
+`parallel = FALSE` the `lapply` function will be applied.}
 
-\item{...}{parameters passed to \code{stabsel.matrix}}
+\item{...}{parameters passed to `stabsel.matrix`}
 }
 \value{
 matrix, matrix with edges inferred from LASSO algorithm 
-\code{stabsel.matrix}
+`stabsel.matrix`
 }
 \description{
-\code{lasso} infers a adjacency matrix using 
-LASSO using the \code{stabsel.matrix} function from the 
-\code{stabs} package. \code{lasso} extracts the  predictors from the 
-function \code{stabsel.matrix} and writes the presence/absence 
-of this connection to a matrix that is returned.
+`lasso` infers a adjacency matrix using 
+LASSO using the `stabsel.matrix` function from the 
+`stabs` package. `lasso` extracts the  predictors from the 
+function `stabsel.matrix` and writes the coefficients 
+to an adjacency matrix.
 }
 \details{
-For use of the parameters used in the \code{stabsel.matrix} function, 
-refer to ?stabs::stabsel.matrix.
+For use of the parameters used in the `stabsel.matrix` function, 
+refer to `?stabs::stabsel.matrix`.
 }
 \examples{
 data("x_test", package = "MetNet")
-x <- x_test[, 3:dim(x_test)[2]]
+x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-\dontrun{lasso(x_z, PFER = 0.75, cutoff = 0.95)}
+\dontrun{lasso(x_z, PFER = 0.95, cutoff = 0.95)}
+
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

@@ -5,36 +5,36 @@
 \title{Create an adjacency matrix based on context likelihood or 
 relatedness network}
 \usage{
-clr(mi, clr_threshold = 0)
+clr(mi)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
 (metabolites), cell entries are mutual information values between the 
 features. As input, the mutual information (e.g. raw MI estimates or 
-Jackknife bias corrected MI estimates) from the \code{cmi} function of the
-\code{mpmi} package can be used.}
-
-\item{clr_threshold}{numeric, if the clr value exceeds the threshold 
-(clr$_{i,j}$ > threshold, where clr$_{i, j}$ is the clr value of the ith row 
-feature and of the jth column feature), the connection is defined as 
-present, if the clr value is lower than the threshold value 
-(clr$_{i,j}$ \eqn{\leq} threshold)
-there is no statistical connection reported.}
+Jackknife bias corrected MI estimates) from the `cmi` function of the
+`mpmi` package can be used.}
 }
 \value{
-matrix, matrix with edges inferred from Context Likelihood or 
-Relatedness Network algorithm \code{clr}
+matrix, matrix with edges inferred from Context Likelihood of
+Relatedness Network algorithm `clr`
 }
 \description{
-\code{clr} infers an adjacency matrix using 
-context likelihood/relatedness network using the \code{clr} function from 
-the \code{parmigene} package. The presence/absence is based on if the 
-returned value exceeds a user-defined threshold value. \code{clr} will 
-return the adjacency matrix containing the presence/absence value.
+`clr` infers an adjacency matrix using 
+context likelihood/relatedness network using the `clr` function from 
+the `parmigene` package. `clr` will 
+return the adjacency matrix containing the Context Likelihood of 
+Relatedness Network-adjusted scores of Mutual
+Information values.
 }
 \details{
-For more details on the \code{clr} function, 
-refer to ?parmigene::clr.
+For more details on the `clr` function, 
+refer to `?parmigene::clr`. CLR computes the score 
+\eqn{sqrt(z_i ^2 + z_j ^2)} for each pair of variables i, j, where 
+\eqn{z_i = max(0, ( I(X_i, X_j) - mean(X_i) ) / sd(X_i) )}. 
+\eqn{mean(X_i)} and \eqn{sd(X_i)} are the mean and standard deviation of the 
+mutual information values \eqn{I(X_i, X_k)} for all \eqn{k = 1, ..., n}.  
+For more information on the CLR algorithm 
+see Faith et al. (2007).
 }
 \examples{
 data("x_test", package = "MetNet")
@@ -43,7 +43,14 @@ x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
 clr(mi_x_z, clr_threshold = 0)
+
+}
+\references{
+Faith et al. (2007): Large-Scale Mapping and Validation of Escherichia coli 
+Transcriptional Regulation from a Compendium of Expression Profiles.
+PLoS Biology, e8, doi: 
+[10.1371/journal.pbio.0050008]( https://doi.org/10.1371/journal.pbio.0050008)
 }
 \author{
-Thomas Naake, \email{thomasnaake @googlemail.com}
+Thomas Naake, \email{thomasnaake@googlemail.com}
 }

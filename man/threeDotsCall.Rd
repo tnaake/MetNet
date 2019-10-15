@@ -8,23 +8,25 @@ call the function with the checked arguments}
 threeDotsCall(fun, ...)
 }
 \arguments{
-\item{fun}{function to check for arguments and to call}
+\item{fun}{`function` to check for arguments and to call}
 
-\item{...}{arguments to be tested to be passed to fun}
+\item{...}{arguments to be tested to be passed to `fun`}
 }
 \value{
-Function call with passed arguments
+Returned object given the function call with passed arguments
 }
 \description{
-The function \code{threeDotsCall} gets the formal arguments
-of a function \code{fun} and checks if the passed arguments \code{...} 
-matches the formal arguments. \code{threeDotsCall} will remove 
-duplicated arguments. \code{threeDotsCall} will call the function 
-\code{fun} with the filtered arguments and will return the result.
+The function `threeDotsCall` gets the formal arguments
+of a function `fun` and checks if the passed arguments `...` 
+matches the formal arguments. `threeDotsCall` will call the function 
+`fun` with the filtered arguments and will return the result of the function
+call and the given arguments.
 }
 \details{
-Used internally in \code{lasso}, \code{randomForest},
-\code{correlation}, \code{bayes}, \code{consensusAdjacency}
+Used internally in `lasso`, `randomForest`, `bayes`, 
+`statistical` and `threshold`.
+
+`threeDotsCall` will not remove duplicated arguments and throw an error.
 }
 \examples{
 MetNet:::threeDotsCall(stats::sd, x = 1:10, y = 1:10)

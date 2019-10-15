@@ -5,38 +5,34 @@
 \title{Create an adjacency matrix based on algorithm for the reconstruction
 of accurate cellular networks}
 \usage{
-aracne(mi, eps = 0.05, aracne_threshold = 0)
+aracne(mi, eps = 0.05)
 }
 \arguments{
 \item{mi}{matrix, where columns and the rows are features 
 (metabolites), cell entries are mutual information values between the 
 features. As input, the mutual information (e.g. raw MI estimates or 
-Jackknife bias corrected MI estimates) from the \code{cmi} function of the
-\code{mpmi} package can be used.}
+Jackknife bias corrected MI estimates) from the `cmi` function of the
+`mpmi` package can be used.}
 
 \item{eps}{numeric, used to remove the weakest edge of each triple of nodes}
-
-\item{aracne_threshold}{numeric, if the aracne value exceeds the threshold 
-(aracne$_{i,j}$ > threshold, where aracne$_{i, j}$ is the aracne value of 
-the ith row feature and of the jth column feature), the connection is 
-defined as present, if the aracne value is lower than the threshold value 
-(aracne$_{i,j}$ <=  threshold) there is no statistical connection reported.}
 }
 \value{
 matrix, matrix with edges inferred from Reconstruction of accurate
-cellular networks algorithm \code{aracne}
+cellular networks algorithm `aracne.a`
 }
 \description{
-\code{.information} infers an adjacency matrix using 
+`aracne` infers an adjacency matrix using 
 the algorithm for the reconstruction of accurate cellular networks 
-using the \code{aracne.a} function from the 
-\code{parmigene} package. The presence/absence is based on if the 
-returned value exceeds a user-defined threshold value. \code{aracne} will 
-return the adjacency matrix containing the presence/absence value.
+using the `aracne.a` function from the 
+`parmigene` package. The function `aracne` will return the weighted 
+adjacency matrix of the inferred network after applying `aracne.a`.
 }
 \details{
-For more details on the \code{aracne.a} function, 
-refer to ?parmigene::aracne.a.
+For more details on the `aracne.a` function, 
+refer to `?parmigene::aracne.a`. `aracne.a` considers each triple of 
+edges independently and removes the weakest one if 
+\eqn{MI(i, j) < MI(j, k) - eps} and \eqn{MI(i, j) < MI(i, k) - eps}. See 
+Margolin et al. (2006) for further information.
 }
 \examples{
 data("x_test", package = "MetNet")
@@ -45,7 +41,14 @@ x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 mi_x_z <- mpmi::cmi(x_z)$bcmi
 aracne(mi_x_z, eps = 0.05, aracne_threshold = 0)
+
+}
+\references{
+Margolin et al. (2006): ARACNE : An algorithm for the reconstruction of 
+gene regulatory networks in a mammalian cellular context. BMC Bioinformatics,
+S7, doi: 
+[10.1186/1471-2105-7-S1-S7](https://doi.org/10.1186/1471-2105-7-S1-S7)
 }
 \author{
-Thomas Naake, \email{thomasnaake @googlemail.com}
+Thomas Naake, \email{thomasnaake@googlemail.com}
 }
