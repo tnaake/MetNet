@@ -396,7 +396,8 @@ Pearson and Spearman correlation using the intensity values as input data.
 The p-values that will be used for assigning edges in the unweighted 
 adjacency matrix will be adjusted by the Benjamini \& Hochberg (False Discovery 
 rate) method and the default q-value of 0.05. 
-<<statistical,eval=TRUE,echo=TRUE>>=
+<<statistical,eval=FALSE,echo=TRUE>>=
+#######################################################################################
 x_int <- x_test[,3:dim(x_test)[2]]
 stat_adj <- createStatisticalAdjacency(x_int, 
                 model=c("pearson", "spearman"), correlation_adjust="BH")
@@ -405,7 +406,8 @@ stat_adj <- createStatisticalAdjacency(x_int,
 To create the same adjacency matrix without using the wrapper function, one can
 call the two functions \Rfunction{createStatisticalAdjacencyList} and 
 \Rfunction{consensusAdjacency} individually: 
-<<statistical_stepwise,eval=TRUE,echo=TRUE>>= 
+<<statistical_stepwise,eval=FALSE,echo=TRUE>>= 
+#######################################################################################
 l <- createStatisticalAdjacencyList(x_int, 
     model=c("pearson", "spearman"), correlation_adjust="BH")
 stat_adj <- consensusAdjacency(l=l)
@@ -426,7 +428,8 @@ if another \Rcode{method} than \Rcode{"central.graph"} in
 \Rfunction{createStatisticalAdjacency}/\Rfunction{consensusAdjacency} is 
 used. 
 
-<<combine,eval=TRUE,echo=TRUE>>=
+<<combine,eval=F,echo=TRUE>>=
+###################################################################################
 cons_adj <- combine(structure=struct_adj, statistical=stat_adj)
 @
 
@@ -437,19 +440,20 @@ tool after exporting the consensus matrix as a text file. In this example
 We will use the \CRANpkg{igraph} \cite{Csardi2006} package to visualize the 
 adjacency matrix. 
 
-<<visualisation,eval=TRUE,echo=TRUE,fig.show='hide'>>=
+<<visualisation,eval=F,echo=TRUE,fig.show='hide'>>=
+###################################################################################
 g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode="undirected")
 plot(g, edge.width=5, vertex.label.cex=0.5, edge.color="grey")
 @
 
-\begin{figure}[t!]
-    \center
-    \includegraphics{./figure/visualisation-1}
-    \caption{\textbf{\textit{Ab initio} network inferred from structural 
-    and quantitative mass spectrometry data.} Verteces are connected 
-    that are separated by given metabolic transformation and statistical 
-    association.}
-\end{figure}
+% \begin{figure}[t!] %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     \center
+%     \includegraphics{./figure/visualisation-1}
+%     \caption{\textbf{\textit{Ab initio} network inferred from structural 
+%     and quantitative mass spectrometry data.} Verteces are connected 
+%     that are separated by given metabolic transformation and statistical 
+%     association.}
+% \end{figure}
 
 Furthermore, the network can be analysed by network analysis techniques
 (topological parameters such as centrality, degree, clustering indices) that 
