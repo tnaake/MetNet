@@ -375,23 +375,23 @@ test_threshold <- function() {
     
     ## check args for top1, top2, mean
     checkException(threshold(stat_adj_l, type = "top1", args = list(x = 1)),
-        msg = "does not contain the entry `n` of length 1")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "top2", args = list(x = 1)),
-        msg = "does not contain the entry `n` of length 1")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "mean", args = list(x = 1)),
-        msg = "does not contain the entry `n` of length 1")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "top1", args = list(n = 1:2)),
-        msg = "does not contain the entry `n` of length 1")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "top2", args = list(n = 1:2)),
-        msg = "does not contain the entry `n` of length 1")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "mean", args = list(n = 1:2)),
-        msg = "does not contain the entry `n` of length 1")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "top1", args = list(n = "a")),
-        msg = "NA/NaN argument")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "top2", args = list(n = "a")),
-        msg = "NA/NaN argument")
+        msg = "does not contain the numeric entry `n` of length 1")
     checkException(threshold(stat_adj_l, type = "mean", args = list(n = "a")),
-        msg = "NA/NaN argument")
+        msg = "does not contain the numeric entry `n` of length 1")
     
     ## check output
     checkTrue(is.matrix(thr_thr))
@@ -411,7 +411,7 @@ test_threshold <- function() {
     checkEquals(rownames(thr_mean), c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
     checkEquals(colnames(thr_mean), c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
     checkEquals(sum(thr_thr), 30)
-    checkEquals(sum(thr_top1), 12)
+    checkEquals(sum(thr_top1), 10)
     checkEquals(sum(thr_top2), 8)
     checkEquals(sum(thr_mean), 10)
     checkTrue(all(thr_thr %in% c(0, 1)))

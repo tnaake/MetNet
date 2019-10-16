@@ -844,7 +844,7 @@ threshold <- function(statistical, type, args, ...) {
     if (type %in% c("top1", "top2", "mean")) {
         if (! ("n"  %in% names(args) && length(args$n) == 1 && 
             is.numeric(args$n)) )
-            stop("args does not contain the entry `n` of length 1")
+            stop("args does not contain the numeric entry `n` of length 1")
     }
     
     if (type == "threshold") {
@@ -988,7 +988,7 @@ topKnet <- function(ranks, type) {
     ## depending on the type argument
     if (type == "top1") {
         ## get the lowest rank
-        cons_val <- apply(ranks, 1, min, na.rm = TRUE)
+        cons_val <- apply(ranks, 1, min, na.rm =TRUE)
     }
     if (type == "top2") {
         
@@ -999,14 +999,9 @@ topKnet <- function(ranks, type) {
         }
         
         ## get the second lowest rank (only if there are at least two or more
-        ## non-NA values, otherwise return NA)
-        cons_val <- apply(ranks, 1, function(x) {
-            if (sum(!is.na(x)) > 1) {
-                sort(x)[2]
-            } else {
-                NA
-            }
-        })
+        ## non-NA values, otherwise return NA --> sort(x)[2] will return
+        ## NA if there are less elements)
+        cons_val <- apply(ranks, 1, function(x) sort(x)[2]) 
     }
     if (type == "mean") {
         ## get the average of all ranks
