@@ -283,7 +283,7 @@ data by creating the \Robject{transformations} object.
 ## define the search space for biochemical transformation 
 transformations <- rbind(
     c("Hydroxylation (-H)", "O", 15.9949146221, "-"),
-    c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "?"),
+    c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "+"),
     c("D-ribose (-H2O) (ribosylation)", "C5H8O4", 132.0422587452, "-"),
     c("C6H10O6", "C6H10O6", 178.0477380536, "-"),
     c("Rhamnose (-H20)", "C6H10O4", 146.057910, "-"),

@@ -10,7 +10,7 @@ mat_test <- cbind(mz = mz, rt = rt, mat_test)
 
 ## transformations object for structual calculation
 transformations <- rbind(
-    c("Malonyl group (–H2O)", "C3H2O3", 86.0003939305, "?"),
+    c("Malonyl group (–H2O)", "C3H2O3", 86.0003939305, "+"),
     c("Monosaccharide (–H2O)", "C6H10O5", 162.0528234315, "-"))
 transformations <- data.frame(group = transformations[, 1],
                             formula = transformations[, 2],
