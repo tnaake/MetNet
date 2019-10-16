@@ -141,7 +141,7 @@ randomForest <- function(x, ...) {
     ## GENIE3 returns the importance of the link from "regulator gene" i to 
     ## target gene "j" in the form of a weighted adjacency matrix
     ## set regulators and targets to NULL that they cannot be changed
-    rf <- threeDotsCall(GENIE3, exprMatrix = x, regulators = NULL, 
+    rf <- threeDotsCall(GENIE3::GENIE3, exprMatrix = x, regulators = NULL, 
         targets = NULL, ...)
     
     return(rf)
