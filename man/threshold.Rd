@@ -74,7 +74,7 @@ threshold(statistical = l, type = "threshold", args = args)
 
 ## type = "top1" 
 args <- list(n = 40)
-threshold(statistical = l, type = "top2", args = args)
+threshold(statistical = l, type = "top1", args = args)
 
 ## type = "top2"
 threshold(statistical = l, type = "top2", args = args)
