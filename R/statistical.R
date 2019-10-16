@@ -998,7 +998,8 @@ topKnet <- function(ranks, type) {
             stop("ncol(ranks) has to be > 1")
         }
         
-        ## get the second lowest rank
+        ## get the second lowest rank (only if there are at least two or more
+        ## non-NA values, otherwise return NA)
         cons_val <- apply(ranks, 1, function(x) {
             if (sum(!is.na(x)) > 1) {
                 sort(x)[2]
