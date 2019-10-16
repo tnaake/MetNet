@@ -1,13 +1,12 @@
-#' @name createStructuralAdjacency
-#' @aliases createStructuralAdjacency
+#' @name structural
+#' @aliases structural
 #' @title Create adjacency matrix based on m/z (molecular weight) difference
-#' @description The function \code{createStructuralAdjacency} infers an 
+#' @description The function \code{structural} infers an 
 #' adjacency matrix using differences in m/z values that are matched against a 
 #' \code{data.frame} of theoretically calculated differences of 
-#' loss/addition of functional groups. \code{createStructuralAdjacency} returns 
+#' loss/addition of functional groups. \code{structural} returns 
 #' the unweighted adjacency matrix together with a character matrix with the 
 #' type of loss/addition as a list at the specific positions.  
-#' @usage createStructuralAdjacency(x, transformation, ppm = 5)
 #' @param x matrix, where columns are the samples and the rows are features 
 #' (metabolites), cell entries are intensity values, \code{x} contains the 
 #' column \code{'mz'} that has the m/z information (numerical values) for the 
@@ -16,7 +15,7 @@
 #' and \code{'mass'} that will be used for detection of transformation of 
 #' (functional) groups
 #' @param ppm numeric, mass accuracy of m/z features in parts per million (ppm)
-#' @details \code{createStructuralAdjacency} accesses the column \code{'mz'} of 
+#' @details \code{structural} accesses the column \code{'mz'} of 
 #' \code{x} to infer structural topologies based on the functional groups 
 #' supplied by \code{transformation}. To account for the mass accuracy of 
 #' the dataset \code{x}, the user can specify the accuracy of m/z features 
@@ -42,9 +41,9 @@
 #' transformation <- data.frame(group = transformation[,1],
 #'                                 formula = transformation[,2],
 #'                                 mass = as.numeric(transformation[,3]))
-#' struct_adj <- createStructuralAdjacency(x_test, transformation, ppm = 5)
+#' struct_adj <- structural(x_test, transformation, ppm = 5)
 #' @export
-createStructuralAdjacency <- function(x, transformation, ppm = 5) {
+structural <- function(x, transformation, ppm = 5) {
     
     if (!is.data.frame(transformation))
         stop("transformation is not a data.frame")
@@ -109,9 +108,8 @@ createStructuralAdjacency <- function(x, transformation, ppm = 5) {
 #' liquid chromatography system). If the connection for the metabolite does not
 #' fit the expected behaviour, the connection will be removed (otherwise 
 #' sustained). 
-#' @usage rtCorrection(struct_adj, x, transformation)
-#' @param struct_adj list returned by the function 
-#' \code{createStructuralAdjacency}, in the first list entry the 
+#' @param structural list returned by the function 
+#' \code{structural}, in the first list entry the 
 #' matrix with edges inferred mass differences is stored, in the second list 
 #' entry the matrix with the type (corresponding to the \code{'group'} column
 #' in \code{transformation}) is stored
@@ -125,13 +123,13 @@ createStructuralAdjacency <- function(x, transformation, ppm = 5) {
 #' (functional) groups based on retention time shifts derived from 
 #' \code{x}
 #' @details \code{rtCorrection} is used to correct the adjacency matrix 
-#' returned by \code{createStructuralAdjacency} when information is available
+#' returned by \code{structural} when information is available
 #' about the retention time and shifts when certain transformation occur
 #' (it is meant to filter out connections that were created by 
 #' m/z differences that have by chance the same m/z difference but 
 #' different/unexpected retention time behaviour). #' 
 #' \code{rtCorrection} accesses the second list element of 
-#' \code{struct_adj} and matches the elements in the \code{'group'} column 
+#' \code{structural} and matches the elements in the \code{'group'} column 
 #' against the character matrix. In case of matches, \code{rtCorrection} 
 #' accesses the \code{'rt'} column of \code{x} and calculates the retention 
 #' time difference between the features. \code{rtCorrection} then checks 
@@ -164,20 +162,20 @@ createStructuralAdjacency <- function(x, transformation, ppm = 5) {
 #'                                 formula = transformation[,2],
 #'                                 mass = as.numeric(transformation[,3]),
 #'                                 rt = transformation[,4])
-#' struct_adj <- createStructuralAdjacency(x_test, transformation, ppm = 5)
+#' struct_adj <- structural(x_test, transformation, ppm = 5)
 #' struct_adj_rt <- rtCorrection(struct_adj, x_test, transformation)
 #' @export
-rtCorrection <- function(struct_adj, x, transformation) {
+rtCorrection <- function(structural, x, transformation) {
     
     ## check arguments 
-    if (!is.list(struct_adj)) stop("struct_adj is not a list")
-    if (!length(struct_adj) == 2) stop("struct_adj is not a list of length 2")
-    ## allocate struct_adj[[1]] and struct_adj[[2]] to adj and group
-    adj <- struct_adj[[1]]
-    group <- struct_adj[[2]]
+    if (!is.list(structural)) stop("structural is not a list")
+    if (!length(structural) == 2) stop("structural is not a list of length 2")
+    ## allocate structural[[1]] and structural[[2]] to adj and group
+    adj <- structural[[1]]
+    group <- structural[[2]]
     
     if (any(dim(adj) != dim(group))) 
-        stop("dim(struct_adj[[1]] is not equal to dim(struct_adj[[2]]")
+        stop("dim(structural[[1]] is not equal to dim(structural[[2]]")
     if (!"rt" %in% colnames(x)) stop("x does not contain the column rt")
     if (!"group" %in% colnames(transformation))
         stop("transformation does not contain the column group")
@@ -189,20 +187,20 @@ rtCorrection <- function(struct_adj, x, transformation) {
         stop('in transformation[, "rt"] does contain other levels than 
                 "+", "-" or "?"' )
     if (!all(colnames(adj) == rownames(adj)))
-        stop("colnames of struct_adj[[1]] is not identical to rownames of 
-                struct_adj[[1]]")
-    if (!all(colnames(struct_adj[[2]]) == rownames(struct_adj[[2]])))
-        stop("colnames of struct_adj[[2]] is not identical to 
-                rownames of struct_adj[[2]]")
-    if (!all(rownames(struct_adj[[1]]) %in% rownames(x)))
-        stop("rownames(struct_adj[[1]]) do not fit rownames(x) ")
-    if (!all(colnames(struct_adj[[1]]) %in% rownames(x))) 
-        stop("colnames(struct_adj[[1]]) do not fit rownames(x)")
-    if (!is.matrix(adj)) stop("struct_adj[[1]] is not a matrix")
-    if (!is.matrix(group)) stop("struct_adj[[2]] is not a matrix")
-    if (!is.numeric(adj)) stop("struct_adj[[1]] is not a numeric matrix")
+        stop("colnames of structural[[1]] is not identical to rownames of 
+                structural[[1]]")
+    if (!all(colnames(structural[[2]]) == rownames(structural[[2]])))
+        stop("colnames of structural[[2]] is not identical to 
+                rownames of structural[[2]]")
+    if (!all(rownames(structural[[1]]) %in% rownames(x)))
+        stop("rownames(structural[[1]]) do not fit rownames(x) ")
+    if (!all(colnames(structural[[1]]) %in% rownames(x))) 
+        stop("colnames(structural[[1]]) do not fit rownames(x)")
+    if (!is.matrix(adj)) stop("structural[[1]] is not a matrix")
+    if (!is.matrix(group)) stop("structural[[2]] is not a matrix")
+    if (!is.numeric(adj)) stop("structural[[1]] is not a numeric matrix")
     if (!is.character(group)) 
-        stop("struct_adj[[2]] is not a character matrix")
+        stop("structural[[2]] is not a character matrix")
     
     mat_rt <- matrix(0, nrow = nrow(adj), ncol = ncol(adj))
     colnames(mat_rt) <- rownames(mat_rt) <- x[rownames(adj), "rt"]

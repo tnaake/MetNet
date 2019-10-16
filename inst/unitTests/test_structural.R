@@ -17,16 +17,16 @@ transformations <- data.frame(group = transformations[, 1],
                             mass = as.numeric(transformations[, 3]),
                             rt = transformations[,4])
 
-## START unit test createStructuralAdjacency ##
-struct_adj <- createStructuralAdjacency(mat_test,
+## START unit test structural ##
+struct_adj <- structural(mat_test,
         transformation = transformations, ppm = 5)
-test_createStructuralAdjacency <- function() {
-    checkException(createStructuralAdjacency(mat_test[, -1], transformations))
-    checkException(createStructuralAdjacency(NULL, transformations))
-    checkException(createStructuralAdjacency(mat_test, transformations[,-1]))
-    checkException(createStructuralAdjacency(mat_test, transformations[,-3]))
-    checkException(createStructuralAdjacency(mat_test, matrix()))
-    checkException(createStructuralAdjacency(mat_test, transformations,
+test_structural <- function() {
+    checkException(structural(mat_test[, -1], transformations))
+    checkException(structural(NULL, transformations))
+    checkException(structural(mat_test, transformations[,-1]))
+    checkException(structural(mat_test, transformations[,-3]))
+    checkException(structural(mat_test, matrix()))
+    checkException(structural(mat_test, transformations,
                                              ppm = "a"))
     checkEquals(length(struct_adj), 2)
     checkEquals(dim(struct_adj[[1]]), c(7, 7))
@@ -43,7 +43,7 @@ test_createStructuralAdjacency <- function() {
     checkTrue(is.numeric(struct_adj[[1]]))
     checkTrue(is.character(struct_adj[[2]]))
 }
-## END unit test createStructuralAdjacency ##
+## END unit test structural ##
 
 ## START unit test rtCorrection ##
 struct_adj_rt <- rtCorrection(struct_adj, mat_test, transformations)

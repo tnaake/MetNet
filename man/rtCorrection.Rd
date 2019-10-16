@@ -5,11 +5,11 @@
 \title{Correct connections in the structural adjacency matrix by 
 retention time}
 \usage{
-rtCorrection(struct_adj, x, transformation)
+rtCorrection(structural, x, transformation)
 }
 \arguments{
-\item{struct_adj}{list returned by the function 
-\code{createStructuralAdjacency}, in the first list entry the 
+\item{structural}{list returned by the function 
+\code{structural}, in the first list entry the 
 matrix with edges inferred mass differences is stored, in the second list 
 entry the matrix with the type (corresponding to the \code{'group'} column
 in \code{transformation}) is stored}
@@ -44,13 +44,13 @@ sustained).
 }
 \details{
 \code{rtCorrection} is used to correct the adjacency matrix 
-returned by \code{createStructuralAdjacency} when information is available
+returned by \code{structural} when information is available
 about the retention time and shifts when certain transformation occur
 (it is meant to filter out connections that were created by 
 m/z differences that have by chance the same m/z difference but 
 different/unexpected retention time behaviour). #' 
 \code{rtCorrection} accesses the second list element of 
-\code{struct_adj} and matches the elements in the \code{'group'} column 
+\code{structural} and matches the elements in the \code{'group'} column 
 against the character matrix. In case of matches, \code{rtCorrection} 
 accesses the \code{'rt'} column of \code{x} and calculates the retention 
 time difference between the features. \code{rtCorrection} then checks 
@@ -78,7 +78,7 @@ transformation <- data.frame(group = transformation[,1],
                                 formula = transformation[,2],
                                 mass = as.numeric(transformation[,3]),
                                 rt = transformation[,4])
-struct_adj <- createStructuralAdjacency(x_test, transformation, ppm = 5)
+struct_adj <- structural(x_test, transformation, ppm = 5)
 struct_adj_rt <- rtCorrection(struct_adj, x_test, transformation)
 }
 \author{
