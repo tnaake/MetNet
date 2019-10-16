@@ -988,7 +988,7 @@ topKnet <- function(ranks, type) {
     ## depending on the type argument
     if (type == "top1") {
         ## get the lowest rank
-        cons_val <- apply(ranks, 1, min)
+        cons_val <- apply(ranks, 1, min, na.rm = TRUE)
     }
     if (type == "top2") {
         
@@ -999,7 +999,13 @@ topKnet <- function(ranks, type) {
         }
         
         ## get the second lowest rank
-        cons_val <- apply(ranks, 1, function(x) sort(x)[2])
+        cons_val <- apply(ranks, 1, function(x) {
+            if (length(x) >= 2) {
+                sort(x)[2]
+            } else {
+                NA
+            }
+        })
     }
     if (type == "mean") {
         ## get the average of all ranks
