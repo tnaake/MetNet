@@ -218,20 +218,20 @@ We will load here the object \Robject{x\_test} that contains m/z values
 \Robject{x\_test} for guidance through the workflow of \Rpackage{MetNet}.
 
 <<data,eval=TRUE,echo=TRUE>>=
-data("x_test", package="MetNet")
+data("x_test", package = "MetNet")
 x_test <- as.matrix(x_test)
 @
 
 \section{Creating the structural matrix}
 
-The function \Rfunction{createStructuralAdjacency} will create the adjacency
+The function \Rfunction{structural} will create the adjacency
 matrix based on structual properties (m/z values) of the features.
 The function expects a matrix with a column \Rcode{"mz"} that contains the 
 mass information of a feature (typically the m/z value). Furthermore,
-\Rfunction{createStructuralAdjacency} takes a \Robject{data.frame}
+\Rfunction{structural} takes a \Robject{data.frame}
 object as argument \Robject{transformations} with the \Rcode{colnames}
 \Rcode{"mass"}, \Rcode{"name"} and additional columns (e.g. \Rcode{"formula"}). 
-\Rfunction{createStructuralAdjacency} looks for transformation (in the 
+\Rfunction{structural} looks for transformation (in the 
 sense of additions/losses of functional groups mediated by biochemical,
 enzymatic reactions) in the data using the mass information. \newline
 
@@ -251,9 +251,9 @@ between metabolic features.
 
 The search space for these transformation is adjustable by the 
 \Robject{transformation} argument in 
-\Rfunction{createStructuralAdjacency} allowing to look for specific 
+\Rfunction{structural} allowing to look for specific 
 enzymatic transformations in mind. Hereby,
-\Rfunction{createStructuralAdjacency} will take into account the 
+\Rfunction{structural} will take into account the 
 \Robject{ppm} value, to adjust for inaccuracies in m/z values due to technical 
 reasons according to the formula
 
@@ -273,7 +273,7 @@ connection (derived from the column \Rcode{"name"} in the
 \Robject{transformations}) will be written to a character matrix. These
 two matrices will be returned as a list (first entry: numerical adjacency
 matrix, second entry: character matrix) by the function
-\Rfunction{createStructuralAdjacency}. \newline
+\Rfunction{structural}. \newline
 
 Before calculating the structural matrix, one must define the search space, 
 i.e. these transformation that will be looked for in the mass spectrometric
@@ -297,20 +297,19 @@ transformations <- rbind(
     c("putrescine to spermidine (+C3H7N)", "C3H7N", 57.0578492299, "?"))
 
 ## convert to data frame
-transformations <- data.frame(group=transformations[,1],
-                            formula=transformations[,2],
-                            mass=as.numeric(transformations[,3]),
-                            rt=transformations[,4])
+transformations <- data.frame(group = transformations[, 1],
+                            formula = transformations[, 2],
+                            mass = as.numeric(transformations[, 3]),
+                            rt = transformations[, 4])
 @
 
-The function \Rfunction{createStructuralAdjacency} will then check for those 
+The function \Rfunction{structural} will then check for those 
 m/z differences that are stored in the column \Rcode{"mass"} in the 
 object \Robject{transformations}. To create the adjacency matrix derived 
 from these structural information we enter
 
 <<structure,eval=TRUE,echo=TRUE>>=
-struct_adj <- createStructuralAdjacency(x=x_test, 
-                                transformation=transformations, ppm=10)
+struct_adj <- structural(x = x_test, transformation = transformations, ppm = 10)
 @
 in the \R~console. 
 
@@ -337,22 +336,20 @@ of the transformation.
 To account for retention time shifts we enter
 
 <<rt_correction,eval=TRUE,echo=TRUE>>=
-struct_adj <- rtCorrection(struct_adj=struct_adj, 
-                                x=x_test, transformation=transformations)
+struct_adj <- rtCorrection(structural = struct_adj, 
+    x = x_test, transformation = transformations)
 @
 in the \R~console. 
 
 
 \section{Creating the statistical matrix}
 
-The function \Rfunction{createStatisticalAdjacency} will create the adjacency
-matrix based on statistical associations. 
-\Rfunction{createStatisticalAdjacency} is a wrapper function for the 
-functions \Rfunction{createStatisticalAdjacencyList} and 
-\Rfunction{consensusAdjacency}. The former function will create a 
-list of adjacency matrices using the statistical models defined by the 
+\subsection{Creating weighted adjacency matrices using \Rfunction{statistical}}
+The function \Rfunction{statistical} will create the adjacency
+matrix based on statistical associations. The function will create a 
+list of weighted adjacency matrices using the statistical models defined by the 
 \Robject{model} argument. Currently, the models LASSO (using \CRANpkg{stabs},
-\cite{Hofner2015,Thomas2017}), Random Forest (using \CRANpkg{rfPermute}, 
+\cite{Hofner2015,Thomas2017}), Random Forest (using \Rpackage{GENIE3}, 
 CLR, ARACNE (the two latter using the package \CRANpkg{mpmi} to calculate
 Mutual Information using a nonparametric bias correction by 
 Bias Corrected Mutual Information, and the functions \Rfunction{clr} and 
@@ -360,77 +357,115 @@ Bias Corrected Mutual Information, and the functions \Rfunction{clr} and
 Spearman correlation (based on the 
 \CRANpkg{WGCNA} package, \cite{Langfelder2008}), partial and semipartial 
 Pearson and Spearman correlation (using the \CRANpkg{ppcor} package) and 
-constraint-based structure 
-learning based on the Fast Incremental Association (Fast-IAMB, algorithm 
+score-based structure learning returning the strength of the probabilistic 
+relationships of the arcs of 
+a Bayesian network, as learned from bootstrapped data (using the 
+\Rfunction{boot.strength} with the Tabu greedy search as default
 from the \CRANpkg{bnlearn} package, \cite{Scutari2010}). 
 
 For further information on the different models 
 take a look on the respective help pages of \Rcode{lasso}, 
 \Rcode{randomForest}, \Rcode{clr}, \Rcode{aracne}, \Rcode{correlation} and/or 
 \Rcode{bayes}. Arguments that are accepted by the respective underlying 
-functions can be passed directly to the \Rfunction{createStatisticalAdjacency} 
-and \Rfunction{createStatisticalAdjacencyList} functions. In addition, 
+functions can be passed directly to the \Rfunction{statistical} 
+function. In addition, 
 arguments that are defined in the functions \Rcode{lasso}, 
 \Rcode{randomForest}, \Rcode{clr}, \Rcode{aracne}, \Rcode{correlation} and/or 
 \Rcode{bayes} can be passed to the functions. \newline
 
-From the list of adjacency matrices the function \Rfunction{consensusAdjacency}
-will create a consensus adjacency matrix using the employed statistical models.
+
+\subsection{Creating an unweighted adjacency matrix using \Rfunction{threshold}}
+
+From the list of adjacency matrices the function \Rfunction{threshold}
+will create a unweighted adjacency matrix from the weighted adjacency matrices
+unifying the information present from all statistical models. 
 The reasoning behind this step is to circumvent disadvantages arising from each 
 model and creating a statistically reliable topology that reflects the actual 
-metabolic relations. To calculate the consensus adjacency matrix, the 
-\Rfunction{consensus} function from the \CRANpkg{sna} \cite{Butts2016} is 
-employed. The arguments that are accepted by this function can be passed to the 
-\Rfunction{consensusAdjacency} and \Rfunction{createStatisticalAdjacency} 
-function, respectively. Furthermore, in case a method other than 
-\Rcode{"central.graph"} is used the argument \Robject{threshold} will define if 
-the value $a_{i,j}$ of the consensus adjacency matrix 
-will be reported as a connection in the returned matrix 
-(if $a_{i,j} \geq$ \Rcode{threshold})
-or not. \Rfunction{createStatisticalAdjacency} and 
-\Rfunction{consensusAdjacency} will return an unweighted adjancency matrix 
-with connections inferred from the respective models. \newline
+metabolic relations. \Rfunction{threshold} return an unweighted adjancency
+matrix with connections inferred from the respective models.
 
-In the following example, we will create a consensus adjacency matrix using 
+There are four different types implemented how the unweighted adjacency 
+matrix can be created: \Robject{threshold}, \Robject{top1}, \Robject{top2},
+\Robject{mean}. \newline
+
+For \Robject{type = "threshold"}, threshold values have to be defined for the 
+\Robject{args} argument for each respective statistical model, above or below 
+which 
+the each in each weighted adjacency matrix will be reported as a unweighted 
+each. The unweighted adjacency matrices will be passed to the  
+\Rfunction{consensus} function from the \CRANpkg{sna} \cite{Butts2016} 
+to calculate the unweighted consensus adjacency matrix. 
+The arguments that are accepted by this function can be passed to the 
+\Rfunction{threshold} 
+function. Furthermore, in \Robject{args} an entry \Robject{threshold} needs 
+to be defined to threshold if the value $a_{i,j}$ of the consensus adjacency 
+matrix will be reported as a connection in the returned matrix 
+(if $a_{i,j} \geq$ \Rcode{threshold}) or not. In the case of the method 
+\Rcode{"central.graph"} (default), the argument \Robject{threshold} should be 
+set to 1. \newline
+
+For the other three types (top1, top2, mean) the ranks per statistical model
+will be calculated and from each respective link the top1, top 2 or mean rank 
+across statistical models will be calculated (cf. \cite{Hase2013}). The 
+top n unqique ranks (defined by the entry n in \Robject{args}) will be returned
+as links in the unweighted consensus adjacency matrix. 
+
+In the following example, we will create a list of unweighted adjacency matrices 
+using 
 Pearson and Spearman correlation using the intensity values as input data. 
 The p-values that will be used for assigning edges in the unweighted 
 adjacency matrix will be adjusted by the Benjamini \& Hochberg (False Discovery 
-rate) method and the default q-value of 0.05. 
-<<statistical,eval=FALSE,echo=TRUE>>=
-#######################################################################################
-x_int <- x_test[,3:dim(x_test)[2]]
-stat_adj <- createStatisticalAdjacency(x_int, 
-                model=c("pearson", "spearman"), correlation_adjust="BH")
+rate) method. 
+<<statistical,eval=TRUE,echo=TRUE>>=
+x_int <- x_test[, 3:dim(x_test)[2]]
+x_int <- as.matrix(x_int)
+stat_adj_l <- statistical(x_int, model = c("pearson", "spearman"), 
+    correlation_adjust = "BH")
 @
 
-To create the same adjacency matrix without using the wrapper function, one can
-call the two functions \Rfunction{createStatisticalAdjacencyList} and 
-\Rfunction{consensusAdjacency} individually: 
-<<statistical_stepwise,eval=FALSE,echo=TRUE>>= 
-#######################################################################################
-l <- createStatisticalAdjacencyList(x_int, 
-    model=c("pearson", "spearman"), correlation_adjust="BH")
-stat_adj <- consensusAdjacency(l=l)
+\Rfunction{threshold} implements four types to obtain an unweighted adjacency
+matrix. We will create for all types the unweighted consensus adjacency 
+matrices.
+
+<<threshold,eval=TRUE,echo=TRUE>>= 
+## type = "threshold" 
+args_thr <- list("pearson" = 0.05, "spearman" = 0.05, threshold = 1)
+stat_adj_thr <- threshold(statistical = stat_adj_l, type = "threshold", 
+    args = args_thr)
+ 
+## type = "top1" 
+args_top <- list(n = 40)
+stat_adj_top1 <- threshold(statistical = stat_adj_l, type = "top2", 
+    args = args_top)
+
+## type = "top2"
+stat_adj_top2 <- threshold(statistical = stat_adj_l, type = "top2", 
+    args = args_top)
+ 
+## type = "mean"
+stat_adj_mean <- threshold(statistical = stat_adj_l, type = "mean", 
+    args = args_top)
 @
 
 \section{Combining the structural and statistical matrix}
-After creating the structural and statistical matrix, it is time to combine 
+After creating the unweighted structural and unweighted statistical adjacency 
+matrices, it is time to combine 
 these two matrices. The function \Rfunction{combine} 
 will combine the matrices to the consensus matrix. The function accepts 
 the arguments \Rcode{structure} and \Rcode{statistical} for the list returned 
-by \Rfunction{createStructuralAdjacency} and the matrix returned 
-by \Rfunction{createStatisticalAdjacency},
+by \Rfunction{structural} and the matrix returned 
+by \Rfunction{threshold},
 respectively, and the argument \Rcode{threshold}, that is a numerical value 
-(default=1). After adding the matrices, the entries will be checked if 
+(default = 1). After adding the matrices, the entries will be checked if 
 they are greater or equal than \Rcode{threshold} and 1 or 0 will be returned,
 respectively. The argument \Rcode{threshold} needs to be adjusted by the user 
 if another \Rcode{method} than \Rcode{"central.graph"} in 
-\Rfunction{createStatisticalAdjacency}/\Rfunction{consensusAdjacency} is 
-used. 
+\Rfunction{threshold} (type = "threshold") is used. 
 
-<<combine,eval=F,echo=TRUE>>=
-###################################################################################
-cons_adj <- combine(structure=struct_adj, statistical=stat_adj)
+We will use here the unweighted statistical adjacency matrix from 
+\Robject{type = "mean"}: 
+<<combine,eval=TRUE,echo=TRUE>>=
+cons_adj <- combine(structural = struct_adj, statistical = stat_adj_mean)
 @
 
 \section{Visualization and further analyses}
@@ -440,20 +475,24 @@ tool after exporting the consensus matrix as a text file. In this example
 We will use the \CRANpkg{igraph} \cite{Csardi2006} package to visualize the 
 adjacency matrix. 
 
-<<visualisation,eval=F,echo=TRUE,fig.show='hide'>>=
-###################################################################################
-g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode="undirected")
-plot(g, edge.width=5, vertex.label.cex=0.5, edge.color="grey")
+\Rfunction{combine} returns a list of two adjacency matrices, where the 
+first entry contains the unweighted adjacency matrix and the second entry 
+contains a matrix given information on the type of link between features
+based on structural information. Only the first entry of the list will be 
+given to the \Rfunction{graph\_from\_adjacency\_matrix} function: 
+<<visualisation,eval=TRUE,echo=TRUE,fig.show='hide'>>=
+g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode = "undirected")
+plot(g, edge.width = 5, vertex.label.cex = 0.5, edge.color = "grey")
 @
 
-% \begin{figure}[t!] %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     \center
-%     \includegraphics{./figure/visualisation-1}
-%     \caption{\textbf{\textit{Ab initio} network inferred from structural 
-%     and quantitative mass spectrometry data.} Verteces are connected 
-%     that are separated by given metabolic transformation and statistical 
-%     association.}
-% \end{figure}
+\begin{figure}[t!] 
+    \center
+    \includegraphics{./figure/visualisation-1}
+    \caption{\textbf{\textit{Ab initio} network inferred from structural
+    and quantitative mass spectrometry data.} Verteces are connected
+    that are separated by given metabolic transformation and statistical
+    association.}
+\end{figure}
 
 Furthermore, the network can be analysed by network analysis techniques
 (topological parameters such as centrality, degree, clustering indices) that 
@@ -570,9 +609,9 @@ transformations <- rbind(
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"),
     c("Cytosine (-H)", "C4H4N3O",  "110.0354367661"))
 
-transformations <- data.frame(name=transformations[,1], 
-            formula=transformations[,2],
-            mass=as.numeric(transformations[,3]))
+transformations <- data.frame(name = transformations[, 1], 
+            formula = transformations[, 2],
+            mass = as.numeric(transformations[, 3]))
 @
 
 \end{document}
