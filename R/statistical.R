@@ -701,7 +701,7 @@ statistical <- function(x, model, ...) {
 #' MetNet:::getLinks(mat, decreasing = TRUE)
 #' 
 #' @export
-getLinks <- function(mat, decreasing = TRUE, exclude = "== 0") {
+getLinks <- function(mat, decreasing = TRUE, exclude = "== 1") {
     
     if (ncol(mat) != nrow(mat)) {
         stop("`mat` is not a square matrix")
@@ -713,7 +713,6 @@ getLinks <- function(mat, decreasing = TRUE, exclude = "== 0") {
         exclude <- paste0("mat", exclude)
         mat[which(eval(parse(text = exclude)))] <- NaN    
     }
-    
     
     ## vectorize mat and write values of mat to confidence
     df <- data.frame(row = c(row(mat)), col = c(col(mat)), confidence = c(mat))
@@ -896,8 +895,8 @@ threshold <- function(statistical, type, args, ...) {
             if (grepl(name_x, pattern = "pearson|spearman")) {
                 ## for pearson/spearman correlation models (incl. partial and 
                 ## semi-partial), low values correspond to higher confidence
-                ## set values that are equal to 0 to NaN
-                getLinks(l_x, decreasing = FALSE, exclude = "== 0")   
+                ## set values that are equal to 1 to NaN
+                getLinks(l_x, decreasing = FALSE, exclude = "== 1")   
                 
             } else {
                 ## for lasso, randomForest, clr, aracne and bayes higher values 
