@@ -15,7 +15,7 @@ transformations <- rbind(
 transformations <- data.frame(group = transformations[, 1],
                             formula = transformations[, 2],
                             mass = as.numeric(transformations[, 3]),
-                            rt = transformations[,4])
+                            rt = transformations[, 4])
 
 ## START unit test structural ##
 struct_adj <- structural(mat_test,
@@ -59,8 +59,9 @@ test_rtCorrection <- function() {
     checkException(rtCorrection(struct_adj, mat_test[,-1], transformations))
     checkException(rtCorrection(struct_adj, mat_test[,-2], transformations))
     checkException(rtCorrection(struct_adj, mat_test, NULL))
-    checkException(rtCorrection(struct_adj, mat_test, transformations[,-1]))
-    checkException(rtCorrection(struct_adj, mat_test, transformations[,-4]))
+    checkException(rtCorrection(struct_adj, mat_test, transformations[, -1]))
+    checkException(rtCorrection(struct_adj, mat_test, transformations[, -3]))
+    checkException(rtCorrection(struct_adj, mat_test, transformations[, -4]))
     checkException(rtCorrection(struct_adj, mat_test,
         cbind(transformations[,-4], rt = rep("a", 4))))
     checkTrue(is.matrix(struct_adj_rt[[1]]))
@@ -73,5 +74,39 @@ test_rtCorrection <- function() {
     checkEquals(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[2]]))
     checkTrue(table(struct_adj_rt)[1] == 41)
     checkTrue(table(struct_adj_rt[[1]])[1] == 41)
+    
+    ## dims of struct_adj[[1]] and struct[[2]], rownames/colnames
+    foo_1 <- struct_adj[[1]]
+    foo_2 <- struct_adj[[2]]
+    foo <- list(foo_1, foo_2[,1:6])
+    checkException(rtCorrection(foo, mat_test, transformations), 
+        msg = "dim(structural[[1]] is not equal to dim(structural[[2]])")
+    
+    rownames(foo_1)[1] <- "foo"
+    foo <- list(foo_1, foo_2)
+    checkException(rtCorrection(foo, mat_test, transformations), 
+        msg = "colnames of structural[[1]] are not identical to rownames of ")
+    
+    foo_1 <- struct_adj[[1]]
+    rownames(foo_2)[1] <- "foo"
+    foo <- list(foo_1, foo_2)
+    checkException(rtCorrection(foo, mat_test, transformations), 
+        msg = "colnames of structural[[2]] are not identical to rownames of ")
+    
+    foo_2 <- struct_adj[[2]]
+    foo <- list(foo_1, foo_2)
+    checkException(rtCorrection(foo, mat_test[1:6,], transformations), 
+                   msg = "rownames(structural[[1]]) do not fit rownames(x)")
+    
+    foo_1 <- as.data.frame(struct_adj[[1]])
+    foo <- list(foo_1, foo_2)
+    checkException(rtCorrection(foo, mat_test, transformations), 
+                   msg = "structural[[1]]) is not a numeric matrix")
+    
+    foo_1 <- struct_adj[[1]]
+    foo_2 <- as.data.frame(struct_adj[[2]])
+    foo <- list(foo_1, foo_2)
+    checkException(rtCorrection(foo, mat_test, transformations), 
+                   msg = "structural[[2]]) is not a character matrix")
 }
 ## END unit test rtCorrection ##

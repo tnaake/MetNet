@@ -175,31 +175,38 @@ rtCorrection <- function(structural, x, transformation) {
     group <- structural[[2]]
     
     if (any(dim(adj) != dim(group))) 
-        stop("dim(structural[[1]] is not equal to dim(structural[[2]]")
+        stop("dim(structural[[1]] is not equal to dim(structural[[2]])")
+    
     if (!"rt" %in% colnames(x)) stop("x does not contain the column rt")
+    
     if (!"group" %in% colnames(transformation))
         stop("transformation does not contain the column group")
+    
     if (!"rt" %in% colnames(transformation))
         stop("transformation does not contain the column rt")
+    
     if (!"mass" %in% colnames(transformation))
         stop("transformation does not contain the column mz")
+    
     if (!all(levels(transformation[, "rt"]) %in% c("+", "-", "?")))
         stop('in transformation[, "rt"] does contain other levels than 
                 "+", "-" or "?"' )
+    
     if (!all(colnames(adj) == rownames(adj)))
-        stop("colnames of structural[[1]] is not identical to rownames of 
+        stop("colnames of structural[[1]] are not identical to rownames of 
                 structural[[1]]")
-    if (!all(colnames(structural[[2]]) == rownames(structural[[2]])))
-        stop("colnames of structural[[2]] is not identical to 
+    
+    if (!all(colnames(group) == rownames(group)))
+        stop("colnames of structural[[2]] are not identical to 
                 rownames of structural[[2]]")
+    
     if (!all(rownames(structural[[1]]) %in% rownames(x)))
         stop("rownames(structural[[1]]) do not fit rownames(x) ")
-    if (!all(colnames(structural[[1]]) %in% rownames(x))) 
-        stop("colnames(structural[[1]]) do not fit rownames(x)")
-    if (!is.matrix(adj)) stop("structural[[1]] is not a matrix")
-    if (!is.matrix(group)) stop("structural[[2]] is not a matrix")
-    if (!is.numeric(adj)) stop("structural[[1]] is not a numeric matrix")
-    if (!is.character(group)) 
+    
+    if (!(is.matrix(adj) && is.numeric(adj)))
+        stop("structural[[1]] is not a numeric matrix")
+    
+    if (!(is.matrix(group) && is.character(group)))
         stop("structural[[2]] is not a character matrix")
     
     mat_rt <- matrix(0, nrow = nrow(adj), ncol = ncol(adj))
