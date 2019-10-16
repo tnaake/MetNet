@@ -1000,7 +1000,7 @@ topKnet <- function(ranks, type) {
         
         ## get the second lowest rank
         cons_val <- apply(ranks, 1, function(x) {
-            if (length(x) >= 2) {
+            if (sum(!is.na(x)) > 1) {
                 sort(x)[2]
             } else {
                 NA
