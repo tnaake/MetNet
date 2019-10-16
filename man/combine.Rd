@@ -4,10 +4,10 @@
 \alias{combine}
 \title{Combine structural and statistical adjacency matrix}
 \usage{
-combine(structure, statistical, threshold = 1)
+combine(structural, statistical, threshold = 1)
 }
 \arguments{
-\item{structure}{list containing `numeric` structural adjacency matrix in 
+\item{structural}{list containing `numeric` structural adjacency matrix in 
 the first entry and `character` structural adjanceny matrix in the second 
 entry}
 
@@ -50,7 +50,7 @@ functional_groups <- rbind(
 functional_groups <- data.frame(group = functional_groups[, 1],
      formula = functional_groups[, 2],
      mass = as.numeric(functional_groups[, 3]))
-struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
+struct_adj <- structural(x_test, functional_groups, ppm = 5)
 stat_adj_l <- statistical(x_test, 
     model = c("pearson", "spearman", "bayes"), 
     correlation_adjust = "bonferroni")

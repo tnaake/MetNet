@@ -34,9 +34,9 @@ strengths of the arcs of the Bayesian connections to an adjacency matrix.
 }
 \details{
 `boot.strength` measures the strength of the 
-probabilistic relationnships by the arcs of a Bayesian network, as learned 
+probabilistic relationships by the arcs of a Bayesian network, as learned 
 from bootstrapped data. By default `bayes` uses the 
-Tabu search greedy search.
+Tabu greedy search.
 
 For use of the parameters used in the `boot.strength` function, 
 refer to `?bnlearn::boot.strength`. For further information see also 

@@ -12,7 +12,7 @@
 #' \code{combine} returns this consensus matrix supported
 #' by the structural and statistical adjacency matrices.
 #' 
-#' @param structure list containing `numeric` structural adjacency matrix in 
+#' @param structural list containing `numeric` structural adjacency matrix in 
 #' the first entry and `character` structural adjanceny matrix in the second 
 #' entry
 #' 
@@ -47,7 +47,7 @@
 #' functional_groups <- data.frame(group = functional_groups[, 1],
 #'      formula = functional_groups[, 2],
 #'      mass = as.numeric(functional_groups[, 3]))
-#' struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
+#' struct_adj <- structural(x_test, functional_groups, ppm = 5)
 #' stat_adj_l <- statistical(x_test, 
 #'     model = c("pearson", "spearman", "bayes"), 
 #'     correlation_adjust = "bonferroni")
@@ -55,32 +55,32 @@
 #' combine(struct_adj, stat_adj)
 #' 
 #' @export
-combine <- function(structure, statistical, threshold = 1) {
+combine <- function(structural, statistical, threshold = 1) {
     
-    if (!is.list(structure) | length(structure) != 2) 
-        stop("structure is not a list of length 2")
+    if (!is.list(structural) | length(structural) != 2) 
+        stop("structural is not a list of length 2")
     
-    if (!is.matrix(structure[[1]]) | !is.numeric(structure[[1]]))
-        stop("structure[[1]] is not a numeric matrix")
+    if (!is.matrix(structural[[1]]) | !is.numeric(structural[[1]]))
+        stop("structural[[1]] is not a numeric matrix")
     
-    if (!is.matrix(structure[[2]]) | !is.character(structure[[2]]))
-        stop("structure[[2]] is not a character matrix")
+    if (!is.matrix(structural[[2]]) | !is.character(structural[[2]]))
+        stop("structural[[2]] is not a character matrix")
     
     if (!is.matrix(statistical) | !is.numeric(statistical))
         stop("statistical is not a numeric matrix")
     
-    if (!all(rownames(structure[[1]]) == rownames(structure[[2]]))) 
-        stop(c("rownames of structure[[1]] are not identical to rownames of ", 
-             "structure[[2]]"))
+    if (!all(rownames(structural[[1]]) == rownames(structural[[2]]))) 
+        stop(c("rownames of structural[[1]] are not identical to rownames of ", 
+             "structural[[2]]"))
         
-    if (!all(colnames(structure[[1]]) == colnames(structure[[2]])))
-        stop(c("colnames of structure[[1]] are not identical to colnames of ", 
-                 "structure[[2]]"))
+    if (!all(colnames(structural[[1]]) == colnames(structural[[2]])))
+        stop(c("colnames of structural[[1]] are not identical to colnames of ", 
+                 "structural[[2]]"))
     
-    if (!all(rownames(structure[[1]]) == rownames(statistical)))
+    if (!all(rownames(structural[[1]]) == rownames(statistical)))
         stop("rownames are not identical")
     
-    if (!all(colnames(structure[[1]]) == colnames(statistical)))
+    if (!all(colnames(structural[[1]]) == colnames(statistical)))
         stop("colnames are not identical")
     
     if (!is.numeric(threshold)) stop("threshold is not numeric")
@@ -89,15 +89,15 @@ combine <- function(structure, statistical, threshold = 1) {
     res <- list()
     
     ## create the first entry of the list
-    ## sum the matrices structure and statistical, if the value is above
+    ## sum the matrices structural and statistical, if the value is above
     ## threshold then assign 1, otherwise 0
-    cons_num <- structure[[1]] + statistical
+    cons_num <- structural[[1]] + statistical
     cons_num <- ifelse(cons_num > threshold, 1, 0)
     
     ## create the second entry of the list
-    ## if element in cons_num is equal to 1, take the element in structure[[2]]
+    ## if element in cons_num is equal to 1, take the element in structural[[2]]
     ## (the type of link), otherwise ""
-    cons_char <- ifelse(cons_num == 1, structure[[2]], "")
+    cons_char <- ifelse(cons_num == 1, structural[[2]], "")
     
     ## assign to list
     res[[1]] <- cons_num

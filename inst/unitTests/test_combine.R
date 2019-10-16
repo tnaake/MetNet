@@ -13,7 +13,7 @@ transformations <- data.frame(group = as.character(transformations[, 1]),
                                 mass = as.numeric(transformations[, 3]))
 
 ## create structural network
-struct_adj <- createStructuralAdjacency(mat_test,
+struct_adj <- structural(mat_test,
         transformation = transformations, ppm = 5)
 
 ## create statistical network
@@ -64,12 +64,12 @@ test_combine <- function() {
     rownames(mock)[1] <- "foo"
     checkException(combine(struct_adj, mock), msg = "are not identical")
     
-    ## check for structure
+    ## check for structural
     l <- list(1, cons_adj[[2]])
-    checkException(combine(structure=l, statistical=stat_adj), 
+    checkException(combine(structural=l, statistical=stat_adj), 
         msg = "not a numeric matrix")
     l <- list(cons_adj[[1]], 1)
-    checkException(combine(structure=l, statistical=stat_adj), 
+    checkException(combine(structural=l, statistical=stat_adj), 
         msg = "not a character ")
 }
 ## END unit test combine ##
