@@ -623,43 +623,43 @@ statistical <- function(x, model, ...) {
     }
     ## add entry for pearson if "pearson" is in model
     if ("pearson" %in% model) {
-        pearson <- correlation(x = x, type = "pearson", ...)
+        pearson <- threeDotsCall("correlation", x = x, type = "pearson", ...) ## was correlation(x = X, type = "p)
         l <- addToList(l, "pearson", pearson)
         print("pearson finished.")
     }
     ## add entry for pearson_partial if "pearson_partial" is in model
     if ("pearson_partial" %in% model) {
-        pearson_partial <- correlation(x = x, type = "pearson_partial", ...)
+        pearson_partial <- threeDotsCall("correlation", x = x, type = "pearson_partial", ...) 
         l <- addToList(l, "pearson_partial", pearson_partial)
         print("pearson_partial finished.")
     }
     ## add entry for pearson_semipartial if "pearson_semipartial" is in model
     if ("pearson_semipartial" %in% model) {
-        pearson_sp <- correlation(x = x, type = "pearson_semipartial", ...)
+        pearson_sp <- threeDotsCall("correlation", x = x, type = "pearson_semipartial", ...)
         l <- addToList(l, "pearson_semipartial", pearson_sp)
         print("pearson_semipartial finished.")
     }
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
-        spearman <- correlation(x = x, type = "spearman", ...)
+        spearman <- threeDotsCall("correlation", x = x, type = "spearman", ...)
         l <- addToList(l, "spearman", spearman)
         print("spearman finished.")
     }
     ## add entry for spearman_partial if "spearman_partial" is in model
     if ("spearman_partial" %in% model) {
-        spearman_partial <- correlation(x, type = "spearman_partial", ...)
+        spearman_partial <- threeDotsCall("correlation", x = x, type = "spearman_partial", ...)
         l <- addToList(l, "spearman_partial", spearman_partial)
         print("spearman_partial finished.")
     }
     ## add entry for spearman_semipartial if "spearman_semipartial" is in model
     if ("spearman_semipartial" %in% model) {
-        spearman_sp <- correlation(x = x, type = "spearman_semipartial", ...)
+        spearman_sp <- threeDotsCall("correlation", x = x, type = "spearman_semipartial", ...)
         l <- addToList(l, "spearman_semipartial", spearman_sp)
         print("spearman_semipartial finished.")
     }
     ## add entry for bayes if "bayes" is in model
     if ("bayes" %in% model) {
-        bayes <- bayes(x = x, ...)
+        bayes <- threeDotsCall("bayes", x = x, ...)
         l <- addToList(l, "bayes", bayes)
         print("bayes finished.")
     }
@@ -830,8 +830,8 @@ threshold <- function(statistical, type, args, ...) {
     
     ## check args
     if (type %in% c("threshold")) {
-        if (!all(names(l) %in% names(args))) {
-            stop("'args' does not contain entries for all 'model's in", 
+        if (!(all(names(l) %in% names(args)))) {
+            stop("'args' does not contain entries for all 'model's in ", 
                 "'statistical'")
         }
         

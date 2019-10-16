@@ -6,9 +6,12 @@ data("mat_test", package = "MetNet")
 
 ## START unit test lasso ##
 lasso_mat <- lasso(t(mat_test_z), parallel = FALSE, PFER = 0.75, cutoff = 0.95)
+lasso_mat_parallel <- lasso(t(mat_test_z)[1:5,], parallel = TRUE, 
+    PFER = 0.75, cutoff = 0.95)
 test_lasso <- function() {
     checkException(lasso(NULL, PFER = 0.75, cutoff = 0.95), 
         msg = "must be coercible to non-negative integer")
+    
     checkException(lasso(mat_test))
     checkEquals(rownames(lasso_mat), colnames(lasso_mat))
     checkEquals(rownames(lasso_mat), rownames(mat_test))
@@ -237,23 +240,53 @@ test_addToList <- function() {
 
 ## START unit test statistical ##
 stat_adj_l <- statistical(mat_test,
-    model = c("clr", "aracne", "pearson", "spearman"), 
-    correlation_adjust = "bonferroni")
+    model = c("lasso", "randomForest", "clr", "aracne", "pearson", 
+        "pearson_partial", "pearson_semipartial", "spearman", 
+        "spearman_partial", "spearman_semipartial", "bayes"), 
+    correlation_adjust = "bonferroni", PFER = 0.75, cutoff = 0.95)
 test_statistical <- function() {
     checkException(statistical(NULL, model = "lasso"), msg = "not a numerical")
     checkException(statistical(mat_test, model = "foo"), 
         msg = "model not implemented in ")
     checkException(statistical(mat_test, model = c("lasso")), 
         msg = "Two of the three arguments 'PFER', 'cutoff' and 'q'" )
-    checkEquals(length(stat_adj_l), 4)
-    checkEquals(as.numeric(lapply(stat_adj_l, nrow)), rep(7, 4))
-    checkEquals(as.numeric(lapply(stat_adj_l, ncol)), rep(7, 4))
+    
+    ## take a high tolerance value for LASSO, randomForest and bayes 
+    ## since these models are probabilistic
+    checkEquals(stat_adj_l[["lasso"]], lasso_mat, tolerance = 5e-01)
+    checkEquals(stat_adj_l[["randomForest"]], rf_mat, tolerance = 5e-01)
+    checkEquals(stat_adj_l[["bayes"]], bayes_mat, tolerance = 5e-01)
+    checkIdentical(stat_adj_l[["clr"]], clr_mat)
+    checkIdentical(stat_adj_l[["aracne"]], aracne_mat)
+    checkIdentical(stat_adj_l[["pearson"]], 
+        correlation(mat_test, correlation_adjust = "bonferroni", 
+            type = "pearson"))
+    checkIdentical(stat_adj_l[["pearson_partial"]], 
+        correlation(mat_test, correlation_adjust = "bonferroni", 
+            type = "pearson_partial"))
+    checkIdentical(stat_adj_l[["pearson_semipartial"]], 
+        correlation(mat_test, correlation_adjust = "bonferroni", 
+            type = "pearson_semipartial"))
+    checkIdentical(stat_adj_l[["spearman"]], 
+        correlation(mat_test, correlation_adjust = "bonferroni", 
+            type = "spearman"))
+    checkIdentical(stat_adj_l[["spearman_partial"]], 
+        correlation(mat_test, correlation_adjust = "bonferroni", 
+            type = "spearman_partial"))
+    checkIdentical(stat_adj_l[["spearman_semipartial"]], 
+        correlation(mat_test, correlation_adjust = "bonferroni", 
+            type = "spearman_semipartial"))
+    checkEquals(length(stat_adj_l), 11)
+    checkEquals(as.numeric(lapply(stat_adj_l, nrow)), rep(7, 11))
+    checkEquals(as.numeric(lapply(stat_adj_l, ncol)), rep(7, 11))
     checkEquals(as.character(unlist((lapply(stat_adj_l, rownames)))),
-                        rep(c("x1", "x2", "x3", "x4", "x5", "x6", "x7"), 4))
+                        rep(c("x1", "x2", "x3", "x4", "x5", "x6", "x7"), 11))
     checkEquals(as.character(unlist((lapply(stat_adj_l, colnames)))),
-                rep(c("x1", "x2", "x3", "x4", "x5", "x6", "x7"), 4))
+                rep(c("x1", "x2", "x3", "x4", "x5", "x6", "x7"), 11))
     checkEquals(names(stat_adj_l), 
-        c("clr", "aracne", "pearson", "spearman"))
+        c("lasso", "randomForest", "clr", "aracne", "pearson", 
+          "pearson_partial", "pearson_semipartial", "spearman",         
+          "spearman_partial", "spearman_semipartial", "bayes"))
     checkTrue(all(unlist(lapply(stat_adj_l, function(x) is.numeric(x)))))
 }
 ## END unit test statistical ##
@@ -266,6 +299,7 @@ getLinks_df <- MetNet:::getLinks(mat, decreasing = TRUE, exclude = "== 0")
 test_getLinks <- function() {
     
     checkException(MetNet:::getLinks(NULL), msg = "argument is of length zero")
+    checkException(MetNet:::getLinks(mat[, 1:2]), msg = "not a square matrix")
     checkException(MetNet:::getLinks(mat, exclude = "foo"), 
         msg = "object 'matfoo' not found")
     
@@ -294,45 +328,70 @@ test_getLinks <- function() {
 
 
 ## START unit test threshold  ##
-stat_adj_l <- statistical(mat_test,
-    model = c("clr", "aracne", "pearson", "spearman"), 
-    correlation_adjust = "bonferroni")
+## remove partial/semipartial correlation from stat_adj_l
+stat_adj_l_cut <- stat_adj_l[!names(stat_adj_l) %in% 
+    c("pearson_partial", "pearson_semipartial", "spearman_partial", 
+        "spearman_semipartial", "bayes", "randomForest", "lasso")]
 args_thr <- list(clr = 0.5, aracne = 0.8, pearson = 0.05, spearman = 0.05, 
     threshold = 1)
-thr_thr <- threshold(stat_adj_l, type = "threshold", args = args_thr)
+thr_thr <- threshold(stat_adj_l_cut, type = "threshold", args = args_thr)
 
 args_top <- list(n = 5)
-thr_top1 <- threshold(stat_adj_l, type = "top1", args = args_top)
-thr_top2 <- threshold(stat_adj_l, type = "top2", args = args_top)
-thr_mean <- threshold(stat_adj_l, type = "mean", args = args_top)
+thr_top1 <- threshold(stat_adj_l_cut, type = "top1", args = args_top)
+thr_top2 <- threshold(stat_adj_l_cut, type = "top2", args = args_top)
+thr_mean <- threshold(stat_adj_l_cut, type = "mean", args = args_top)
 
 test_threshold <- function() {
     ## test arguments
-    checkException(threshold(NULL, type = "threshold", args = args_thr))
-    checkException(threshold(1:3, type = "threshold", args = args_thr))
+    checkException(threshold(NULL, type = "threshold", args = args_thr), 
+        msg = "consensus requires graphs of identical order")
+    checkException(threshold(1:3, type = "threshold", args = args_thr),
+        msg = "attempt to select less than one element in")
     args_foo <- list(clr = 0.5, aracne = 0.8, threshold = 1)
     checkException(threshold(
         data.frame(clr = 1:3, aracne = 1:3), 
-        type = "threshold", args = args_foo))
+        type = "threshold", args = args_foo), 
+        msg = "input must be an adjacency matrix/array, network, or list")
     checkException(threshold(cbind(clr = c("a", "b", "c"), 
-        aracne = c("a", "b", "c")), type = "threshold", args = args_foo))
+        aracne = c("a", "b", "c")), type = "threshold", args = args_foo),
+        msg = "attempt to select less than one element in")
+    args_thr_double <- list(lasso = 0.8, randomForest = 0.2, 
+        clr = 0.5, clr = 0.5, aracne = 0.8, pearson = 0.05, spearman = 0.05, 
+        threshold = 1)
+    checkException(
+        threshold(stat_adj_l_cut, type = "threshold", args = args_thr_double),
+        msg = "contain duplicated entries")
+    checkException(
+        threshold(stat_adj_l_cut, type = "foo", args = args_thr),
+        msg = "type not in")
     
     ## check that args contains all models
-    checkException(threshold(stat_adj_l, type = "threshold", args_thr[1:3]))
+    checkException(threshold(stat_adj_l_cut, type = "threshold", args_thr[1:3]),
+        msg = "does not contain entries for all 'model's in 'statistical'")
     
     ## check that args contains threshold
-    checkException(threshold(stat_adj_l, type = "threshold", args_thr[1:4]))
+    checkException(threshold(stat_adj_l_cut, type = "threshold", args_thr[1:4]),
+        msg = "'args' does not contain entry 'threshold' of length 1")
     
     ## check args for top1, top2, mean
-    checkException(threshold(stat_adj_l, type = "top1", args = list(x = 1)))
-    checkException(threshold(stat_adj_l, type = "top2", args = list(x = 1)))
-    checkException(threshold(stat_adj_l, type = "mean", args = list(x = 1)))
-    checkException(threshold(stat_adj_l, type = "top1", args = list(n = 1:2)))
-    checkException(threshold(stat_adj_l, type = "top2", args = list(n = 1:2)))
-    checkException(threshold(stat_adj_l, type = "mean", args = list(n = 1:2)))
-    checkException(threshold(stat_adj_l, type = "top1", args = list(n = "a")))
-    checkException(threshold(stat_adj_l, type = "top2", args = list(n = "a")))
-    checkException(threshold(stat_adj_l, type = "mean", args = list(n = "a")))
+    checkException(threshold(stat_adj_l, type = "top1", args = list(x = 1)),
+        msg = "does not contain the entry `n` of length 1")
+    checkException(threshold(stat_adj_l, type = "top2", args = list(x = 1)),
+        msg = "does not contain the entry `n` of length 1")
+    checkException(threshold(stat_adj_l, type = "mean", args = list(x = 1)),
+        msg = "does not contain the entry `n` of length 1")
+    checkException(threshold(stat_adj_l, type = "top1", args = list(n = 1:2)),
+        msg = "does not contain the entry `n` of length 1")
+    checkException(threshold(stat_adj_l, type = "top2", args = list(n = 1:2)),
+        msg = "does not contain the entry `n` of length 1")
+    checkException(threshold(stat_adj_l, type = "mean", args = list(n = 1:2)),
+        msg = "does not contain the entry `n` of length 1")
+    checkException(threshold(stat_adj_l, type = "top1", args = list(n = "a")),
+        msg = "NA/NaN argument")
+    checkException(threshold(stat_adj_l, type = "top2", args = list(n = "a")),
+        msg = "NA/NaN argument")
+    checkException(threshold(stat_adj_l, type = "mean", args = list(n = "a")),
+        msg = "NA/NaN argument")
     
     ## check output
     checkTrue(is.matrix(thr_thr))
