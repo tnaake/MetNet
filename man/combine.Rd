@@ -24,10 +24,10 @@ statistcal adjacency matrices. In the second entry a `matrix` of type
 `character` the corresonding type/putative link at this position.
 }
 \description{
-The function \code{combine} takes as 
+The function `combine` takes as 
 input the structural and statistical adjacency matrix, created in former 
 steps, adds them together and will report a connection between metabolites
-in the returned when the sum exceeds the \code{threshold} . 
+in the returned when the sum exceeds the `threshold`. 
 \code{combine} returns this consensus matrix supported
 by the structural and statistical adjacency matrices.
 }
