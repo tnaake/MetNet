@@ -7,39 +7,39 @@
 structural(x, transformation, ppm = 5)
 }
 \arguments{
-\item{x}{matrix, where columns are the samples and the rows are features 
-(metabolites), cell entries are intensity values, \code{x} contains the 
-column \code{'mz'} that has the m/z information (numerical values) for the 
+\item{x}{`matrix`, where columns are the samples and the rows are features 
+(metabolites), cell entries are intensity values. `x` contains the 
+column `"mz"` that has the m/z information (numerical values) for the 
 calculation of mass differences between features}
 
-\item{transformation}{data.frame, containing the columns \code{"group"}, 
-and \code{'mass'} that will be used for detection of transformation of 
+\item{transformation}{`data.frame`, containing the columns `"group"`, 
+and `"mass"` that will be used for detection of transformation of 
 (functional) groups}
 
-\item{ppm}{numeric, mass accuracy of m/z features in parts per million (ppm)}
+\item{ppm}{`numeric`, mass accuracy of m/z features in parts per million (ppm)}
 }
 \value{
-list containing two matrices, in the first list entry the 
-matrix with edges inferred mass differences is stored, in the second list 
-entry the matrix with the type (corresponding to the \code{"group"} column
-in \code{transformation}) is stored
+`list` containing two matrices. The first entry stores the `numeric` 
+`matrix` with edges inferred from mass differences. The second entry
+stores the `character` `matrix` with the type (corresponding to the 
+`"group"` column in `transformation`) is stored
 }
 \description{
-The function \code{structural} infers an 
+The function `structural` infers an unweighted
 adjacency matrix using differences in m/z values that are matched against a 
-\code{data.frame} of theoretically calculated differences of 
-loss/addition of functional groups. \code{structural} returns 
-the unweighted adjacency matrix together with a character matrix with the 
-type of loss/addition as a list at the specific positions.
+`data.frame` of calculated theoretical differences of 
+loss/addition of functional groups. `structural` returns 
+the unweighted `numeric` `matrix` together with a `character` `matrix` with 
+the type of loss/addition as a list at the specific positions.
 }
 \details{
-\code{structural} accesses the column \code{'mz'} of 
-\code{x} to infer structural topologies based on the functional groups 
-supplied by \code{transformation}. To account for the mass accuracy of 
-the dataset \code{x}, the user can specify the accuracy of m/z features 
-in parts per million (ppm) by the \code{ppm} argument. The m/z values in the 
-\code{'mz'} column of \code{x} will be converted to m/z ranges according to 
-the \code{ppm} argument (default \code{ppm = 5}).
+`structural` accesses the column `"mz"` of 
+`x` to infer structural topologies based on the functional groups 
+defined by `transformation`. To account for the mass accuracy of 
+the dataset `x`, the user can specify the accuracy of m/z features 
+in parts per million (ppm) by the `ppm` argument. The m/z values in the 
+`"mz"` column of `x`" will be converted to m/z ranges according to 
+the `ppm` argument (default `ppm = 5`).
 }
 \examples{
 data("x_test", package = "MetNet")
@@ -56,6 +56,7 @@ transformation <- data.frame(group = transformation[,1],
                                 formula = transformation[,2],
                                 mass = as.numeric(transformation[,3]))
 struct_adj <- structural(x_test, transformation, ppm = 5)
+
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

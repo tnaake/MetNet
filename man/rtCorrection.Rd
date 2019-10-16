@@ -8,32 +8,30 @@ retention time}
 rtCorrection(structural, x, transformation)
 }
 \arguments{
-\item{structural}{list returned by the function 
-\code{structural}, in the first list entry the 
-matrix with edges inferred mass differences is stored, in the second list 
-entry the matrix with the type (corresponding to the \code{'group'} column
-in \code{transformation}) is stored}
+\item{structural}{`list` returned by the function `structural`. The first entry 
+stores the `numeric` matrix with edges inferred by mass 
+differences. The second entry stores the `character` matrix with the type 
+(corresponding to the `"group"` column in `transformation`).}
 
-\item{x}{matrix, where columns are the samples and the rows are features 
-(metabolites), cell entries are intensity values, \code{x} contains the 
-column \code{'rt'} that has the rt information (numerical values) for the 
+\item{x}{`matrix`, where columns are the samples and the rows are features 
+(metabolites), cell entries are intensity values, `x` contains the 
+column `"rt"` that has the rt information (numerical values) for the 
 correction of retention time shifts between features that 
 have a putative connection assigned based on m/z value difference}
 
-\item{transformation}{data.frame, containing the columns \code{"group"}, 
-and \code{'rt'} that will be used for correction of transformation of 
-(functional) groups based on retention time shifts derived from 
-\code{x}}
+\item{transformation}{`data.frame`, containing the columns `"group"`, 
+and `"rt"` that will be used for correction of transformation of 
+(functional) groups based on retention time shifts derived from `x`}
 }
 \value{
-list containing two matrices, in the first list entry the 
-matrix with edges inferred mass differences corrected by retention time 
-shifts  is stored, in the second list entry the matrix with the type 
-(corresponding to the \code{'group'} column
-in \code{transformation}) is stored
+`list` containing two matrices. The first entry stores the 
+`numeric` `matrix` with edges inferred mass differences corrected by 
+retention time shifts. The second entry stores the `character` matrix with 
+the type (corresponding to the `"group`" column
+in `transformation``) is stored.
 }
 \description{
-The function \code{rtCorrection} corrects the adjacency matrix
+The function `rtCorrection` corrects the adjacency matrix
 infered from structural data based on shifts in the retention time. For 
 known chemical modifications (e.g. addition of glycosyl groups) molecules 
 with the moiety should elue at a different time (in the case of glycosyl 
@@ -43,21 +41,22 @@ fit the expected behaviour, the connection will be removed (otherwise
 sustained).
 }
 \details{
-\code{rtCorrection} is used to correct the adjacency matrix 
-returned by \code{structural} when information is available
+`rtCorrection` is used to correct the unweighted adjacency matrix 
+returned by `structural` when information is available
 about the retention time and shifts when certain transformation occur
 (it is meant to filter out connections that were created by 
 m/z differences that have by chance the same m/z difference but 
-different/unexpected retention time behaviour). #' 
-\code{rtCorrection} accesses the second list element of 
-\code{structural} and matches the elements in the \code{'group'} column 
-against the character matrix. In case of matches, \code{rtCorrection} 
-accesses the \code{'rt'} column of \code{x} and calculates the retention 
-time difference between the features. \code{rtCorrection} then checks 
+different/unexpected retention time behaviour). 
+
+`rtCorrection` accesses the second list element of 
+`structural` and matches the elements in the `"group"` column 
+against the character matrix. In case of matches, `rtCorrection` 
+accesses the `"rt"` column of `x` and calculates the retention 
+time difference between the features. `rtCorrection` then checks 
 if the observed retention time difference matches the expected behaviour
-(indicated by \code{'+'} for a higher retention time of the feature with 
-the putative group, \code{'-'} for a lower retention time of the feature
-with the putative group or \code{'?'} when there is no information 
+(indicated by `"+"` for a higher retention time of the feature with 
+the putative group, `"-"` for a lower retention time of the feature
+with the putative group or `"?"` when there is no information 
 available or features with that group should not be checked). In case 
 several transformation were assigned to a feature/feature pair connections 
 will always be removed if there is an inconsistency with any of the given 
@@ -80,6 +79,7 @@ transformation <- data.frame(group = transformation[,1],
                                 rt = transformation[,4])
 struct_adj <- structural(x_test, transformation, ppm = 5)
 struct_adj_rt <- rtCorrection(struct_adj, x_test, transformation)
+
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

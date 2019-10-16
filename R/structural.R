@@ -1,32 +1,48 @@
 #' @name structural
+#' 
 #' @aliases structural
+#' 
 #' @title Create adjacency matrix based on m/z (molecular weight) difference
-#' @description The function \code{structural} infers an 
+#' 
+#' @description 
+#' The function `structural` infers an unweighted
 #' adjacency matrix using differences in m/z values that are matched against a 
-#' \code{data.frame} of theoretically calculated differences of 
-#' loss/addition of functional groups. \code{structural} returns 
-#' the unweighted adjacency matrix together with a character matrix with the 
-#' type of loss/addition as a list at the specific positions.  
-#' @param x matrix, where columns are the samples and the rows are features 
-#' (metabolites), cell entries are intensity values, \code{x} contains the 
-#' column \code{'mz'} that has the m/z information (numerical values) for the 
+#' `data.frame` of calculated theoretical differences of 
+#' loss/addition of functional groups. `structural` returns 
+#' the unweighted `numeric` `matrix` together with a `character` `matrix` with 
+#' the type of loss/addition as a list at the specific positions.  
+#' 
+#' @param 
+#' x `matrix`, where columns are the samples and the rows are features 
+#' (metabolites), cell entries are intensity values. `x` contains the 
+#' column `"mz"` that has the m/z information (numerical values) for the 
 #' calculation of mass differences between features 
-#' @param transformation data.frame, containing the columns \code{"group"}, 
-#' and \code{'mass'} that will be used for detection of transformation of 
+#' 
+#' @param 
+#' transformation `data.frame`, containing the columns `"group"`, 
+#' and `"mass"` that will be used for detection of transformation of 
 #' (functional) groups
-#' @param ppm numeric, mass accuracy of m/z features in parts per million (ppm)
-#' @details \code{structural} accesses the column \code{'mz'} of 
-#' \code{x} to infer structural topologies based on the functional groups 
-#' supplied by \code{transformation}. To account for the mass accuracy of 
-#' the dataset \code{x}, the user can specify the accuracy of m/z features 
-#' in parts per million (ppm) by the \code{ppm} argument. The m/z values in the 
-#' \code{'mz'} column of \code{x} will be converted to m/z ranges according to 
-#' the \code{ppm} argument (default \code{ppm = 5}). 
-#' @return list containing two matrices, in the first list entry the 
-#' matrix with edges inferred mass differences is stored, in the second list 
-#' entry the matrix with the type (corresponding to the \code{"group"} column
-#' in \code{transformation}) is stored
+#' 
+#' @param 
+#' ppm `numeric`, mass accuracy of m/z features in parts per million (ppm)
+#' 
+#' @details 
+#' `structural` accesses the column `"mz"` of 
+#' `x` to infer structural topologies based on the functional groups 
+#' defined by `transformation`. To account for the mass accuracy of 
+#' the dataset `x`, the user can specify the accuracy of m/z features 
+#' in parts per million (ppm) by the `ppm` argument. The m/z values in the 
+#' `"mz"` column of `x`" will be converted to m/z ranges according to 
+#' the `ppm` argument (default `ppm = 5`). 
+#' 
+#' @return 
+#' `list` containing two matrices. The first entry stores the `numeric` 
+#' `matrix` with edges inferred from mass differences. The second entry
+#' stores the `character` `matrix` with the type (corresponding to the 
+#' `"group"` column in `transformation`) is stored
+#' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' 
 #' @examples 
 #' data("x_test", package = "MetNet")
 #' transformation <- rbind(
@@ -42,6 +58,7 @@
 #'                                 formula = transformation[,2],
 #'                                 mass = as.numeric(transformation[,3]))
 #' struct_adj <- structural(x_test, transformation, ppm = 5)
+#' 
 #' @export
 structural <- function(x, transformation, ppm = 5) {
     
@@ -97,56 +114,72 @@ structural <- function(x, transformation, ppm = 5) {
 }
 
 #' @name rtCorrection
+#' 
 #' @aliases rtCorrection
+#' 
 #' @title Correct connections in the structural adjacency matrix by 
-#' retention time 
-#' @description The function \code{rtCorrection} corrects the adjacency matrix
+#' retention time
+#' 
+#' @description 
+#' The function `rtCorrection` corrects the adjacency matrix
 #' infered from structural data based on shifts in the retention time. For 
 #' known chemical modifications (e.g. addition of glycosyl groups) molecules 
 #' with the moiety should elue at a different time (in the case of glycosyl 
 #' groups the metabolite should elute earlier in a reverse-phase 
 #' liquid chromatography system). If the connection for the metabolite does not
 #' fit the expected behaviour, the connection will be removed (otherwise 
-#' sustained). 
-#' @param structural list returned by the function 
-#' \code{structural}, in the first list entry the 
-#' matrix with edges inferred mass differences is stored, in the second list 
-#' entry the matrix with the type (corresponding to the \code{'group'} column
-#' in \code{transformation}) is stored
-#' @param x matrix, where columns are the samples and the rows are features 
-#' (metabolites), cell entries are intensity values, \code{x} contains the 
-#' column \code{'rt'} that has the rt information (numerical values) for the 
+#' sustained).
+#' 
+#' @param 
+#' structural `list` returned by the function `structural`. The first entry 
+#' stores the `numeric` matrix with edges inferred by mass 
+#' differences. The second entry stores the `character` matrix with the type 
+#' (corresponding to the `"group"` column in `transformation`).
+#' 
+#' @param 
+#' x `matrix`, where columns are the samples and the rows are features 
+#' (metabolites), cell entries are intensity values, `x` contains the 
+#' column `"rt"` that has the rt information (numerical values) for the 
 #' correction of retention time shifts between features that 
 #' have a putative connection assigned based on m/z value difference
-#' @param transformation data.frame, containing the columns \code{"group"}, 
-#' and \code{'rt'} that will be used for correction of transformation of 
-#' (functional) groups based on retention time shifts derived from 
-#' \code{x}
-#' @details \code{rtCorrection} is used to correct the adjacency matrix 
-#' returned by \code{structural} when information is available
+#' 
+#' @param 
+#' transformation `data.frame`, containing the columns `"group"`, 
+#' and `"rt"` that will be used for correction of transformation of 
+#' (functional) groups based on retention time shifts derived from `x`
+#' 
+#' 
+#' @details 
+#' `rtCorrection` is used to correct the unweighted adjacency matrix 
+#' returned by `structural` when information is available
 #' about the retention time and shifts when certain transformation occur
 #' (it is meant to filter out connections that were created by 
 #' m/z differences that have by chance the same m/z difference but 
-#' different/unexpected retention time behaviour). #' 
-#' \code{rtCorrection} accesses the second list element of 
-#' \code{structural} and matches the elements in the \code{'group'} column 
-#' against the character matrix. In case of matches, \code{rtCorrection} 
-#' accesses the \code{'rt'} column of \code{x} and calculates the retention 
-#' time difference between the features. \code{rtCorrection} then checks 
+#' different/unexpected retention time behaviour). 
+#' 
+#' `rtCorrection` accesses the second list element of 
+#' `structural` and matches the elements in the `"group"` column 
+#' against the character matrix. In case of matches, `rtCorrection` 
+#' accesses the `"rt"` column of `x` and calculates the retention 
+#' time difference between the features. `rtCorrection` then checks 
 #' if the observed retention time difference matches the expected behaviour
-#' (indicated by \code{'+'} for a higher retention time of the feature with 
-#' the putative group, \code{'-'} for a lower retention time of the feature
-#' with the putative group or \code{'?'} when there is no information 
+#' (indicated by `"+"` for a higher retention time of the feature with 
+#' the putative group, `"-"` for a lower retention time of the feature
+#' with the putative group or `"?"` when there is no information 
 #' available or features with that group should not be checked). In case 
 #' several transformation were assigned to a feature/feature pair connections 
 #' will always be removed if there is an inconsistency with any of the given 
 #' transformation. 
-#' @return list containing two matrices, in the first list entry the 
-#' matrix with edges inferred mass differences corrected by retention time 
-#' shifts  is stored, in the second list entry the matrix with the type 
-#' (corresponding to the \code{'group'} column
-#' in \code{transformation}) is stored
+#' 
+#' @return 
+#' `list` containing two matrices. The first entry stores the 
+#' `numeric` `matrix` with edges inferred mass differences corrected by 
+#' retention time shifts. The second entry stores the `character` matrix with 
+#' the type (corresponding to the `"group`" column
+#' in `transformation``) is stored.
+#' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' 
 #' @examples 
 #' data("x_test", package = "MetNet")
 #' transformation <- rbind(
@@ -164,6 +197,7 @@ structural <- function(x, transformation, ppm = 5) {
 #'                                 rt = transformation[,4])
 #' struct_adj <- structural(x_test, transformation, ppm = 5)
 #' struct_adj_rt <- rtCorrection(struct_adj, x_test, transformation)
+#' 
 #' @export
 rtCorrection <- function(structural, x, transformation) {
     
@@ -201,7 +235,7 @@ rtCorrection <- function(structural, x, transformation) {
                 rownames of structural[[2]]")
     
     if (!all(rownames(structural[[1]]) %in% rownames(x)))
-        stop("rownames(structural[[1]]) do not fit rownames(x) ")
+        stop("rownames(structural[[1]]) do not fit rownames(x)")
     
     if (!(is.matrix(adj) && is.numeric(adj)))
         stop("structural[[1]] is not a numeric matrix")
@@ -255,5 +289,3 @@ rtCorrection <- function(structural, x, transformation) {
     }
     return(list(adj, group))
 }
-
-

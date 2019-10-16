@@ -298,10 +298,11 @@ transformations <- rbind(
     c("putrescine to spermidine (+C3H7N)", "C3H7N", 57.0578492299, "?"))
 
 ## convert to data frame
-transformations <- data.frame(group = transformations[, 1],
-                            formula = transformations[, 2],
-                            mass = as.numeric(transformations[, 3]),
-                            rt = transformations[, 4])
+transformations <- data.frame(
+    group = transformations[, 1],
+    formula = transformations[, 2],
+    mass = as.numeric(transformations[, 3]),
+    rt = transformations[, 4])
 @
 
 The function \Rfunction{structural} will then check for those 

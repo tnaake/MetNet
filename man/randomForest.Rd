@@ -33,6 +33,7 @@ data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 randomForest(x)
+
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

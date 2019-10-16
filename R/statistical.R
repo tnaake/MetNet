@@ -135,6 +135,7 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' randomForest(x)
+#' 
 #' @export
 randomForest <- function(x, ...) {
     
