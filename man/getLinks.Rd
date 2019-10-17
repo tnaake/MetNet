@@ -4,7 +4,7 @@
 \alias{getLinks}
 \title{Write an adjacency matrix to a `data.frame`}
 \usage{
-getLinks(mat, decreasing = TRUE, exclude = "== 0")
+getLinks(mat, decreasing = TRUE, exclude = "== 1")
 }
 \arguments{
 \item{mat}{matrix containing the values of confidence for a link}

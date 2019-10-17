@@ -253,29 +253,40 @@ test_statistical <- function() {
     
     ## take a high tolerance value for LASSO, randomForest and bayes 
     ## since these models are probabilistic
-    checkEquals(stat_adj_l[["lasso"]], lasso_mat, tolerance = 5e-01)
-    checkEquals(stat_adj_l[["randomForest"]], rf_mat, tolerance = 5e-01)
-    checkEquals(stat_adj_l[["bayes"]], bayes_mat, tolerance = 5e-01)
-    checkIdentical(stat_adj_l[["clr"]], clr_mat)
-    checkIdentical(stat_adj_l[["aracne"]], aracne_mat)
-    checkIdentical(stat_adj_l[["pearson"]], 
-        correlation(mat_test, correlation_adjust = "bonferroni", 
-            type = "pearson"))
-    checkIdentical(stat_adj_l[["pearson_partial"]], 
-        correlation(mat_test, correlation_adjust = "bonferroni", 
-            type = "pearson_partial"))
-    checkIdentical(stat_adj_l[["pearson_semipartial"]], 
-        correlation(mat_test, correlation_adjust = "bonferroni", 
-            type = "pearson_semipartial"))
-    checkIdentical(stat_adj_l[["spearman"]], 
-        correlation(mat_test, correlation_adjust = "bonferroni", 
-            type = "spearman"))
-    checkIdentical(stat_adj_l[["spearman_partial"]], 
-        correlation(mat_test, correlation_adjust = "bonferroni", 
-            type = "spearman_partial"))
-    checkIdentical(stat_adj_l[["spearman_semipartial"]], 
-        correlation(mat_test, correlation_adjust = "bonferroni", 
-            type = "spearman_semipartial"))
+    tmp <- lasso_mat; diag(tmp) <- NaN
+    checkEquals(stat_adj_l[["lasso"]], tmp, tolerance = 5e-01)
+    tmp <- rf_mat; diag(tmp) <- NaN
+    checkEquals(stat_adj_l[["randomForest"]], tmp, tolerance = 5e-01)
+    tmp <- bayes_mat; diag(tmp) <- NaN
+    checkEquals(stat_adj_l[["bayes"]], tmp, tolerance = 5e-01)
+    tmp <- clr_mat; diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["clr"]], tmp)
+    tmp <- aracne_mat; diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["aracne"]], tmp)
+    tmp <-  correlation(mat_test, correlation_adjust = "bonferroni", 
+        type = "pearson")
+    diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["pearson"]], tmp)
+    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
+        type = "pearson_partial")
+    diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["pearson_partial"]], tmp)
+    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
+        type = "pearson_semipartial")
+    diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["pearson_semipartial"]], tmp)
+    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
+        type = "spearman")
+    diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["spearman"]], tmp)
+    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
+        type = "spearman_partial")
+    diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["spearman_partial"]], tmp)
+    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
+        type = "spearman_semipartial")
+    diag(tmp) <- NaN
+    checkIdentical(stat_adj_l[["spearman_semipartial"]], tmp)
     checkEquals(length(stat_adj_l), 11)
     checkEquals(as.numeric(lapply(stat_adj_l, nrow)), rep(7, 11))
     checkEquals(as.numeric(lapply(stat_adj_l, ncol)), rep(7, 11))
@@ -411,8 +422,8 @@ test_threshold <- function() {
     checkEquals(rownames(thr_mean), c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
     checkEquals(colnames(thr_mean), c("x1", "x2", "x3", "x4", "x5", "x6", "x7"))
     checkEquals(sum(thr_thr), 30)
-    checkEquals(sum(thr_top1), 10)
-    checkEquals(sum(thr_top2), 8)
+    checkEquals(sum(thr_top1), 20)
+    checkEquals(sum(thr_top2), 14)
     checkEquals(sum(thr_mean), 10)
     checkTrue(all(thr_thr %in% c(0, 1)))
     checkTrue(all(thr_top1 %in% c(0, 1)))

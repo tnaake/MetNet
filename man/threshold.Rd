@@ -51,11 +51,15 @@ values of `method`, the value should be carefully defined by the user.
 
 If  `type` is equal to `"top1"`, `"top2"` or
 `"mean"`, then `args` has to contain a numeric vector of length 1 that 
-gives the number of top ranks included in the returned adjacency matrix.
+gives the number of top ranks included in the returned adjacency matrix. 
+In this case p-values from correlation values (Pearson and Spearman, 
+including for partial and semipartial correlation) will be set to `NaN`; 
+values that are 0 for the models `lasso`, `randomForest` and `bayes` are 
+set to `NaN`; values from `clr` and `aracne` are taken as they are
  
-For `type = "top1"`, the best/lowest rank in `statistical` is taken. 
-For `type = "top2"`, the second best/lowest rank in `statistical` is 
-taken.
+For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken. 
+For `type = "top2"`, the second best (i.e. second lowest) rank in 
+`statistical` is taken.
 For `type = "mean"`, the average rank in `statistical` is taken. 
 Subsequently the first `n` unique ranks are returned.
 }

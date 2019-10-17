@@ -594,12 +594,14 @@ statistical <- function(x, model, ...) {
     ## add entry for lasso if "lasso" is in model
     if ("lasso" %in% model) {
         lasso <- lasso(x = x_z, ...)
+        diag(lasso) <- NaN
         l <- addToList(l, "lasso", lasso)
         print("lasso finished")
     }
     ## add entry for randomForest if "randomForest" is in model
     if ("randomForest" %in% model) {
         randomForest <- randomForest(x = x, ...)
+        diag(randomForest) <- NaN
         l <- addToList(l, "randomForest", randomForest)
         print("randomForest finished.")
     }
@@ -613,54 +615,65 @@ statistical <- function(x, model, ...) {
     ## add entry for clr if "clr" is in model
     if ("clr" %in% model) {
         clr <- threeDotsCall("clr", mi = mi_x_z, ...)
+        diag(clr) <- NaN
         l <- addToList(l, "clr", clr)
         print("clr finished.")
     }
     ## add entry for aracne if "aracne" is in model
     if ("aracne" %in% model) {
         aracne <- threeDotsCall("aracne", mi = mi_x_z, ...)
+        diag(aracne) <- NaN
         l <- addToList(l, "aracne", aracne)
         print("aracne finished.")
     }
     ## add entry for pearson if "pearson" is in model
     if ("pearson" %in% model) {
-        pearson <- threeDotsCall("correlation", x = x, type = "pearson", ...) ## was correlation(x = X, type = "p)
+        pearson <- threeDotsCall("correlation", x = x, type = "pearson", ...) 
+        diag(pearson) <- NaN
         l <- addToList(l, "pearson", pearson)
         print("pearson finished.")
     }
     ## add entry for pearson_partial if "pearson_partial" is in model
     if ("pearson_partial" %in% model) {
-        pearson_partial <- threeDotsCall("correlation", x = x, type = "pearson_partial", ...) 
+        pearson_partial <- threeDotsCall("correlation", x = x, 
+            type = "pearson_partial", ...) 
+        diag(pearson_partial) <- NaN
         l <- addToList(l, "pearson_partial", pearson_partial)
         print("pearson_partial finished.")
     }
     ## add entry for pearson_semipartial if "pearson_semipartial" is in model
     if ("pearson_semipartial" %in% model) {
-        pearson_sp <- threeDotsCall("correlation", x = x, type = "pearson_semipartial", ...)
+        pearson_sp <- threeDotsCall("correlation", x = x, 
+            type = "pearson_semipartial", ...)
+        diag(pearson_sp) <- NaN
         l <- addToList(l, "pearson_semipartial", pearson_sp)
         print("pearson_semipartial finished.")
     }
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
         spearman <- threeDotsCall("correlation", x = x, type = "spearman", ...)
+        diag(spearman) <- NaN
         l <- addToList(l, "spearman", spearman)
         print("spearman finished.")
     }
     ## add entry for spearman_partial if "spearman_partial" is in model
     if ("spearman_partial" %in% model) {
         spearman_partial <- threeDotsCall("correlation", x = x, type = "spearman_partial", ...)
+        diag(spearman_partial) <- NaN
         l <- addToList(l, "spearman_partial", spearman_partial)
         print("spearman_partial finished.")
     }
     ## add entry for spearman_semipartial if "spearman_semipartial" is in model
     if ("spearman_semipartial" %in% model) {
         spearman_sp <- threeDotsCall("correlation", x = x, type = "spearman_semipartial", ...)
+        diag(spearman_sp) <- NaN
         l <- addToList(l, "spearman_semipartial", spearman_sp)
         print("spearman_semipartial finished.")
     }
     ## add entry for bayes if "bayes" is in model
     if ("bayes" %in% model) {
         bayes <- threeDotsCall("bayes", x = x, ...)
+        diag(bayes) <- NaN
         l <- addToList(l, "bayes", bayes)
         print("bayes finished.")
     }
@@ -781,11 +794,15 @@ getLinks <- function(mat, decreasing = TRUE, exclude = "== 1") {
 #' 
 #' If  `type` is equal to `"top1"`, `"top2"` or
 #' `"mean"`, then `args` has to contain a numeric vector of length 1 that 
-#' gives the number of top ranks included in the returned adjacency matrix.
+#' gives the number of top ranks included in the returned adjacency matrix. 
+#' In this case p-values from correlation values (Pearson and Spearman, 
+#' including for partial and semipartial correlation) will be set to `NaN`; 
+#' values that are 0 for the models `lasso`, `randomForest` and `bayes` are 
+#' set to `NaN`; values from `clr` and `aracne` are taken as they are
 #'  
-#' For `type = "top1"`, the best/lowest rank in `statistical` is taken. 
-#' For `type = "top2"`, the second best/lowest rank in `statistical` is 
-#' taken.
+#' For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken. 
+#' For `type = "top2"`, the second best (i.e. second lowest) rank in 
+#' `statistical` is taken.
 #' For `type = "mean"`, the average rank in `statistical` is taken. 
 #' Subsequently the first `n` unique ranks are returned. 
 #' 
@@ -892,17 +909,25 @@ threshold <- function(statistical, type, args, ...) {
             ## get corresponding adjacency matrix in l
             l_x <- l[[name_x]]
             
+            ## for pearson/spearman correlation models (incl. partial and 
+            ## semi-partial), low values correspond to higher confidence
             if (grepl(name_x, pattern = "pearson|spearman")) {
-                ## for pearson/spearman correlation models (incl. partial and 
-                ## semi-partial), low values correspond to higher confidence
-                ## set values that are equal to 1 to NaN
-                getLinks(l_x, decreasing = FALSE, exclude = "== 1")   
+                ## set values (p-values) that are equal to 1 to NaN
+                res <- getLinks(l_x, decreasing = FALSE, exclude = "== 1")   
                 
-            } else {
-                ## for lasso, randomForest, clr, aracne and bayes higher values 
-                ## corresond to higher confidence 
-                getLinks(l_x, decreasing = TRUE, exclude = NULL)
+            } 
+            ## for lasso, randomForest, clr, aracne and bayes higher values 
+            ## corresond to higher confidence 
+            if (grepl(name_x, pattern = "lasso|randomForest|bayes")) {
+                ## set values that are equal to 0 to NaN (values that are 0)
+                ## do not explain the variability
+                res <- getLinks(l_x, decreasing = TRUE, exclude = "== 0")
+            } 
+            if (grepl(name_x, pattern = "clr|aracne")) {
+                res <- getLinks(l_x, decreasing = TRUE, exclude = NULL)
             }
+            
+            res
         })
         
         names(l_df) <- names(l)
@@ -987,7 +1012,12 @@ topKnet <- function(ranks, type) {
     ## depending on the type argument
     if (type == "top1") {
         ## get the lowest rank
-        cons_val <- apply(ranks, 1, min, na.rm =TRUE)
+        cons_val <- apply(ranks, 1, function(x) {
+            if (!all(is.na(x))) {
+                min(x, na.rm = TRUE)
+            } else {NaN}
+        })
+        
     }
     if (type == "top2") {
         
@@ -1000,7 +1030,11 @@ topKnet <- function(ranks, type) {
         ## get the second lowest rank (only if there are at least two or more
         ## non-NA values, otherwise return NA --> sort(x)[2] will return
         ## NA if there are less elements)
-        cons_val <- apply(ranks, 1, function(x) sort(x)[2]) 
+        cons_val <- apply(ranks, 1, function(x) {
+            if (!all(is.na(x))) {
+                sort(x)[2] 
+            } else {NaN}
+        })
     }
     if (type == "mean") {
         ## get the average of all ranks
