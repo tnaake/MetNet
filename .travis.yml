@@ -22,6 +22,7 @@ jobs:
         - covr
         - knitr
         - roxygen2
+        - testthat
       r_github_packages:
         - jimhester/lintr
       before_install: 
@@ -46,14 +47,14 @@ jobs:
     - stage: "CodeCov"
       install: skip
       script:
-        - travis_wait 20 Rscript -e 'covr::codecov()'
+        - travis_wait 10 Rscript -e 'covr::codecov()'
       name: "codecov"
       on:
         branch: master
     - stage: "lintr" 
       install: skip
       script:
-        - travis_wait 20 Rscript -e 'lintr::lint_package()' 
+        - travis_wait 10 Rscript -e 'lintr::lint_package()' 
       name: "lintr"
       on: 
         branch: "master"
