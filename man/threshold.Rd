@@ -52,10 +52,11 @@ values of `method`, the value should be carefully defined by the user.
 If  `type` is equal to `"top1"`, `"top2"` or
 `"mean"`, then `args` has to contain a numeric vector of length 1 that 
 gives the number of top ranks included in the returned adjacency matrix. 
-In this case p-values from correlation values (Pearson and Spearman, 
-including for partial and semipartial correlation) will be set to `NaN`; 
+In this case 
 values that are 0 for the models `lasso`, `randomForest` and `bayes` are 
-set to `NaN`; values from `clr` and `aracne` are taken as they are
+set to `NaN`; values from correlation (Pearson and Spearman, including
+for partial and semipartial correlation) and `clr` and `aracne` are 
+taken as they are.
  
 For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken. 
 For `type = "top2"`, the second best (i.e. second lowest) rank in 
@@ -68,12 +69,12 @@ data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
 model <- c("pearson", "spearman")
-args <- list("pearson" = 0.05, "spearman" = 0.05, n = 40)
+args <- list("pearson" = 0.95, "spearman" = 0.95, n = 40)
 l <- statistical(x, model = model)
 
 
 ## type = "threshold" 
-args <- list("pearson" = 0.05, "spearman" = 0.05, threshold = 1)
+args <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
 threshold(statistical = l, type = "threshold", args = args)
 
 ## type = "top1" 

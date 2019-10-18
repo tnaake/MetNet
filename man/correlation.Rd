@@ -4,19 +4,18 @@
 \alias{correlation}
 \title{Create an adjacency matrix based on correlation}
 \usage{
-correlation(x, correlation_adjust = "none", type = "pearson", ...)
+correlation(x, type = "pearson", use = "pairwise.complete.obs")
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features 
 (metabolites), cell entries are intensity values}
 
-\item{correlation_adjust}{character}
-
 \item{type}{`character`, either "pearson", "spearman", "pearson_partial",
 "spearman_partial", "pearson_semipartial" or "spearman_semipartial".}
 
-\item{...}{parameters passed to `corAndPvalue` (argument `adjust` 
-will be ignored)}
+\item{use}{`character` string giving a method for computing covariance in the 
+presence of missing values, Only for `type = "pearson"` or 
+`type = "spearman"`. For further information see `?stats::cor`}
 }
 \value{
 matrix, matrix with edges inferred from correlation algorithm 
@@ -24,17 +23,16 @@ matrix, matrix with edges inferred from correlation algorithm
 }
 \description{
 `correlation` infers an adjacency matrix using 
-correlation using the `corAndPvalue` function (from the 
-`WGCNA` package), `pcor` (from `ppcor`) or 
-`spcor` (from `ppcor`). `correlation` extracts the reported 
-p-values from the function `corAndPvalue`, `pcor` or `spcor` 
-that can be adjusted for 
-multiple testing (`correlation_adjust` parameter) and will return 
-the weighted adjacency matrix containing these.
+correlation using the `cor` function (from the 
+`stats` package), `pcor` (from `ppcor`) or 
+`spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
+correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor` 
+and will return 
+the weighted adjacency matrix of the absolute correlation values.
 }
 \details{
 If `"pearson"` or `"spearman"` is used as a `method`, the function 
-`corAndPvalue` from `WGCNA` will be employed. 
+`corAndPvalue` from `stats` will be employed. 
 
 If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the 
 function `pcor` from `spcor` will be employed. 
@@ -42,20 +40,18 @@ function `pcor` from `spcor` will be employed.
 If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a 
 `method` the function `spcor` from `spcor` will be employed. 
 
-`type` will be passed to argument `method` in `corAndPvalue` 
-(in the case of "pearson" or "spearman") or to `method` in `pcor` 
-("pearson" and "spearman" for "pearson_partial" and "spearman_partial", 
-respectively) or to `method` in `spcor` ("pearson" or "spearman"
-for "pearson_semipartial" and "spearman_semipartial", respectively)
-
-For use of the parameters used in the `corAndPvalue` function, 
-refer to ?WGCNA::corAndPvalue.
+`type` will be passed to argument `method` in `cor` 
+(in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor` 
+(`"pearson"` and `"spearman"` for `"pearson_partial"` and 
+`"spearman_partial"`, respectively) or to `method` in `spcor` 
+(`"pearson"` or `"spearman"` for `"pearson_semipartial"` and 
+`"spearman_semipartial"`, respectively)
 }
 \examples{
 data("x_test", package = "MetNet")
 x <- x_test[, 3:dim(x_test)[2]]
 x <- as.matrix(x)
-correlation(x, correlation_adjust = "bonferroni", type = "pearson")
+correlation(x, type = "pearson")
 
 }
 \author{

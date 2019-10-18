@@ -6,15 +6,13 @@ NULL
 NULL
 #' @importFrom parmigene clr aracne.a
 NULL
-#' @importFrom WGCNA corAndPvalue
-NULL
 #' @importFrom bnlearn fast.iamb arcs
 NULL
 #' @importFrom sna consensus
 NULL
 #' @importFrom BiocParallel bplapply
 NULL
-#' @importFrom stats formula p.adjust sd
+#' @importFrom stats formula p.adjust sd cor
 NULL
 #' @importFrom methods formalArgs
 NULL
@@ -275,13 +273,12 @@ aracne <- function(mi, eps = 0.05) {
 #' 
 #' @description  
 #' `correlation` infers an adjacency matrix using 
-#' correlation using the `corAndPvalue` function (from the 
-#' `WGCNA` package), `pcor` (from `ppcor`) or 
-#' `spcor` (from `ppcor`). `correlation` extracts the reported 
-#' p-values from the function `corAndPvalue`, `pcor` or `spcor` 
-#' that can be adjusted for 
-#' multiple testing (`correlation_adjust` parameter) and will return 
-#' the weighted adjacency matrix containing these. 
+#' correlation using the `cor` function (from the 
+#' `stats` package), `pcor` (from `ppcor`) or 
+#' `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
+#' correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor` 
+#' and will return 
+#' the weighted adjacency matrix of the absolute correlation values. 
 #' 
 #' @param 
 #' x matrix, where columns are the samples and the rows are features 
@@ -291,14 +288,14 @@ aracne <- function(mi, eps = 0.05) {
 #' type `character`, either "pearson", "spearman", "pearson_partial",
 #' "spearman_partial", "pearson_semipartial" or "spearman_semipartial". 
 #' 
-#' @param correlation_adjust character 
-#' 
-#' @param ... parameters passed to `corAndPvalue` (argument `adjust` 
-#' will be ignored)
+#' @param 
+#' use `character` string giving a method for computing covariance in the 
+#' presence of missing values, Only for `type = "pearson"` or 
+#' `type = "spearman"`. For further information see `?stats::cor`
 #' 
 #' @details 
 #' If `"pearson"` or `"spearman"` is used as a `method`, the function 
-#' `corAndPvalue` from `WGCNA` will be employed. 
+#' `corAndPvalue` from `stats` will be employed. 
 #' 
 #' If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the 
 #' function `pcor` from `spcor` will be employed. 
@@ -306,14 +303,12 @@ aracne <- function(mi, eps = 0.05) {
 #' If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a 
 #' `method` the function `spcor` from `spcor` will be employed. 
 #' 
-#' `type` will be passed to argument `method` in `corAndPvalue` 
-#' (in the case of "pearson" or "spearman") or to `method` in `pcor` 
-#' ("pearson" and "spearman" for "pearson_partial" and "spearman_partial", 
-#' respectively) or to `method` in `spcor` ("pearson" or "spearman"
-#' for "pearson_semipartial" and "spearman_semipartial", respectively)
-#' 
-#' For use of the parameters used in the `corAndPvalue` function, 
-#' refer to ?WGCNA::corAndPvalue. 
+#' `type` will be passed to argument `method` in `cor` 
+#' (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor` 
+#' (`"pearson"` and `"spearman"` for `"pearson_partial"` and 
+#' `"spearman_partial"`, respectively) or to `method` in `spcor` 
+#' (`"pearson"` or `"spearman"` for `"pearson_semipartial"` and 
+#' `"spearman_semipartial"`, respectively)
 #' 
 #' @return 
 #' matrix, matrix with edges inferred from correlation algorithm 
@@ -325,43 +320,35 @@ aracne <- function(mi, eps = 0.05) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
-#' correlation(x, correlation_adjust = "bonferroni", type = "pearson")
+#' correlation(x, type = "pearson")
 #' 
 #' @export
-correlation <- function(x, correlation_adjust = "none", type = "pearson", ...) {
+correlation <- function(x, type = "pearson", use = "pairwise.complete.obs") {
     
-    ## get character vector for p-value adjustment
-    adjust <- correlation_adjust
-    
-    ## allow for compatibility of arguments
+    ## pearson/spearman
     if (type %in% c("pearson", "spearman")) {
-        cor_mat <- WGCNA::corAndPvalue(x = t(x),
-            method = type, ...)$p
-        cor_mat <- stats::p.adjust(cor_mat, method = adjust)
-        cor_mat <- matrix(cor_mat, ncol = nrow(x), nrow = nrow(x),
-            byrow = FALSE)
+        cor_mat <- cor(x = t(x), method = type, use = use)
     }
     
+    ## partial pearson/spearman
     if (type %in% c("pearson_partial", "spearman_partial")) {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
-        cor_mat <- ppcor::pcor(t(x), method = method)$p.value
-        cor_mat <- stats::p.adjust(cor_mat, method = adjust)
-        cor_mat <- matrix(cor_mat, ncol = nrow(x), nrow = nrow(x),
-            byrow = FALSE)
+        cor_mat <- ppcor::pcor(t(x), method = method)$estimate
     }
     
+    ## semipartial pearson/spearman
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
-        cor_mat <- ppcor::spcor(t(x), method = method)$p.value
-        cor_mat <- stats::p.adjust(cor_mat, method = adjust)
-        cor_mat <- matrix(cor_mat, ncol = nrow(x), nrow = nrow(x), 
-            byrow = FALSE)
+        cor_mat <- ppcor::spcor(t(x), method = method)$estimate
     }
     
     ## assign col- and rownames to cor_mat
     colnames(cor_mat) <- rownames(cor_mat) <- rownames(x)
+    
+    ## get absolute values
+    cor_mat <- abs(cor_mat)
     
     return(cor_mat)
 }
@@ -694,11 +681,6 @@ statistical <- function(x, model, ...) {
 #' @param mat matrix containing the values of confidence for a link
 #' 
 #' @param 
-#' decreasing `logical`, if high values of `mat` correspond to higher
-#' confidence than `decreasing = TRUE`, if low values of `mat` correspond to
-#' higher confidence than `decreasing = FALSE`
-#' 
-#' @param 
 #' exclude `character`, logical statement as `character` to set `TRUE` 
 #' values to NaN in `mat`, will be omitted if `exclude = NULL`
 #' 
@@ -711,10 +693,10 @@ statistical <- function(x, model, ...) {
 #' 
 #' @examples 
 #' mat <- matrix(0:8, ncol = 3, nrow = 3)
-#' MetNet:::getLinks(mat, decreasing = TRUE)
+#' MetNet:::getLinks(mat, exclude = "== 0")
 #' 
 #' @export
-getLinks <- function(mat, decreasing = TRUE, exclude = "== 1") {
+getLinks <- function(mat, exclude = "== 1") {
     
     if (ncol(mat) != nrow(mat)) {
         stop("`mat` is not a square matrix")
@@ -730,15 +712,12 @@ getLinks <- function(mat, decreasing = TRUE, exclude = "== 1") {
     ## vectorize mat and write values of mat to confidence
     df <- data.frame(row = c(row(mat)), col = c(col(mat)), confidence = c(mat))
     
-    ## treat confidence values depending on decreasing parameter
-    ## if TRUE, then the highest confidence value should get the first rank
-    ## if TRUE, recalculate the confidence values that the values with highest
+
+    ## the highest confidence value should get the first rank
+    ## recalculate the confidence values that the values with highest
     ## support have low values
-    if (decreasing) {
-        conf <- max(df$confidence, na.rm = TRUE) - df$confidence
-    } else {
-        conf <- df$confidence - min(df$confidence, na.rm = TRUE)
-    }
+    conf <- max(df$confidence, na.rm = TRUE) - df$confidence
+    
     
     ## calculate rank and add to data.frame
     df <- data.frame(df, rank = NaN) 
@@ -795,10 +774,11 @@ getLinks <- function(mat, decreasing = TRUE, exclude = "== 1") {
 #' If  `type` is equal to `"top1"`, `"top2"` or
 #' `"mean"`, then `args` has to contain a numeric vector of length 1 that 
 #' gives the number of top ranks included in the returned adjacency matrix. 
-#' In this case p-values from correlation values (Pearson and Spearman, 
-#' including for partial and semipartial correlation) will be set to `NaN`; 
+#' In this case 
 #' values that are 0 for the models `lasso`, `randomForest` and `bayes` are 
-#' set to `NaN`; values from `clr` and `aracne` are taken as they are
+#' set to `NaN`; values from correlation (Pearson and Spearman, including
+#' for partial and semipartial correlation) and `clr` and `aracne` are 
+#' taken as they are.
 #'  
 #' For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken. 
 #' For `type = "top2"`, the second best (i.e. second lowest) rank in 
@@ -815,12 +795,12 @@ getLinks <- function(mat, decreasing = TRUE, exclude = "== 1") {
 #' x <- x_test[, 3:dim(x_test)[2]]
 #' x <- as.matrix(x)
 #' model <- c("pearson", "spearman")
-#' args <- list("pearson" = 0.05, "spearman" = 0.05, n = 40)
+#' args <- list("pearson" = 0.95, "spearman" = 0.95, n = 40)
 #' l <- statistical(x, model = model)
 #' 
 #' 
 #' ## type = "threshold" 
-#' args <- list("pearson" = 0.05, "spearman" = 0.05, threshold = 1)
+#' args <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
 #' threshold(statistical = l, type = "threshold", args = args)
 #' 
 #' ## type = "top1" 
@@ -878,16 +858,10 @@ threshold <- function(statistical, type, args, ...) {
             l_x <- l[[name_x]]
             
             ## for pearson/spearman correlation models (incl. partial and 
-            ## semi-partial), low values correspond to higher confidence,
-            ## only assign 1 to values that are below the threshold
-            if (grepl(name_x, pattern = "pearson|spearman")) {
-                ifelse(l_x < threshold_x, 1, 0)    
-                ## for lasso, randomForest, clr, aracne and bayes higher values 
-                ## corresond to higher confidence 
-                ## only assign 1 to values that are above the threshold
-            } else {
-                ifelse(l_x > threshold_x, 1, 0)
-            }
+            ## semi-partial), lasso, randomForest, clr, aracne and bayes higher 
+            ## values corresond to higher confidence 
+            ## only assign 1 to values that are above the threshold
+            ifelse(l_x > threshold_x, 1, 0)
         })
 
         ## allow for compatibility of arguments 
@@ -909,22 +883,16 @@ threshold <- function(statistical, type, args, ...) {
             ## get corresponding adjacency matrix in l
             l_x <- l[[name_x]]
             
-            ## for pearson/spearman correlation models (incl. partial and 
-            ## semi-partial), low values correspond to higher confidence
-            if (grepl(name_x, pattern = "pearson|spearman")) {
-                ## set values (p-values) that are equal to 1 to NaN
-                res <- getLinks(l_x, decreasing = FALSE, exclude = "== 1")   
-                
-            } 
-            ## for lasso, randomForest, clr, aracne and bayes higher values 
-            ## corresond to higher confidence 
+            ## for pearson/spearman correlation (incl. partial and 
+            ## semi-partial), lasso, randomForest, clr, aracne and bayes 
+            ## higher values corresond to higher confidence 
             if (grepl(name_x, pattern = "lasso|randomForest|bayes")) {
                 ## set values that are equal to 0 to NaN (values that are 0)
                 ## do not explain the variability
-                res <- getLinks(l_x, decreasing = TRUE, exclude = "== 0")
+                res <- getLinks(l_x, exclude = "== 0")
             } 
-            if (grepl(name_x, pattern = "clr|aracne")) {
-                res <- getLinks(l_x, decreasing = TRUE, exclude = NULL)
+            if (grepl(name_x, pattern = "pearson|spearman|clr|aracne")) {
+                res <- getLinks(l_x, exclude = NULL)
             }
             
             res

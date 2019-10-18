@@ -4,14 +4,10 @@
 \alias{getLinks}
 \title{Write an adjacency matrix to a `data.frame`}
 \usage{
-getLinks(mat, decreasing = TRUE, exclude = "== 1")
+getLinks(mat, exclude = "== 1")
 }
 \arguments{
 \item{mat}{matrix containing the values of confidence for a link}
-
-\item{decreasing}{`logical`, if high values of `mat` correspond to higher
-confidence than `decreasing = TRUE`, if low values of `mat` correspond to
-higher confidence than `decreasing = FALSE`}
 
 \item{exclude}{`character`, logical statement as `character` to set `TRUE` 
 values to NaN in `mat`, will be omitted if `exclude = NULL`}
@@ -28,7 +24,7 @@ and their corresponding ranks to a `data.frame`.
 }
 \examples{
 mat <- matrix(0:8, ncol = 3, nrow = 3)
-MetNet:::getLinks(mat, decreasing = TRUE)
+MetNet:::getLinks(mat, exclude = "== 0")
 
 }
 \author{

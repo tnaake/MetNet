@@ -357,7 +357,7 @@ Mutual Information using a nonparametric bias correction by
 Bias Corrected Mutual Information, and the functions \Rfunction{clr} and 
 \Rfunction{aracne.a} from the \CRANpkg{parmigene} package), Pearson and 
 Spearman correlation (based on the 
-\CRANpkg{WGCNA} package, \cite{Langfelder2008}), partial and semipartial 
+\CRANpkg{stats} package), partial and semipartial 
 Pearson and Spearman correlation (using the \CRANpkg{ppcor} package) and 
 score-based structure learning returning the strength of the probabilistic 
 relationships of the arcs of 
@@ -415,14 +415,11 @@ as links in the unweighted consensus adjacency matrix.
 In the following example, we will create a list of unweighted adjacency matrices 
 using 
 Pearson and Spearman correlation using the intensity values as input data. 
-The p-values that will be used for assigning edges in the unweighted 
-adjacency matrix will be adjusted by the Benjamini \& Hochberg (False Discovery 
-rate) method. 
+
 <<statistical,eval=TRUE,echo=TRUE>>=
 x_int <- x_test[, 3:dim(x_test)[2]]
 x_int <- as.matrix(x_int)
-stat_adj_l <- statistical(x_int, model = c("pearson", "spearman"), 
-    correlation_adjust = "BH")
+stat_adj_l <- statistical(x_int, model = c("pearson", "spearman"))
 @
 
 \Rfunction{threshold} implements four types to obtain an unweighted adjacency
@@ -431,7 +428,7 @@ matrices.
 
 <<threshold,eval=TRUE,echo=TRUE>>= 
 ## type = "threshold" 
-args_thr <- list("pearson" = 0.05, "spearman" = 0.05, threshold = 1)
+args_thr <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
 stat_adj_thr <- threshold(statistical = stat_adj_l, type = "threshold", 
     args = args_thr)
  

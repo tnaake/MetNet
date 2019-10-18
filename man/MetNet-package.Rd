@@ -43,8 +43,7 @@ functional_groups <- data.frame(group = functional_groups[,1],
 struct_adj <- structural(x_test, functional_groups, ppm = 5)
 
 stat_adj_l <- statistical(x_test, 
-    model = c("pearson", "spearman","bayes"), 
-    correlation_adjust = "bonferroni")
+    model = c("pearson", "spearman","bayes"))
 args_top1 <- list(n = 10)
 stat_adj <- threshold(stat_adj_l, type = "top2", args = args_top1)
 cons_adj <- combine(struct_adj, stat_adj)

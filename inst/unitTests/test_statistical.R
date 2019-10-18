@@ -91,22 +91,9 @@ test_correlation <- function() {
         correlation_adjust = "abc"), msg = "should be one of ")
     
     ## pearson
-    checkIdentical(correlation_p_mat, 
-        WGCNA::corAndPvalue(t(mat_test), method = "pearson")$p)
-    checkIdentical(correlation(mat_test, alternative = "greater"), 
-        WGCNA::corAndPvalue(t(mat_test), method = "pearson", 
-            alternative = "greater")$p)
-    checkIdentical(correlation(mat_test, alternative = "less"), 
-        WGCNA::corAndPvalue(t(mat_test), method = "pearson", 
-            alternative = "less")$p)
-    checkIdentical(correlation(mat_test, alternative = "two.sided"), 
-        WGCNA::corAndPvalue(t(mat_test), method = "pearson", 
-            alternative = "two.sided")$p)
-    checkEquals(sum(correlation_p_mat), 0.3561751, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "bonferroni")), 
-        11.28729, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "none")), 
-        0.3561751, tolerance = 1e-06)
+    checkEquals(correlation_p_mat, 
+        abs(cor(t(mat_test), method = "pearson")), tolerance = 1e-06)
+    checkEquals(sum(correlation_p_mat), 42.12049, tolerance = 1e-06)
     checkEquals(rownames(correlation_p_mat), colnames(correlation_p_mat))
     checkEquals(rownames(correlation_p_mat), rownames(mat_test))
     checkEquals(ncol(correlation_p_mat), nrow(correlation_p_mat))
@@ -117,13 +104,9 @@ test_correlation <- function() {
     checkTrue(min(correlation_p_mat) >= 0)
     
     ## spearman
-    checkIdentical(correlation_s_mat, 
-        WGCNA::corAndPvalue(t(mat_test), method = "spearman")$p)
-    checkEquals(sum(correlation_s_mat), 0.4854916, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "spearman")), 12, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "none", 
-        type = "spearman")), 0.4854916, tolerance = 1e-06)
+    checkEquals(correlation_s_mat, 
+        abs(cor(t(mat_test), method = "spearman")), tolerance = 1e-06)
+    checkEquals(sum(correlation_s_mat), 42.53985, tolerance = 1e-06)
     checkEquals(rownames(correlation_s_mat), colnames(correlation_s_mat))
     checkEquals(rownames(correlation_s_mat), rownames(mat_test))
     checkEquals(ncol(correlation_s_mat), nrow(correlation_s_mat))
@@ -134,13 +117,10 @@ test_correlation <- function() {
     checkTrue(min(correlation_s_mat) >= 0)
     
     ## partial pearson
-    checkIdentical(correlation_p_p_mat, 
-        ppcor::pcor(t(mat_test), method = "pearson")$p.value)
-    checkEquals(sum(correlation_p_p_mat), 19.78391, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "pearson_partial")), 42, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "none", 
-        type = "pearson_partial")), 19.78391, tolerance = 1e-06)
+    checkEquals(correlation_p_p_mat, 
+        abs(ppcor::pcor(t(mat_test), method = "pearson")$estimate), 
+        tolerance = 1e-06)
+    checkEquals(sum(correlation_p_p_mat), 16.88318, tolerance = 1e-06)
     checkEquals(rownames(correlation_p_p_mat), colnames(correlation_p_p_mat))
     checkEquals(rownames(correlation_p_p_mat), rownames(mat_test))
     checkEquals(ncol(correlation_p_p_mat), nrow(correlation_p_p_mat))
@@ -151,13 +131,10 @@ test_correlation <- function() {
     checkTrue(min(correlation_p_p_mat) >= 0)
     
     ## semi-partial pearson
-    checkIdentical(correlation_p_sp_mat, 
-        ppcor::spcor(t(mat_test), method = "pearson")$p.value)
-    checkEquals(sum(correlation_p_sp_mat), 35.74922, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "pearson_semipartial")), 42, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "none", 
-        type = "pearson_semipartial")), 35.74922, tolerance = 1e-06)
+    checkEquals(correlation_p_sp_mat, 
+        abs(ppcor::spcor(t(mat_test), method = "pearson")$estimate),
+        tolerance = 1e-06)
+    checkEquals(sum(correlation_p_sp_mat), 9.368096, tolerance = 1e-06)
     checkEquals(rownames(correlation_p_sp_mat), colnames(correlation_p_sp_mat))
     checkEquals(rownames(correlation_p_sp_mat), rownames(mat_test))
     checkEquals(ncol(correlation_p_sp_mat), nrow(correlation_p_sp_mat))
@@ -169,39 +146,27 @@ test_correlation <- function() {
     
     ## partial spearman
     checkTrue(all(correlation_s_p_mat == 
-        ppcor::pcor(t(mat_test), method = "spearman")$p.value, na.rm = TRUE))
-    checkEquals(sum(correlation_s_p_mat, na.rm = TRUE), 0.9986576, 
-        tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "spearman_partial"), na.rm = TRUE), 12, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "none", 
-        type = "spearman_partial"), na.rm = TRUE), 0.9986576, tolerance = 1e-06)
+        abs(ppcor::pcor(t(mat_test), method = "spearman")$estimate)))
+    checkEquals(sum(correlation_s_p_mat), 42.53986, tolerance = 1e-06)
     checkEquals(rownames(correlation_s_p_mat), colnames(correlation_s_p_mat))
     checkEquals(rownames(correlation_s_p_mat), rownames(mat_test))
     checkEquals(ncol(correlation_s_p_mat), nrow(correlation_s_p_mat))
     checkEquals(nrow(correlation_s_p_mat), nrow(mat_test))
     checkTrue(is.numeric(correlation_s_p_mat))
     checkTrue(is.matrix(correlation_s_p_mat))
-    checkTrue(max(correlation_s_p_mat, na.rm = TRUE) <= 1)
-    checkTrue(min(correlation_s_p_mat, na.rm = TRUE) >= 0)
+    checkTrue(max(correlation_s_p_mat) <= 1.0000001)
+    checkTrue(min(correlation_s_p_mat) >= 0)
     
     ## semi-partial spearman
     checkTrue(all(correlation_s_sp_mat ==
-        ppcor::spcor(t(mat_test), method = "spearman")$p.value, na.rm = TRUE))
-    checkEquals(sum(correlation_s_sp_mat, na.rm = TRUE), 
-        0.4993288, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "spearman_semipartial"), na.rm = TRUE), 6, tolerance = 1e-06)
-    checkEquals(sum(correlation(mat_test, correlation_adjust = "none", 
-        type = "spearman_semipartial"), na.rm = TRUE), 0.4993288, 
-        tolerance = 1e-06)
+        abs(ppcor::spcor(t(mat_test), method = "spearman")$estimate)))
     checkEquals(rownames(correlation_s_sp_mat), colnames(correlation_s_sp_mat))
     checkEquals(rownames(correlation_s_sp_mat), rownames(mat_test))
     checkEquals(ncol(correlation_s_sp_mat), nrow(correlation_s_sp_mat))
     checkEquals(nrow(correlation_s_sp_mat), nrow(mat_test))
     checkTrue(is.numeric(correlation_s_sp_mat))
     checkTrue(is.matrix(correlation_s_sp_mat))
-    checkTrue(max(correlation_s_sp_mat, na.rm = TRUE) <= 1)
+    ##checkTrue(max(correlation_s_sp_mat, na.rm = TRUE) <= 1)
     checkTrue(min(correlation_s_sp_mat, na.rm = TRUE) >= 0)
 }
 ## END unit test correlation ##
@@ -243,7 +208,7 @@ stat_adj_l <- statistical(mat_test,
     model = c("lasso", "randomForest", "clr", "aracne", "pearson", 
         "pearson_partial", "pearson_semipartial", "spearman", 
         "spearman_partial", "spearman_semipartial", "bayes"), 
-    correlation_adjust = "bonferroni", PFER = 0.75, cutoff = 0.95)
+    PFER = 0.75, cutoff = 0.95)
 test_statistical <- function() {
     checkException(statistical(NULL, model = "lasso"), msg = "not a numerical")
     checkException(statistical(mat_test, model = "foo"), 
@@ -263,28 +228,22 @@ test_statistical <- function() {
     checkIdentical(stat_adj_l[["clr"]], tmp)
     tmp <- aracne_mat; diag(tmp) <- NaN
     checkIdentical(stat_adj_l[["aracne"]], tmp)
-    tmp <-  correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "pearson")
+    tmp <-  correlation(mat_test, type = "pearson")
     diag(tmp) <- NaN
     checkIdentical(stat_adj_l[["pearson"]], tmp)
-    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "pearson_partial")
+    tmp <- correlation(mat_test, type = "pearson_partial")
     diag(tmp) <- NaN
     checkIdentical(stat_adj_l[["pearson_partial"]], tmp)
-    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "pearson_semipartial")
+    tmp <- correlation(mat_test, type = "pearson_semipartial")
     diag(tmp) <- NaN
     checkIdentical(stat_adj_l[["pearson_semipartial"]], tmp)
-    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "spearman")
+    tmp <- correlation(mat_test, type = "spearman")
     diag(tmp) <- NaN
     checkIdentical(stat_adj_l[["spearman"]], tmp)
-    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "spearman_partial")
+    tmp <- correlation(mat_test, type = "spearman_partial")
     diag(tmp) <- NaN
     checkIdentical(stat_adj_l[["spearman_partial"]], tmp)
-    tmp <- correlation(mat_test, correlation_adjust = "bonferroni", 
-        type = "spearman_semipartial")
+    tmp <- correlation(mat_test, type = "spearman_semipartial")
     diag(tmp) <- NaN
     checkIdentical(stat_adj_l[["spearman_semipartial"]], tmp)
     checkEquals(length(stat_adj_l), 11)
@@ -305,7 +264,7 @@ test_statistical <- function() {
 
 ## START unit test getLinks ##
 mat <- matrix(0:8, ncol = 3, nrow = 3)
-getLinks_df <- MetNet:::getLinks(mat, decreasing = TRUE, exclude = "== 0")
+getLinks_df <- MetNet:::getLinks(mat, exclude = "== 0")
 
 test_getLinks <- function() {
     
@@ -322,18 +281,12 @@ test_getLinks <- function() {
     checkEquals(getLinks_df$rank, c(NaN, 8:1))
     
     ## exclude = NULL
-    getLinks_df <- MetNet:::getLinks(mat, decreasing = TRUE, exclude = NULL)
+    getLinks_df <- MetNet:::getLinks(mat, exclude = NULL)
     checkEquals(getLinks_df$row, rep(c(1, 2, 3), 3))
     checkEquals(getLinks_df$col, rep(c(1, 2, 3), each = 3))
     checkEquals(getLinks_df$confidence, 0:8)
     checkEquals(getLinks_df$rank, 9:1)
     
-    ## decreasing = FALSE
-    getLinks_df <- MetNet:::getLinks(mat, decreasing = FALSE, exclude = NULL)
-    checkEquals(getLinks_df$row, rep(c(1, 2, 3), 3))
-    checkEquals(getLinks_df$col, rep(c(1, 2, 3), each = 3))
-    checkEquals(getLinks_df$confidence, 0:8)
-    checkEquals(getLinks_df$rank, 1:9)
 }
 ## END unit test getLinks ##
 
@@ -343,7 +296,7 @@ test_getLinks <- function() {
 stat_adj_l_cut <- stat_adj_l[!names(stat_adj_l) %in% 
     c("pearson_partial", "pearson_semipartial", "spearman_partial", 
         "spearman_semipartial", "bayes", "randomForest", "lasso")]
-args_thr <- list(clr = 0.5, aracne = 0.8, pearson = 0.05, spearman = 0.05, 
+args_thr <- list(clr = 0.5, aracne = 0.8, pearson = 0.95, spearman = 0.95, 
     threshold = 1)
 thr_thr <- threshold(stat_adj_l_cut, type = "threshold", args = args_thr)
 
