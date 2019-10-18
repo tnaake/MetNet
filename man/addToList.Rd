@@ -27,7 +27,7 @@ The function `addToList` is a helper function used internally in
 }
 \examples{
 data("x_test", package = "MetNet")
-x <- x_test[, 3:dim(x_test)[2]]
+x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 cor_pearson <- correlation(x, type = "pearson")
 cor_spearman <- correlation(x, type = "spearman")

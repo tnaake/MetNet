@@ -30,7 +30,7 @@ of the link from i to j.
 }
 \examples{
 data("x_test", package = "MetNet")
-x <- x_test[, 3:dim(x_test)[2]]
+x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 randomForest(x)
 

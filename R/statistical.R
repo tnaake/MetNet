@@ -130,7 +130,7 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' 
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' randomForest(x)
 #' 
@@ -188,7 +188,7 @@ randomForest <- function(x, ...) {
 #' 
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
@@ -247,7 +247,7 @@ clr <- function(mi) {
 #' 
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
@@ -318,7 +318,7 @@ aracne <- function(mi, eps = 0.05) {
 #' 
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' correlation(x, type = "pearson")
 #' 
@@ -408,7 +408,7 @@ correlation <- function(x, type = "pearson", use = "pairwise.complete.obs") {
 #' 
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' bayes(x, algorithm = "tabu", R = 100)
 #' 
@@ -464,7 +464,7 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
 #' 
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' cor_pearson <- correlation(x, type = "pearson")
 #' cor_spearman <- correlation(x, type = "spearman")
@@ -553,7 +553,7 @@ addToList <- function(l, name, object) {
 #' 
 #' @examples 
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' statistical(x = x, model = c("pearson", "spearman"))
 #' 
@@ -571,8 +571,8 @@ statistical <- function(x, model, ...) {
     if (mode(x) != "numeric") stop("x is not a numerical matrix")
     
     ## z-scale x and transpose
-    x_z <- apply(x, 1, function(x) {
-        (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+    x_z <- apply(x, 1, function(y) {
+        (y - mean(y, na.rm = TRUE)) / sd(y, na.rm = TRUE)
     })
     x_z <- t(x_z)
     
@@ -792,10 +792,10 @@ getLinks <- function(mat, exclude = "== 1") {
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples
 #' data("x_test", package = "MetNet")
-#' x <- x_test[, 3:dim(x_test)[2]]
+#' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' model <- c("pearson", "spearman")
-#' args <- list("pearson" = 0.95, "spearman" = 0.95, n = 40)
+#' args <- list("pearson" = 0.95, "spearman" = 0.95, n = 10)
 #' l <- statistical(x, model = model)
 #' 
 #' 
@@ -804,7 +804,7 @@ getLinks <- function(mat, exclude = "== 1") {
 #' threshold(statistical = l, type = "threshold", args = args)
 #' 
 #' ## type = "top1" 
-#' args <- list(n = 40)
+#' args <- list(n = 10)
 #' threshold(statistical = l, type = "top1", args = args)
 #' 
 #' ## type = "top2"

@@ -43,18 +43,13 @@ the `ppm` argument (default `ppm = 5`).
 }
 \examples{
 data("x_test", package = "MetNet")
-transformation <- rbind(
-    c("Hydroxylation (-H)", "O", "15.9949146221"),
-    c("Malonyl group (-H2O)", "C3H2O3", "86.0003939305"),
-    c("C6H10O6", "C6H10O6", "178.0477380536"),
-    c("D-ribose (-H2O) (ribosylation)", "C5H8O4", "132.0422587452"),
-    c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
-    c("Glucuronic acid (-H2O)", "C6H8O6", "176.0320879894"),
+transformation <- rbind(     
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
+    c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
-transformation <- data.frame(group = transformation[,1],
-                                formula = transformation[,2],
-                                mass = as.numeric(transformation[,3]))
+transformation <- data.frame(group = transformation[, 1],
+                                formula = transformation[, 2],
+                                mass = as.numeric(transformation[, 3]))
 struct_adj <- structural(x_test, transformation, ppm = 5)
 
 }

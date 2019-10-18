@@ -66,10 +66,10 @@ Subsequently the first `n` unique ranks are returned.
 }
 \examples{
 data("x_test", package = "MetNet")
-x <- x_test[, 3:dim(x_test)[2]]
+x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 model <- c("pearson", "spearman")
-args <- list("pearson" = 0.95, "spearman" = 0.95, n = 40)
+args <- list("pearson" = 0.95, "spearman" = 0.95, n = 10)
 l <- statistical(x, model = model)
 
 
@@ -78,7 +78,7 @@ args <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
 threshold(statistical = l, type = "threshold", args = args)
 
 ## type = "top1" 
-args <- list(n = 40)
+args <- list(n = 10)
 threshold(statistical = l, type = "top1", args = args)
 
 ## type = "top2"

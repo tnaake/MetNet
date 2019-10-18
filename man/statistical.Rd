@@ -55,7 +55,7 @@ will be used in `lasso`, `clr` and/or `aracne`.
 }
 \examples{
 data("x_test", package = "MetNet")
-x <- x_test[, 3:dim(x_test)[2]]
+x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 statistical(x = x, model = c("pearson", "spearman"))
 

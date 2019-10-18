@@ -49,7 +49,7 @@ If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
 }
 \examples{
 data("x_test", package = "MetNet")
-x <- x_test[, 3:dim(x_test)[2]]
+x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 correlation(x, type = "pearson")
 
