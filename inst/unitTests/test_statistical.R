@@ -5,8 +5,7 @@ library(RUnit)
 data("mat_test", package = "MetNet")
 
 ## START unit test lasso ##
-lasso_mat <- lasso(t(mat_test_z), parallel = FALSE, PFER = 0.75, cutoff = 0.95)
-lasso_mat_parallel <- lasso(t(mat_test_z)[1:5,], parallel = TRUE, 
+lasso_mat <- lasso(t(mat_test_z), parallel = TRUE, 
     PFER = 0.75, cutoff = 0.95)
 test_lasso <- function() {
     checkException(lasso(NULL, PFER = 0.75, cutoff = 0.95), 
