@@ -43,11 +43,13 @@ jobs:
       r_check_args: --as-cran --no-build-vignettes --no-vignettes --no-manual --no-codoc --no-examples
       install: skip
       before_script: rm -rf vignettes
+      script: 
+        - travis_wait 20 R CMD check MetNet*tar.gz
       name: "tests"
     - stage: "CodeCov"
       install: skip
       script:
-        - travis_wait 10 Rscript -e 'covr::codecov()'
+        - travis_wait 20 Rscript -e 'covr::codecov()'
       name: "codecov"
       on:
         branch: master
