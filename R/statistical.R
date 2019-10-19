@@ -877,13 +877,12 @@ threshold <- function(statistical, type, args, ...) {
         ## calculate consenses from the binary matrices
         cons <- threeDotsCall(sna::consensus, dat = l, ...)
 
-        ##if (method == "central.graph") threshold <- 1
         ## threshold consensus that it is a binary matrix
         cons <- ifelse(cons >= args$threshold, 1, 0)
 
         rownames(cons) <- colnames(cons) <- colnames(l[[1]])
 
-    } else { ## if type %in% c("top1", "top2", "mean")
+    } else { ## if type is in "top1", "top2" or "mean"
         l_df <- lapply(seq_along(l), function(x) {
 
             ## find corresponding model in l
