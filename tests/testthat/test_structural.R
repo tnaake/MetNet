@@ -23,9 +23,9 @@ test_that("structural", {
         "does not contain the column mz")
     expect_error(structural(NULL, transformations),
         "does not contain the column mz")
-    expect_error(structural(mat_test, transformations[,-1]),
+    expect_error(structural(mat_test, transformations[, -1]),
         "does not contain the column group")
-    expect_error(structural(mat_test, transformations[,-3]),
+    expect_error(structural(mat_test, transformations[, -3]),
         "does not contain the column mass")
     expect_error(structural(mat_test, matrix()),
         "is not a data.frame")
@@ -40,7 +40,7 @@ test_that("structural", {
     expect_equal(rownames(struct_adj[[1]]), paste0("x", 1:7))
     expect_equal(sum(struct_adj[[1]]), 12)
     expect_equal(unique(as.vector(struct_adj[[2]])),
-                c("", "Monosaccharide (–H2O)", "Malonyl group (–H2O)" ))
+                c("", "Monosaccharide (–H2O)", "Malonyl group (–H2O)"))
     expect_true(is.matrix(struct_adj[[1]]))
     expect_true(is.matrix(struct_adj[[2]]))
     expect_true(is.numeric(struct_adj[[1]]))
@@ -62,9 +62,9 @@ test_that("rtCorrection", {
         mat_test, transformations), "is not a character matrix")
     expect_error(rtCorrection(struct_adj, NULL, transformations),
         "does not contain the column rt")
-    expect_error(rtCorrection(struct_adj, mat_test[,-1], transformations),
+    expect_error(rtCorrection(struct_adj, mat_test[, -1], transformations),
         "subscript out of bounds")
-    expect_error(rtCorrection(struct_adj, mat_test[,-2], transformations),
+    expect_error(rtCorrection(struct_adj, mat_test[, -2], transformations),
         "does not contain the column rt")
     expect_error(rtCorrection(struct_adj, mat_test, NULL),
         "does not contain the column group")
@@ -75,7 +75,7 @@ test_that("rtCorrection", {
     expect_error(rtCorrection(struct_adj, mat_test, transformations[, -4]),
         "does not contain the column rt")
     expect_error(rtCorrection(struct_adj, mat_test,
-        cbind(transformations[,-4], rt = rep("a", 4))),
+        cbind(transformations[, -4], rt = rep("a", 4))),
         "does contain other levels than")
     expect_true(is.matrix(struct_adj_rt[[1]]))
     expect_true(is.numeric(struct_adj_rt[[1]]))
@@ -91,7 +91,7 @@ test_that("rtCorrection", {
     ## dims of struct_adj[[1]] and struct[[2]], rownames/colnames
     foo_1 <- struct_adj[[1]]
     foo_2 <- struct_adj[[2]]
-    foo <- list(foo_1, foo_2[,1:6])
+    foo <- list(foo_1, foo_2[, 1:6])
     expect_error(rtCorrection(foo, mat_test, transformations),
         " is not equal to dim")
 
@@ -108,7 +108,7 @@ test_that("rtCorrection", {
 
     foo_2 <- struct_adj[[2]]
     foo <- list(foo_1, foo_2)
-    expect_error(rtCorrection(foo, mat_test[1:6,], transformations),
+    expect_error(rtCorrection(foo, mat_test[1:6, ], transformations),
         "do not fit rownames[(]x[])]")
 
     foo_1 <- as.data.frame(struct_adj[[1]])

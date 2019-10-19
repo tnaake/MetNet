@@ -34,7 +34,7 @@
 #' in parts per million (ppm) by the `ppm` argument. The m/z values in the
 #' `"mz"` column of `x`" will be converted to m/z ranges according to
 #' the `ppm` argument (default `ppm = 5`).
-#' 
+#'
 #' @return
 #' `list` containing two matrices. The first entry stores the `numeric`
 #' `matrix` with edges inferred from mass differences. The second entry
@@ -78,15 +78,15 @@ structural <- function(x, transformation, ppm = 5) {
     mat <- mat - t(mat)
     mat <- abs(mat)
     ## calculate ppm deviation
-    mat_1 <- mat / abs(ppm / 10 ^ 6  - 1 )
-    mat_2 <- mat / abs(ppm / 10 ^ 6  + 1 )
+    mat_1 <- mat / abs(ppm / 10 ^ 6  - 1)
+    mat_2 <- mat / abs(ppm / 10 ^ 6  + 1)
 
     ## create two matrices to store result
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
     mat_type <- matrix("", nrow = length(mass), ncol = length(mass))
 
     ## iterate through each column and check if the "mass" is in the interval
-    ## defined by the m/z value and ppm 
+    ## defined by the m/z value and ppm
     for (i in seq_along(transformation[, "mass"])) {
 
         ind_mat_1 <- which(mat_1 >= transformation[i, "mass"])
@@ -96,8 +96,9 @@ structural <- function(x, transformation, ppm = 5) {
         ind_hit <- intersect(ind_mat_1, ind_mat_2)
         ## write to these indices 1 and the "group"
         mat[ind_hit] <- 1
-        mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) != 0, 
-            yes = paste(mat_type[ind_hit], transformation[i, "group"], sep = "/"),
+        mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) != 0,
+            yes = paste(mat_type[ind_hit], transformation[i, "group"],
+                sep = "/"),
             no = as.character(transformation[i, "group"]))
     }
 
@@ -190,14 +191,14 @@ structural <- function(x, transformation, ppm = 5) {
 #' @export
 rtCorrection <- function(structural, x, transformation) {
 
-    ## check arguments 
+    ## check arguments
     if (!is.list(structural)) stop("structural is not a list")
     if (!length(structural) == 2) stop("structural is not a list of length 2")
     ## allocate structural[[1]] and structural[[2]] to adj and group
     adj <- structural[[1]]
     group <- structural[[2]]
 
-    if (any(dim(adj) != dim(group))) 
+    if (any(dim(adj) != dim(group)))
         stop("dim(structural[[1]] is not equal to dim(structural[[2]])")
 
     if (!"rt" %in% colnames(x)) stop("x does not contain the column rt")
@@ -213,7 +214,7 @@ rtCorrection <- function(structural, x, transformation) {
 
     if (!all(levels(transformation[, "rt"]) %in% c("+", "-", "?")))
         stop(c('in transformation[, "rt"] does contain other levels than',
-                ' "+", "-" or "?"' ))
+                ' "+", "-" or "?"'))
 
     if (!all(colnames(adj) == rownames(adj)))
         stop(c("colnames of structural[[1]] are not identical to rownames of",
@@ -256,7 +257,7 @@ rtCorrection <- function(structural, x, transformation) {
 
     ## iterate through transformation rows
     for (j in seq_len(nrow(transformation))) {
-   
+
         ## check if observed rt shift corresponds to expected one and
         ## remove connection if necessary
         if (transformation[j, "rt"] == "+") {
@@ -269,7 +270,7 @@ rtCorrection <- function(structural, x, transformation) {
         if (transformation[j, "rt"] == "-") {
             adj[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- 0
             group[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
-            adj[ind[[j]]][ mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- 0
+            adj[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- 0
             group[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
         }
     }

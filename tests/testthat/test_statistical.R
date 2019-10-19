@@ -48,7 +48,7 @@ test_that("clr", {
     expect_equal(rownames(clr_mat), colnames(clr_mat))
     expect_equal(rownames(clr_mat), rownames(mat_test)[1:5])
     expect_equal(ncol(clr_mat), nrow(clr_mat))
-    expect_equal(nrow(clr_mat), nrow(mat_test[1:5,]))
+    expect_equal(nrow(clr_mat), nrow(mat_test[1:5, ]))
     expect_true(is.numeric(clr_mat))
     expect_true(is.matrix(clr_mat))
     expect_true(max(clr_mat) <= 1)
@@ -77,11 +77,11 @@ test_that("aracne", {
 ## START unit test correlation ##
 correlation_p_mat <- correlation(mat_test[1:5, ], type = "pearson")
 correlation_p_p_mat <- correlation(mat_test[1:5, ], type = "pearson_partial")
-correlation_p_sp_mat <- correlation(mat_test[1:5, ], 
+correlation_p_sp_mat <- correlation(mat_test[1:5, ],
     type = "pearson_semipartial")
 correlation_s_mat <- correlation(mat_test[1:5, ], type = "spearman")
 correlation_s_p_mat <- correlation(mat_test[1:5, ], type = "spearman_partial")
-correlation_s_sp_mat <- correlation(mat_test[1:5, ], 
+correlation_s_sp_mat <- correlation(mat_test[1:5, ],
     type = "spearman_semipartial")
 
 test_that("correlation", {
@@ -131,8 +131,8 @@ test_that("correlation", {
     expect_true(min(correlation_p_p_mat) >= 0)
 
     ## semi-partial pearson
-    expect_true(all(correlation_p_sp_mat -
-        abs(ppcor::spcor(t(mat_test[1:5, ]), method = "pearson")$estimate) == 0))
+    expect_true(all(correlation_p_sp_mat - abs(ppcor::spcor(t(mat_test[1:5, ]),
+        method = "pearson")$estimate) == 0))
     expect_equal(sum(correlation_p_sp_mat), 6.690744, tolerance = 1e-06)
     expect_equal(rownames(correlation_p_sp_mat), colnames(correlation_p_sp_mat))
     expect_equal(rownames(correlation_p_sp_mat), rownames(mat_test)[1:5])
@@ -144,8 +144,8 @@ test_that("correlation", {
     expect_true(min(correlation_p_sp_mat) >= 0)
 
     ## partial spearman
-    expect_true(all(correlation_s_p_mat -
-        abs(ppcor::pcor(t(mat_test[1:5, ]), method = "spearman")$estimate) == 0))
+    expect_true(all(correlation_s_p_mat - abs(ppcor::pcor(t(mat_test[1:5, ]), 
+        method = "spearman")$estimate) == 0))
     expect_equal(sum(correlation_s_p_mat), 20.69323, tolerance = 1e-06)
     expect_equal(rownames(correlation_s_p_mat), colnames(correlation_s_p_mat))
     expect_equal(rownames(correlation_s_p_mat), rownames(mat_test)[1:5])
@@ -157,16 +157,14 @@ test_that("correlation", {
     expect_true(min(correlation_s_p_mat) >= 0)
 
     ## semi-partial spearman
-    expect_true(all(correlation_s_sp_mat -
-        abs(ppcor::spcor(t(mat_test[1:5, ]), method = "spearman")$estimate) == 0, 
-        na.rm = TRUE))
+    expect_true(all(correlation_s_sp_mat - abs(ppcor::spcor(t(mat_test[1:5, ]), 
+        method = "spearman")$estimate) == 0, na.rm = TRUE))
     expect_equal(rownames(correlation_s_sp_mat), colnames(correlation_s_sp_mat))
     expect_equal(rownames(correlation_s_sp_mat), rownames(mat_test)[1:5])
     expect_equal(ncol(correlation_s_sp_mat), nrow(correlation_s_sp_mat))
     expect_equal(nrow(correlation_s_sp_mat), nrow(mat_test[1:5, ]))
     expect_true(is.numeric(correlation_s_sp_mat))
     expect_true(is.matrix(correlation_s_sp_mat))
-    ##expect_true(max(correlation_s_sp_mat, na.rm = TRUE) <= 1)
     expect_true(min(correlation_s_sp_mat, na.rm = TRUE) >= 0)
 })
 ## END unit test correlation ##
@@ -234,9 +232,9 @@ test_that("statistical", {
     tmp <-  correlation(mat_test[1:5, ], type = "pearson")
     diag(tmp) <- NaN
     expect_true(all(stat_adj_l[["pearson"]], tmp, na.rm = TRUE))
-    tmp <- correlation(mat_test[1:5,], type = "pearson_partial")
+    tmp <- correlation(mat_test[1:5, ], type = "pearson_partial")
     diag(tmp) <- NaN
-    expect_true(all(stat_adj_l[["pearson_partial"]] == tmp, na.rm =TRUE))
+    expect_true(all(stat_adj_l[["pearson_partial"]] == tmp, na.rm = TRUE))
     tmp <- correlation(mat_test[1:5, ], type = "pearson_semipartial")
     diag(tmp) <- NaN
     expect_true(all(stat_adj_l[["pearson_semipartial"]] == tmp, na.rm = TRUE))
@@ -275,7 +273,7 @@ test_that("getLinks", {
     expect_error(MetNet:::getLinks(mat, exclude = "foo"),
         "object 'matfoo' not found")
 
-    ## exclude = "== 0"
+    ## checks for exclude = "== 0"
     expect_true(is.data.frame(getLinks_df))
     expect_equal(getLinks_df$row, rep(c(1, 2, 3), 3))
     expect_equal(getLinks_df$col, rep(c(1, 2, 3), each = 3))
@@ -308,7 +306,7 @@ thr_top2 <- threshold(stat_adj_l_cut, type = "top2", args = args_top)
 thr_mean <- threshold(stat_adj_l_cut, type = "mean", args = args_top)
 
 test_that("threshold", {
-    
+
     ## test arguments
     expect_error(threshold(NULL, type = "threshold", args = args_thr),
         "consensus requires graphs of identical order")
@@ -428,4 +426,3 @@ test_that("threeDotsCall", {
     expect_equal(MetNet:::threeDotsCall("mean", x = 1:10, foo = 1), mean(1:10))
 })
 ## END unit test threeDotsCall ##
-

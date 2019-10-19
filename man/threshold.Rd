@@ -29,7 +29,7 @@ consensus matrix (a named list with entry `n`)}
 \description{
 The function `threshold` takes as input a list of adjacency matrices
 as returned from the function `statistical`. Depending on the `type`
-argument, 'threshold` will identify the strongest link that are 
+argument, 'threshold` will identify the strongest link that are
 lower or higher a certain threshold (`type = "threshold"`) or
 identify the top `n` links (`type` either `"top1`, `"top2` or `"mean"`).
 }
@@ -72,11 +72,11 @@ model <- c("pearson", "spearman")
 args <- list("pearson" = 0.95, "spearman" = 0.95, n = 10)
 l <- statistical(x, model = model)
 
-## type = "threshold" 
+## type = "threshold"
 args <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
 threshold(statistical = l, type = "threshold", args = args)
 
-## type = "top1" 
+## type = "top1"
 args <- list(n = 10)
 threshold(statistical = l, type = "top1", args = args)
 

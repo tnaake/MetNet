@@ -17,7 +17,7 @@ struct_adj <- structural(mat_test,
         transformation = transformations, ppm = 5)
 
 ## create statistical network
-stat_adj_l <- statistical(mat_test, 
+stat_adj_l <- statistical(mat_test,
     model = c("clr", "aracne", "pearson", "spearman", "bayes"))
 stat_adj <- threshold(stat_adj_l, type = "top2", args = list(n = 10))
 
@@ -65,10 +65,10 @@ test_that("combine", {
 
     ## check for structural
     l <- list(1, cons_adj[[2]])
-    expect_error(combine(structural=l, statistical=stat_adj),
+    expect_error(combine(structural = l, statistical = stat_adj),
         "not a numeric matrix")
     l <- list(cons_adj[[1]], 1)
-    expect_error(combine(structural=l, statistical=stat_adj),
+    expect_error(combine(structural = l, statistical = stat_adj),
         "not a character ")
 })
 ## END unit test combine ##

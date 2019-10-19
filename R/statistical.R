@@ -44,13 +44,13 @@ NULL
 #' @details For use of the parameters used in the `stabsel.matrix` function,
 #' refer to `?stabs::stabsel.matrix`.
 #'
-#' @return 
+#' @return
 #' matrix, matrix with edges inferred from LASSO algorithm
 #' `stabsel.matrix`
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -66,25 +66,25 @@ lasso <- function(x, parallel = FALSE, ...) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
 
             ## lasso: alpha set to 1
-            ## allow for compatibility of arguments 
+            ## allow for compatibility of arguments
             l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
                     y = y_l1, fitfun = glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
 
             ## return selection probabilities of features that are not 0
             return(l1$max[l1$max != 0])
-        }) 
-        
+        })
+
     } else {
         l1 <- lapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
-            
+
             ## lasso: alpha set to 1
             ## allow for compatibility of arguments
             l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
                     y = y_l1, fitfun = glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
-            
+
             ## return selection probabilities of features that are not 0
             return(l1$max[l1$max != 0])
         })
@@ -103,65 +103,65 @@ lasso <- function(x, parallel = FALSE, ...) {
 }
 
 #' @name randomForest
-#' 
+#'
 #' @aliases randomForest
-#' 
+#'
 #' @title Create an adjacency matrix based on random forest
-#' 
+#'
 #' @description
 #' `randomForest` infers an adjacency matrix using
 #' random forest using the `GENIE3` function from the 
 #' `GENIE3` package. `randomForest` returns the importance of the link
 #' between features in the form of an adjacency matrix.
-#' 
+#'
 #' @param
 #' x matrix, where columns are the samples and the rows are features
 #' (metabolites), cell entries are intensity values
-#' 
+#'
 #' @param ... parameters passed to `GENIE3`
-#' 
+#'
 #' @details For use of the parameters used in the `GENIE3` function,
 #' refer to `?GENIE3::GENIE3`. The arguments `regulators` and `targets` are
 #' set to `NULL`. Element \eqn{w_{i,j}} (row i, column j) gives the importance
 #' of the link from i to j.
-#' 
+#'
 #' @return matrix, matrix with the importance of the links inferred from
 #' random forest algorithm implemented by `GENIE3`
-#' 
+#'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' 
+#'
 #' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' randomForest(x)
-#' 
+#'
 #' @export
 randomForest <- function(x, ...) {
-    
+
     ## GENIE3 returns the importance of the link from "regulator gene" i to
     ## target gene "j" in the form of a weighted adjacency matrix
     ## set regulators and targets to NULL that they cannot be changed
     rf <- threeDotsCall(GENIE3::GENIE3, exprMatrix = x, regulators = NULL,
         targets = NULL, ...)
-    
+
     return(rf)
 }
 
 #' @name clr
-#' 
+#'
 #' @aliases clr
-#' 
+#'
 #' @title Create an adjacency matrix based on context likelihood or
 #' relatedness network
-#' 
+#'
 #' @description  `clr` infers an adjacency matrix using
 #' context likelihood/relatedness network using the `clr` function from
 #' the `parmigene` package. `clr` will
 #' return the adjacency matrix containing the Context Likelihood of
 #' Relatedness Network-adjusted scores of Mutual
 #' Information values.
-#' 
+#'
 #' @param mi matrix, where columns and the rows are features
 #' (metabolites), cell entries are mutual information values between the
 #' features. As input, the mutual information (e.g. raw MI estimates or
@@ -325,19 +325,19 @@ aracne <- function(mi, eps = 0.05) {
 #' @export
 correlation <- function(x, type = "pearson", use = "pairwise.complete.obs") {
 
-    ## pearson/spearman
+    ## for pearson/spearman correlation
     if (type %in% c("pearson", "spearman")) {
         cor_mat <- cor(x = t(x), method = type, use = use)
     }
 
-    ## partial pearson/spearman
+    ## for partial pearson/spearman correlation
     if (type %in% c("pearson_partial", "spearman_partial")) {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
         cor_mat <- ppcor::pcor(t(x), method = method)$estimate
     }
 
-    ## semipartial pearson/spearman
+    ## for semipartial pearson/spearman corelation
     if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
@@ -360,7 +360,7 @@ correlation <- function(x, type = "pearson", use = "pairwise.complete.obs") {
 #' @title Create an adjacency matrix based on score-based structure learning
 #' algorithm
 #'
-#' @description  
+#' @description
 #' `bayes` infers an adjacency matrix using score-based structure learning
 #' algorithm `boot.strength` from the
 #' `bnlearn` package. `bayes` extracts then the reported
@@ -426,10 +426,10 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
     colnames(bs_mat) <- rownames(bs_mat) <- rownames(x)
 
     ## write to bs_mat
-    for(i in seq_len(nrow(strength))) {
+    for (i in seq_len(nrow(strength))) {
         tmp <- as.character(strength[i, ])
         names(tmp) <- names(strength[i, ])
-        bs_mat[tmp["from"], tmp["to"] ] <- tmp["strength"]
+        bs_mat[tmp["from"], tmp["to"]] <- tmp["strength"]
     }
 
     mode(bs_mat) <- "numeric"
@@ -443,7 +443,7 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
 #'
 #' @title Add adjacency matrix to list
 #'
-#' @description 
+#' @description
 #' This helper function used in the function
 #' `statistical` adds an adjacency matrix to a `list` of
 #' adjacency matrices.
@@ -567,7 +567,7 @@ statistical <- function(x, model, ...) {
             "pearson", "pearson_partial", "pearson_semipartial",
             "spearman", "spearman_partial", "spearman_semipartial", "bayes"))))
         stop("'model' not implemented in statistical")
-  
+
     ## check if x is numeric matrix and return error if not so
     if (mode(x) != "numeric") stop("x is not a numerical matrix")
 
@@ -627,8 +627,8 @@ statistical <- function(x, model, ...) {
 
     ## add entry for pearson_partial if "pearson_partial" is in model
     if ("pearson_partial" %in% model) {
-        pearson_partial <- threeDotsCall("correlation", x = x, 
-            type = "pearson_partial", ...) 
+        pearson_partial <- threeDotsCall("correlation", x = x,
+            type = "pearson_partial", ...)
         diag(pearson_partial) <- NaN
         l <- addToList(l, "pearson_partial", pearson_partial)
         print("pearson_partial finished.")
@@ -636,7 +636,7 @@ statistical <- function(x, model, ...) {
 
     ## add entry for pearson_semipartial if "pearson_semipartial" is in model
     if ("pearson_semipartial" %in% model) {
-        pearson_sp <- threeDotsCall("correlation", x = x, 
+        pearson_sp <- threeDotsCall("correlation", x = x,
             type = "pearson_semipartial", ...)
         diag(pearson_sp) <- NaN
         l <- addToList(l, "pearson_semipartial", pearson_sp)
@@ -730,7 +730,7 @@ getLinks <- function(mat, exclude = "== 1") {
     conf <- max(df$confidence, na.rm = TRUE) - df$confidence
 
     ## calculate rank and add to data.frame
-    df <- data.frame(df, rank = NaN) 
+    df <- data.frame(df, rank = NaN)
     df$rank[!is.na(df$confidence)] <- rank(conf, na.last = NA)
 
     ## return
@@ -743,10 +743,10 @@ getLinks <- function(mat, exclude = "== 1") {
 #'
 #' @title  Threshold the statistical adjacency matrices
 #'
-#' @description 
+#' @description
 #' The function `threshold` takes as input a list of adjacency matrices
 #' as returned from the function `statistical`. Depending on the `type`
-#' argument, 'threshold` will identify the strongest link that are 
+#' argument, 'threshold` will identify the strongest link that are
 #' lower or higher a certain threshold (`type = "threshold"`) or
 #' identify the top `n` links (`type` either `"top1`, `"top2` or `"mean"`).
 #'
@@ -808,11 +808,11 @@ getLinks <- function(mat, exclude = "== 1") {
 #' args <- list("pearson" = 0.95, "spearman" = 0.95, n = 10)
 #' l <- statistical(x, model = model)
 #'
-#' ## type = "threshold" 
+#' ## type = "threshold"
 #' args <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
 #' threshold(statistical = l, type = "threshold", args = args)
 #'
-#' ## type = "top1" 
+#' ## type = "top1"
 #' args <- list(n = 10)
 #' threshold(statistical = l, type = "top1", args = args)
 #'
@@ -837,27 +837,27 @@ threshold <- function(statistical, type, args, ...) {
     ## check args
     if (type %in% c("threshold")) {
         if (!(all(names(l) %in% names(args)))) {
-            stop("'args' does not contain entries for all 'model's in ", 
+            stop("'args' does not contain entries for all 'model's in ",
                 "'statistical'")
         }
-  
+
         if (!"threshold" %in% names(args) && length(args$threshold) != 1) {
             stop("'args' does not contain entry 'threshold' of length 1")
         }
     }
 
     if (type %in% c("top1", "top2", "mean")) {
-        if (! ("n"  %in% names(args) && length(args$n) == 1 && 
-            is.numeric(args$n)) )
+        if (!("n"  %in% names(args) && length(args$n) == 1 &&
+            is.numeric(args$n)))
             stop("args does not contain the numeric entry `n` of length 1")
     }
 
     if (type == "threshold") {
-        ## iterate through the list and remove the links below or above the 
+        ## iterate through the list and remove the links below or above the
         ## threshold and write to list
         l <- lapply(seq_along(l), function(x) {
 
-            ## find corresponding model in l 
+            ## find corresponding model in l
             name_x <- names(l)[x]
 
             ## get corresponding threshold in args
@@ -898,7 +898,7 @@ threshold <- function(statistical, type, args, ...) {
                 ## set values that are equal to 0 to NaN (values that are 0)
                 ## do not explain the variability
                 res <- getLinks(l_x, exclude = "== 0")
-            } 
+            }
             if (grepl(name_x, pattern = "pearson|spearman|clr|aracne")) {
                 res <- getLinks(l_x, exclude = NULL)
             }
@@ -942,7 +942,7 @@ threshold <- function(statistical, type, args, ...) {
 #' @aliases topKnet
 #' @title Return consensus ranks from a matrix containing ranks
 #'
-#' @description 
+#' @description
 #' `topKnet` returns consensus ranks depending on the `type` argument from
 #' `ranks`, a matrix containing the ranks per statistical `model`.
 #'
@@ -993,7 +993,9 @@ topKnet <- function(ranks, type) {
         cons_val <- apply(ranks, 1, function(x) {
             if (!all(is.na(x))) {
                 min(x, na.rm = TRUE)
-            } else {NaN}
+            } else {
+                NaN
+            }
         })
     }
 
@@ -1010,8 +1012,10 @@ topKnet <- function(ranks, type) {
         ## NA if there are less elements)
         cons_val <- apply(ranks, 1, function(x) {
             if (!all(is.na(x))) {
-                sort(x)[2] 
-            } else {NaN}
+                sort(x)[2]
+            } else {
+                NaN
+            }
         })
     }
 
@@ -1030,7 +1034,7 @@ topKnet <- function(ranks, type) {
 #' @title Check if passed arguments match the function's formal arguments and
 #' call the function with the checked arguments
 #'
-#' @description 
+#' @description
 #' The function `threeDotsCall` gets the formal arguments
 #' of a function `fun` and checks if the passed arguments `...`
 #' matches the formal arguments. `threeDotsCall` will call the function

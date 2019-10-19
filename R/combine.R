@@ -67,7 +67,7 @@ combine <- function(structural, statistical, threshold = 1) {
     if (!all(rownames(structural[[1]]) == rownames(structural[[2]])))
         stop(c("rownames of structural[[1]] are not identical to rownames of ",
              "structural[[2]]"))
-   
+
     if (!all(colnames(structural[[1]]) == colnames(structural[[2]])))
         stop(c("colnames of structural[[1]] are not identical to colnames of ",
                  "structural[[2]]"))
