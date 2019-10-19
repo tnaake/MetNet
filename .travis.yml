@@ -39,13 +39,16 @@ jobs:
       before_script: rm -rf vignettes
       install: skip
       name: "examples"
-    - r_build_args: --no-build-vignettes --no-manual
-      r_check_args: --as-cran --no-build-vignettes --no-vignettes --no-manual --no-codoc --no-examples
-      install: skip
-      before_script: rm -rf vignettes
+    - install: skip
       script: 
-        - travis_wait 20 R CMD check MetNet*tar.gz
+        - travis_wait 10 R CMD build --no-buildvignettes --no-manual .
+        - travis_wait 40 R CMD check --as-cran --no-build-vignettes --no-vignettes --no-manual --no-codoc --no-examples MetNet*tar.gz
+      before_script: rm -rf vignettes
       name: "tests"
+    - r_build_args:
+      r_check_args: --as-cran --no-build-vignettes --no-codoc --no-examples --no-tests
+      install: skip
+      name: "vignettes"
     - stage: "CodeCov"
       install: skip
       script:
@@ -56,7 +59,7 @@ jobs:
     - stage: "lintr" 
       install: skip
       script:
-        - travis_wait 10 Rscript -e 'lintr::lint_package()' 
+        - travis_wait 20 Rscript -e 'lintr::lint_package()' 
       name: "lintr"
       on: 
         branch: "master"
