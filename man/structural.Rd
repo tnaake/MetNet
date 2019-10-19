@@ -7,43 +7,43 @@
 structural(x, transformation, ppm = 5)
 }
 \arguments{
-\item{x}{`matrix`, where columns are the samples and the rows are features 
-(metabolites), cell entries are intensity values. `x` contains the 
-column `"mz"` that has the m/z information (numerical values) for the 
+\item{x}{`matrix`, where columns are the samples and the rows are features
+(metabolites), cell entries are intensity values. `x` contains the
+column `"mz"` that has the m/z information (numerical values) for the
 calculation of mass differences between features}
 
-\item{transformation}{`data.frame`, containing the columns `"group"`, 
-and `"mass"` that will be used for detection of transformation of 
+\item{transformation}{`data.frame`, containing the columns `"group"`,
+and `"mass"` that will be used for detection of transformation of
 (functional) groups}
 
 \item{ppm}{`numeric`, mass accuracy of m/z features in parts per million (ppm)}
 }
 \value{
-`list` containing two matrices. The first entry stores the `numeric` 
+`list` containing two matrices. The first entry stores the `numeric`
 `matrix` with edges inferred from mass differences. The second entry
-stores the `character` `matrix` with the type (corresponding to the 
+stores the `character` `matrix` with the type (corresponding to the
 `"group"` column in `transformation`) is stored
 }
 \description{
 The function `structural` infers an unweighted
-adjacency matrix using differences in m/z values that are matched against a 
-`data.frame` of calculated theoretical differences of 
-loss/addition of functional groups. `structural` returns 
-the unweighted `numeric` `matrix` together with a `character` `matrix` with 
+adjacency matrix using differences in m/z values that are matched against a
+`data.frame` of calculated theoretical differences of
+loss/addition of functional groups. `structural` returns
+the unweighted `numeric` `matrix` together with a `character` `matrix` with
 the type of loss/addition as a list at the specific positions.
 }
 \details{
-`structural` accesses the column `"mz"` of 
-`x` to infer structural topologies based on the functional groups 
-defined by `transformation`. To account for the mass accuracy of 
-the dataset `x`, the user can specify the accuracy of m/z features 
-in parts per million (ppm) by the `ppm` argument. The m/z values in the 
-`"mz"` column of `x`" will be converted to m/z ranges according to 
+`structural` accesses the column `"mz"` of
+`x` to infer structural topologies based on the functional groups
+defined by `transformation`. To account for the mass accuracy of
+the dataset `x`, the user can specify the accuracy of m/z features
+in parts per million (ppm) by the `ppm` argument. The m/z values in the
+`"mz"` column of `x`" will be converted to m/z ranges according to
 the `ppm` argument (default `ppm = 5`).
 }
 \examples{
 data("x_test", package = "MetNet")
-transformation <- rbind(     
+transformation <- rbind(
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))

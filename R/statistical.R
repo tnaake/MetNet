@@ -1,6 +1,6 @@
 #' @importFrom stabs stabsel.matrix glmnet.lasso
 NULL
-#' @importFrom GENIE3 GENIE3 
+#' @importFrom GENIE3 GENIE3
 NULL
 #' @importFrom mpmi cmi
 NULL
@@ -24,28 +24,28 @@ NULL
 #' @title Create an adjacency matrix based on LASSO
 #' 
 #' @description  
-#' `lasso` infers a adjacency matrix using 
-#' LASSO using the `stabsel.matrix` function from the 
-#' `stabs` package. `lasso` extracts the  predictors from the 
-#' function `stabsel.matrix` and writes the coefficients 
-#' to an adjacency matrix. 
+#' `lasso` infers a adjacency matrix using
+#' LASSO using the `stabsel.matrix` function from the
+#' `stabs` package. `lasso` extracts the  predictors from the
+#' function `stabsel.matrix` and writes the coefficients
+#' to an adjacency matrix.
 #' 
 #' @param 
-#' x matrix, where columns are the samples and the rows are features 
-#' (metabolites), cell entries are intensity values 
+#' x matrix, where columns are the samples and the rows are features
+#' (metabolites), cell entries are intensity values
 #' 
 #' @param 
-#' parallel logical, should computation be parallelized? If 
-#' `parallel = TRUE` the `bplapply` will be applied if 
-#' `parallel = FALSE` the `lapply` function will be applied. 
+#' parallel logical, should computation be parallelized? If
+#' `parallel = TRUE` the `bplapply` will be applied if
+#' `parallel = FALSE` the `lapply` function will be applied.
 #' 
-#' @param ... parameters passed to `stabsel.matrix` 
+#' @param ... parameters passed to `stabsel.matrix`
 #' 
-#' @details For use of the parameters used in the `stabsel.matrix` function, 
+#' @details For use of the parameters used in the `stabsel.matrix` function,
 #' refer to `?stabs::stabsel.matrix`.
 #' 
 #' @return 
-#' matrix, matrix with edges inferred from LASSO algorithm 
+#' matrix, matrix with edges inferred from LASSO algorithm
 #' `stabsel.matrix`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -87,7 +87,7 @@ lasso <- function(x, parallel = FALSE, ...) {
             
             ## return selection probabilities of features that are not 0
             return(l1$max[l1$max != 0])
-        })   
+        })
     }
     
     ## create a matrix to store the values
@@ -106,29 +106,29 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' 
 #' @title Create an adjacency matrix based on random forest
 #' 
-#' @description  
-#' `randomForest` infers an adjacency matrix using 
+#' @description
+#' `randomForest` infers an adjacency matrix using
 #' random forest using the `GENIE3` function from the 
 #' `GENIE3` package. `randomForest` returns the importance of the link
-#' between features in the form of an adjacency matrix. 
+#' between features in the form of an adjacency matrix.
 #' 
-#' @param 
-#' x matrix, where columns are the samples and the rows are features 
-#' (metabolites), cell entries are intensity values 
+#' @param
+#' x matrix, where columns are the samples and the rows are features
+#' (metabolites), cell entries are intensity values
 #' 
 #' @param ... parameters passed to `GENIE3`
 #' 
-#' @details For use of the parameters used in the `GENIE3` function, 
+#' @details For use of the parameters used in the `GENIE3` function,
 #' refer to `?GENIE3::GENIE3`. The arguments `regulators` and `targets` are
 #' set to `NULL`. Element \eqn{w_{i,j}} (row i, column j) gives the importance
-#' of the link from i to j. 
+#' of the link from i to j.
 #' 
-#' @return matrix, matrix with the importance of the links inferred from 
+#' @return matrix, matrix with the importance of the links inferred from
 #' random forest algorithm implemented by `GENIE3`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -137,10 +137,10 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' @export
 randomForest <- function(x, ...) {
     
-    ## GENIE3 returns the importance of the link from "regulator gene" i to 
+    ## GENIE3 returns the importance of the link from "regulator gene" i to
     ## target gene "j" in the form of a weighted adjacency matrix
     ## set regulators and targets to NULL that they cannot be changed
-    rf <- threeDotsCall(GENIE3::GENIE3, exprMatrix = x, regulators = NULL, 
+    rf <- threeDotsCall(GENIE3::GENIE3, exprMatrix = x, regulators = NULL,
         targets = NULL, ...)
     
     return(rf)
@@ -150,35 +150,35 @@ randomForest <- function(x, ...) {
 #' 
 #' @aliases clr
 #' 
-#' @title Create an adjacency matrix based on context likelihood or 
+#' @title Create an adjacency matrix based on context likelihood or
 #' relatedness network
 #' 
-#' @description  `clr` infers an adjacency matrix using 
-#' context likelihood/relatedness network using the `clr` function from 
-#' the `parmigene` package. `clr` will 
-#' return the adjacency matrix containing the Context Likelihood of 
+#' @description  `clr` infers an adjacency matrix using
+#' context likelihood/relatedness network using the `clr` function from
+#' the `parmigene` package. `clr` will
+#' return the adjacency matrix containing the Context Likelihood of
 #' Relatedness Network-adjusted scores of Mutual
 #' Information values.
 #' 
-#' @param mi matrix, where columns and the rows are features 
-#' (metabolites), cell entries are mutual information values between the 
-#' features. As input, the mutual information (e.g. raw MI estimates or 
+#' @param mi matrix, where columns and the rows are features
+#' (metabolites), cell entries are mutual information values between the
+#' features. As input, the mutual information (e.g. raw MI estimates or
 #' Jackknife bias corrected MI estimates) from the `cmi` function of the
 #' `mpmi` package can be used.
 #' 
-#' @details For more details on the `clr` function, 
-#' refer to `?parmigene::clr`. CLR computes the score 
-#' \eqn{sqrt(z_i ^2 + z_j ^2)} for each pair of variables i, j, where 
-#' \eqn{z_i = max(0, ( I(X_i, X_j) - mean(X_i) ) / sd(X_i) )}. 
-#' \eqn{mean(X_i)} and \eqn{sd(X_i)} are the mean and standard deviation of the 
-#' mutual information values \eqn{I(X_i, X_k)} for all \eqn{k = 1, ..., n}.  
-#' For more information on the CLR algorithm 
+#' @details For more details on the `clr` function,
+#' refer to `?parmigene::clr`. CLR computes the score
+#' \eqn{sqrt(z_i ^2 + z_j ^2)} for each pair of variables i, j, where
+#' \eqn{z_i = max(0, ( I(X_i, X_j) - mean(X_i) ) / sd(X_i) )}.
+#' \eqn{mean(X_i)} and \eqn{sd(X_i)} are the mean and standard deviation of the
+#' mutual information values \eqn{I(X_i, X_k)} for all \eqn{k = 1, ..., n}.
+#' For more information on the CLR algorithm
 #' see Faith et al. (2007).
 #' 
-#' @references 
-#' Faith et al. (2007): Large-Scale Mapping and Validation of Escherichia coli 
+#' @references
+#' Faith et al. (2007): Large-Scale Mapping and Validation of Escherichia coli
 #' Transcriptional Regulation from a Compendium of Expression Profiles.
-#' PLoS Biology, e8, doi: 
+#' PLoS Biology, e8, doi:
 #' [10.1371/journal.pbio.0050008]( https://doi.org/10.1371/journal.pbio.0050008)
 #' 
 #' @return matrix, matrix with edges inferred from Context Likelihood of
@@ -186,7 +186,7 @@ randomForest <- function(x, ...) {
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -211,41 +211,41 @@ clr <- function(mi) {
 #' @aliases aracne
 #' 
 #' @title Create an adjacency matrix based on algorithm for the reconstruction
-#' of accurate cellular networks 
+#' of accurate cellular networks
 #' 
-#' @description  `aracne` infers an adjacency matrix using 
-#' the algorithm for the reconstruction of accurate cellular networks 
-#' using the `aracne.a` function from the 
-#' `parmigene` package. The function `aracne` will return the weighted 
+#' @description  `aracne` infers an adjacency matrix using
+#' the algorithm for the reconstruction of accurate cellular networks
+#' using the `aracne.a` function from the
+#' `parmigene` package. The function `aracne` will return the weighted
 #' adjacency matrix of the inferred network after applying `aracne.a`.
 #' 
-#' @param mi matrix, where columns and the rows are features 
-#' (metabolites), cell entries are mutual information values between the 
-#' features. As input, the mutual information (e.g. raw MI estimates or 
+#' @param mi matrix, where columns and the rows are features
+#' (metabolites), cell entries are mutual information values between the
+#' features. As input, the mutual information (e.g. raw MI estimates or
 #' Jackknife bias corrected MI estimates) from the `cmi` function of the
 #' `mpmi` package can be used.
 #' 
 #' @param eps numeric, used to remove the weakest edge of each triple of nodes
 #' 
-#' @details For more details on the `aracne.a` function, 
-#' refer to `?parmigene::aracne.a`. `aracne.a` considers each triple of 
-#' edges independently and removes the weakest one if 
-#' \eqn{MI(i, j) < MI(j, k) - eps} and \eqn{MI(i, j) < MI(i, k) - eps}. See 
-#' Margolin et al. (2006) for further information. 
+#' @details For more details on the `aracne.a` function,
+#' refer to `?parmigene::aracne.a`. `aracne.a` considers each triple of
+#' edges independently and removes the weakest one if
+#' \eqn{MI(i, j) < MI(j, k) - eps} and \eqn{MI(i, j) < MI(i, k) - eps}. See
+#' Margolin et al. (2006) for further information.
 #' 
-#' @references 
-#' Margolin et al. (2006): ARACNE : An algorithm for the reconstruction of 
+#' @references
+#' Margolin et al. (2006): ARACNE : An algorithm for the reconstruction of
 #' gene regulatory networks in a mammalian cellular context. BMC Bioinformatics,
-#' S7, doi: 
+#' S7, doi:
 #' [10.1186/1471-2105-7-S1-S7](https://doi.org/10.1186/1471-2105-7-S1-S7)
 #' 
-#' @return 
+#' @return
 #' matrix, matrix with edges inferred from Reconstruction of accurate
 #' cellular networks algorithm `aracne.a`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -265,58 +265,58 @@ aracne <- function(mi, eps = 0.05) {
     return(aracne_mat)
 }
 
-#' @name correlation 
+#' @name correlation
 #' 
 #' @aliases correlation
 #' 
-#' @title Create an adjacency matrix based on correlation 
+#' @title Create an adjacency matrix based on correlation
 #' 
-#' @description  
-#' `correlation` infers an adjacency matrix using 
-#' correlation using the `cor` function (from the 
-#' `stats` package), `pcor` (from `ppcor`) or 
+#' @description
+#' `correlation` infers an adjacency matrix using
+#' correlation using the `cor` function (from the
+#' `stats` package), `pcor` (from `ppcor`) or
 #' `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
-#' correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor` 
-#' and will return 
-#' the weighted adjacency matrix of the absolute correlation values. 
+#' correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
+#' and will return
+#' the weighted adjacency matrix of the absolute correlation values.
 #' 
-#' @param 
-#' x matrix, where columns are the samples and the rows are features 
-#' (metabolites), cell entries are intensity values 
+#' @param
+#' x matrix, where columns are the samples and the rows are features
+#' (metabolites), cell entries are intensity values
 #' 
-#' @param 
+#' @param
 #' type `character`, either "pearson", "spearman", "pearson_partial",
-#' "spearman_partial", "pearson_semipartial" or "spearman_semipartial". 
+#' "spearman_partial", "pearson_semipartial" or "spearman_semipartial".
 #' 
-#' @param 
-#' use `character` string giving a method for computing covariance in the 
-#' presence of missing values, Only for `type = "pearson"` or 
+#' @param
+#' use `character` string giving a method for computing covariance in the
+#' presence of missing values, Only for `type = "pearson"` or
 #' `type = "spearman"`. For further information see `?stats::cor`
 #' 
-#' @details 
-#' If `"pearson"` or `"spearman"` is used as a `method`, the function 
-#' `corAndPvalue` from `stats` will be employed. 
+#' @details
+#' If `"pearson"` or `"spearman"` is used as a `method`, the function
+#' `corAndPvalue` from `stats` will be employed.
 #' 
-#' If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the 
-#' function `pcor` from `spcor` will be employed. 
+#' If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the
+#' function `pcor` from `spcor` will be employed.
 #' 
-#' If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a 
-#' `method` the function `spcor` from `spcor` will be employed. 
+#' If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
+#' `method` the function `spcor` from `spcor` will be employed.
 #' 
-#' `type` will be passed to argument `method` in `cor` 
-#' (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor` 
-#' (`"pearson"` and `"spearman"` for `"pearson_partial"` and 
-#' `"spearman_partial"`, respectively) or to `method` in `spcor` 
-#' (`"pearson"` or `"spearman"` for `"pearson_semipartial"` and 
-#' `"spearman_semipartial"`, respectively)
+#' `type` will be passed to argument `method` in `cor`
+#' (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
+#' (`"pearson"` and `"spearman"` for `"pearson_partial"` and
+#' `"spearman_partial"`, respectively) or to `method` in `spcor`
+#' (`"pearson"` or `"spearman"` for `"pearson_semipartial"` and
+#' `"spearman_semipartial"`, respectively).
 #' 
-#' @return 
-#' matrix, matrix with edges inferred from correlation algorithm 
+#' @return
+#' matrix, matrix with edges inferred from correlation algorithm
 #' `corAndPvalue`, `pcor` or `spcor` (depending on the chosen `method`)
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -357,56 +357,56 @@ correlation <- function(x, type = "pearson", use = "pairwise.complete.obs") {
 #' 
 #' @aliases bayes
 #' 
-#' @title Create an adjacency matrix based on score-based structure learning 
+#' @title Create an adjacency matrix based on score-based structure learning
 #' algorithm
 #' 
 #' @description  
-#' `bayes` infers an adjacency matrix using score-based structure learning 
-#' algorithm `boot.strength` from the 
-#' `bnlearn` package. `bayes` extracts then the reported 
+#' `bayes` infers an adjacency matrix using score-based structure learning
+#' algorithm `boot.strength` from the
+#' `bnlearn` package. `bayes` extracts then the reported
 #' connections from running the `boot.strength` function and assigns the
-#' strengths of the arcs of the Bayesian connections to an adjacency matrix. 
+#' strengths of the arcs of the Bayesian connections to an adjacency matrix.
 #' `bayes` returns this weighted adjacency matrix.
 #'
-#' @param x `matrix` 
-#' where columns are the samples and the rows are features 
+#' @param
+#' x `matrix` where columns are the samples and the rows are features
 #' (metabolites), cell entries are intensity values
 #' 
-#' @param algorithm `character`, 
-#' structure learning to be applied to the 
+#' @param algorithm `character`,
+#' structure learning to be applied to the
 #' bootstrap replicates (default is `"tabu"`)
 #' 
 #' @param R `numeric`, number of bootstrap replicates
 #' 
 #' @param ... parameters passed to `boot.strength`
 #' 
-#' @details 
-#' `boot.strength` measures the strength of the 
-#' probabilistic relationships by the arcs of a Bayesian network, as learned 
-#' from bootstrapped data. By default `bayes` uses the 
+#' @details
+#' `boot.strength` measures the strength of the
+#' probabilistic relationships by the arcs of a Bayesian network, as learned
+#' from bootstrapped data. By default `bayes` uses the
 #' Tabu greedy search.
 #' 
-#' For use of the parameters used in the `boot.strength` function, 
-#' refer to `?bnlearn::boot.strength`. For further information see also 
+#' For use of the parameters used in the `boot.strength` function,
+#' refer to `?bnlearn::boot.strength`. For further information see also
 #' Friedman et al. (1999) and Scutari and Nagarajan (2001).
 #' 
-#' @references 
-#' Friedman et al. (1999): Data Analysis with Bayesian Networks: A Bootstrap 
-#' Approach. Proceedings of the 15th Annual Conference on Uncertainty in 
+#' @references
+#' Friedman et al. (1999): Data Analysis with Bayesian Networks: A Bootstrap
+#' Approach. Proceedings of the 15th Annual Conference on Uncertainty in
 #' Artificial Intelligence, 196-201.
 #' 
-#' Scutari and Nagarajan (2011): On Identifying Significant Edges in Graphical 
+#' Scutari and Nagarajan (2011): On Identifying Significant Edges in Graphical
 #' Models. Proceedings of the Workshop Probabilistic Problem Solving in
-#' Biomedicine of the 13th Artificial Intelligence in Medicine Conference, 
+#' Biomedicine of the 13th Artificial Intelligence in Medicine Conference,
 #' 15-27.
 #' 
-#' @return 
-#' `matrix` with edges inferred from score-based structure 
-#' learning algorithm `boot.strength` 
+#' @return
+#' `matrix` with edges inferred from score-based structure
+#' learning algorithm `boot.strength`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -417,8 +417,8 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
     
     x_df <- data.frame(t(x))
     
-    ## allow for compatibility of arguments 
-    strength <- threeDotsCall(bnlearn::boot.strength, data = x_df, 
+    ## allow for compatibility of arguments
+    strength <- threeDotsCall(bnlearn::boot.strength, data = x_df,
         algorithm = algorithm, R = R, ...)
     
     ## create empty bs_mat to be filled with connections
@@ -444,7 +444,7 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
 #' 
 #' @description 
 #' This helper function used in the function
-#' `statistical` adds an adjacency matrix to a `list` of 
+#' `statistical` adds an adjacency matrix to a `list` of
 #' adjacency matrices.
 #' 
 #' @param l `list` of adjacency matrices
@@ -453,16 +453,16 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
 #' 
 #' @param object `matrix` that will be added
 #' 
-#' @details 
-#' The function `addToList` is a helper function used internally in 
-#' `statistical`. 
+#' @details
+#' The function `addToList` is a helper function used internally in
+#' `statistical`.
 #' 
-#' @return 
+#' @return
 #' `list` containing the existing matrices and the added matrix
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -501,57 +501,57 @@ addToList <- function(l, name, object) {
 #' 
 #' @title Create a list of adjacency matrices from statistical methods
 #' 
-#' @description 
-#' The function `statitical` infers adjacency matrix topologies from 
-#' statistical methods and returns matrices of these networks in a `list`. The 
-#' function includes functionality to calculate adjacency matrices based on 
-#' LASSO (L1 norm)-regression, random forests, context likelihood of 
-#' relatedness (CLR), the algorithm for the reconstruction of accurate 
-#' cellular networks (ARACNE), Pearson correlation (also partial and 
-#' semipartial), Spearman correlation (also partial and semipartial) 
-#' and score-based structure learning (Bayes). The function returns a 
-#' list of adjacency matrices that are defined by `model`. 
+#' @description
+#' The function `statitical` infers adjacency matrix topologies from
+#' statistical methods and returns matrices of these networks in a `list`. The
+#' function includes functionality to calculate adjacency matrices based on
+#' LASSO (L1 norm)-regression, random forests, context likelihood of
+#' relatedness (CLR), the algorithm for the reconstruction of accurate
+#' cellular networks (ARACNE), Pearson correlation (also partial and
+#' semipartial), Spearman correlation (also partial and semipartial)
+#' and score-based structure learning (Bayes). The function returns a
+#' list of adjacency matrices that are defined by `model`.
 #' 
-#' @param 
-#' x `matrix` that contains intensity values of 
-#' features/metabolites (rows) per sample (columns). 
+#' @param
+#' x `matrix` that contains intensity values of
+#' features/metabolites (rows) per sample (columns).
 #' 
-#' @param 
-#' model `character` vector containing the methods that will be used 
-#' (`"lasso"`, `"randomForest"`, `"clr"`, `"aracne"`, `"pearson"`, 
-#' `"pearson_partial"`, `"pearson_semipartial"`, `"spearman"`, 
+#' @param
+#' model `character` vector containing the methods that will be used
+#' (`"lasso"`, `"randomForest"`, `"clr"`, `"aracne"`, `"pearson"`,
+#' `"pearson_partial"`, `"pearson_semipartial"`, `"spearman"`,
 #' `"spearman_partial"`, `"spearman_semipartial"`, `"bayes"`)
 #' 
-#' @param 
-#' ... parameters passed to the functions  `lasso`, `randomForest`, 
+#' @param
+#' ... parameters passed to the functions  `lasso`, `randomForest`,
 #' `clr`, `aracne`, `correlation` and/or `bayes`
 #' 
-#' @details 
-#' The function `statistical` includes functionality to calculate adjacency 
-#' matrices based on 
-#' LASSO (L1 norm)-regression, random forests, context likelihood of 
-#' relatedness (CLR), the algorithm for the reconstruction of accurate 
-#' cellular networks (ARACNE), Pearson correlation (also partial and 
+#' @details
+#' The function `statistical` includes functionality to calculate adjacency
+#' matrices based on
+#' LASSO (L1 norm)-regression, random forests, context likelihood of
+#' relatedness (CLR), the algorithm for the reconstruction of accurate
+#' cellular networks (ARACNE), Pearson correlation (also partial and
 #' semipartial), Spearman correlation (also partial and semipartial)
-#' and Constraint-based structure learning (Bayes). 
+#' and Constraint-based structure learning (Bayes).
 #' 
 #' `statistical` calls the function
-#' `lasso`, `randomForest`, `clr`, `aracne`, 
+#' `lasso`, `randomForest`, `clr`, `aracne`,
 #' `correlation` (for `"pearson"`, `"pearson_partial"`, `"pearson_semipartial"`,
-#' `"spearman"`, `"spearman_partial"`, `"spearman_semipartial"`) and/or `bayes` 
-#' as specified by `model`. It will create adjacency matrices using the 
+#' `"spearman"`, `"spearman_partial"`, `"spearman_semipartial"`) and/or `bayes`
+#' as specified by `model`. It will create adjacency matrices using the
 #' specified methods and will return a `list` containing the weighted
-#' adjacency matrices. 
+#' adjacency matrices.
 #' 
-#' Internally `x` will be z-scaled and the z-scaled object 
+#' Internally `x` will be z-scaled and the z-scaled object
 #' will be used in `lasso`, `clr` and/or `aracne`.
 #' 
-#' @return `list` containing the respective adjacency matrices specified by 
+#' @return `list` containing the respective adjacency matrices specified by
 #' `model`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
@@ -560,10 +560,10 @@ addToList <- function(l, name, object) {
 #' @export
 statistical <- function(x, model, ...) {
     
-    ## check if model complies with the implemented model and return error 
+    ## check if model complies with the implemented model and return error
     ## if not so
-    if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne", 
-            "pearson", "pearson_partial", "pearson_semipartial", 
+    if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne",
+            "pearson", "pearson_partial", "pearson_semipartial",
             "spearman", "spearman_partial", "spearman_semipartial", "bayes"))))
         stop("'model' not implemented in statistical")
         
@@ -615,7 +615,7 @@ statistical <- function(x, model, ...) {
     }
     ## add entry for pearson if "pearson" is in model
     if ("pearson" %in% model) {
-        pearson <- threeDotsCall("correlation", x = x, type = "pearson", ...) 
+        pearson <- threeDotsCall("correlation", x = x, type = "pearson", ...)
         diag(pearson) <- NaN
         l <- addToList(l, "pearson", pearson)
         print("pearson finished.")
@@ -674,24 +674,24 @@ statistical <- function(x, model, ...) {
 #' 
 #' @title Write an adjacency matrix to a `data.frame`
 #' 
-#' @description 
-#' `getLinks` vectorizes a numerical square `matrix` and writes the values 
+#' @description
+#' `getLinks` vectorizes a numerical square `matrix` and writes the values
 #' and their corresponding ranks to a `data.frame`.
 #' 
 #' @param mat matrix containing the values of confidence for a link
 #' 
-#' @param 
-#' exclude `character`, logical statement as `character` to set `TRUE` 
+#' @param
+#' exclude `character`, logical statement as `character` to set `TRUE`
 #' values to NaN in `mat`, will be omitted if `exclude = NULL`
 #' 
-#' @details 
+#' @details
 #' `getLinks` is a helper function used in the function `threshold`.
 #' 
 #' @return `data.frame` with entries `row`, `col`, `confidence` and `rank`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' mat <- matrix(0:8, ncol = 3, nrow = 3)
 #' MetNet:::getLinks(mat, exclude = "== 0")
 #' 
@@ -702,11 +702,11 @@ getLinks <- function(mat, exclude = "== 1") {
         stop("`mat` is not a square matrix")
     }
     
-    ## replace values that match exclude by NaN, 
+    ## replace values that match exclude by NaN,
     ## will be omitted if exclude = NULL
     if (!is.null(exclude)) {
         exclude <- paste0("mat", exclude)
-        mat[which(eval(parse(text = exclude)))] <- NaN    
+        mat[which(eval(parse(text = exclude)))] <- NaN
     }
     
     ## vectorize mat and write values of mat to confidence
@@ -734,59 +734,59 @@ getLinks <- function(mat, exclude = "== 1") {
 #' @title  Threshold the statistical adjacency matrices
 #' 
 #' @description 
-#' The function `threshold` takes as input a list of adjacency matrices 
+#' The function `threshold` takes as input a list of adjacency matrices
 #' as returned from the function `statistical`. Depending on the `type`
 #' argument, 'threshold` will identify the strongest link that are 
-#' lower or higher a certain threshold (`type = "threshold"`) or 
+#' lower or higher a certain threshold (`type = "threshold"`) or
 #' identify the top `n` links (`type` either `"top1`, `"top2` or `"mean"`).
 #' 
 #' @param statistical `list` containing adjacency matrices
 #' 
-#' @param type `character`, either `"threshold"`, `"top1`, `"top2` or 
+#' @param type `character`, either `"threshold"`, `"top1`, `"top2` or
 #' `"mean"`
 #' 
 #' @param args `list` of arguments, has to contain thresholds for weighted
 #' adjacency matrices depending on the statistical model
-#' (a named list, where names are identical to `model`s in `statistical`) 
-#' or a numerical 
-#' vector of length 1 that denotes the number of top ranks written to the 
+#' (a named list, where names are identical to `model`s in `statistical`)
+#' or a numerical
+#' vector of length 1 that denotes the number of top ranks written to the
 #' consensus matrix (a named list with entry `n`)
 #' 
 #' @param ... parameters passed to the function `consensus` in the
 #' `sna` package (only for `type = "threshold"`)
 #' 
-#' @details 
-#' The entries of `args` differ depending on the argument `type`. 
-#' If `type = "treshhold"`, then `args` has to contain numeric vector of 
-#' length 1 with names equal to `names(statistical)` for each `model` 
-#' (`names(statistical)`) and the entry `threshold`, a numerical `vector(1)` 
+#' @details
+#' The entries of `args` differ depending on the argument `type`.
+#' If `type = "treshhold"`, then `args` has to contain numeric vector of
+#' length 1 with names equal to `names(statistical)` for each `model`
+#' (`names(statistical)`) and the entry `threshold`, a numerical `vector(1)`
 #' to threshold the consensus
-#' matrix after using the `consensus` function from the `sna` package. 
-#' Depending on the chosen `method` in `consensus`, the `threshold` value of the 
-#' consensus adjacency matrix should be chosen accordingly to report a 
-#' connection by different statistical modelss. 
+#' matrix after using the `consensus` function from the `sna` package.
+#' Depending on the chosen `method` in `consensus`, the `threshold` value of the
+#' consensus adjacency matrix should be chosen accordingly to report a
+#' connection by different statistical modelss.
 #' 
-#' When combining the adjacency matrices the 
-#' `threshold` value defines if an edge is reported or not. For 
+#' When combining the adjacency matrices the
+#' `threshold` value defines if an edge is reported or not. For
 #' `method = "central.graph"` threshold should be set to 1 by default. For other
-#' values of `method`, the value should be carefully defined by the user.  
+#' values of `method`, the value should be carefully defined by the user.
 #' 
 #' If  `type` is equal to `"top1"`, `"top2"` or
-#' `"mean"`, then `args` has to contain a numeric vector of length 1 that 
-#' gives the number of top ranks included in the returned adjacency matrix. 
-#' In this case 
-#' values that are 0 for the models `lasso`, `randomForest` and `bayes` are 
+#' `"mean"`, then `args` has to contain a numeric vector of length 1 that
+#' gives the number of top ranks included in the returned adjacency matrix.
+#' In this case
+#' values that are 0 for the models `lasso`, `randomForest` and `bayes` are
 #' set to `NaN`; values from correlation (Pearson and Spearman, including
-#' for partial and semipartial correlation) and `clr` and `aracne` are 
+#' for partial and semipartial correlation) and `clr` and `aracne` are
 #' taken as they are.
 #'  
-#' For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken. 
-#' For `type = "top2"`, the second best (i.e. second lowest) rank in 
+#' For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken.
+#' For `type = "top2"`, the second best (i.e. second lowest) rank in
 #' `statistical` is taken.
-#' For `type = "mean"`, the average rank in `statistical` is taken. 
-#' Subsequently the first `n` unique ranks are returned. 
+#' For `type = "mean"`, the average rank in `statistical` is taken.
+#' Subsequently the first `n` unique ranks are returned.
 #' 
-#' @return `matrix`, binary adjacency matrix given the links supported by the 
+#' @return `matrix`, binary adjacency matrix given the links supported by the
 #' `type` and the `args`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -857,14 +857,14 @@ threshold <- function(statistical, type, args, ...) {
             ## get corresponding adjacency matrix in l
             l_x <- l[[name_x]]
             
-            ## for pearson/spearman correlation models (incl. partial and 
-            ## semi-partial), lasso, randomForest, clr, aracne and bayes higher 
-            ## values corresond to higher confidence 
+            ## for pearson/spearman correlation models (incl. partial and
+            ## semi-partial), lasso, randomForest, clr, aracne and bayes higher
+            ## values corresond to higher confidence
             ## only assign 1 to values that are above the threshold
             ifelse(l_x > threshold_x, 1, 0)
         })
 
-        ## allow for compatibility of arguments 
+        ## allow for compatibility of arguments
         ## calculate consenses from the binary matrices
         cons <- threeDotsCall(sna::consensus, dat = l, ...)
         
@@ -883,9 +883,9 @@ threshold <- function(statistical, type, args, ...) {
             ## get corresponding adjacency matrix in l
             l_x <- l[[name_x]]
             
-            ## for pearson/spearman correlation (incl. partial and 
-            ## semi-partial), lasso, randomForest, clr, aracne and bayes 
-            ## higher values corresond to higher confidence 
+            ## for pearson/spearman correlation (incl. partial and
+            ## semi-partial), lasso, randomForest, clr, aracne and bayes
+            ## higher values corresond to higher confidence
             if (grepl(name_x, pattern = "lasso|randomForest|bayes")) {
                 ## set values that are equal to 0 to NaN (values that are 0)
                 ## do not explain the variability
@@ -905,7 +905,7 @@ threshold <- function(statistical, type, args, ...) {
         ranks <- do.call("cbind", ranks)
         colnames(ranks) <- names(l_df)
         
-        ## calculate the consensus information, i.e. either get the first or 
+        ## calculate the consensus information, i.e. either get the first or
         ## second top rank per row or calculate the average across rows
         ## depending on the type argument
         cons_val <- topKnet(ranks, type)
@@ -932,24 +932,24 @@ threshold <- function(statistical, type, args, ...) {
     
 #' @name topKnet
 #' @aliases topKnet
-#' @title Return consensus ranks from a matrix containing ranks 
+#' @title Return consensus ranks from a matrix containing ranks
 #' 
 #' @description 
 #' `topKnet` returns consensus ranks depending on the `type` argument from
-#' `ranks`, a matrix containing the ranks per statistical `model`. 
+#' `ranks`, a matrix containing the ranks per statistical `model`.
 #' 
 #' @param ranks `matrix` containing the ranks per statistical model (in columns)
 #' and per feature pair (in rows)
 #' 
 #' @param type `character`, either `"top1"`, `"top2"` or `"mean"`
 #' 
-#' @details 
+#' @details
 #' See Hase et al. (2014) for further details.
 #' 
 #' @references
-#' Hase et al. (2014):  Harnessing Diversity towards the Reconstructing of 
-#' Large Scale Gene Regulatory Networks. PLoS Computational Biology, 2013, 
-#' e1003361, doi: 
+#' Hase et al. (2014):  Harnessing Diversity towards the Reconstructing of
+#' Large Scale Gene Regulatory Networks. PLoS Computational Biology, 2013,
+#' e1003361, doi:
 #' [10.1371/journal.pcbi.1003361](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003361)
 #' 
 #' @return `numeric` `vector`` with consensus ranks
@@ -975,7 +975,7 @@ topKnet <- function(ranks, type) {
     if (! type %in% c("top1", "top2", "mean")) {
         stop("type neither 'top1', 'top2' or 'mean'")
     }
-    ## calculate the consensus information, i.e. either get the first or 
+    ## calculate the consensus information, i.e. either get the first or
     ## second top rank per row or calculate the average across rows
     ## depending on the type argument
     if (type == "top1") {
@@ -989,7 +989,7 @@ topKnet <- function(ranks, type) {
     }
     if (type == "top2") {
         
-        ## "top2" will work only if there are at least two `model`s 
+        ## "top2" will work only if there are at least two `model`s
         ## return error if ncol(ranks) == 1
         if (ncol(ranks) == 1) {
             stop("ncol(ranks) has to be > 1")
@@ -1021,8 +1021,8 @@ topKnet <- function(ranks, type) {
 #' 
 #' @description 
 #' The function `threeDotsCall` gets the formal arguments
-#' of a function `fun` and checks if the passed arguments `...` 
-#' matches the formal arguments. `threeDotsCall` will call the function 
+#' of a function `fun` and checks if the passed arguments `...`
+#' matches the formal arguments. `threeDotsCall` will call the function
 #' `fun` with the filtered arguments and will return the result of the function
 #' call and the given arguments.
 #' 
@@ -1031,18 +1031,18 @@ topKnet <- function(ranks, type) {
 #' @param ... arguments to be tested to be passed to `fun`
 #' 
 #' @details
-#' Used internally in `lasso`, `randomForest`, `bayes`, 
+#' Used internally in `lasso`, `randomForest`, `bayes`,
 #' `statistical` and `threshold`.
 #' 
 #' `threeDotsCall` will not remove duplicated arguments and throw an error.
 #' 
-#' @return Returned object given the function call with passed arguments 
+#' @return Returned object given the function call with passed arguments
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' MetNet:::threeDotsCall(stats::sd, x = 1:10, y = 1:10)
-#' ## in contrast to the above example, the following example will result in an 
+#' ## in contrast to the above example, the following example will result in an
 #' ## error
 #' \dontrun{stats::sd(x = 1:10, y = 1:10)}
 threeDotsCall <- function(fun, ...) {
@@ -1054,7 +1054,7 @@ threeDotsCall <- function(fun, ...) {
     input <- args[names(args) %in% formal_args]
     ##input <- input[!duplicated(names(input))]
     
-    ## call the function 
+    ## call the function
     res <- do.call(fun, input)
     return(res)
 }

@@ -7,45 +7,45 @@
 correlation(x, type = "pearson", use = "pairwise.complete.obs")
 }
 \arguments{
-\item{x}{matrix, where columns are the samples and the rows are features 
+\item{x}{matrix, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values}
 
 \item{type}{`character`, either "pearson", "spearman", "pearson_partial",
 "spearman_partial", "pearson_semipartial" or "spearman_semipartial".}
 
-\item{use}{`character` string giving a method for computing covariance in the 
-presence of missing values, Only for `type = "pearson"` or 
+\item{use}{`character` string giving a method for computing covariance in the
+presence of missing values, Only for `type = "pearson"` or
 `type = "spearman"`. For further information see `?stats::cor`}
 }
 \value{
-matrix, matrix with edges inferred from correlation algorithm 
+matrix, matrix with edges inferred from correlation algorithm
 `corAndPvalue`, `pcor` or `spcor` (depending on the chosen `method`)
 }
 \description{
-`correlation` infers an adjacency matrix using 
-correlation using the `cor` function (from the 
-`stats` package), `pcor` (from `ppcor`) or 
+`correlation` infers an adjacency matrix using
+correlation using the `cor` function (from the
+`stats` package), `pcor` (from `ppcor`) or
 `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
-correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor` 
-and will return 
+correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
+and will return
 the weighted adjacency matrix of the absolute correlation values.
 }
 \details{
-If `"pearson"` or `"spearman"` is used as a `method`, the function 
-`corAndPvalue` from `stats` will be employed. 
+If `"pearson"` or `"spearman"` is used as a `method`, the function
+`corAndPvalue` from `stats` will be employed.
 
-If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the 
-function `pcor` from `spcor` will be employed. 
+If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the
+function `pcor` from `spcor` will be employed.
 
-If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a 
-`method` the function `spcor` from `spcor` will be employed. 
+If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
+`method` the function `spcor` from `spcor` will be employed.
 
-`type` will be passed to argument `method` in `cor` 
-(in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor` 
-(`"pearson"` and `"spearman"` for `"pearson_partial"` and 
-`"spearman_partial"`, respectively) or to `method` in `spcor` 
-(`"pearson"` or `"spearman"` for `"pearson_semipartial"` and 
-`"spearman_semipartial"`, respectively)
+`type` will be passed to argument `method` in `cor`
+(in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
+(`"pearson"` and `"spearman"` for `"pearson_partial"` and
+`"spearman_partial"`, respectively) or to `method` in `spcor`
+(`"pearson"` or `"spearman"` for `"pearson_semipartial"` and
+`"spearman_semipartial"`, respectively).
 }
 \examples{
 data("x_test", package = "MetNet")

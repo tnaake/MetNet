@@ -35,9 +35,9 @@ MetNet:::topKnet(ranks = ranks, type = "top2")
 MetNet:::topKnet(ranks = ranks, type = "mean")
 }
 \references{
-Hase et al. (2014):  Harnessing Diversity towards the Reconstructing of 
-Large Scale Gene Regulatory Networks. PLoS Computational Biology, 2013, 
-e1003361, doi: 
+Hase et al. (2014):  Harnessing Diversity towards the Reconstructing of
+Large Scale Gene Regulatory Networks. PLoS Computational Biology, 2013,
+e1003361, doi:
 [10.1371/journal.pcbi.1003361](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003361)
 }
 \author{

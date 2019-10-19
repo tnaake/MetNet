@@ -2,15 +2,15 @@
 % Please edit documentation in R/statistical.R
 \name{clr}
 \alias{clr}
-\title{Create an adjacency matrix based on context likelihood or 
+\title{Create an adjacency matrix based on context likelihood or
 relatedness network}
 \usage{
 clr(mi)
 }
 \arguments{
-\item{mi}{matrix, where columns and the rows are features 
-(metabolites), cell entries are mutual information values between the 
-features. As input, the mutual information (e.g. raw MI estimates or 
+\item{mi}{matrix, where columns and the rows are features
+(metabolites), cell entries are mutual information values between the
+features. As input, the mutual information (e.g. raw MI estimates or
 Jackknife bias corrected MI estimates) from the `cmi` function of the
 `mpmi` package can be used.}
 }
@@ -19,21 +19,21 @@ matrix, matrix with edges inferred from Context Likelihood of
 Relatedness Network algorithm `clr`
 }
 \description{
-`clr` infers an adjacency matrix using 
-context likelihood/relatedness network using the `clr` function from 
-the `parmigene` package. `clr` will 
-return the adjacency matrix containing the Context Likelihood of 
+`clr` infers an adjacency matrix using
+context likelihood/relatedness network using the `clr` function from
+the `parmigene` package. `clr` will
+return the adjacency matrix containing the Context Likelihood of
 Relatedness Network-adjusted scores of Mutual
 Information values.
 }
 \details{
-For more details on the `clr` function, 
-refer to `?parmigene::clr`. CLR computes the score 
-\eqn{sqrt(z_i ^2 + z_j ^2)} for each pair of variables i, j, where 
-\eqn{z_i = max(0, ( I(X_i, X_j) - mean(X_i) ) / sd(X_i) )}. 
-\eqn{mean(X_i)} and \eqn{sd(X_i)} are the mean and standard deviation of the 
-mutual information values \eqn{I(X_i, X_k)} for all \eqn{k = 1, ..., n}.  
-For more information on the CLR algorithm 
+For more details on the `clr` function,
+refer to `?parmigene::clr`. CLR computes the score
+\eqn{sqrt(z_i ^2 + z_j ^2)} for each pair of variables i, j, where
+\eqn{z_i = max(0, ( I(X_i, X_j) - mean(X_i) ) / sd(X_i) )}.
+\eqn{mean(X_i)} and \eqn{sd(X_i)} are the mean and standard deviation of the
+mutual information values \eqn{I(X_i, X_k)} for all \eqn{k = 1, ..., n}.
+For more information on the CLR algorithm
 see Faith et al. (2007).
 }
 \examples{
@@ -46,9 +46,9 @@ clr(mi_x_z)
 
 }
 \references{
-Faith et al. (2007): Large-Scale Mapping and Validation of Escherichia coli 
+Faith et al. (2007): Large-Scale Mapping and Validation of Escherichia coli
 Transcriptional Regulation from a Compendium of Expression Profiles.
-PLoS Biology, e8, doi: 
+PLoS Biology, e8, doi:
 [10.1371/journal.pbio.0050008]( https://doi.org/10.1371/journal.pbio.0050008)
 }
 \author{

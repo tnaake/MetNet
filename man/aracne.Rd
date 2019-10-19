@@ -8,9 +8,9 @@ of accurate cellular networks}
 aracne(mi, eps = 0.05)
 }
 \arguments{
-\item{mi}{matrix, where columns and the rows are features 
-(metabolites), cell entries are mutual information values between the 
-features. As input, the mutual information (e.g. raw MI estimates or 
+\item{mi}{matrix, where columns and the rows are features
+(metabolites), cell entries are mutual information values between the
+features. As input, the mutual information (e.g. raw MI estimates or
 Jackknife bias corrected MI estimates) from the `cmi` function of the
 `mpmi` package can be used.}
 
@@ -21,17 +21,17 @@ matrix, matrix with edges inferred from Reconstruction of accurate
 cellular networks algorithm `aracne.a`
 }
 \description{
-`aracne` infers an adjacency matrix using 
-the algorithm for the reconstruction of accurate cellular networks 
-using the `aracne.a` function from the 
-`parmigene` package. The function `aracne` will return the weighted 
+`aracne` infers an adjacency matrix using
+the algorithm for the reconstruction of accurate cellular networks
+using the `aracne.a` function from the
+`parmigene` package. The function `aracne` will return the weighted
 adjacency matrix of the inferred network after applying `aracne.a`.
 }
 \details{
-For more details on the `aracne.a` function, 
-refer to `?parmigene::aracne.a`. `aracne.a` considers each triple of 
-edges independently and removes the weakest one if 
-\eqn{MI(i, j) < MI(j, k) - eps} and \eqn{MI(i, j) < MI(i, k) - eps}. See 
+For more details on the `aracne.a` function,
+refer to `?parmigene::aracne.a`. `aracne.a` considers each triple of
+edges independently and removes the weakest one if
+\eqn{MI(i, j) < MI(j, k) - eps} and \eqn{MI(i, j) < MI(i, k) - eps}. See
 Margolin et al. (2006) for further information.
 }
 \examples{
@@ -44,9 +44,9 @@ aracne(mi_x_z, eps = 0.05)
 
 }
 \references{
-Margolin et al. (2006): ARACNE : An algorithm for the reconstruction of 
+Margolin et al. (2006): ARACNE : An algorithm for the reconstruction of
 gene regulatory networks in a mammalian cellular context. BMC Bioinformatics,
-S7, doi: 
+S7, doi:
 [10.1186/1471-2105-7-S1-S7](https://doi.org/10.1186/1471-2105-7-S1-S7)
 }
 \author{

@@ -4,48 +4,48 @@
 #' 
 #' @title Create adjacency matrix based on m/z (molecular weight) difference
 #' 
-#' @description 
+#' @description
 #' The function `structural` infers an unweighted
-#' adjacency matrix using differences in m/z values that are matched against a 
-#' `data.frame` of calculated theoretical differences of 
-#' loss/addition of functional groups. `structural` returns 
-#' the unweighted `numeric` `matrix` together with a `character` `matrix` with 
-#' the type of loss/addition as a list at the specific positions.  
+#' adjacency matrix using differences in m/z values that are matched against a
+#' `data.frame` of calculated theoretical differences of
+#' loss/addition of functional groups. `structural` returns
+#' the unweighted `numeric` `matrix` together with a `character` `matrix` with
+#' the type of loss/addition as a list at the specific positions.
 #' 
-#' @param 
-#' x `matrix`, where columns are the samples and the rows are features 
-#' (metabolites), cell entries are intensity values. `x` contains the 
-#' column `"mz"` that has the m/z information (numerical values) for the 
-#' calculation of mass differences between features 
+#' @param
+#' x `matrix`, where columns are the samples and the rows are features
+#' (metabolites), cell entries are intensity values. `x` contains the
+#' column `"mz"` that has the m/z information (numerical values) for the
+#' calculation of mass differences between features
 #' 
-#' @param 
-#' transformation `data.frame`, containing the columns `"group"`, 
-#' and `"mass"` that will be used for detection of transformation of 
+#' @param
+#' transformation `data.frame`, containing the columns `"group"`,
+#' and `"mass"` that will be used for detection of transformation of
 #' (functional) groups
 #' 
-#' @param 
+#' @param
 #' ppm `numeric`, mass accuracy of m/z features in parts per million (ppm)
 #' 
-#' @details 
-#' `structural` accesses the column `"mz"` of 
-#' `x` to infer structural topologies based on the functional groups 
-#' defined by `transformation`. To account for the mass accuracy of 
-#' the dataset `x`, the user can specify the accuracy of m/z features 
-#' in parts per million (ppm) by the `ppm` argument. The m/z values in the 
-#' `"mz"` column of `x`" will be converted to m/z ranges according to 
-#' the `ppm` argument (default `ppm = 5`). 
+#' @details
+#' `structural` accesses the column `"mz"` of
+#' `x` to infer structural topologies based on the functional groups
+#' defined by `transformation`. To account for the mass accuracy of
+#' the dataset `x`, the user can specify the accuracy of m/z features
+#' in parts per million (ppm) by the `ppm` argument. The m/z values in the
+#' `"mz"` column of `x`" will be converted to m/z ranges according to
+#' the `ppm` argument (default `ppm = 5`).
 #' 
-#' @return 
-#' `list` containing two matrices. The first entry stores the `numeric` 
+#' @return
+#' `list` containing two matrices. The first entry stores the `numeric`
 #' `matrix` with edges inferred from mass differences. The second entry
-#' stores the `character` `matrix` with the type (corresponding to the 
+#' stores the `character` `matrix` with the type (corresponding to the
 #' `"group"` column in `transformation`) is stored
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
-#' transformation <- rbind(     
+#' transformation <- rbind(
 #'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
 #'     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
 #'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
@@ -112,70 +112,69 @@ structural <- function(x, transformation, ppm = 5) {
 #' 
 #' @aliases rtCorrection
 #' 
-#' @title Correct connections in the structural adjacency matrix by 
+#' @title Correct connections in the structural adjacency matrix by
 #' retention time
 #' 
-#' @description 
+#' @description
 #' The function `rtCorrection` corrects the adjacency matrix
-#' infered from structural data based on shifts in the retention time. For 
-#' known chemical modifications (e.g. addition of glycosyl groups) molecules 
-#' with the moiety should elue at a different time (in the case of glycosyl 
-#' groups the metabolite should elute earlier in a reverse-phase 
+#' infered from structural data based on shifts in the retention time. For
+#' known chemical modifications (e.g. addition of glycosyl groups) molecules
+#' with the moiety should elue at a different time (in the case of glycosyl
+#' groups the metabolite should elute earlier in a reverse-phase
 #' liquid chromatography system). If the connection for the metabolite does not
-#' fit the expected behaviour, the connection will be removed (otherwise 
+#' fit the expected behaviour, the connection will be removed (otherwise
 #' sustained).
 #' 
-#' @param 
-#' structural `list` returned by the function `structural`. The first entry 
-#' stores the `numeric` matrix with edges inferred by mass 
-#' differences. The second entry stores the `character` matrix with the type 
+#' @param
+#' structural `list` returned by the function `structural`. The first entry
+#' stores the `numeric` matrix with edges inferred by mass
+#' differences. The second entry stores the `character` matrix with the type
 #' (corresponding to the `"group"` column in `transformation`).
 #' 
-#' @param 
-#' x `matrix`, where columns are the samples and the rows are features 
-#' (metabolites), cell entries are intensity values, `x` contains the 
-#' column `"rt"` that has the rt information (numerical values) for the 
-#' correction of retention time shifts between features that 
+#' @param
+#' x `matrix`, where columns are the samples and the rows are features
+#' (metabolites), cell entries are intensity values, `x` contains the
+#' column `"rt"` that has the rt information (numerical values) for the
+#' correction of retention time shifts between features that
 #' have a putative connection assigned based on m/z value difference
 #' 
-#' @param 
-#' transformation `data.frame`, containing the columns `"group"`, 
-#' and `"rt"` that will be used for correction of transformation of 
+#' @param
+#' transformation `data.frame`, containing the columns `"group"`,
+#' and `"rt"` that will be used for correction of transformation of
 #' (functional) groups based on retention time shifts derived from `x`
 #' 
-#' 
-#' @details 
-#' `rtCorrection` is used to correct the unweighted adjacency matrix 
+#' @details
+#' `rtCorrection` is used to correct the unweighted adjacency matrix
 #' returned by `structural` when information is available
 #' about the retention time and shifts when certain transformation occur
-#' (it is meant to filter out connections that were created by 
-#' m/z differences that have by chance the same m/z difference but 
-#' different/unexpected retention time behaviour). 
+#' (it is meant to filter out connections that were created by
+#' m/z differences that have by chance the same m/z difference but
+#' different/unexpected retention time behaviour).
 #' 
-#' `rtCorrection` accesses the second list element of 
-#' `structural` and matches the elements in the `"group"` column 
-#' against the character matrix. In case of matches, `rtCorrection` 
-#' accesses the `"rt"` column of `x` and calculates the retention 
-#' time difference between the features. `rtCorrection` then checks 
+#' `rtCorrection` accesses the second list element of
+#' `structural` and matches the elements in the `"group"` column
+#' against the character matrix. In case of matches, `rtCorrection`
+#' accesses the `"rt"` column of `x` and calculates the retention
+#' time difference between the features. `rtCorrection` then checks
 #' if the observed retention time difference matches the expected behaviour
-#' (indicated by `"+"` for a higher retention time of the feature with 
+#' (indicated by `"+"` for a higher retention time of the feature with
 #' the putative group, `"-"` for a lower retention time of the feature
-#' with the putative group or `"?"` when there is no information 
-#' available or features with that group should not be checked). In case 
-#' several transformation were assigned to a feature/feature pair connections 
-#' will always be removed if there is an inconsistency with any of the given 
-#' transformation. 
+#' with the putative group or `"?"` when there is no information
+#' available or features with that group should not be checked). In case
+#' several transformation were assigned to a feature/feature pair connections
+#' will always be removed if there is an inconsistency with any of the given
+#' transformation.
 #' 
-#' @return 
-#' `list` containing two matrices. The first entry stores the 
-#' `numeric` `matrix` with edges inferred mass differences corrected by 
-#' retention time shifts. The second entry stores the `character` matrix with 
+#' @return
+#' `list` containing two matrices. The first entry stores the
+#' `numeric` `matrix` with edges inferred mass differences corrected by
+#' retention time shifts. The second entry stores the `character` matrix with
 #' the type (corresponding to the `"group`" column
 #' in `transformation``) is stored.
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
-#' @examples 
+#' @examples
 #' data("x_test", package = "MetNet")
 #' transformation <- rbind(
 #'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315", "-"),
@@ -213,16 +212,16 @@ rtCorrection <- function(structural, x, transformation) {
         stop("transformation does not contain the column mz")
     
     if (!all(levels(transformation[, "rt"]) %in% c("+", "-", "?")))
-        stop('in transformation[, "rt"] does contain other levels than 
-                "+", "-" or "?"' )
+        stop(c('in transformation[, "rt"] does contain other levels than',
+                ' "+", "-" or "?"' ))
     
     if (!all(colnames(adj) == rownames(adj)))
-        stop("colnames of structural[[1]] are not identical to rownames of 
-                structural[[1]]")
+        stop(c("colnames of structural[[1]] are not identical to rownames of",
+                " structural[[1]]"))
     
     if (!all(colnames(group) == rownames(group)))
-        stop("colnames of structural[[2]] are not identical to 
-                rownames of structural[[2]]")
+        stop(c("colnames of structural[[2]] are not identical to",
+                " rownames of structural[[2]]"))
     
     if (!all(rownames(structural[[1]]) %in% rownames(x)))
         stop("rownames(structural[[1]]) do not fit rownames(x)")
@@ -256,7 +255,7 @@ rtCorrection <- function(structural, x, transformation) {
         grep(group, pattern = transformation[x, 1], fixed = TRUE))
     
     ## iterate through transformation rows
-    for (j in seq_len(nrow(transformation))) { 
+    for (j in seq_len(nrow(transformation))) {
         
         ## check if observed rt shift corresponds to expected one and
         ## remove connection if necessary

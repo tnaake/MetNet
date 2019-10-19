@@ -7,28 +7,28 @@
 lasso(x, parallel = FALSE, ...)
 }
 \arguments{
-\item{x}{matrix, where columns are the samples and the rows are features 
+\item{x}{matrix, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values}
 
-\item{parallel}{logical, should computation be parallelized? If 
-`parallel = TRUE` the `bplapply` will be applied if 
+\item{parallel}{logical, should computation be parallelized? If
+`parallel = TRUE` the `bplapply` will be applied if
 `parallel = FALSE` the `lapply` function will be applied.}
 
 \item{...}{parameters passed to `stabsel.matrix`}
 }
 \value{
-matrix, matrix with edges inferred from LASSO algorithm 
+matrix, matrix with edges inferred from LASSO algorithm
 `stabsel.matrix`
 }
 \description{
-`lasso` infers a adjacency matrix using 
-LASSO using the `stabsel.matrix` function from the 
-`stabs` package. `lasso` extracts the  predictors from the 
-function `stabsel.matrix` and writes the coefficients 
+`lasso` infers a adjacency matrix using
+LASSO using the `stabsel.matrix` function from the
+`stabs` package. `lasso` extracts the  predictors from the
+function `stabsel.matrix` and writes the coefficients
 to an adjacency matrix.
 }
 \details{
-For use of the parameters used in the `stabsel.matrix` function, 
+For use of the parameters used in the `stabsel.matrix` function,
 refer to `?stabs::stabsel.matrix`.
 }
 \examples{

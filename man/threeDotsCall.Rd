@@ -17,20 +17,20 @@ Returned object given the function call with passed arguments
 }
 \description{
 The function `threeDotsCall` gets the formal arguments
-of a function `fun` and checks if the passed arguments `...` 
-matches the formal arguments. `threeDotsCall` will call the function 
+of a function `fun` and checks if the passed arguments `...`
+matches the formal arguments. `threeDotsCall` will call the function
 `fun` with the filtered arguments and will return the result of the function
 call and the given arguments.
 }
 \details{
-Used internally in `lasso`, `randomForest`, `bayes`, 
+Used internally in `lasso`, `randomForest`, `bayes`,
 `statistical` and `threshold`.
 
 `threeDotsCall` will not remove duplicated arguments and throw an error.
 }
 \examples{
 MetNet:::threeDotsCall(stats::sd, x = 1:10, y = 1:10)
-## in contrast to the above example, the following example will result in an 
+## in contrast to the above example, the following example will result in an
 ## error
 \dontrun{stats::sd(x = 1:10, y = 1:10)}
 }

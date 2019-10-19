@@ -9,14 +9,14 @@ getLinks(mat, exclude = "== 1")
 \arguments{
 \item{mat}{matrix containing the values of confidence for a link}
 
-\item{exclude}{`character`, logical statement as `character` to set `TRUE` 
+\item{exclude}{`character`, logical statement as `character` to set `TRUE`
 values to NaN in `mat`, will be omitted if `exclude = NULL`}
 }
 \value{
 `data.frame` with entries `row`, `col`, `confidence` and `rank`
 }
 \description{
-`getLinks` vectorizes a numerical square `matrix` and writes the values 
+`getLinks` vectorizes a numerical square `matrix` and writes the values
 and their corresponding ranks to a `data.frame`.
 }
 \details{

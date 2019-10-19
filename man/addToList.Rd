@@ -18,11 +18,11 @@ addToList(l, name, object)
 }
 \description{
 This helper function used in the function
-`statistical` adds an adjacency matrix to a `list` of 
+`statistical` adds an adjacency matrix to a `list` of
 adjacency matrices.
 }
 \details{
-The function `addToList` is a helper function used internally in 
+The function `addToList` is a helper function used internally in
 `statistical`.
 }
 \examples{

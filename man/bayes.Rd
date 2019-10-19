@@ -2,18 +2,17 @@
 % Please edit documentation in R/statistical.R
 \name{bayes}
 \alias{bayes}
-\title{Create an adjacency matrix based on score-based structure learning 
+\title{Create an adjacency matrix based on score-based structure learning
 algorithm}
 \usage{
 bayes(x, algorithm = "tabu", R = 100, ...)
 }
 \arguments{
-\item{x}{`matrix` 
-where columns are the samples and the rows are features 
+\item{x}{`matrix` where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values}
 
-\item{algorithm}{`character`, 
-structure learning to be applied to the 
+\item{algorithm}{`character`,
+structure learning to be applied to the
 bootstrap replicates (default is `"tabu"`)}
 
 \item{R}{`numeric`, number of bootstrap replicates}
@@ -21,25 +20,25 @@ bootstrap replicates (default is `"tabu"`)}
 \item{...}{parameters passed to `boot.strength`}
 }
 \value{
-`matrix` with edges inferred from score-based structure 
+`matrix` with edges inferred from score-based structure
 learning algorithm `boot.strength`
 }
 \description{
-`bayes` infers an adjacency matrix using score-based structure learning 
-algorithm `boot.strength` from the 
-`bnlearn` package. `bayes` extracts then the reported 
+`bayes` infers an adjacency matrix using score-based structure learning
+algorithm `boot.strength` from the
+`bnlearn` package. `bayes` extracts then the reported
 connections from running the `boot.strength` function and assigns the
-strengths of the arcs of the Bayesian connections to an adjacency matrix. 
+strengths of the arcs of the Bayesian connections to an adjacency matrix.
 `bayes` returns this weighted adjacency matrix.
 }
 \details{
-`boot.strength` measures the strength of the 
-probabilistic relationships by the arcs of a Bayesian network, as learned 
-from bootstrapped data. By default `bayes` uses the 
+`boot.strength` measures the strength of the
+probabilistic relationships by the arcs of a Bayesian network, as learned
+from bootstrapped data. By default `bayes` uses the
 Tabu greedy search.
 
-For use of the parameters used in the `boot.strength` function, 
-refer to `?bnlearn::boot.strength`. For further information see also 
+For use of the parameters used in the `boot.strength` function,
+refer to `?bnlearn::boot.strength`. For further information see also
 Friedman et al. (1999) and Scutari and Nagarajan (2001).
 }
 \examples{
@@ -50,13 +49,13 @@ bayes(x, algorithm = "tabu", R = 100)
 
 }
 \references{
-Friedman et al. (1999): Data Analysis with Bayesian Networks: A Bootstrap 
-Approach. Proceedings of the 15th Annual Conference on Uncertainty in 
+Friedman et al. (1999): Data Analysis with Bayesian Networks: A Bootstrap
+Approach. Proceedings of the 15th Annual Conference on Uncertainty in
 Artificial Intelligence, 196-201.
 
-Scutari and Nagarajan (2011): On Identifying Significant Edges in Graphical 
+Scutari and Nagarajan (2011): On Identifying Significant Edges in Graphical
 Models. Proceedings of the Workshop Probabilistic Problem Solving in
-Biomedicine of the 13th Artificial Intelligence in Medicine Conference, 
+Biomedicine of the 13th Artificial Intelligence in Medicine Conference,
 15-27.
 }
 \author{
