@@ -57,7 +57,7 @@ values that are 0 for the models `lasso`, `randomForest` and `bayes` are
 set to `NaN`; values from correlation (Pearson and Spearman, including
 for partial and semipartial correlation) and `clr` and `aracne` are
 taken as they are.
- 
+
 For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken.
 For `type = "top2"`, the second best (i.e. second lowest) rank in
 `statistical` is taken.
@@ -71,7 +71,6 @@ x <- as.matrix(x)
 model <- c("pearson", "spearman")
 args <- list("pearson" = 0.95, "spearman" = 0.95, n = 10)
 l <- statistical(x, model = model)
-
 
 ## type = "threshold" 
 args <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
