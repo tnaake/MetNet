@@ -19,13 +19,14 @@ Imports:
     ppcor (>= 1.1),
     sna (>= 2.4),
     stabs (>= 0.6),
-    stats (>= 3.5)
+    stats (>= 3.6)
 Suggests:
     BiocGenerics (>= 0.24.0),
     BiocStyle (>= 2.6.1), 
     glmnet (>= 2.0-18),
     igraph (>= 1.1.2), 
-    knitr (>= 1.11), 
+    knitr (>= 1.11),
+    rmarkdown (>= 1.15),
     testthat (>= 2.2.1)
 biocViews: ImmunoOncology, Metabolomics, MassSpectrometry, Network, Regression
 Description: MetNet contains functionality to infer metabolic network topologies from 
