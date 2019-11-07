@@ -144,7 +144,7 @@ test_that("correlation", {
     expect_true(min(correlation_p_sp_mat) >= 0)
 
     ## partial spearman
-    expect_true(all(correlation_s_p_mat - abs(ppcor::pcor(t(mat_test[1:5, ]), 
+    expect_true(all(correlation_s_p_mat - abs(ppcor::pcor(t(mat_test[1:5, ]),
         method = "spearman")$estimate) == 0))
     expect_equal(sum(correlation_s_p_mat), 20.69323, tolerance = 1e-06)
     expect_equal(rownames(correlation_s_p_mat), colnames(correlation_s_p_mat))
@@ -157,7 +157,7 @@ test_that("correlation", {
     expect_true(min(correlation_s_p_mat) >= 0)
 
     ## semi-partial spearman
-    expect_true(all(correlation_s_sp_mat - abs(ppcor::spcor(t(mat_test[1:5, ]), 
+    expect_true(all(correlation_s_sp_mat - abs(ppcor::spcor(t(mat_test[1:5, ]),
         method = "spearman")$estimate) == 0, na.rm = TRUE))
     expect_equal(rownames(correlation_s_sp_mat), colnames(correlation_s_sp_mat))
     expect_equal(rownames(correlation_s_sp_mat), rownames(mat_test)[1:5])
@@ -280,7 +280,7 @@ test_that("getLinks", {
     expect_equal(getLinks_df$confidence, c(NaN, 1:8))
     expect_equal(getLinks_df$rank, c(NaN, 8:1))
 
-    ## exclude = NULL
+    ## checks for exclude = NULL
     getLinks_df <- MetNet:::getLinks(mat, exclude = NULL)
     expect_equal(getLinks_df$row, rep(c(1, 2, 3), 3))
     expect_equal(getLinks_df$col, rep(c(1, 2, 3), each = 3))

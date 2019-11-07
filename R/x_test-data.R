@@ -1,6 +1,6 @@
 #' @name x_test
 #' @title Example data for \code{MetNet}: data input
-#' @description \code{x_test} contains 36 selected metabolic features of 
+#' @description \code{x_test} contains 36 selected metabolic features of
 #' \code{peaklist}. It will be used as an example data set in the vignette to
 #' show the functionality of the packages.
 #' @docType data
@@ -14,7 +14,7 @@
 #' peaklist[, 3:dim(peaklist)[2]] <- log2(peaklist[, 3:dim(peaklist)[2]] + 1)
 #'
 #' ## function to add specific features of x (defined by m/z and retention
-#' ## time) to x_test 
+#' ## time) to x_test
 #' addTo_x_test <- function(x_test, x, mz, rt) {
 #'     mzX <- x[, "mz"]
 #'     rtX <- x[, "rt"]
@@ -38,7 +38,7 @@
 #' x_test <- addTo_x_test(x_test, peaklist, mz = 987.40, rt = 398.46)
 #' ## NicotianosideXIII M+Na+ 1074.4042
 #' x_test <- addTo_x_test(x_test, peaklist, mz = 1074.40, rt = 404.92)
-#' #' ## Lyciumoside IV  M+Na+ 799.4091
+#' ## Lyciumoside IV  M+Na+ 799.4091
 #' x_test <- addTo_x_test(x_test, peaklist, mz = 799.40, rt = 411.23)
 #' ## Nicotianoside I M+Na+ 885.4084
 #' x_test <- addTo_x_test(x_test, peaklist, mz = 885.41, rt = 420.12)

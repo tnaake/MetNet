@@ -18,7 +18,7 @@ random forest algorithm implemented by `GENIE3`
 }
 \description{
 `randomForest` infers an adjacency matrix using
-random forest using the `GENIE3` function from the 
+random forest using the `GENIE3` function from the
 `GENIE3` package. `randomForest` returns the importance of the link
 between features in the form of an adjacency matrix.
 }
