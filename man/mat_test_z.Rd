@@ -15,9 +15,6 @@ rownames(mat_test) <- paste("x", 1:7, sep = "")
 mat_test_z <- apply(mat_test, 1, function(x)
                     (x - mean(x, na.rm = TRUE))/sd(x, na.rm = TRUE))
 }
-\usage{
-mat_test_z
-}
 \value{
 \code{matrix}
 }

@@ -99,9 +99,6 @@ x_test <- addTo_x_test(x_test, peaklist, mz = 355.10, rt = 241.04)
 ## change rownames (that it is accepted by formulas)
 rownames(x_test) <- paste0("x", rownames(x_test))
 }
-\usage{
-x_test
-}
 \value{
 \code{matrix}
 }

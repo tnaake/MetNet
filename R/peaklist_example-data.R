@@ -3,7 +3,6 @@
 #' @description The object \code{peaklist} is a \code{data.frame}, where rows
 #' are features and the columns are samples (starting with X001-180).
 #' @docType data
-#' @usage peaklist
 #' @return \code{data.frame}
 #' @format \code{data.frame}
 #' @source Internal peaklist from metabolite profiling of Nicotiana species

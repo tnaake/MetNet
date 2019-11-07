@@ -15,9 +15,6 @@ were removed. Entries with m/z values < 250 and > 1200 were removed
 as well as entries with m/z values between 510 and 600 to reduce the file
 size.
 }
-\usage{
-peaklist
-}
 \value{
 \code{data.frame}
 }

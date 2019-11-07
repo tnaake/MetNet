@@ -3,7 +3,6 @@
 #' @description \code{mat_test} contains 7 toy features that were derived
 #' from \code{rnorm}. It will be used as an example data set in unit tests.
 #' @docType data
-#' @usage mat_test
 #' @return \code{matrix}
 #' @format \code{matrix}
 #' @source
@@ -21,7 +20,6 @@ NULL
 #' @description \code{mat_test_z} contains 7 toy features that were derived
 #' from \code{rnorm}. It will be used as an example data set in unit tests.
 #' @docType data
-#' @usage mat_test_z
 #' @return \code{matrix}
 #' @format \code{matrix}
 #' @source

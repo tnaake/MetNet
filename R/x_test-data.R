@@ -4,7 +4,6 @@
 #' \code{peaklist}. It will be used as an example data set in the vignette to
 #' show the functionality of the packages.
 #' @docType data
-#' @usage x_test
 #' @return \code{matrix}
 #' @format \code{matrix}
 #' @source
