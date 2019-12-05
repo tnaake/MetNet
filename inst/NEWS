@@ -11,6 +11,7 @@ Changes in version 1.5.0 (2019-10-16)
   to Hase et al.) to replace removed functions
 + rename createStructuralAdjacency to structural
 + change vignette to markdown
++ allow for directed networks in structural
 
 Changes in version 1.3.1 (2019-09-06) 
 + change License to GPL (>= 3)

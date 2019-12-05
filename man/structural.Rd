@@ -4,7 +4,7 @@
 \alias{structural}
 \title{Create adjacency matrix based on m/z (molecular weight) difference}
 \usage{
-structural(x, transformation, ppm = 5)
+structural(x, transformation, ppm = 5, directed = FALSE)
 }
 \arguments{
 \item{x}{`matrix`, where columns are the samples and the rows are features
@@ -17,6 +17,12 @@ and `"mass"` that will be used for detection of transformation of
 (functional) groups}
 
 \item{ppm}{`numeric`, mass accuracy of m/z features in parts per million (ppm)}
+
+\item{directed}{`logical`, if `TRUE` absolute values of m/z differences will be
+taken to query against `transformation`  (irrespective the sign of `mass`)
+and an undirected adjacency matrix will be returned, if `FALSE` a directed
+adjacency matrix will be returned with links reported that match the
+transformations defined in `transformation` (respecting the sign of `mass`)}
 }
 \value{
 `list` containing two matrices. The first entry stores the `numeric`
@@ -50,7 +56,7 @@ transformation <- rbind(
 transformation <- data.frame(group = transformation[, 1],
                                 formula = transformation[, 2],
                                 mass = as.numeric(transformation[, 3]))
-struct_adj <- structural(x_test, transformation, ppm = 5)
+struct_adj <- structural(x_test, transformation, ppm = 5, directed = TRUE)
 
 }
 \author{

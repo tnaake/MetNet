@@ -16,7 +16,9 @@ transformations <- data.frame(group = transformations[, 1],
 
 ## START unit test structural ##
 struct_adj <- structural(mat_test,
-        transformation = transformations, ppm = 5)
+        transformation = transformations, ppm = 5, directed = FALSE)
+struct_adj_dir <- structural(mat_test,
+        transformation = transformations, ppm = 5, directed = TRUE)
 
 test_that("structural", {
     expect_error(structural(mat_test[, -1], transformations),
@@ -39,6 +41,7 @@ test_that("structural", {
     expect_equal(rownames(struct_adj[[1]]), rownames(struct_adj[[2]]))
     expect_equal(rownames(struct_adj[[1]]), paste0("x", 1:7))
     expect_equal(sum(struct_adj[[1]]), 12)
+    expect_equal(sum(struct_adj_dir[[1]]), 6)
     expect_equal(unique(as.vector(struct_adj[[2]])),
                 c("", "Monosaccharide (–H2O)", "Malonyl group (–H2O)"))
     expect_true(is.matrix(struct_adj[[1]]))
@@ -50,6 +53,8 @@ test_that("structural", {
 
 ## START unit test rtCorrection ##
 struct_adj_rt <- rtCorrection(struct_adj, mat_test, transformations)
+struct_adj_rt_dir <- rtCorrection(struct_adj_dir, mat_test, transformations)
+
 test_that("rtCorrection", {
     expect_error(rtCorrection(struct_adj[[1]], mat_test, transformations),
         "is not a list")
@@ -85,8 +90,10 @@ test_that("rtCorrection", {
     expect_equal(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[1]]))
     expect_equal(colnames(struct_adj_rt[[1]]), colnames(struct_adj_rt[[2]]))
     expect_equal(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[2]]))
-    expect_true(table(struct_adj_rt)[1] == 41)
     expect_true(table(struct_adj_rt[[1]])[1] == 41)
+    expect_true(table(struct_adj_rt_dir[[1]])[1] == 45)
+    expect_equal(sum(struct_adj_rt[[1]]), 8)
+    expect_equal(sum(struct_adj_rt_dir[[1]]), 4)
 
     ## dims of struct_adj[[1]] and struct[[2]], rownames/colnames
     foo_1 <- struct_adj[[1]]

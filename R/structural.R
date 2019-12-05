@@ -25,7 +25,14 @@
 #'
 #' @param
 #' ppm `numeric`, mass accuracy of m/z features in parts per million (ppm)
-#'
+#' 
+#' @param
+#' directed `logical`, if `TRUE` absolute values of m/z differences will be
+#' taken to query against `transformation`  (irrespective the sign of `mass`)
+#' and an undirected adjacency matrix will be returned, if `FALSE` a directed
+#' adjacency matrix will be returned with links reported that match the
+#' transformations defined in `transformation` (respecting the sign of `mass`)
+#' 
 #' @details
 #' `structural` accesses the column `"mz"` of
 #' `x` to infer structural topologies based on the functional groups
@@ -52,10 +59,10 @@
 #' transformation <- data.frame(group = transformation[, 1],
 #'                                 formula = transformation[, 2],
 #'                                 mass = as.numeric(transformation[, 3]))
-#' struct_adj <- structural(x_test, transformation, ppm = 5)
+#' struct_adj <- structural(x_test, transformation, ppm = 5, directed = TRUE)
 #'
 #' @export
-structural <- function(x, transformation, ppm = 5) {
+structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 
     if (!is.data.frame(transformation))
         stop("transformation is not a data.frame")
@@ -75,8 +82,8 @@ structural <- function(x, transformation, ppm = 5) {
     mat <- apply(mat, 1, function(x) as.numeric(rownames(mat)))
     ## calculate difference between rownames and colnames
     ## (difference between features)
-    mat <- mat - t(mat)
-    mat <- abs(mat)
+    mat <- t(mat) - mat
+    if (!directed) mat <- abs(mat)
     ## calculate ppm deviation
     mat_1 <- mat / abs(ppm / 10 ^ 6  - 1)
     mat_2 <- mat / abs(ppm / 10 ^ 6  + 1)
@@ -239,13 +246,15 @@ rtCorrection <- function(structural, x, transformation) {
     mat_rt <- apply(mat_rt, 1, function(x) as.numeric(rownames(mat_rt)))
     ## calculate difference between rownames and colnames
     ## (difference between features)
-    mat_rt <- mat_rt - t(mat_rt)
+    mat_rt <- t(mat_rt) - mat_rt
     colnames(mat_rt) <- rownames(mat_rt) <- colnames(adj)
 
     mat_mz <- matrix(0, nrow = nrow(adj), ncol = ncol(adj))
     colnames(mat_mz) <- rownames(mat_mz) <- x[rownames(adj), "mz"]
+    
     ## create matrix which has rownmames per row
     mat_mz <- apply(mat_mz, 1, function(x) as.numeric(rownames(mat_mz)))
+    
     ## calculate difference between rownames and colnames
     ## (difference between features)
     mat_mz <- mat_mz - t(mat_mz)
