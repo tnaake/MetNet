@@ -4,7 +4,7 @@
 \alias{threshold}
 \title{Threshold the statistical adjacency matrices}
 \usage{
-threshold(statistical, type, args, ...)
+threshold(statistical, type, args, values = c("all", "min", "max"), ...)
 }
 \arguments{
 \item{statistical}{`list` containing adjacency matrices}
@@ -18,6 +18,11 @@ adjacency matrices depending on the statistical model
 or a numerical
 vector of length 1 that denotes the number of top ranks written to the
 consensus matrix (a named list with entry `n`)}
+
+\item{values}{`character`, take from the adjacency matrix all values ("all"),
+the minimum of the pairs ("min") or the maximum ("max")
+a^*_{ij} = min(a_ij, a_ji)
+a^*_{ij} = max(a_ij, a_ji)}
 
 \item{...}{parameters passed to the function `consensus` in the
 `sna` package (only for `type = "threshold"`)}

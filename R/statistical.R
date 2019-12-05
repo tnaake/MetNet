@@ -761,6 +761,12 @@ getLinks <- function(mat, exclude = "== 1") {
 #' or a numerical
 #' vector of length 1 that denotes the number of top ranks written to the
 #' consensus matrix (a named list with entry `n`)
+#' 
+#' @param values `character`, take from the adjacency matrix all values ("all"),
+#' the minimum of the pairs ("min") or the maximum ("max")
+#' a^*_{ij} = min(a_ij, a_ji)
+#' a^*_{ij} = max(a_ij, a_ji)
+#' 
 #'
 #' @param ... parameters passed to the function `consensus` in the
 #' `sna` package (only for `type = "threshold"`)
@@ -822,7 +828,8 @@ getLinks <- function(mat, exclude = "== 1") {
 #' ## type = "mean"
 #' threshold(statistical = l, type = "mean", args = args)
 #' @export
-threshold <- function(statistical, type, args, ...) {
+threshold <- function(statistical, type, args,
+    values = c("all", "min", "max"), ...) {
 
     l <- statistical
     ## args, either N for tops
@@ -845,6 +852,9 @@ threshold <- function(statistical, type, args, ...) {
             stop("'args' does not contain entry 'threshold' of length 1")
         }
     }
+    
+    ## check match.arg for values
+    values <- match.arg(values)
 
     if (type %in% c("top1", "top2", "mean")) {
         if (!("n"  %in% names(args) && length(args$n) == 1 &&
@@ -890,6 +900,30 @@ threshold <- function(statistical, type, args, ...) {
 
             ## get corresponding adjacency matrix in l
             l_x <- l[[name_x]]
+
+            ## take the respective minimum or maximum depending on `values`,
+            ## do not do anything if `values` is equal to `all`
+            if (values %in% c("min", "max")) {
+
+                ## get values from the lower triangle
+                lower_tri <- l_x[lower.tri(l_x)]
+
+                ## get values from the upper triangle (requires transposing)
+                l_x_t <- t(l_x)
+                upper_tri <- l_x_t[lower.tri(l_x_t)]
+
+                ## get min of lower_tri and upper_tri
+                if (values == "min") {
+                    values <- apply(rbind(lower_tri, upper_tri), 2, min)
+                } else {
+                    values <- apply(rbind(lower_tri, upper_tri), 2, max)
+                }
+
+                ## write back to the matrix
+                l_x[lower.tri(l_x)] <- values
+                l_x <- t(l_x)
+                l_x[lower.tri(l_x)] <- values
+            }
 
             ## for pearson/spearman correlation (incl. partial and
             ## semi-partial), lasso, randomForest, clr, aracne and bayes

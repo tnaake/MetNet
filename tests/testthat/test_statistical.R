@@ -205,7 +205,7 @@ test_that("addToList", {
 
 ## START unit test statistical ##
 stat_adj_l <- statistical(mat_test[1:5, ],
-    model = c("lasso", "randomForest", "clr", "aracne", "pearson",
+    model = c("randomForest", "clr", "aracne", "pearson",
         "pearson_partial", "pearson_semipartial", "spearman",
         "spearman_partial", "spearman_semipartial", "bayes"),
     PFER = 0.75, cutoff = 0.95)
@@ -217,10 +217,8 @@ test_that("statistical", {
     expect_error(statistical(mat_test, model = c("lasso")),
         "Two of the three argumnets")
 
-    ## take a high tolerance value for LASSO, randomForest and bayes
+    ## take a high tolerance value for randomForest and bayes
     ## since these models are probabilistic
-    tmp <- lasso_mat; diag(tmp) <- NaN
-    expect_equal(stat_adj_l[["lasso"]], tmp, tolerance = 5e-01)
     tmp <- rf_mat; diag(tmp) <- NaN
     expect_equal(stat_adj_l[["randomForest"]], tmp, tolerance = 5e-01)
     tmp <- bayes_mat; diag(tmp) <- NaN
@@ -247,17 +245,17 @@ test_that("statistical", {
     tmp <- correlation(mat_test[1:5, ], type = "spearman_semipartial")
     diag(tmp) <- NaN
     expect_true(all(stat_adj_l[["spearman_semipartial"]] == tmp, na.rm = TRUE))
-    expect_equal(length(stat_adj_l), 11)
-    expect_equal(as.numeric(lapply(stat_adj_l, nrow)), rep(5, 11))
-    expect_equal(as.numeric(lapply(stat_adj_l, ncol)), rep(5, 11))
+    expect_equal(length(stat_adj_l), 10)
+    expect_equal(as.numeric(lapply(stat_adj_l, nrow)), rep(5, 10))
+    expect_equal(as.numeric(lapply(stat_adj_l, ncol)), rep(5, 10))
     expect_equal(as.character(unlist((lapply(stat_adj_l, rownames)))),
-                        rep(c("x1", "x2", "x3", "x4", "x5"), 11))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 10))
     expect_equal(as.character(unlist((lapply(stat_adj_l, colnames)))),
-                rep(c("x1", "x2", "x3", "x4", "x5"), 11))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 10))
     expect_equal(names(stat_adj_l),
-        c("lasso", "randomForest", "clr", "aracne", "pearson",
-          "pearson_partial", "pearson_semipartial", "spearman",
-          "spearman_partial", "spearman_semipartial", "bayes"))
+        c("randomForest", "clr", "aracne", "pearson",
+            "pearson_partial", "pearson_semipartial", "spearman",
+            "spearman_partial", "spearman_semipartial", "bayes"))
     expect_true(all(unlist(lapply(stat_adj_l, function(x) is.numeric(x)))))
 })
 ## END unit test statistical ##
@@ -295,7 +293,7 @@ test_that("getLinks", {
 ## remove partial/semipartial correlation from stat_adj_l
 stat_adj_l_cut <- stat_adj_l[!names(stat_adj_l) %in%
     c("pearson_partial", "pearson_semipartial", "spearman_partial",
-        "spearman_semipartial", "bayes", "randomForest", "lasso")]
+        "spearman_semipartial", "bayes", "randomForest")]
 args_thr <- list(clr = 0.5, aracne = 0.8, pearson = 0.95, spearman = 0.95,
     threshold = 1)
 thr_thr <- threshold(stat_adj_l_cut, type = "threshold", args = args_thr)
@@ -304,6 +302,14 @@ args_top <- list(n = 5)
 thr_top1 <- threshold(stat_adj_l_cut, type = "top1", args = args_top)
 thr_top2 <- threshold(stat_adj_l_cut, type = "top2", args = args_top)
 thr_mean <- threshold(stat_adj_l_cut, type = "mean", args = args_top)
+
+mat <- matrix(1:25, nrow = 5, ncol = 5)
+diag(mat) <- NaN
+rownames(mat) <- colnames(mat) <- paste("x", 1:5, sep = "")
+mat_l <- list(pearson = mat)
+thr_top1_all <- threshold(mat_l, type = "top1", args = args_top, values = "all")
+thr_top1_min <- threshold(mat_l, type = "top1", args = args_top, values = "min")
+thr_top1_max <- threshold(mat_l, type = "top1", args = args_top, values = "max")
 
 test_that("threshold", {
 
@@ -320,7 +326,7 @@ test_that("threshold", {
     expect_error(threshold(cbind(clr = c("a", "b", "c"),
         aracne = c("a", "b", "c")), type = "threshold", args = args_foo),
         "attempt to select less than one element in")
-    args_thr_double <- list(lasso = 0.8, randomForest = 0.2,
+    args_thr_double <- list(randomForest = 0.2,
         clr = 0.5, clr = 0.5, aracne = 0.8, pearson = 0.05, spearman = 0.05,
         threshold = 1)
     expect_error(
@@ -329,6 +335,8 @@ test_that("threshold", {
     expect_error(
         threshold(stat_adj_l_cut, type = "foo", args = args_thr),
         "type not in")
+    expect_error(threshold(stat_adj_l_cut, type = "top1", args = args_top, 
+        values = "foo"), "should be one of ")
 
     ## check that args contains all models
     expect_error(threshold(stat_adj_l_cut, type = "threshold", args_thr[1:3]),
@@ -379,10 +387,23 @@ test_that("threshold", {
     expect_equal(sum(thr_top1), 16)
     expect_equal(sum(thr_top2), 14)
     expect_equal(sum(thr_mean), 10)
+    expect_equal(sum(thr_top1_all), 5)
+    expect_equal(sum(thr_top1_min), 10)
+    expect_equal(sum(thr_top1_max), 10)
+    expect_equal(c(thr_top1_all), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0))
+    expect_equal(c(thr_top1_min), c(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 
+        1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0))
+    expect_equal(c(thr_top1_max), c(0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0,
+        1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0))
     expect_true(all(thr_thr %in% c(0, 1)))
     expect_true(all(thr_top1 %in% c(0, 1)))
     expect_true(all(thr_top2 %in% c(0, 1)))
     expect_true(all(thr_mean %in% c(0, 1)))
+    
+    threshold(stat_adj_l_cut, type = "top1", args = args_top, values = "all")
+    threshold(stat_adj_l_cut, type = "top1", args = args_top, values = "min")
+    threshold(stat_adj_l_cut, type = "top1", args = args_top, values = "max")
 })
 ## END unit test threshold  ##
 
