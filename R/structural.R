@@ -95,18 +95,26 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     ## iterate through each column and check if the "mass" is in the interval
     ## defined by the m/z value and ppm
     for (i in seq_along(transformation[, "mass"])) {
-
-        ind_mat_1 <- which(mat_1 >= transformation[i, "mass"])
-        ind_mat_2 <- which(mat_2 <= transformation[i, "mass"])
+        
+        transformation_i <- transformation[i, ]
+        
+        if (transformation_i[["mass"]] < 0) {
+            ind_mat_1 <- which(mat_1 <= transformation_i[["mass"]])
+            ind_mat_2 <- which(mat_2 >= transformation_i[["mass"]])   
+        } else {
+            ind_mat_1 <- which(mat_1 >= transformation_i[["mass"]])
+            ind_mat_2 <- which(mat_2 <= transformation_i[["mass"]])    
+        }
+        
 
         ## get intersect from the two (indices where "mass" is in the interval)
         ind_hit <- intersect(ind_mat_1, ind_mat_2)
         ## write to these indices 1 and the "group"
         mat[ind_hit] <- 1
         mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) != 0,
-            yes = paste(mat_type[ind_hit], transformation[i, "group"],
+            yes = paste(mat_type[ind_hit], transformation_i[["group"]],
                 sep = "/"),
-            no = as.character(transformation[i, "group"]))
+            no = as.character(transformation_i[["group"]]))
     }
 
     rownames(mat) <- colnames(mat) <- rownames(x)

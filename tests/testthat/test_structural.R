@@ -9,16 +9,21 @@ mat_test <- cbind(mz = mz, rt = rt, mat_test)
 transformations <- rbind(
     c("Malonyl group (–H2O)", "C3H2O3", 86.0003939305, "+"),
     c("Monosaccharide (–H2O)", "C6H10O5", 162.0528234315, "-"))
-transformations <- data.frame(group = transformations[, 1],
-                            formula = transformations[, 2],
-                            mass = as.numeric(transformations[, 3]),
-                            rt = transformations[, 4])
+transformations_neg <- transformations <- data.frame(
+    group = transformations[, 1],
+    formula = transformations[, 2],
+    mass = as.numeric(transformations[, 3]),
+    rt = transformations[, 4])
+transformations_neg[, 3] <- -1 * transformations_neg[, 3]
+
 
 ## START unit test structural ##
 struct_adj <- structural(mat_test,
         transformation = transformations, ppm = 5, directed = FALSE)
 struct_adj_dir <- structural(mat_test,
         transformation = transformations, ppm = 5, directed = TRUE)
+struct_adj_dir_neg <- structural(mat_test,
+        transformation = transformations_neg, ppm = 5, directed = TRUE)
 
 test_that("structural", {
     expect_error(structural(mat_test[, -1], transformations),
@@ -42,6 +47,7 @@ test_that("structural", {
     expect_equal(rownames(struct_adj[[1]]), paste0("x", 1:7))
     expect_equal(sum(struct_adj[[1]]), 12)
     expect_equal(sum(struct_adj_dir[[1]]), 6)
+    expect_equal(sum(struct_adj_dir_neg[[1]]), 6)
     expect_equal(unique(as.vector(struct_adj[[2]])),
                 c("", "Monosaccharide (–H2O)", "Malonyl group (–H2O)"))
     expect_true(is.matrix(struct_adj[[1]]))
