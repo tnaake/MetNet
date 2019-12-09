@@ -44,7 +44,7 @@ clr_mat <- clr(mi_mat_test_z)
 
 test_that("clr", {
     expect_error(clr(NULL), msg = "mi must be a matrix")
-    expect_equal(sum(clr_mat), 3.586808, tolerance = 1e-06)
+    expect_equal(sum(clr_mat), 3.586808, tolerance = 1e-03)
     expect_equal(rownames(clr_mat), colnames(clr_mat))
     expect_equal(rownames(clr_mat), rownames(mat_test)[1:5])
     expect_equal(ncol(clr_mat), nrow(clr_mat))
@@ -62,7 +62,7 @@ aracne_mat <- aracne(mi_mat_test_z)
 test_that("aracne", {
     expect_error(aracne(NULL, eps = 0.05), "mi must be a matrix")
     expect_error(aracne(mi_mat_test_z, eps = "a"), "in foreign function call")
-    expect_equal(sum(aracne_mat), 12.69407, tolerance = 1e-06)
+    expect_equal(sum(aracne_mat), 12.69407, tolerance = 1e-03)
     expect_equal(rownames(aracne_mat), colnames(aracne_mat))
     expect_equal(rownames(aracne_mat), rownames(mat_test)[1:5])
     expect_equal(ncol(aracne_mat), nrow(aracne_mat))
