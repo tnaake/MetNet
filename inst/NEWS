@@ -1,3 +1,6 @@
+Changes in version 1.5.2 (2019-12-11)
++ change unit tests for clr and aracne that it doesn't fail in Windows
+
 Changes in version 1.5.1 (2019-12-05)
 + rename combineStructuralStatistical to combine
 + combine accepts directly the output of createStructuralAdjacency, before the
