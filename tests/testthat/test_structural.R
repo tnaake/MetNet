@@ -20,6 +20,8 @@ transformations_neg[, 3] <- -1 * transformations_neg[, 3]
 ## START unit test structural ##
 struct_adj <- structural(mat_test,
         transformation = transformations, ppm = 5, directed = FALSE)
+struct_adj_neg <- structural(mat_test,
+        transformation = transformations_neg, ppm = 5, directed = FALSE)
 struct_adj_dir <- structural(mat_test,
         transformation = transformations, ppm = 5, directed = TRUE)
 struct_adj_dir_neg <- structural(mat_test,
@@ -46,6 +48,7 @@ test_that("structural", {
     expect_equal(rownames(struct_adj[[1]]), rownames(struct_adj[[2]]))
     expect_equal(rownames(struct_adj[[1]]), paste0("x", 1:7))
     expect_equal(sum(struct_adj[[1]]), 12)
+    expect_equal(sum(struct_adj_neg[[1]]), 0)
     expect_equal(sum(struct_adj_dir[[1]]), 6)
     expect_equal(sum(struct_adj_dir_neg[[1]]), 6)
     expect_equal(unique(as.vector(struct_adj[[2]])),

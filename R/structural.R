@@ -78,15 +78,32 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
     rownames(mat) <- colnames(mat) <- mass
 
-    ## create matrix which has rownmames per row
-    mat <- apply(mat, 1, function(x) as.numeric(rownames(mat)))
+    ## create matrix which has rowmames per row
+    mat <- apply(mat, 1, function(x) as.numeric(mass))
+    
+    ## calculate ppm deviation
+    mat_1 <- mat / abs(ppm / 10 ^ 6 + 1)
+    mat_2 <- mat / abs(ppm / 10 ^ 6 - 1)
+    
     ## calculate difference between rownames and colnames
     ## (difference between features)
-    mat <- t(mat) - mat
-    if (!directed) mat <- abs(mat)
+    
+    #mat <- t(mat_1) - mat_2
+    #if (!directed) mat <- abs(mat)
+    
     ## calculate ppm deviation
-    mat_1 <- mat / abs(ppm / 10 ^ 6  - 1)
-    mat_2 <- mat / abs(ppm / 10 ^ 6  + 1)
+    #mat_1 <- mat / abs(ppm / 10 ^ 6  - 1)
+    #mat_2 <- mat / abs(ppm / 10 ^ 6  + 1)
+    
+    mat_1 <- mat - t(mat_1) ## max
+    mat_2 <- mat - t(mat_2) ## min
+    
+    if (!directed) {
+        mat_1_abs <- abs(mat_1)
+        mat_2_abs <- abs(mat_2)
+        mat_1 <- ifelse(mat_1_abs <= mat_2_abs, mat_2_abs, mat_1_abs) ## max
+        mat_2 <- ifelse(mat_1_abs > mat_2_abs, mat_2_abs, mat_1_abs) ## min
+    }
 
     ## create two matrices to store result
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
@@ -98,13 +115,13 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
         
         transformation_i <- transformation[i, ]
         
-        if (transformation_i[["mass"]] < 0) {
-            ind_mat_1 <- which(mat_1 <= transformation_i[["mass"]])
-            ind_mat_2 <- which(mat_2 >= transformation_i[["mass"]])   
-        } else {
+        #if (!directed & transformation_i[["mass"]] < 0) {
+        #    ind_mat_1 <- which(mat_1 >= transformation_i[["mass"]])
+        #    ind_mat_2 <- which(mat_2 <= transformation_i[["mass"]])   
+        #} else {
             ind_mat_1 <- which(mat_1 >= transformation_i[["mass"]])
             ind_mat_2 <- which(mat_2 <= transformation_i[["mass"]])    
-        }
+        #}
         
 
         ## get intersect from the two (indices where "mass" is in the interval)
