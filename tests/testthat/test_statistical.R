@@ -62,7 +62,7 @@ aracne_mat <- aracne(mi_mat_test_z)
 test_that("aracne", {
     expect_error(aracne(NULL, eps = 0.05), "mi must be a matrix")
     expect_error(aracne(mi_mat_test_z, eps = "a"), "in foreign function call")
-    expect_equal(sum(aracne_mat), 12.69407, tolerance = 1e-03)
+    expect_equal(sum(aracne_mat), 12.69407, tolerance = 1e-02)
     expect_equal(rownames(aracne_mat), colnames(aracne_mat))
     expect_equal(rownames(aracne_mat), rownames(mat_test)[1:5])
     expect_equal(ncol(aracne_mat), nrow(aracne_mat))
