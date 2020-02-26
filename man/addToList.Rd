@@ -7,31 +7,31 @@
 addToList(l, name, object)
 }
 \arguments{
-\item{l}{list of adjacency matrices}
+\item{l}{`list` of adjacency matrices}
 
-\item{name}{character, name of newly created entry}
+\item{name}{`character`, name of added entry}
 
-\item{object}{matrix containing the adjacency matrix to be added}
+\item{object}{`matrix` that will be added}
 }
 \value{
-list containing the existing adjacency matrices and the added 
-adjacency matrix
+`list` containing the existing matrices and the added matrix
 }
 \description{
 This helper function used in the function
-\code{createStatisticalAdjacencyList} adds a adjacency matrix to a list of 
+`statistical` adds an adjacency matrix to a `list` of
 adjacency matrices.
 }
 \details{
-Used internally in \code{createStatisticalAdjacencyList}
+The function `addToList` is a helper function used internally in
+`statistical`.
 }
 \examples{
-data("x_test", package="MetNet")
-x <- x_test[, 3:dim(x_test)[2]]
+data("x_test", package = "MetNet")
+x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
-cor_pearson <- correlation(x, type="pearson")
-cor_spearman <- correlation(x, type="spearman")
-l <- list(pearson=cor_pearson)
+cor_pearson <- correlation(x, type = "pearson")
+cor_spearman <- correlation(x, type = "spearman")
+l <- list(pearson = cor_pearson)
 MetNet:::addToList(l, "spearman", cor_spearman)
 }
 \author{

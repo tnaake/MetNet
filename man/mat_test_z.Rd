@@ -12,11 +12,8 @@ mat_test <- matrix(random_numbers, nrow = 7)
 mat_test[1:3, ] <- t(apply(mat_test[1:3, ], 1, sort))
 mat_test[5:7, ] <- t(apply(mat_test[5:7, ], 1, sort, decreasing = TRUE))
 rownames(mat_test) <- paste("x", 1:7, sep = "")
-mat_test_z <- apply(mat_test, 1, function(x) 
-                    (x - mean(x, na.rm=TRUE))/sd(x, na.rm=TRUE))
-}
-\usage{
-mat_test_z
+mat_test_z <- apply(mat_test, 1, function(x)
+                    (x - mean(x, na.rm = TRUE))/sd(x, na.rm = TRUE))
 }
 \value{
 \code{matrix}
