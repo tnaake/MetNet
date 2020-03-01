@@ -67,12 +67,12 @@ sample) to propose putative metabolic networks that can be used for further
 exploration. 
 
 The idea of using high-resolution mass spectrometry data for network 
-construction was first proposed in [@Breitling2006] and followed soon 
+construction was first proposed in @Breitling2006 and followed soon 
 afterwards by a Cytoscape plugin, MetaNetter [@Jourdan2007], that 
 is based on the inference of metabolic networks on molecular weight differences
 and correlation (Pearson correlation and partial correlation). 
 
-Inspired by the paper of [@Marbach2012] different algorithms for network 
+Inspired by the paper of @Marbach2012 different algorithms for network 
 were implemented in `MetNet` to account for 
 biases that are inherent in these statistical methods, followed by the 
 calculation of a consensus adjacency matrix using the differently computed 
@@ -85,7 +85,7 @@ the following statistical models are implemented to infer a statistical
 adjacency matrix: Least absolute shrinkage and selection operator
 (LASSO, L1-norm regression, [@Tibshirani1994]), Random Forest 
 [@Breiman2001], Pearson and Spearman correlation (including partial and
-semipartial correlation, see [@Steuer2006]
+semipartial correlation, see @Steuer2006
 for a discussion on correlation-based metabolic networks), context likelihood 
 of relatedness (CLR, [@Faith2007]), the algorithm for the reconstruction 
 of accurate cellular networks (ARACNE, [@Margolin2006]) and 
@@ -128,12 +128,12 @@ library(MetNet)
 ``` 
 
 The data format that is compatible with the `MetNet` framework is
-in the `xcms`/`CAMERA` output-like $$m~\times~n$$ matrix, where
-columns denote the different samples $$n$$ and where $$m$$ features are present.
+in the `xcms`/`CAMERA` output-like `m~\times~n` matrix, where
+columns denote the different samples `n` and where `m` features are present.
 In such a matrix, information about the masses of the features and quantitative
 information of the features (intensity or concentration values) are needed. 
 The information about the m/z values has to be stored in a vector of
-length $$\vert m \vert$$ in the column `"mz"`. 
+length `\vert m \vert` in the column `"mz"`. 
 
 `MetNet` does not impose any requirements for
 data normalization, filtering, etc. However, the user has to make sure that
@@ -141,10 +141,10 @@ the data is properly preprocessed. These include division by internal standard,
 `log2` transformation, noise filtering, removal of features that do not 
 represent mass features/metabolites, removal of isotopes, etc. 
 
-We will load here the object `x\_test` that contains m/z values
+We will load here the object `x_test` that contains m/z values
 (in the column `"mz"`), together with the corresponding retention time
 (in the column `"rt"`) and intensity values. We will use here the object
-`x\_test` for guidance through the workflow of `MetNet`.
+`x_test` for guidance through the workflow of `MetNet`.
 
 ```{r data,eval=TRUE,echo=TRUE}
 data("x_test", package = "MetNet")
@@ -165,16 +165,16 @@ sense of additions/losses of functional groups mediated by biochemical,
 enzymatic reactions) in the data using the mass information. 
 
 Following the work of [@Breitling2006] and [@Jourdan2007], 
-molecular weight difference $$w_{X}$$ is defined by 
+molecular weight difference w~X~ is defined by 
 $$w_X = \vert w_A - w_B \vert$$
 
-where $$w_{A}$$ is the molecular weight
-of substrate A, and $$w_{B}$$ is the molecular weight of product B 
+where w~A~ is the molecular weight
+of substrate A, and w~B~ is the molecular weight of product B 
 (typically, m/z values will be used as a proxy for the molecular weight since 
 the molecular weight is not directly derivable from mass spectrometric data). 
 As examplified in [@Jourdan2007] specific enzymatic reactions refer to 
 specific changes in the molecular weight, e.g. carboxylation reactions 
-will result in a mass difference of 43.98983 (molecular weight of CO$$_2$$) 
+will result in a mass difference of 43.98983 (molecular weight of CO~2~) 
 between metabolic features. 
 
 The search space for these transformation is adjustable by the 
@@ -187,7 +187,7 @@ reasons according to the formula
 
 $$ppm = \frac{m_{exp} - m_{calc}}{m_{exp}} \cdot 10^{-6}$$
 
-with $$m_{exp}$$ the experimentally determined m/z value and $$m_{calc}$$ the
+with m~exp~ the experimentally determined m/z value and m~calc~ the
 calculated accurate mass of a molecule. Within the function, a lower and upper
 range is calculated depending on the supplied `ppm` value, differences
 between the m/z feature values are calculated and matched against the
@@ -289,7 +289,7 @@ score-based structure learning returning the strength of the probabilistic
 relationships of the arcs of 
 a Bayesian network, as learned from bootstrapped data (using the 
 `boot.strength` with the Tabu greedy search as default
-from the `bnlearn` package, [@Scutari2010]). 
+from the `bnlearn` package [@Scutari2010]). 
 
 For further information on the different models 
 take a look on the respective help pages of `lasso`, 
@@ -325,9 +325,9 @@ to calculate the unweighted consensus adjacency matrix.
 The arguments that are accepted by this function can be passed to the 
 `threshold` 
 function. Furthermore, in `args` an entry `threshold` needs 
-to be defined to threshold if the value $$a_{i,j}$$ of the consensus adjacency 
+to be defined to threshold if the value a~i,j~ of the consensus adjacency 
 matrix will be reported as a connection in the returned matrix 
-(if $$a_{i,j} \geq$$ `threshold`) or not. In the case of the method 
+(if a~i,j~ \( \geq \) `threshold`) or not. In the case of the method 
 `"central.graph"` (default), the argument `threshold` should be 
 set to 1. 
 
@@ -404,7 +404,7 @@ adjacency matrix.
 first entry contains the unweighted adjacency matrix and the second entry 
 contains a matrix given information on the type of link between features
 based on structural information. Only the first entry of the list will be 
-given to the `graph\_from\_adjacency\_matrix` function:
+given to the `graph_from_adjacency_matrix` function:
 ```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.'}
 g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode = "undirected")
 plot(g, edge.width = 5, vertex.label.cex = 0.5, edge.color = "grey")
@@ -416,9 +416,6 @@ Furthermore, the network can be analysed by network analysis techniques
 are implemented in different packages in `R`
 (e.g. `igraph` or `sna`) or other software tools outside of 
 the `R` environment. 
-
-# References{-}
-
 
 # Appendix {-}
 
@@ -433,10 +430,10 @@ sessionInfo()
 
 ## Transformations {-}
 
-The list of transformations is taken from [@Breitling2006]. 
+The list of transformations is taken from @Breitling2006. 
 The numerical m/z values were calculated by using the structural formula and 
 the Biological Magnetic Resonance Data Bank
-{web tool} (http://www.bmrb.wisc.edu/metabolomics/mol_mass.php). 
+[web tool](http://www.bmrb.wisc.edu/metabolomics/mol_mass.php). 
 
 ```{r ttransformations,eval=TRUE,echo=TRUE}
 transformations <- rbind(
@@ -529,3 +526,5 @@ transformations <- data.frame(name = transformations[, 1],
             formula = transformations[, 2],
             mass = as.numeric(transformations[, 3]))
 ```
+
+## References
