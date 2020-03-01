@@ -404,7 +404,7 @@ adjacency matrix.
 first entry contains the unweighted adjacency matrix and the second entry 
 contains a matrix given information on the type of link between features
 based on structural information. Only the first entry of the list will be 
-given to the `graph_from_adjacency_matrix` function:
+passed to the `graph_from_adjacency_matrix` function:
 ```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.'}
 g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode = "undirected")
 plot(g, edge.width = 5, vertex.label.cex = 0.5, edge.color = "grey")
