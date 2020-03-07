@@ -40,9 +40,11 @@ functional_groups <- rbind(
 functional_groups <- data.frame(group = functional_groups[,1],
     formula = functional_groups[,2],
     mass = as.numeric(functional_groups[,3]))
-struct_adj <- createStructuralAdjacency(x_test, functional_groups, ppm = 5)
-stat_adj <- createStatisticalAdjacency(x_test, 
-    model = c("pearson", "spearman","bayes"), 
-    adjust_correlation = "bonferroni")
-cons_adj <- combineStructuralStatistical(struct_adj[[1]], stat_adj)
+struct_adj <- structural(x_test, functional_groups, ppm = 5)
+
+stat_adj_l <- statistical(x_test, 
+    model = c("pearson", "spearman","bayes"))
+args_top1 <- list(n = 10)
+stat_adj <- threshold(stat_adj_l, type = "top2", args = args_top1)
+cons_adj <- combine(struct_adj, stat_adj)
 }

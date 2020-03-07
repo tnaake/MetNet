@@ -1,3 +1,38 @@
+Changes in version 1.4.3 (2020-03-07)
++ change release that it does not use rfPermute.formula anymore 
+
+Changes in version 1.5.2 (2020-01-12)
++ change unit tests for clr and aracne that it doesn't fail in Windows
++ change ppm calculation in structural, use m/z of precursors instead
+of m/z differences
+
+Changes in version 1.5.2 (2019-12-11)
++ change unit tests for clr and aracne that it doesn't fail in Windows
+
+Changes in version 1.5.1 (2019-12-05)
++ rename combineStructuralStatistical to combine
++ combine accepts directly the output of createStructuralAdjacency, before the
+  function combineStructuralStatistical accepted a numeric matrix (first entry
+  of the output of createStatisticalAdjacency)
++ remove the functions consensusAdjacency, createStatisticalAdjacency,
+  createStatisticalAdjacencyList
++ add functions statistical, getLinks, topKnet, threshold with improved
+  functionality for thresholding the statistical adjacency matrices (based on
+  hard thresholds, or top1, top2 or mean consensus matrix calculation according
+  to Hase et al.) to replace removed functions
++ rename createStructuralAdjacency to structural
++ change vignette to markdown
++ add parameter directed in structural to allow for directed networks
++ add parameter values to specify if respectively min, max or all values from
+  the corresponding feature pairs (in the upper and lower triangle) should be
+  taken in statistical
+
+Changes in version 1.3.1 (2019-09-06) 
++ change License to GPL (>= 3)
++ add codecov
++ add Travis-CI for continuous integration
++ add CITATION file 
+
 Changes in version 1.1.2 (2019-04-16)
 + check that MetNet passes all builds without any errors or warnings
 

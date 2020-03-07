@@ -1,31 +1,33 @@
 Package: MetNet
 Type: Package
 Title: Inferring metabolic networks from untargeted high-resolution mass spectrometry data
-Version: 1.4.1
-Date: 2020-01-12
+Version: 1.4.2
+Date: 2020-03-07
 Authors@R: c(person(given = "Thomas", family = "Naake",
     email = "thomasnaake@googlemail.com",
     role = c("aut","cre")))
 VignetteBuilder: knitr
 Depends:
-    R (>= 3.5),
-    stats (>= 3.5)
+    R (>= 3.5)
 Imports:
     bnlearn (>= 4.3), 
     BiocParallel (>= 1.12.0),  
+    GENIE3 (>= 1.7.0),
     methods (>= 3.5),
     mpmi (>= 0.42), 
     parmigene (>= 1.0.2),
     ppcor (>= 1.1),
-    rfPermute (>= 2.1.5),
     sna (>= 2.4),
     stabs (>= 0.6),
-    WGCNA (>= 1.61)
+    stats (>= 3.6)
 Suggests:
     BiocGenerics (>= 0.24.0),
     BiocStyle (>= 2.6.1), 
+    glmnet (>= 2.0-18),
     igraph (>= 1.1.2), 
-    knitr (>= 1.11)    
+    knitr (>= 1.11),
+    rmarkdown (>= 1.15),
+    testthat (>= 2.2.1)   
 biocViews: ImmunoOncology, Metabolomics, MassSpectrometry, Network, Regression
 Description: MetNet contains functionality to infer metabolic network topologies from 
   quantitative data and high-resolution mass/charge information. Using statistical models
@@ -37,4 +39,4 @@ Description: MetNet contains functionality to infer metabolic network topologies
   the two matrices are combined to form a adjacency matrix inferred from both quantitative 
   and structure information. 
 License: GPL-2
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
