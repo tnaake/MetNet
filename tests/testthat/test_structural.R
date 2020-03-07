@@ -89,7 +89,7 @@ test_that("rtCorrection", {
     expect_error(rtCorrection(struct_adj, mat_test, transformations[, -4]),
         "does not contain the column rt")
     expect_error(rtCorrection(struct_adj, mat_test,
-        cbind(transformations[, -4], rt = rep("a", 4))))#,
+        transformation = cbind(transformations[, -4], rt = rep("a", 4))))#,
     #    "does contain other")
     expect_true(is.matrix(struct_adj_rt[[1]]))
     expect_true(is.numeric(struct_adj_rt[[1]]))

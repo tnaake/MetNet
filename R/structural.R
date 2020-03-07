@@ -232,8 +232,8 @@ rtCorrection <- function(structural, x, transformation) {
         stop("transformation does not contain the column mz")
 
     if (!all(levels(transformation[, "rt"]) %in% c("+", "-", "?")))
-        stop(c('transformation[, "rt"] does contain other levels than',
-                ' "+", "-" or "?"'))
+        stop(c("transformation[, 'rt'] does contain other levels than",
+                " '+'', '-'' or '?'"))
 
     if (!all(colnames(adj) == rownames(adj)))
         stop(c("colnames of structural[[1]] are not identical to rownames of",
