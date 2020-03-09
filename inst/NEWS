@@ -1,3 +1,8 @@
+Changes in version 1.5.3 (2020-03-09)
++ change tests for rtCorrection, do not use function levels to test for 
+if `+`, `.` or `?` is present in the transformation list
++ update vignette that formulas are displayed properly
+
 Changes in version 1.5.2 (2020-01-12)
 + change unit tests for clr and aracne that it doesn't fail in Windows
 + change ppm calculation in structural, use m/z of precursors instead
