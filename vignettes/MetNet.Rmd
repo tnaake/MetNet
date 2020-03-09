@@ -128,12 +128,12 @@ library(MetNet)
 ``` 
 
 The data format that is compatible with the `MetNet` framework is
-in the `xcms`/`CAMERA` output-like `m~\times~n` matrix, where
-columns denote the different samples `n` and where `m` features are present.
+in the `xcms`/`CAMERA` output-like $m~\times~n$ matrix, where
+columns denote the different samples $n$ and where $m$ features are present.
 In such a matrix, information about the masses of the features and quantitative
 information of the features (intensity or concentration values) are needed. 
 The information about the m/z values has to be stored in a vector of
-length `\vert m \vert` in the column `"mz"`. 
+length $\vert m \vert$ in the column `"mz"`. 
 
 `MetNet` does not impose any requirements for
 data normalization, filtering, etc. However, the user has to make sure that
@@ -166,7 +166,7 @@ enzymatic reactions) in the data using the mass information.
 
 Following the work of [@Breitling2006] and [@Jourdan2007], 
 molecular weight difference w~X~ is defined by 
-$$w_X = \vert w_A - w_B \vert$$
+$w_X = \vert w_A - w_B \vert$
 
 where w~A~ is the molecular weight
 of substrate A, and w~B~ is the molecular weight of product B 
