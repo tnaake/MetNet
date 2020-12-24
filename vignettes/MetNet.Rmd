@@ -79,7 +79,7 @@ calculation of a consensus adjacency matrix using the differently computed
 individual adjacency matrices. 
 
 The two main functionalities of the package include the creation of an
-adjacency matrix from structual properties, based on losses/addition of
+adjacency matrix from structural properties, based on losses/addition of
 functional groups defined by the user, and statistical associations. Currently,
 the following statistical models are implemented to infer a statistical
 adjacency matrix: Least absolute shrinkage and selection operator
@@ -95,7 +95,7 @@ advantages and disadvantages, the user has the possibility to select
 several of these methods, compute adjacency matrices from these models and
 create a consensus matrix from the different statistical frameworks. 
 
-After creating the statistical and structural adjaceny matrices these two 
+After creating the statistical and structural adjacency matrices these two 
 matrices can be combined to form a consensus matrix that has both information 
 from structural and statistical properties of the data. This can be followed 
 by further network analyses (e.g. calculation of topological parameters),
@@ -154,7 +154,7 @@ x_test <- as.matrix(x_test)
 # Creating the structural matrix {#sec-structural}
 
 The function `structural` will create the adjacency
-matrix based on structual properties (m/z values) of the features.
+matrix based on structural properties (m/z values) of the features.
 The function expects a matrix with a column `"mz"` that contains the 
 mass information of a feature (typically the m/z value). Furthermore,
 `structural` takes a `data.frame`
@@ -246,8 +246,8 @@ Depending on the chemical group added the retention time will differ depending
 on the chemical group added, e.g. an addition of a glycosyl group will 
 usually result in a lower retentiom time in reverse-phase chromatography-
 This information can be used in refining the adjacency matrix derived from 
-the structural matrix. The `rtCorrection` does this checking, if
-predicted transformation correspond to the expected retention time shift, 
+the structural matrix. The `rtCorrection` does this check, if the
+predicted transformations correspond to the expected retention time shift, 
 in an automated fashion. It requires information about the expected retention
 time shift in the `data.frame` passed to the `transformation`
 argument (in the `"rt"` column). Within this columns, information about
@@ -332,9 +332,9 @@ matrix will be reported as a connection in the returned matrix
 set to 1. 
 
 For the other three types (top1, top2, mean) the ranks per statistical model
-will be calculated and from each respective link the top1, top 2 or mean rank 
+will be calculated and from each respective link the top1, top2 or mean rank 
 across statistical models will be calculated (cf. [@Hase2013]). The 
-top n unqique ranks (defined by the entry n in `args`) will be returned
+top n unique ranks (defined by the entry n in `args`) will be returned
 as links in the unweighted consensus adjacency matrix. 
 
 In the following example, we will create a list of unweighted adjacency matrices 
@@ -359,7 +359,7 @@ stat_adj_thr <- threshold(statistical = stat_adj_l, type = "threshold",
  
 ## type = "top1" 
 args_top <- list(n = 40)
-stat_adj_top1 <- threshold(statistical = stat_adj_l, type = "top2", 
+stat_adj_top1 <- threshold(statistical = stat_adj_l, type = "top1", 
     args = args_top)
 
 ## type = "top2"

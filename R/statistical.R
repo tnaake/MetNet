@@ -591,6 +591,7 @@ statistical <- function(x, model, ...) {
     if ("randomForest" %in% model) {
         randomForest <- randomForest(x = x, ...)
         diag(randomForest) <- NaN
+        randomForest <- randomForest[rownames(x), rownames(x)]
         l <- addToList(l, "randomForest", randomForest)
         print("randomForest finished.")
     }
@@ -780,7 +781,7 @@ getLinks <- function(mat, exclude = "== 1") {
 #' matrix after using the `consensus` function from the `sna` package.
 #' Depending on the chosen `method` in `consensus`, the `threshold` value of the
 #' consensus adjacency matrix should be chosen accordingly to report a
-#' connection by different statistical modelss.
+#' connection by different statistical models.
 #'
 #' When combining the adjacency matrices the
 #' `threshold` value defines if an edge is reported or not. For
