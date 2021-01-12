@@ -52,8 +52,8 @@ High-resolution mass spectrometric data is often very rich in information
 content and metabolic conversions, and reactions can be derived from structural
 properties of features [@Breitling2006]. 
 In addition to that, statistical associations between
-features (based on their intensity values) can be a valuable ressource to find 
-co-synthesised or co-regulated metabolites, which are synthesised in the same
+features (based on their intensity values) can be a valuable resource to find 
+co-synthesized or co-regulated metabolites, which are synthesized in the same
 biosynthetic pathways. Given that an analysis tool within the `R` framework 
 is still lacking that is
 integrating the two features of mass spectrometric information commonly
@@ -64,7 +64,7 @@ topologies from high-resolution mass spectrometry data. `MetNet`
 combines information from both structural data (differences in m/z values
 of features) and statistical associations (intensity values of features per
 sample) to propose putative metabolic networks that can be used for further
-exploration. 
+exploration.
 
 The idea of using high-resolution mass spectrometry data for network 
 construction was first proposed in @Breitling2006 and followed soon 
@@ -96,9 +96,9 @@ several of these methods, compute adjacency matrices from these models and
 create a consensus matrix from the different statistical frameworks. 
 
 After creating the statistical and structural adjacency matrices these two 
-matrices can be combined to form a consensus matrix that has both information 
-from structural and statistical properties of the data. This can be followed 
-by further network analyses (e.g. calculation of topological parameters),
+matrices can be combined to form a consensus matrix that has information 
+from both structural and statistical properties of the data. This can be followed 
+by network analyses (e.g. calculation of topological parameters),
 integration with other data sources (e.g. genomic information or
 transcriptomic data) and/or visualization. 
 
@@ -128,7 +128,7 @@ library(MetNet)
 ``` 
 
 The data format that is compatible with the `MetNet` framework is
-in the `xcms`/`CAMERA` output-like $m~\times~n$ matrix, where
+a `xcms`/`CAMERA` output-like $m~\times~n$ matrix, where
 columns denote the different samples $n$ and where $m$ features are present.
 In such a matrix, information about the masses of the features and quantitative
 information of the features (intensity or concentration values) are needed. 
@@ -138,7 +138,7 @@ length $\vert m \vert$ in the column `"mz"`.
 `MetNet` does not impose any requirements for
 data normalization, filtering, etc. However, the user has to make sure that
 the data is properly preprocessed. These include division by internal standard,
-`log2` transformation, noise filtering, removal of features that do not 
+`log2` or `vsn` transformation, noise filtering, removal of features that do not 
 represent mass features/metabolites, removal of isotopes, etc. 
 
 We will load here the object `x_test` that contains m/z values
@@ -164,15 +164,15 @@ object as argument `transformations` with the `colnames`
 sense of additions/losses of functional groups mediated by biochemical,
 enzymatic reactions) in the data using the mass information. 
 
-Following the work of [@Breitling2006] and [@Jourdan2007], 
-molecular weight difference w~X~ is defined by 
+Following the work of @Breitling2006 and @Jourdan2007, 
+molecular weight difference $w_X$ is defined by 
 $w_X = \vert w_A - w_B \vert$
 
-where w~A~ is the molecular weight
-of substrate A, and w~B~ is the molecular weight of product B 
+where $w_A$ is the molecular weight
+of substrate A, and $w_B$ is the molecular weight of product B 
 (typically, m/z values will be used as a proxy for the molecular weight since 
 the molecular weight is not directly derivable from mass spectrometric data). 
-As examplified in [@Jourdan2007] specific enzymatic reactions refer to 
+As exemplified in @Jourdan2007, specific enzymatic reactions refer to 
 specific changes in the molecular weight, e.g. carboxylation reactions 
 will result in a mass difference of 43.98983 (molecular weight of CO~2~) 
 between metabolic features. 
@@ -180,7 +180,7 @@ between metabolic features.
 The search space for these transformation is adjustable by the 
 `transformation` argument in 
 `structural` allowing to look for specific 
-enzymatic transformations in mind. Hereby,
+enzymatic transformations. Hereby,
 `structural` will take into account the 
 `ppm` value, to adjust for inaccuracies in m/z values due to technical 
 reasons according to the formula
@@ -191,19 +191,19 @@ with m~exp~ the experimentally determined m/z value and m~calc~ the
 calculated accurate mass of a molecule. Within the function, a lower and upper
 range is calculated depending on the supplied `ppm` value, differences
 between the m/z feature values are calculated and matched against the
-`"mass"`es of the `transformations` argument. If any
-of the additions/losses defined in `transformations` is found in the
+`"mass"`es of the `transformation` argument. If any
+of the additions/losses defined in `transformation` is found in the
 data, it will be reported as an (unweighted) connection in the
-returned adjacency matrix. Together with the adjacency matrix the type of
+returned adjacency matrix (value 1). Together with the adjacency matrix the type of
 connection (derived from the column `"name"` in the
-`transformations`) will be written to a character matrix. These
-two matrices will be returned as a list (first entry: numerical adjacency
-matrix, second entry: character matrix) by the function
-`structural`. 
+`transformation` object) will be written to a character matrix. These
+two matrices will be returned as a list by the function
+`structural`: the first entry contains the numerical adjacency
+matrix and second entry the character matrix.
 
 Before calculating the structural matrix, one must define the search space, 
-i.e. these transformation that will be looked for in the mass spectrometric
-data by creating the `transformations` object. 
+i.e. the transformation that will be looked for in the mass spectrometric
+data, by creating here the `transformations` object. 
 
 ```{r transformation_example,echo=TRUE,eval=TRUE}
 ## define the search space for biochemical transformation 
@@ -244,19 +244,19 @@ in the `R` console.
 ## Refining the structural adjacency matrix (optional) {-}
 The retention time will differ depending
 on the chemical group added, e.g. an addition of a glycosyl group will 
-usually result in a lower retentiom time in reverse-phase chromatography-
+usually result in a lower retentiom time in reverse-phase chromatography.
 This information can be used in refining the adjacency matrix derived from 
-the structural matrix. The `rtCorrection` does this check, if the
+the structural matrix. The `rtCorrection` function does this check, if the
 predicted transformations correspond to the expected retention time shift, 
 in an automated fashion. It requires information about the expected retention
 time shift in the `data.frame` passed to the `transformation`
-argument (in the `"rt"` column). Within this columns, information about
+argument (in the `"rt"` column). Within this column, information about
 retention time shifts is encoded by `"-"`, `"+"` and `"?"`, 
 which means the feature with higher m/z value has lower, higher or unknown 
 retention time than the feature with the lower m/z value. The values for 
 m/z and retention time will be taken from the object passed to the 
 `x` argument. In case there is a discrepancy between the transformation
-and the retention time shift the adjacency matrix at the specific position
+and the retention time shift, the adjacency matrix at the specific position
 will be set to 0. `rtCorrection` will return the 
 updated adjacency matrix and the updated character matrix with the descriptions 
 of the transformation. 
@@ -306,11 +306,11 @@ arguments that are defined in the functions `lasso`,
 ## Creating an unweighted adjacency matrix using `threshold` {#subsec-threshold}
 
 From the list of adjacency matrices the function `threshold`
-will create a unweighted adjacency matrix from the weighted adjacency matrices
+will create an unweighted adjacency matrix from the weighted adjacency matrices
 unifying the information present from all statistical models. 
 The reasoning behind this step is to circumvent disadvantages arising from each 
 model and creating a statistically reliable topology that reflects the actual 
-metabolic relations. `threshold` return an unweighted adjancency
+metabolic relations. `threshold` returns an unweighted adjacency
 matrix with connections inferred from the respective models.
 
 There are four different types implemented how the unweighted adjacency 
@@ -318,8 +318,9 @@ matrix can be created: `threshold`, `top1`, `top2`, `mean`.
 
 For `type = "threshold"`, threshold values have to be defined in the 
 `args` argument for each respective statistical model. Values above or below 
-these threshold in each respective weighted adjacency matrix will be 
-reported as unweighted edges. The unweighted adjacency matrices will be passed to the  
+these thresholds in each respective weighted adjacency matrix will be 
+reported as present (1) or absent (0) in the returned unweighted adjacency 
+matrix. The unweighted adjacency matrices will be passed to the  
 `consensus` function from the `sna` package [@Butts2016] 
 to calculate the unweighted consensus adjacency matrix. 
 The arguments that are accepted by this function can be passed to the 
@@ -331,10 +332,10 @@ matrix will be reported as a connection in the returned matrix
 `"central.graph"` (default), the argument `threshold` should be 
 set to 1. 
 
-For the other three types (top1, top2, mean) the ranks per statistical model
+For the other three types (`top1`, `top2`, `mean`) the ranks per statistical model
 will be calculated and from each respective link the top1, top2 or mean rank 
 across statistical models will be calculated (cf. [@Hase2013]). The 
-top n unique ranks (defined by the entry n in `args`) will be returned
+top n unique ranks (defined by the entry `n` in `args`) will be returned
 as links in the unweighted consensus adjacency matrix. 
 
 In the following example, we will create a list of unweighted adjacency matrices 
@@ -347,8 +348,8 @@ x_int <- as.matrix(x_int)
 stat_adj_l <- statistical(x_int, model = c("pearson", "spearman"))
 ```
 
-`threshold` implements four types to obtain an unweighted adjacency
-matrix. We will create for all types the unweighted consensus adjacency 
+`threshold` implements four ways to obtain an unweighted adjacency
+matrix. We will create here for all ways the unweighted consensus adjacency 
 matrices.
 
 ```{r threshold,eval=TRUE,echo=TRUE}
@@ -381,13 +382,13 @@ by `structural` and the matrix returned
 by `threshold`,
 respectively, and the argument `threshold`, that is a numerical value 
 (default = 1). After adding the matrices, the entries will be checked if 
-they are greater or equal than `threshold` and 1 or 0 will be returned,
+they are greater or equal than `threshold` and the value 1 or 0 will be returned,
 respectively. The argument `threshold` needs to be adjusted by the user 
 if another `method` than `"central.graph"` in 
 `threshold` (`type = "threshold"`) is used. 
 
 We will use here the unweighted statistical adjacency matrix from 
-`type = "mean"`: 
+`type = "mean"` to combine it with the structural adjacency matrix, `stat_adj`: 
 ```{r combine,eval=TRUE,echo=TRUE}
 cons_adj <- combine(structural = struct_adj, statistical = stat_adj_mean)
 ```
