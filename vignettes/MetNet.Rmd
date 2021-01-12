@@ -199,7 +199,7 @@ connection (derived from the column `"name"` in the
 `transformation` object) will be written to a character matrix. These
 two matrices will be returned as a list by the function
 `structural`: the first entry contains the numerical adjacency
-matrix and second entry the character matrix.
+matrix and the second entry the character matrix.
 
 Before calculating the structural matrix, one must define the search space, 
 i.e. the transformation that will be looked for in the mass spectrometric
