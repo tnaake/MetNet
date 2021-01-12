@@ -242,7 +242,7 @@ struct_adj <- structural(x = x_test, transformation = transformations, ppm = 10)
 in the `R` console. 
 
 ## Refining the structural adjacency matrix (optional) {-}
-Depending on the chemical group added the retention time will differ depending
+The retention time will differ depending
 on the chemical group added, e.g. an addition of a glycosyl group will 
 usually result in a lower retentiom time in reverse-phase chromatography-
 This information can be used in refining the adjacency matrix derived from 
@@ -276,7 +276,8 @@ in the `R` console.
 The function `statistical` will create the adjacency
 matrix based on statistical associations. The function will create a 
 list of weighted adjacency matrices using the statistical models defined by the 
-`model` argument. Currently, the models LASSO (using `stabs`,
+`model` argument. Currently, the following models are available: 
+LASSO (using `stabs`,
 [@Hofner2015;@Thomas2017]), Random Forest (using `GENIE3`, 
 CLR, ARACNE (the two latter using the package `mpmi` to calculate
 Mutual Information using a nonparametric bias correction by 
@@ -315,12 +316,11 @@ matrix with connections inferred from the respective models.
 There are four different types implemented how the unweighted adjacency 
 matrix can be created: `threshold`, `top1`, `top2`, `mean`.
 
-For `type = "threshold"`, threshold values have to be defined for the 
-`args` argument for each respective statistical model, above or below 
-which 
-the each in each weighted adjacency matrix will be reported as a unweighted 
-each. The unweighted adjacency matrices will be passed to the  
-`consensus` function from the `sna` [@Butts2016]
+For `type = "threshold"`, threshold values have to be defined in the 
+`args` argument for each respective statistical model. Values above or below 
+these threshold in each respective weighted adjacency matrix will be 
+reported as unweighted edges. The unweighted adjacency matrices will be passed to the  
+`consensus` function from the `sna` package [@Butts2016] 
 to calculate the unweighted consensus adjacency matrix. 
 The arguments that are accepted by this function can be passed to the 
 `threshold` 
@@ -384,7 +384,7 @@ respectively, and the argument `threshold`, that is a numerical value
 they are greater or equal than `threshold` and 1 or 0 will be returned,
 respectively. The argument `threshold` needs to be adjusted by the user 
 if another `method` than `"central.graph"` in 
-`threshold` (type = "threshold") is used. 
+`threshold` (`type = "threshold"`) is used. 
 
 We will use here the unweighted statistical adjacency matrix from 
 `type = "mean"`: 
@@ -396,8 +396,8 @@ cons_adj <- combine(structural = struct_adj, statistical = stat_adj_mean)
 
 To display the created consensus adjacency matrix, existing visualization 
 tools available in the `R` framework can be employed or any other visualization 
-tool after exporting the consensus matrix as a text file. In this example 
-We will use the `igraph` [@Csardi2006] package to visualize the 
+tool after exporting the consensus matrix as a text file. In this example, 
+we will use the `igraph` [@Csardi2006] package to visualize the 
 adjacency matrix. 
 
 `combine` returns a list of two adjacency matrices, where the 
