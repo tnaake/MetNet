@@ -7,7 +7,7 @@ author:
 package: MetNet
 abstract: >
     A major bottleneck of mass spectrometry-based metabolomic analysis is 
-    still the rapid detection and annotation of unknown m/z features across 
+    still the rapid detection and annotation of unknown m/z features across
     biological matrices. Traditionally, the annotation was done manually 
     imposing constraints in reproducibility and automatization. 
     Furthermore, different analysis tools are typically used at different steps 
@@ -523,7 +523,7 @@ transformations <- rbind(
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"),
     c("Cytosine (-H)", "C4H4N3O",  "110.0354367661"))
 
-transformations <- data.frame(name = transformations[, 1], 
+transformations <- data.frame(group = transformations[, 1], 
             formula = transformations[, 2],
             mass = as.numeric(transformations[, 3]))
 ```

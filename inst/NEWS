@@ -1,3 +1,6 @@
+Changes in version 1.9.1 (2021-02-20)
++ fix typos in the vignette
+
 Changes in version 1.5.3 (2020-03-09)
 + change tests for rtCorrection, do not use function levels to test for 
 if `+`, `.` or `?` is present in the transformation list
