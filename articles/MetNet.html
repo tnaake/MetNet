@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.1</span>
       </span>
     </div>
 
@@ -54,11 +56,11 @@
 
       
 
-      </header><script src="MetNet_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="MetNet_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>MetNet: Inferring metabolic networks from untargeted high-resolution mass spectrometry data</h1>
-                        <h4 class="author">Thomas Naake</h4>
+                        <h4 data-toc-skip class="author">Thomas Naake</h4>
             <address class="author_afil">
       Max Planck Institute of Molecular Plant Physiology, 14476 Potsdam-Golm, Germany<br><div class="hidden name"><code>MetNet.Rmd</code></div>
 
@@ -94,58 +96,58 @@ document.addEventListener("DOMContentLoaded", function() {
 <div id="questions-and-bugs" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#questions-and-bugs" class="anchor"></a>Questions and bugs</h1>
-<p><code>MetNet</code> is currently under active development. If you discover any bugs, typos or develop ideas of improving <code>MetNet</code> feel free to raise an issue via <a href="https://github.com/tnaake/MetNet">Github</a> or send a mail to the developer.</p>
+<p><code>MetNet</code> is currently under active development. If you discover any bugs, typos or develop ideas of improving <code>MetNet</code> feel free to raise an issue via <a href="https://github.com/tnaake/MetNet" class="external-link">Github</a> or send a mail to the developer.</p>
 </div>
 <div id="sec-prepare" class="section level1">
 <h1 class="hasAnchor">
 <a href="#sec-prepare" class="anchor"></a>Prepare the environment and load the data</h1>
 <p>To install <code>MetNet</code> enter the following to the <code>R</code> console</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
-<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">"MetNet"</span><span class="op">)</span> </code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"MetNet"</span><span class="op">)</span> </code></pre></div>
 <p>Before starting with the analysis, load the <code>MetNet</code> package. This will also load the required packages <code>glmnet</code>, <code>stabs</code>, <code>randomForest</code>, <code>rfPermute</code>, <code>mpmi</code>, <code>parmigene</code>, <code>WGCNA</code> and <code>bnlearn</code> that are needed for functions in the statistical adjacency matrix inference.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">MetNet</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">MetNet</span><span class="op">)</span></code></pre></div>
 <p>The data format that is compatible with the <code>MetNet</code> framework is a <code>xcms</code>/<code>CAMERA</code> output-like <span class="math inline">\(m~\times~n\)</span> matrix, where columns denote the different samples <span class="math inline">\(n\)</span> and where <span class="math inline">\(m\)</span> features are present. In such a matrix, information about the masses of the features and quantitative information of the features (intensity or concentration values) are needed. The information about the m/z values has to be stored in a vector of length <span class="math inline">\(\vert m \vert\)</span> in the column <code>"mz"</code>.</p>
 <p><code>MetNet</code> does not impose any requirements for data normalization, filtering, etc. However, the user has to make sure that the data is properly preprocessed. These include division by internal standard, <code>log2</code> or <code>vsn</code> transformation, noise filtering, removal of features that do not represent mass features/metabolites, removal of isotopes, etc.</p>
 <p>We will load here the object <code>x_test</code> that contains m/z values (in the column <code>"mz"</code>), together with the corresponding retention time (in the column <code>"rt"</code>) and intensity values. We will use here the object <code>x_test</code> for guidance through the workflow of <code>MetNet</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"x_test"</span>, package <span class="op">=</span> <span class="st">"MetNet"</span><span class="op">)</span>
-<span class="va">x_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">x_test</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"x_test"</span>, package <span class="op">=</span> <span class="st">"MetNet"</span><span class="op">)</span>
+<span class="va">x_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x_test</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="sec-structural" class="section level1">
 <h1 class="hasAnchor">
 <a href="#sec-structural" class="anchor"></a>Creating the structural matrix</h1>
 <p>The function <code>structural</code> will create the adjacency matrix based on structural properties (m/z values) of the features. The function expects a matrix with a column <code>"mz"</code> that contains the mass information of a feature (typically the m/z value). Furthermore, <code>structural</code> takes a <code>data.frame</code> object as argument <code>transformations</code> with the <code>colnames</code> <code>"mass"</code>, <code>"name"</code> and additional columns (e.g. <code>"formula"</code>). <code>structural</code> looks for transformation (in the sense of additions/losses of functional groups mediated by biochemical, enzymatic reactions) in the data using the mass information.</p>
-<p>Following the work of <span class="citation">Breitling et al. (2006)</span> and <span class="citation">Jourdan et al. (2007)</span>, molecular weight difference <span class="math inline">\(w_X\)</span> is defined by <span class="math inline">\(w_X = \vert w_A - w_B \vert\)</span></p>
-<p>where <span class="math inline">\(w_A\)</span> is the molecular weight of substrate A, and <span class="math inline">\(w_B\)</span> is the molecular weight of product B (typically, m/z values will be used as a proxy for the molecular weight since the molecular weight is not directly derivable from mass spectrometric data). As exemplified in <span class="citation">Jourdan et al. (2007)</span>, specific enzymatic reactions refer to specific changes in the molecular weight, e.g. carboxylation reactions will result in a mass difference of 43.98983 (molecular weight of CO<sub>2</sub>) between metabolic features.</p>
+<p>Following the work of <span class="citation">Breitling et al. (2006)</span> and <span class="citation">Jourdan et al. (2007)</span>, molecular weight difference w<sub>X</sub> is defined by <span class="math inline">\(w_X = \vert w_A - w_B \vert\)</span></p>
+<p>where w<sub>A</sub> is the molecular weight of substrate A, and w<sub>B</sub> is the molecular weight of product B (typically, m/z values will be used as a proxy for the molecular weight since the molecular weight is not directly derivable from mass spectrometric data). As exemplified in <span class="citation">Jourdan et al. (2007)</span>, specific enzymatic reactions refer to specific changes in the molecular weight, e.g. carboxylation reactions will result in a mass difference of 43.98983 (molecular weight of CO<sub>2</sub>) between metabolic features.</p>
 <p>The search space for these transformation is adjustable by the <code>transformation</code> argument in <code>structural</code> allowing to look for specific enzymatic transformations. Hereby, <code>structural</code> will take into account the <code>ppm</code> value, to adjust for inaccuracies in m/z values due to technical reasons according to the formula</p>
 <p><span class="math display">\[ppm = \frac{m_{exp} - m_{calc}}{m_{exp}} \cdot 10^{-6}\]</span></p>
-<p>with m<sub>exp</sub> the experimentally determined m/z value and m<sub>calc</sub> the calculated accurate mass of a molecule. Within the function, a lower and upper range is calculated depending on the supplied <code>ppm</code> value, differences between the m/z feature values are calculated and matched against the <code>"mass"</code>es of the <code>transformation</code> argument. If any of the additions/losses defined in <code>transformation</code> is found in the data, it will be reported as an (unweighted) connection in the returned adjacency matrix (value 1). Together with the adjacency matrix the type of connection (derived from the column <code>"name"</code> in the <code>transformation</code> object) will be written to a character matrix. These two matrices will be returned as a list by the function <code>structural</code>: the first entry contains the numerical adjacency matrix and second entry the character matrix.</p>
+<p>with m<sub>exp</sub> the experimentally determined m/z value and m<sub>calc</sub> the calculated accurate mass of a molecule. Within the function, a lower and upper range is calculated depending on the supplied <code>ppm</code> value, differences between the m/z feature values are calculated and matched against the <code>"mass"</code>es of the <code>transformation</code> argument. If any of the additions/losses defined in <code>transformation</code> is found in the data, it will be reported as an (unweighted) connection in the returned adjacency matrix (value 1). Together with the adjacency matrix the type of connection (derived from the column <code>"name"</code> in the <code>transformation</code> object) will be written to a character matrix. These two matrices will be returned as a list by the function <code>structural</code>: the first entry contains the numerical adjacency matrix and the second entry the character matrix.</p>
 <p>Before calculating the structural matrix, one must define the search space, i.e. the transformation that will be looked for in the mass spectrometric data, by creating here the <code>transformations</code> object.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## define the search space for biochemical transformation </span>
-<span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Hydroxylation (-H)"</span>, <span class="st">"O"</span>, <span class="fl">15.9949146221</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Malonyl group (-H2O)"</span>, <span class="st">"C3H2O3"</span>, <span class="fl">86.0003939305</span>, <span class="st">"+"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"D-ribose (-H2O) (ribosylation)"</span>, <span class="st">"C5H8O4"</span>, <span class="fl">132.0422587452</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C6H10O6"</span>, <span class="st">"C6H10O6"</span>, <span class="fl">178.0477380536</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Rhamnose (-H20)"</span>, <span class="st">"C6H10O4"</span>, <span class="fl">146.057910</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Monosaccharide (-H2O)"</span>, <span class="st">"C6H10O5"</span>, <span class="fl">162.0528234315</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #1"</span>, <span class="st">"C12H20O10"</span>, <span class="fl">324.105649</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #2"</span>, <span class="st">"C12H20O11"</span>, <span class="fl">340.1005614851</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Trisaccharide (-H2O)"</span>, <span class="st">"C18H30O15"</span>, <span class="fl">486.1584702945</span>, <span class="st">"-"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glucuronic acid (-H2O)"</span>, <span class="st">"C6H8O6"</span>, <span class="fl">176.0320879894</span>, <span class="st">"?"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"coumaroyl (-H2O)"</span>, <span class="st">"C9H6O2"</span>, <span class="fl">146.0367794368</span>, <span class="st">"?"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"feruloyl (-H2O)"</span>, <span class="st">"C9H6O2OCH2"</span>, <span class="fl">176.0473441231</span>, <span class="st">"?"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"sinapoyl (-H2O)"</span>, <span class="st">"C9H6O2OCH2OCH2"</span>, <span class="fl">206.0579088094</span>, <span class="st">"?"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"putrescine to spermidine (+C3H7N)"</span>, <span class="st">"C3H7N"</span>, <span class="fl">57.0578492299</span>, <span class="st">"?"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hydroxylation (-H)"</span>, <span class="st">"O"</span>, <span class="fl">15.9949146221</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Malonyl group (-H2O)"</span>, <span class="st">"C3H2O3"</span>, <span class="fl">86.0003939305</span>, <span class="st">"+"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"D-ribose (-H2O) (ribosylation)"</span>, <span class="st">"C5H8O4"</span>, <span class="fl">132.0422587452</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C6H10O6"</span>, <span class="st">"C6H10O6"</span>, <span class="fl">178.0477380536</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Rhamnose (-H20)"</span>, <span class="st">"C6H10O4"</span>, <span class="fl">146.057910</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monosaccharide (-H2O)"</span>, <span class="st">"C6H10O5"</span>, <span class="fl">162.0528234315</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #1"</span>, <span class="st">"C12H20O10"</span>, <span class="fl">324.105649</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #2"</span>, <span class="st">"C12H20O11"</span>, <span class="fl">340.1005614851</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Trisaccharide (-H2O)"</span>, <span class="st">"C18H30O15"</span>, <span class="fl">486.1584702945</span>, <span class="st">"-"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glucuronic acid (-H2O)"</span>, <span class="st">"C6H8O6"</span>, <span class="fl">176.0320879894</span>, <span class="st">"?"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"coumaroyl (-H2O)"</span>, <span class="st">"C9H6O2"</span>, <span class="fl">146.0367794368</span>, <span class="st">"?"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"feruloyl (-H2O)"</span>, <span class="st">"C9H6O2OCH2"</span>, <span class="fl">176.0473441231</span>, <span class="st">"?"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sinapoyl (-H2O)"</span>, <span class="st">"C9H6O2OCH2OCH2"</span>, <span class="fl">206.0579088094</span>, <span class="st">"?"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"putrescine to spermidine (+C3H7N)"</span>, <span class="st">"C3H7N"</span>, <span class="fl">57.0578492299</span>, <span class="st">"?"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## convert to data frame</span>
-<span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
+<span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>
     group <span class="op">=</span> <span class="va">transformations</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>,
     formula <span class="op">=</span> <span class="va">transformations</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>,
-    mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">transformations</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span>,
+    mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">transformations</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span>,
     rt <span class="op">=</span> <span class="va">transformations</span><span class="op">[</span>, <span class="fl">4</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <p>The function <code>structural</code> will then check for those m/z differences that are stored in the column <code>"mass"</code> in the object <code>transformations</code>. To create the adjacency matrix derived from these structural information we enter</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -179,23 +181,23 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>From the list of adjacency matrices the function <code>threshold</code> will create an unweighted adjacency matrix from the weighted adjacency matrices unifying the information present from all statistical models. The reasoning behind this step is to circumvent disadvantages arising from each model and creating a statistically reliable topology that reflects the actual metabolic relations. <code>threshold</code> returns an unweighted adjacency matrix with connections inferred from the respective models.</p>
 <p>There are four different types implemented how the unweighted adjacency matrix can be created: <code>threshold</code>, <code>top1</code>, <code>top2</code>, <code>mean</code>.</p>
 <p>For <code>type = "threshold"</code>, threshold values have to be defined in the <code>args</code> argument for each respective statistical model. Values above or below these thresholds in each respective weighted adjacency matrix will be reported as present (1) or absent (0) in the returned unweighted adjacency matrix. The unweighted adjacency matrices will be passed to the<br><code>consensus</code> function from the <code>sna</code> package <span class="citation">(Butts 2016)</span> to calculate the unweighted consensus adjacency matrix. The arguments that are accepted by this function can be passed to the <code>threshold</code> function. Furthermore, in <code>args</code> an entry <code>threshold</code> needs to be defined to threshold if the value a<sub>i,j</sub> of the consensus adjacency matrix will be reported as a connection in the returned matrix (if a<sub>i,j</sub><span class="math inline">\(\geq\)</span> <code>threshold</code>) or not. In the case of the method <code>"central.graph"</code> (default), the argument <code>threshold</code> should be set to 1.</p>
-<p>For the other three types (<code>top1</code>, <code>top2</code>, <code>mean</code>) the ranks per statistical model will be calculated and from each respective link the top1, top2 or mean rank across statistical models will be calculated (cf. <span class="citation">(Hase et al. 2013)</span>). The top n unique ranks (defined by the entry <code>n</code> in <code>args</code>) will be returned as links in the unweighted consensus adjacency matrix.</p>
+<p>For the other three types (<code>top1</code>, <code>top2</code>, <code>mean</code>) the ranks per statistical model will be calculated and from each respective link the top1, top2 or mean rank across statistical models will be calculated (cf. <span class="citation">(Hase et al. 2013)</span>). The top n unique ranks (defined by the entry <code>n</code> in <code>args</code>) will be returned as links in the unweighted consensus adjacency matrix.</p>
 <p>In the following example, we will create a list of unweighted adjacency matrices using Pearson and Spearman correlation using the intensity values as input data.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">x_int</span> <span class="op">&lt;-</span> <span class="va">x_test</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">x_test</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>
-<span class="va">x_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">x_int</span><span class="op">)</span>
-<span class="va">stat_adj_l</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/statistical.html">statistical</a></span><span class="op">(</span><span class="va">x_int</span>, model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"pearson"</span>, <span class="st">"spearman"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">x_int</span> <span class="op">&lt;-</span> <span class="va">x_test</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">x_test</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>
+<span class="va">x_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x_int</span><span class="op">)</span>
+<span class="va">stat_adj_l</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/statistical.html">statistical</a></span><span class="op">(</span><span class="va">x_int</span>, model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pearson"</span>, <span class="st">"spearman"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "pearson finished."
 ## [1] "spearman finished."</code></pre>
 <p><code>threshold</code> implements four ways to obtain an unweighted adjacency matrix. We will create here for all ways the unweighted consensus adjacency matrices.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## type = "threshold" </span>
-<span class="va">args_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"pearson"</span> <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"spearman"</span> <span class="op">=</span> <span class="fl">0.95</span>, threshold <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
+<span class="va">args_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"pearson"</span> <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"spearman"</span> <span class="op">=</span> <span class="fl">0.95</span>, threshold <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">stat_adj_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold.html">threshold</a></span><span class="op">(</span>statistical <span class="op">=</span> <span class="va">stat_adj_l</span>, type <span class="op">=</span> <span class="st">"threshold"</span>, 
     args <span class="op">=</span> <span class="va">args_thr</span><span class="op">)</span>
  
 <span class="co">## type = "top1" </span>
-<span class="va">args_top</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
+<span class="va">args_top</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 <span class="va">stat_adj_top1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold.html">threshold</a></span><span class="op">(</span>statistical <span class="op">=</span> <span class="va">stat_adj_l</span>, type <span class="op">=</span> <span class="st">"top1"</span>, 
     args <span class="op">=</span> <span class="va">args_top</span><span class="op">)</span>
 
@@ -222,8 +224,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>To display the created consensus adjacency matrix, existing visualization tools available in the <code>R</code> framework can be employed or any other visualization tool after exporting the consensus matrix as a text file. In this example, we will use the <code>igraph</code> <span class="citation">(Csardi and Nepusz 2006)</span> package to visualize the adjacency matrix.</p>
 <p><code>combine</code> returns a list of two adjacency matrices, where the first entry contains the unweighted adjacency matrix and the second entry contains a matrix given information on the type of link between features based on structural information. Only the first entry of the list will be passed to the <code>graph_from_adjacency_matrix</code> function:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">cons_adj</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mode <span class="op">=</span> <span class="st">"undirected"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">g</span>, edge.width <span class="op">=</span> <span class="fl">5</span>, vertex.label.cex <span class="op">=</span> <span class="fl">0.5</span>, edge.color <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">cons_adj</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mode <span class="op">=</span> <span class="st">"undirected"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, edge.width <span class="op">=</span> <span class="fl">5</span>, vertex.label.cex <span class="op">=</span> <span class="fl">0.5</span>, edge.color <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></code></pre></div>
 <div class="figure">
 <img src="MetNet_files/figure-html/visualisation-1.png" alt="** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association." width="700"><p class="caption">
 ** <em>Ab initio</em> network inferred from structural and quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.
@@ -238,9 +240,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <h2 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session information</h2>
 <p>All software and respective versions to build this vignette are listed here:</p>
-<pre><code>## R Under development (unstable) (2021-01-07 r79806)
+<pre><code>## R Under development (unstable) (2021-02-18 r80027)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 20.04.1 LTS
+## Running under: Ubuntu 20.04.2 LTS
 ## 
 ## Matrix products: default
 ## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
@@ -257,167 +259,168 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] MetNet_1.9.0     knitr_1.30       BiocStyle_2.19.1
+## [1] MetNet_1.9.1     knitr_1.31       BiocStyle_2.19.1
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] sna_2.6              highr_0.8            pillar_1.4.7        
 ##  [4] compiler_4.1.0       BiocManager_1.30.10  ppcor_1.1           
-##  [7] GENIE3_1.13.0        tools_4.1.0          digest_0.6.27       
-## [10] lifecycle_0.2.0      tibble_3.0.4         evaluate_0.14       
-## [13] memoise_1.1.0        parmigene_1.1.0      rle_0.9.2           
+##  [7] tools_4.1.0          GENIE3_1.13.0        digest_0.6.27       
+## [10] lifecycle_1.0.0      tibble_3.0.6         evaluate_0.14       
+## [13] memoise_2.0.0        parmigene_1.1.0      rle_0.9.2           
 ## [16] lattice_0.20-41      pkgconfig_2.0.3      rlang_0.4.10        
 ## [19] igraph_1.2.6         mpmi_0.43.1          yaml_2.2.1          
-## [22] parallel_4.1.0       pkgdown_1.6.1.9000   xfun_0.20           
-## [25] coda_0.19-4          stringr_1.4.0        stabs_0.6-3         
-## [28] vctrs_0.3.6          desc_1.2.0           fs_1.5.0            
-## [31] systemfonts_0.3.2    rprojroot_2.0.2      grid_4.1.0          
-## [34] R6_2.5.0             textshaping_0.2.1    BiocParallel_1.25.2 
-## [37] bnlearn_4.6.1        rmarkdown_2.6        bookdown_0.21       
-## [40] magrittr_2.0.1       ellipsis_0.3.1       htmltools_0.5.1     
-## [43] MASS_7.3-53          assertthat_0.2.1     ragg_0.4.1          
-## [46] KernSmooth_2.23-18   stringi_1.5.3        network_1.16.1      
-## [49] statnet.common_4.4.1 crayon_1.3.4</code></pre>
+## [22] parallel_4.1.0       pkgdown_1.6.1.9000   xfun_0.21           
+## [25] fastmap_1.1.0        coda_0.19-4          stringr_1.4.0       
+## [28] stabs_0.6-4          vctrs_0.3.6          desc_1.2.0          
+## [31] fs_1.5.0             systemfonts_1.0.1    grid_4.1.0          
+## [34] rprojroot_2.0.2      R6_2.5.0             textshaping_0.3.0   
+## [37] BiocParallel_1.25.4  bnlearn_4.6.1        rmarkdown_2.7       
+## [40] bookdown_0.21        magrittr_2.0.1       ellipsis_0.3.1      
+## [43] htmltools_0.5.1.1    MASS_7.3-53.1        assertthat_0.2.1    
+## [46] ragg_1.1.0           KernSmooth_2.23-18   stringi_1.5.3       
+## [49] network_1.16.1       cachem_1.0.4         statnet.common_4.4.1
+## [52] crayon_1.4.1</code></pre>
 </div>
 <div id="transformations" class="section level2 unnumbered">
 <h2 class="hasAnchor">
 <a href="#transformations" class="anchor"></a>Transformations</h2>
-<p>The list of transformations is taken from <span class="citation">Breitling et al. (2006)</span>. The numerical m/z values were calculated by using the structural formula and the Biological Magnetic Resonance Data Bank <a href="http://www.bmrb.wisc.edu/metabolomics/mol_mass.php">web tool</a>.</p>
+<p>The list of transformations is taken from <span class="citation">Breitling et al. (2006)</span>. The numerical m/z values were calculated by using the structural formula and the Biological Magnetic Resonance Data Bank <a href="http://www.bmrb.wisc.edu/metabolomics/mol_mass.php" class="external-link">web tool</a>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Alanine"</span>, <span class="st">"C3H5NO"</span>, <span class="st">"71.0371137878"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Arginine"</span>, <span class="st">"C6H12N4O"</span>, <span class="st">"156.1011110281"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Asparagine"</span>, <span class="st">"C4H6N2O2"</span>, <span class="st">"114.0429274472"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Guanosine 5-diphosphate (-H2O)"</span>, <span class="st">"C10H13N5O10P2"</span>, <span class="st">"425.0137646843"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Guanosine 5-monophosphate (-H2O)"</span>, <span class="st">"C10H12N5O7P"</span>, <span class="st">"345.0474342759"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Guanine (-H)"</span>, <span class="st">"C5H4N5O"</span>, <span class="st">"150.0415847765"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Aspartic acid"</span>, <span class="st">"C4H5NO3"</span>, <span class="st">"115.0269430320"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Guanosine (-H2O)"</span>, <span class="st">"C10H11N5O4"</span>, <span class="st">"265.0811038675"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Cysteine"</span>, <span class="st">"C3H5NOS"</span>, <span class="st">"103.0091844778"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Deoxythymidine 5'-diphosphate (-H2O)"</span>, <span class="st">"C10H14N2O10P2"</span>, <span class="st">"384.01236770"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Cystine"</span>, <span class="st">"C6H10N2O3S2"</span>, <span class="st">"222.0132835777"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Thymidine (-H2O)"</span>, <span class="st">"C10H12N2O4"</span>, <span class="st">"224.0797068840"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glutamic acid"</span>, <span class="st">"C5H7NO3"</span>, <span class="st">"129.0425930962"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Thymine (-H)"</span>, <span class="st">"C5H5N2O2"</span>, <span class="st">"125.0351024151"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glutamine"</span>, <span class="st">"C5H8N2O2"</span>, <span class="st">"128.0585775114"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Thymidine 5'-monophosphate (-H2O)"</span>, <span class="st">"C10H13N2O7P"</span>, <span class="st">"304.0460372924"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glycine"</span>, <span class="st">"C2H3NO"</span>, <span class="st">"57.0214637236"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Uridine 5'-diphosphate (-H2O)"</span>, <span class="st">"C9H12N2O11P2"</span>, <span class="st">"385.9916322587"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Histidine"</span>, <span class="st">"C6H7N3O"</span>, <span class="st">"137.0589118624"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Uridine 5'-monophosphate (-H2O)"</span>, <span class="st">"C9H11N2O8P"</span>, <span class="st">"306.0253018503"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Isoleucine"</span>, <span class="st">"C6H11NO"</span>, <span class="st">"113.0840639804"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Uracil (-H)"</span>, <span class="st">"C4H3N2O2"</span>, <span class="st">"111.0194523509"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Leucine"</span>, <span class="st">"C6H11NO"</span>, <span class="st">"113.0840639804"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Uridine (-H2O)"</span>, <span class="st">"C9H10N2O5"</span>, <span class="st">"226.0589714419"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Lysine"</span>, <span class="st">"C6H12N2O"</span>, <span class="st">"128.0949630177"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Acetylation (-H)"</span>, <span class="st">"C2H3O2"</span>, <span class="st">"59.0133043405"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Methionine"</span>, <span class="st">"C5H9NOS"</span>, <span class="st">"131.0404846062"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Acetylation (-H2O)"</span>, <span class="st">"C2H2O"</span>,  <span class="st">"42.0105646863"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Phenylalanine"</span>, <span class="st">"C9H9NO"</span>,  <span class="st">"147.0684139162"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C2H2"</span>, <span class="st">"C2H2"</span>, <span class="st">"26.0156500642"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Proline"</span>, <span class="st">"C5H7NO"</span>, <span class="st">"97.0527638520"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Carboxylation"</span>, <span class="st">"CO2"</span>, <span class="st">"43.9898292442"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Serine"</span>, <span class="st">"C3H5NO2"</span>, <span class="st">"87.0320284099"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CHO2"</span>, <span class="st">"CHO2"</span>, <span class="st">"44.9976542763"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Threonine"</span>,  <span class="st">"C4H7NO2"</span>,  <span class="st">"101.0476784741"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Condensation/dehydration"</span>, <span class="st">"H2O"</span>, <span class="st">"18.0105646863"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Tryptophan"</span>, <span class="st">"C11H10N2O"</span>,  <span class="st">"186.0793129535"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Diphosphate"</span>, <span class="st">"H3O6P2"</span>, <span class="st">"160.9404858489"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Tyrosine"</span>, <span class="st">"C9H9NO2"</span>, <span class="st">"163.0633285383"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Ethyl addition (-H2O)"</span>, <span class="st">"C2H4"</span>, <span class="st">"28.0313001284"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Valine"</span>, <span class="st">"C5H9NO"</span>,  <span class="st">"99.0684139162"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Formic Acid (-H2O)"</span>, <span class="st">"CO"</span>, <span class="st">"27.9949146221"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Acetotacetate (-H2O)"</span>,  <span class="st">"C4H4O2"</span>, <span class="st">"84.0211293726"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glyoxylate (-H2O)"</span>, <span class="st">"C2O2"</span>,  <span class="st">"55.9898292442"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Acetone (-H)"</span>, <span class="st">"C3H5O"</span>, <span class="st">"57.0340397826"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Hydrogenation/dehydrogenation"</span>, <span class="st">"H2"</span>, <span class="st">"2.0156500642"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Adenylate (-H2O)"</span>, <span class="st">"C10H12N5O6P"</span>, <span class="st">"329.0525196538"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Hydroxylation (-H)"</span>, <span class="st">"O"</span>, <span class="st">"15.9949146221"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Biotinyl (-H)"</span>, <span class="st">"C10H15N2O3S"</span>, <span class="st">"243.0803380482"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Inorganic phosphate"</span>, <span class="st">"P"</span>, <span class="st">"30.9737615100"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Biotinyl (-H2O)"</span>, <span class="st">"C10H14N2O2S"</span>, <span class="st">"226.0775983940"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Ketol group (-H2O)"</span>, <span class="st">"C2H2O"</span>, <span class="st">"42.0105646863"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Carbamoyl P transfer (-H2PO4)"</span>, <span class="st">"CH2ON"</span>, <span class="st">"44.0136386915"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Methanol (-H2O)"</span>, <span class="st">"CH2"</span>, <span class="st">"14.0156500642"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Co-enzyme A (-H)"</span>, <span class="st">"C21H34N7O16P3S"</span>, <span class="st">"765.0995583014"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Phosphate"</span>, <span class="st">"HPO3"</span>, <span class="st">"79.9663304084"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Co-enzyme A (-H2O)"</span>, <span class="st">"C21H33N7O15P3S"</span>, <span class="st">"748.0968186472"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Primary amine"</span>, <span class="st">"NH2"</span>, <span class="st">"16.0187240694"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glutathione (-H2O)"</span>, <span class="st">"C10H15N3O5S"</span>, <span class="st">"289.0732412976"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Pyrophosphate"</span>, <span class="st">"PP"</span>, <span class="st">"61.9475230200"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Isoprene addition (-H)"</span>, <span class="st">"C5H7"</span>, <span class="st">"67.0547752247"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Secondary amine"</span>, <span class="st">"NH"</span>, <span class="st">"15.0108990373"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Malonyl group (-H2O)"</span>, <span class="st">"C3H2O3"</span>, <span class="st">"86.0003939305"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Sulfate (-H2O)"</span>, <span class="st">"SO3"</span>, <span class="st">"79.9568145563"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Palmitoylation (-H2O)"</span>, <span class="st">"C16H30O"</span>, <span class="st">"238.2296655851"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Tertiary amine"</span>, <span class="st">"N"</span>, <span class="st">"14.0030740052"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Pyridoxal phosphate (-H2O)"</span>, <span class="st">"C8H8NO5P"</span>, <span class="st">"229.0140088825"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C6H10O5"</span>, <span class="st">"C6H10O5"</span>, <span class="st">"162.0528234315"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Urea addition (-H)"</span>, <span class="st">"CH3N2O"</span>, <span class="st">"59.0245377288"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C6H10O6"</span>, <span class="st">"C6H10O6"</span>, <span class="st">"178.0477380536"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Adenine (-H)"</span>, <span class="st">"C5H4N5"</span>, <span class="st">"134.0466701544"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"D-ribose (-H2O) (ribosylation)"</span>, <span class="st">"C5H8O4"</span>, <span class="st">"132.0422587452"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Adenosine (-H2O)"</span>, <span class="st">"C10H11N5O3"</span>, <span class="st">"249.0861892454"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #1"</span>, <span class="st">"C12H20O10"</span>, <span class="st">"324.105649"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #2"</span>, <span class="st">"C12H20O11"</span>, <span class="st">"340.1005614851"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Adenosine 5'-diphosphate (-H2O)"</span>, <span class="st">"C10H13N5O9P2"</span>, <span class="st">"409.0188500622"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glucose-N-phosphate (-H2O)"</span>, <span class="st">"C6H11O8P"</span>, <span class="st">"242.0191538399"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Adenosine 5'-monophosphate (-H2O)"</span>, <span class="st">"C10H12N5O6P"</span>, <span class="st">"329.0525196538"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Glucuronic acid (-H2O)"</span>, <span class="st">"C6H8O6"</span>, <span class="st">"176.0320879894"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Cytidine 5'-diphosphate (-H2O)"</span>, <span class="st">"C9H13N3O10P2"</span>, <span class="st">"385.0076166739"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Monosaccharide (-H2O)"</span>, <span class="st">"C6H10O5"</span>, <span class="st">"162.0528234315"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Cytidine 5'-monophsophate (-H2O)"</span>, <span class="st">"C9H12N3O7P"</span>, <span class="st">"305.0412862655"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Trisaccharide (-H2O)"</span>, <span class="st">"C18H30O15"</span>, <span class="st">"486.1584702945"</span><span class="op">)</span>,
-    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Cytosine (-H)"</span>, <span class="st">"C4H4N3O"</span>,  <span class="st">"110.0354367661"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alanine"</span>, <span class="st">"C3H5NO"</span>, <span class="st">"71.0371137878"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Arginine"</span>, <span class="st">"C6H12N4O"</span>, <span class="st">"156.1011110281"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Asparagine"</span>, <span class="st">"C4H6N2O2"</span>, <span class="st">"114.0429274472"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Guanosine 5-diphosphate (-H2O)"</span>, <span class="st">"C10H13N5O10P2"</span>, <span class="st">"425.0137646843"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Guanosine 5-monophosphate (-H2O)"</span>, <span class="st">"C10H12N5O7P"</span>, <span class="st">"345.0474342759"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Guanine (-H)"</span>, <span class="st">"C5H4N5O"</span>, <span class="st">"150.0415847765"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Aspartic acid"</span>, <span class="st">"C4H5NO3"</span>, <span class="st">"115.0269430320"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Guanosine (-H2O)"</span>, <span class="st">"C10H11N5O4"</span>, <span class="st">"265.0811038675"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cysteine"</span>, <span class="st">"C3H5NOS"</span>, <span class="st">"103.0091844778"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Deoxythymidine 5'-diphosphate (-H2O)"</span>, <span class="st">"C10H14N2O10P2"</span>, <span class="st">"384.01236770"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cystine"</span>, <span class="st">"C6H10N2O3S2"</span>, <span class="st">"222.0132835777"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Thymidine (-H2O)"</span>, <span class="st">"C10H12N2O4"</span>, <span class="st">"224.0797068840"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glutamic acid"</span>, <span class="st">"C5H7NO3"</span>, <span class="st">"129.0425930962"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Thymine (-H)"</span>, <span class="st">"C5H5N2O2"</span>, <span class="st">"125.0351024151"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glutamine"</span>, <span class="st">"C5H8N2O2"</span>, <span class="st">"128.0585775114"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Thymidine 5'-monophosphate (-H2O)"</span>, <span class="st">"C10H13N2O7P"</span>, <span class="st">"304.0460372924"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glycine"</span>, <span class="st">"C2H3NO"</span>, <span class="st">"57.0214637236"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Uridine 5'-diphosphate (-H2O)"</span>, <span class="st">"C9H12N2O11P2"</span>, <span class="st">"385.9916322587"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Histidine"</span>, <span class="st">"C6H7N3O"</span>, <span class="st">"137.0589118624"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Uridine 5'-monophosphate (-H2O)"</span>, <span class="st">"C9H11N2O8P"</span>, <span class="st">"306.0253018503"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Isoleucine"</span>, <span class="st">"C6H11NO"</span>, <span class="st">"113.0840639804"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Uracil (-H)"</span>, <span class="st">"C4H3N2O2"</span>, <span class="st">"111.0194523509"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Leucine"</span>, <span class="st">"C6H11NO"</span>, <span class="st">"113.0840639804"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Uridine (-H2O)"</span>, <span class="st">"C9H10N2O5"</span>, <span class="st">"226.0589714419"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Lysine"</span>, <span class="st">"C6H12N2O"</span>, <span class="st">"128.0949630177"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Acetylation (-H)"</span>, <span class="st">"C2H3O2"</span>, <span class="st">"59.0133043405"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Methionine"</span>, <span class="st">"C5H9NOS"</span>, <span class="st">"131.0404846062"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Acetylation (-H2O)"</span>, <span class="st">"C2H2O"</span>,  <span class="st">"42.0105646863"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phenylalanine"</span>, <span class="st">"C9H9NO"</span>,  <span class="st">"147.0684139162"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C2H2"</span>, <span class="st">"C2H2"</span>, <span class="st">"26.0156500642"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Proline"</span>, <span class="st">"C5H7NO"</span>, <span class="st">"97.0527638520"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Carboxylation"</span>, <span class="st">"CO2"</span>, <span class="st">"43.9898292442"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Serine"</span>, <span class="st">"C3H5NO2"</span>, <span class="st">"87.0320284099"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CHO2"</span>, <span class="st">"CHO2"</span>, <span class="st">"44.9976542763"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Threonine"</span>,  <span class="st">"C4H7NO2"</span>,  <span class="st">"101.0476784741"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Condensation/dehydration"</span>, <span class="st">"H2O"</span>, <span class="st">"18.0105646863"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tryptophan"</span>, <span class="st">"C11H10N2O"</span>,  <span class="st">"186.0793129535"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Diphosphate"</span>, <span class="st">"H3O6P2"</span>, <span class="st">"160.9404858489"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tyrosine"</span>, <span class="st">"C9H9NO2"</span>, <span class="st">"163.0633285383"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ethyl addition (-H2O)"</span>, <span class="st">"C2H4"</span>, <span class="st">"28.0313001284"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Valine"</span>, <span class="st">"C5H9NO"</span>,  <span class="st">"99.0684139162"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Formic Acid (-H2O)"</span>, <span class="st">"CO"</span>, <span class="st">"27.9949146221"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Acetotacetate (-H2O)"</span>,  <span class="st">"C4H4O2"</span>, <span class="st">"84.0211293726"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glyoxylate (-H2O)"</span>, <span class="st">"C2O2"</span>,  <span class="st">"55.9898292442"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Acetone (-H)"</span>, <span class="st">"C3H5O"</span>, <span class="st">"57.0340397826"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hydrogenation/dehydrogenation"</span>, <span class="st">"H2"</span>, <span class="st">"2.0156500642"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adenylate (-H2O)"</span>, <span class="st">"C10H12N5O6P"</span>, <span class="st">"329.0525196538"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Hydroxylation (-H)"</span>, <span class="st">"O"</span>, <span class="st">"15.9949146221"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Biotinyl (-H)"</span>, <span class="st">"C10H15N2O3S"</span>, <span class="st">"243.0803380482"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Inorganic phosphate"</span>, <span class="st">"P"</span>, <span class="st">"30.9737615100"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Biotinyl (-H2O)"</span>, <span class="st">"C10H14N2O2S"</span>, <span class="st">"226.0775983940"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ketol group (-H2O)"</span>, <span class="st">"C2H2O"</span>, <span class="st">"42.0105646863"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Carbamoyl P transfer (-H2PO4)"</span>, <span class="st">"CH2ON"</span>, <span class="st">"44.0136386915"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Methanol (-H2O)"</span>, <span class="st">"CH2"</span>, <span class="st">"14.0156500642"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Co-enzyme A (-H)"</span>, <span class="st">"C21H34N7O16P3S"</span>, <span class="st">"765.0995583014"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phosphate"</span>, <span class="st">"HPO3"</span>, <span class="st">"79.9663304084"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Co-enzyme A (-H2O)"</span>, <span class="st">"C21H33N7O15P3S"</span>, <span class="st">"748.0968186472"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Primary amine"</span>, <span class="st">"NH2"</span>, <span class="st">"16.0187240694"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glutathione (-H2O)"</span>, <span class="st">"C10H15N3O5S"</span>, <span class="st">"289.0732412976"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Pyrophosphate"</span>, <span class="st">"PP"</span>, <span class="st">"61.9475230200"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Isoprene addition (-H)"</span>, <span class="st">"C5H7"</span>, <span class="st">"67.0547752247"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Secondary amine"</span>, <span class="st">"NH"</span>, <span class="st">"15.0108990373"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Malonyl group (-H2O)"</span>, <span class="st">"C3H2O3"</span>, <span class="st">"86.0003939305"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sulfate (-H2O)"</span>, <span class="st">"SO3"</span>, <span class="st">"79.9568145563"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Palmitoylation (-H2O)"</span>, <span class="st">"C16H30O"</span>, <span class="st">"238.2296655851"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tertiary amine"</span>, <span class="st">"N"</span>, <span class="st">"14.0030740052"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Pyridoxal phosphate (-H2O)"</span>, <span class="st">"C8H8NO5P"</span>, <span class="st">"229.0140088825"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C6H10O5"</span>, <span class="st">"C6H10O5"</span>, <span class="st">"162.0528234315"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Urea addition (-H)"</span>, <span class="st">"CH3N2O"</span>, <span class="st">"59.0245377288"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C6H10O6"</span>, <span class="st">"C6H10O6"</span>, <span class="st">"178.0477380536"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adenine (-H)"</span>, <span class="st">"C5H4N5"</span>, <span class="st">"134.0466701544"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"D-ribose (-H2O) (ribosylation)"</span>, <span class="st">"C5H8O4"</span>, <span class="st">"132.0422587452"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adenosine (-H2O)"</span>, <span class="st">"C10H11N5O3"</span>, <span class="st">"249.0861892454"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #1"</span>, <span class="st">"C12H20O10"</span>, <span class="st">"324.105649"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Disaccharide (-H2O) #2"</span>, <span class="st">"C12H20O11"</span>, <span class="st">"340.1005614851"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adenosine 5'-diphosphate (-H2O)"</span>, <span class="st">"C10H13N5O9P2"</span>, <span class="st">"409.0188500622"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glucose-N-phosphate (-H2O)"</span>, <span class="st">"C6H11O8P"</span>, <span class="st">"242.0191538399"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adenosine 5'-monophosphate (-H2O)"</span>, <span class="st">"C10H12N5O6P"</span>, <span class="st">"329.0525196538"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Glucuronic acid (-H2O)"</span>, <span class="st">"C6H8O6"</span>, <span class="st">"176.0320879894"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cytidine 5'-diphosphate (-H2O)"</span>, <span class="st">"C9H13N3O10P2"</span>, <span class="st">"385.0076166739"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Monosaccharide (-H2O)"</span>, <span class="st">"C6H10O5"</span>, <span class="st">"162.0528234315"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cytidine 5'-monophsophate (-H2O)"</span>, <span class="st">"C9H12N3O7P"</span>, <span class="st">"305.0412862655"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Trisaccharide (-H2O)"</span>, <span class="st">"C18H30O15"</span>, <span class="st">"486.1584702945"</span><span class="op">)</span>,
+    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cytosine (-H)"</span>, <span class="st">"C4H4N3O"</span>,  <span class="st">"110.0354367661"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>name <span class="op">=</span> <span class="va">transformations</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, 
+<span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">transformations</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, 
             formula <span class="op">=</span> <span class="va">transformations</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>,
-            mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">transformations</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+            mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">transformations</span><span class="op">[</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<div id="refs" class="references">
-<div id="ref-Breiman2001">
-<p>Breiman, L. 2001. “Random Forests.” <em>Machine Learning</em> 45: 5–32. <a href="https://doi.org/10.1023/A:1010933404324">https://doi.org/10.1023/A:1010933404324</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Breiman2001" class="csl-entry">
+Breiman, L. 2001. <span>“Random Forests.”</span> <em>Machine Learning</em> 45: 5–32. <a href="https://doi.org/10.1023/A:1010933404324" class="external-link">https://doi.org/10.1023/A:1010933404324</a>.
 </div>
-<div id="ref-Breitling2006">
-<p>Breitling, R., S. Ritchie, D. Goodenowe, M. L. Stewart, and M. P. Barrett. 2006. “<em>Ab Initio</em> Prediction of Metabolic Networks Using Fourier Transform Mass Spectrometry Data.” <em>Metabolomics</em> 2: 155–64. <a href="https://doi.org/10.1007/s11306-006-0029-z">https://doi.org/10.1007/s11306-006-0029-z</a>.</p>
+<div id="ref-Breitling2006" class="csl-entry">
+Breitling, R., S. Ritchie, D. Goodenowe, M. L. Stewart, and M. P. Barrett. 2006. <span>“<em>Ab Initio</em> Prediction of Metabolic Networks Using Fourier Transform Mass Spectrometry Data.”</span> <em>Metabolomics</em> 2: 155–64. <a href="https://doi.org/10.1007/s11306-006-0029-z" class="external-link">https://doi.org/10.1007/s11306-006-0029-z</a>.
 </div>
-<div id="ref-Butts2016">
-<p>Butts, Carter T. 2016. <em>Sna: Tools for Social Network Analysis</em>. <a href="https://CRAN.R-project.org/package=sna">https://CRAN.R-project.org/package=sna</a>.</p>
+<div id="ref-Butts2016" class="csl-entry">
+Butts, Carter T. 2016. <em>Sna: Tools for Social Network Analysis</em>. <a href="https://CRAN.R-project.org/package=sna" class="external-link">https://CRAN.R-project.org/package=sna</a>.
 </div>
-<div id="ref-Csardi2006">
-<p>Csardi, G., and T. Nepusz. 2006. “The Igraph Software Package for Complex Network Research.” <em>InterJournal</em> Complex Systems: 1695. <a href="http://igraph.org">http://igraph.org</a>.</p>
+<div id="ref-Csardi2006" class="csl-entry">
+Csardi, G., and T. Nepusz. 2006. <span>“The Igraph Software Package for Complex Network Research.”</span> <em>InterJournal</em> Complex Systems: 1695. <a href="http://igraph.org" class="external-link">http://igraph.org</a>.
 </div>
-<div id="ref-Faith2007">
-<p>Faith, J. J., B. Hayete, J. T. Thaden, I. Mogno, J. Wierzbowski, G. Cottarel, S. Kasif, J. J. Collins, and T. S. Gardner. 2007. “Large-Scale Mapping and Validation of Escherichia Coli Transcriptional Regulation from a Compendium of Expression Profiles.” <em>Plos Biology</em> 5: e8. <a href="https://doi.org/10.1371/journal.pbio.0050008">https://doi.org/10.1371/journal.pbio.0050008</a>.</p>
+<div id="ref-Faith2007" class="csl-entry">
+Faith, J. J., B. Hayete, J. T. Thaden, I. Mogno, J. Wierzbowski, G. Cottarel, S. Kasif, J. J. Collins, and T. S. Gardner. 2007. <span>“Large-Scale Mapping and Validation of Escherichia Coli Transcriptional Regulation from a Compendium of Expression Profiles.”</span> <em>Plos Biology</em> 5: e8. <a href="https://doi.org/10.1371/journal.pbio.0050008" class="external-link">https://doi.org/10.1371/journal.pbio.0050008</a>.
 </div>
-<div id="ref-Hase2013">
-<p>Hase, T., S. Ghosh, R. Yamanaka, and H. Kitano. 2013. “Harnessing Diversity Towards the Reconstructing of Large Scale Gene Regulatory Networks.” <em>PLoS Computational Biology</em> 9: e1003361. <a href="https://doi.org/10.1371/journal.pcbi.1003361">https://doi.org/10.1371/journal.pcbi.1003361</a>.</p>
+<div id="ref-Hase2013" class="csl-entry">
+Hase, T., S. Ghosh, R. Yamanaka, and H. Kitano. 2013. <span>“Harnessing Diversity Towards the Reconstructing of Large Scale Gene Regulatory Networks.”</span> <em>PLoS Computational Biology</em> 9: e1003361. <a href="https://doi.org/10.1371/journal.pcbi.1003361" class="external-link">https://doi.org/10.1371/journal.pcbi.1003361</a>.
 </div>
-<div id="ref-Hofner2015">
-<p>Hofner, B., L. Boccuto, and M. Göker. 2015. “Controlling False Discoveries in High-Dimensional Situations: Boosting with Stability Selection.” <em>BMC Bioinformatics</em> 16: 144. <a href="https://doi.org/10.1186/s12859-015-0575-3">https://doi.org/10.1186/s12859-015-0575-3</a>.</p>
+<div id="ref-Hofner2015" class="csl-entry">
+Hofner, B., L. Boccuto, and M. Göker. 2015. <span>“Controlling False Discoveries in High-Dimensional Situations: Boosting with Stability Selection.”</span> <em>BMC Bioinformatics</em> 16: 144. <a href="https://doi.org/10.1186/s12859-015-0575-3" class="external-link">https://doi.org/10.1186/s12859-015-0575-3</a>.
 </div>
-<div id="ref-Jourdan2007">
-<p>Jourdan, F., R. Breitling, M. P. Barrett, and D. Gilbert. 2007. “MetaNetter: Inference and Visualization of High-Resolution Metabolomic Networks.” <em>Bioinformatics</em> 24: 143–45. <a href="https://doi.org/10.1093/bioinformatics/btm536">https://doi.org/10.1093/bioinformatics/btm536</a>.</p>
+<div id="ref-Jourdan2007" class="csl-entry">
+Jourdan, F., R. Breitling, M. P. Barrett, and D. Gilbert. 2007. <span>“MetaNetter: Inference and Visualization of High-Resolution Metabolomic Networks.”</span> <em>Bioinformatics</em> 24: 143–45. <a href="https://doi.org/10.1093/bioinformatics/btm536" class="external-link">https://doi.org/10.1093/bioinformatics/btm536</a>.
 </div>
-<div id="ref-Marbach2012">
-<p>Marbach, D., J. C. Costello, R. Küffner, N. M. Vega, R. J. Prill, D. M. Camacho, K. R. Allison, et al. 2012. “Wisdom of Crowds for Robust Gene Network Inference.” <em>Nature Methods</em> 9: 796–804. <a href="https://doi.org/10.1038/nmeth.2016">https://doi.org/10.1038/nmeth.2016</a>.</p>
+<div id="ref-Marbach2012" class="csl-entry">
+Marbach, D., J. C. Costello, R. Küffner, N. M. Vega, R. J. Prill, D. M. Camacho, K. R. Allison, et al. 2012. <span>“Wisdom of Crowds for Robust Gene Network Inference.”</span> <em>Nature Methods</em> 9: 796–804. <a href="https://doi.org/10.1038/nmeth.2016" class="external-link">https://doi.org/10.1038/nmeth.2016</a>.
 </div>
-<div id="ref-Margolin2006">
-<p>Margolin, A. A., I. Nemenman, K. Basso, C. Wiggins, G. Stolovitzky, R. Dalla Favera, and A. Califano. 2006. “ARACNE: An Algorithm for the Reconstruction of Gene Regulatory Networks in a Mammalian Cellular Context.” <em>BMC Bioinformatics</em> 7: S7. <a href="https://doi.org/10.1186/1471-2105-7-S1-S7">https://doi.org/10.1186/1471-2105-7-S1-S7</a>.</p>
+<div id="ref-Margolin2006" class="csl-entry">
+Margolin, A. A., I. Nemenman, K. Basso, C. Wiggins, G. Stolovitzky, R. Dalla Favera, and A. Califano. 2006. <span>“ARACNE: An Algorithm for the Reconstruction of Gene Regulatory Networks in a Mammalian Cellular Context.”</span> <em>BMC Bioinformatics</em> 7: S7. <a href="https://doi.org/10.1186/1471-2105-7-S1-S7" class="external-link">https://doi.org/10.1186/1471-2105-7-S1-S7</a>.
 </div>
-<div id="ref-Scutari2010">
-<p>Scutari, M. 2010. “Learning Bayesian Networks with the bnlearn R Package.” <em>Journal of Statistical Software</em> 35: 1–22. <a href="https://doi.org/10.18637/jss.v035.i03">https://doi.org/10.18637/jss.v035.i03</a>.</p>
+<div id="ref-Scutari2010" class="csl-entry">
+Scutari, M. 2010. <span>“Learning Bayesian Networks with the <span class="nocase">bnlearn</span> <span>R</span> Package.”</span> <em>Journal of Statistical Software</em> 35: 1–22. <a href="https://doi.org/10.18637/jss.v035.i03" class="external-link">https://doi.org/10.18637/jss.v035.i03</a>.
 </div>
-<div id="ref-Steuer2006">
-<p>Steuer, R. 2006. “On the Analysis and Interpretation of Correlations in Metabolomic Data.” <em>Briefings in Bioinformatics</em> 7: 151–58. <a href="https://doi.org/10.1093/bib/bbl009">https://doi.org/10.1093/bib/bbl009</a>.</p>
+<div id="ref-Steuer2006" class="csl-entry">
+Steuer, R. 2006. <span>“On the Analysis and Interpretation of Correlations in Metabolomic Data.”</span> <em>Briefings in Bioinformatics</em> 7: 151–58. <a href="https://doi.org/10.1093/bib/bbl009" class="external-link">https://doi.org/10.1093/bib/bbl009</a>.
 </div>
-<div id="ref-Thomas2017">
-<p>Thomas, J., A. Mayr, B. Bischl, M. Schmid, A. Smith, and B. Hofner. 2017. “Gradient Boosting for Distributional Regression - Faster Tuning and Improved Variable Selection via Noncyclical Updates.” <em>Statistics and Computing</em> 28: 673–87. <a href="https://doi.org/10.1007/s11222-017-9754-6">https://doi.org/10.1007/s11222-017-9754-6</a>.</p>
+<div id="ref-Thomas2017" class="csl-entry">
+Thomas, J., A. Mayr, B. Bischl, M. Schmid, A. Smith, and B. Hofner. 2017. <span>“Gradient Boosting for Distributional Regression - Faster Tuning and Improved Variable Selection via Noncyclical Updates.”</span> <em>Statistics and Computing</em> 28: 673–87. <a href="https://doi.org/10.1007/s11222-017-9754-6" class="external-link">https://doi.org/10.1007/s11222-017-9754-6</a>.
 </div>
-<div id="ref-Tibshirani1994">
-<p>Tibshirani, R. 1994. “Regression Shrinkage and Selection via the Lasso.” <em>Journal of the Royal Statistical Society. Series B (Methodological)</em> 58: 267–88.</p>
+<div id="ref-Tibshirani1994" class="csl-entry">
+Tibshirani, R. 1994. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society. Series B (Methodological)</em> 58: 267–88.
 </div>
 </div>
 </div>
@@ -435,11 +438,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
       <footer><div class="copyright">
-  <p>Developed by Thomas Naake.</p>
+  <p></p>
+<p>Developed by Thomas Naake.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -447,6 +452,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   
 
+
+  
 
   </body>
 </html>
