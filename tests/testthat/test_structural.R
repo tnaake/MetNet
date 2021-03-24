@@ -7,8 +7,8 @@ mat_test <- cbind(mz = mz, rt = rt, mat_test)
 
 ## transformations object for structual calculation
 transformations <- rbind(
-    c("Malonyl group (–H2O)", "C3H2O3", 86.0003939305, "+"),
-    c("Monosaccharide (–H2O)", "C6H10O5", 162.0528234315, "-"))
+    c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "+"),
+    c("Monosaccharide (-H2O)", "C6H10O5", 162.0528234315, "-"))
 transformations_neg <- transformations <- data.frame(
     group = transformations[, 1],
     formula = transformations[, 2],
@@ -52,7 +52,7 @@ test_that("structural", {
     expect_equal(sum(struct_adj_dir[[1]]), 6)
     expect_equal(sum(struct_adj_dir_neg[[1]]), 6)
     expect_equal(unique(as.vector(struct_adj[[2]])),
-                c("", "Monosaccharide (–H2O)", "Malonyl group (–H2O)"))
+                c("", "Monosaccharide (-H2O)", "Malonyl group (-H2O)"))
     expect_true(is.matrix(struct_adj[[1]]))
     expect_true(is.matrix(struct_adj[[2]]))
     expect_true(is.numeric(struct_adj[[1]]))

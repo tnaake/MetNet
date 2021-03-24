@@ -115,7 +115,7 @@ To install `MetNet` enter the following to the `R` console
 
 ```{r install, eval=FALSE}
 install.packages("BiocManager")
-BiocManager::install("MetNet") 
+BiocManager::install("MetNet")
 ```
 
 Before starting with the analysis, load the `MetNet` package. This 
@@ -236,12 +236,40 @@ m/z differences that are stored in the column `"mass"` in the
 object `transformations`. To create the adjacency matrix derived 
 from these structural information we enter
 
-```{r structure,eval=TRUE,echo=TRUE}
+```{r structure, eval=TRUE,echo=TRUE}
 struct_adj <- structural(x = x_test, transformation = transformations, ppm = 10)
 ```
 in the `R` console. 
 
-## Refining the structural adjacency matrix (optional) {-}
+## Advanced topic: Creating a directed structural graph
+
+By default, an undirected structural adjacency matrix is directed (the
+argument is set to `directed = FALSE` by default). `MetNet`,
+however, also allows to include the information on the directionality of 
+the transformation (e.g. to distinguish between additions and losses).
+This behaviour can be specified by setting `directed = TRUE`:
+
+```{r structure_dir, eval=TRUE,echo=TRUE}
+struct_adj_dir <- structural(x = x_test, transformation = transformations, 
+    ppm = 10, directed = TRUE)
+```
+
+In the following we will visualize the results from the undirected and 
+directed structural network:
+
+```{r visualization_directed}
+g_undirected <- igraph::graph_from_adjacency_matrix(struct_adj[[1]], 
+    mode = "directed", weighted = NULL)
+plot(g_undirected, edge.width = 1, edge.arrow.size = 0.5,
+     vertex.label.cex = 0.5, edge.color = "grey")
+g_directed <- igraph::graph_from_adjacency_matrix(struct_adj_dir[[1]], 
+    mode = "directed", weighted = NULL)
+plot(g_directed, edge.width = 1, edge.arrow.size = 0.5,
+     vertex.label.cex = 0.5, edge.color = "grey")
+```
+
+
+## Advanced topic: Refining the structural adjacency matrix (optional) {-}
 The retention time will differ depending
 on the chemical group added, e.g. an addition of a glycosyl group will 
 usually result in a lower retentiom time in reverse-phase chromatography.
@@ -263,7 +291,7 @@ of the transformation.
 
 To account for retention time shifts we enter
 
-```{r rt_correction,eval=TRUE,echo=TRUE}
+```{r rt_correction, eval=TRUE, echo=TRUE}
 struct_adj <- rtCorrection(structural = struct_adj, 
     x = x_test, transformation = transformations)
 ```
@@ -357,9 +385,10 @@ matrices.
 args_thr <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
 stat_adj_thr <- threshold(statistical = stat_adj_l, type = "threshold", 
     args = args_thr)
- 
+
+## retrieve the feature pairs which have the 100 highest coefficients
+args_top <- list(n = 100)
 ## type = "top1" 
-args_top <- list(n = 40)
 stat_adj_top1 <- threshold(statistical = stat_adj_l, type = "top1", 
     args = args_top)
 
@@ -408,9 +437,8 @@ based on structural information. Only the first entry of the list will be
 passed to the `graph_from_adjacency_matrix` function:
 ```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.'}
 g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode = "undirected")
-plot(g, edge.width = 5, vertex.label.cex = 0.5, edge.color = "grey")
+plot(g, edge.width = 2, vertex.label.cex = 0.5, edge.color = "grey")
 ```
-
 
 Furthermore, the network can be analysed by network analysis techniques
 (topological parameters such as centrality, degree, clustering indices) that 

@@ -1,3 +1,6 @@
+Changes in version 1.9.2 (2021-03-24)
++ add section on structual matrix generation for directed=FALSE
+
 Changes in version 1.9.1 (2021-02-20)
 + fix typos in the vignette
 
