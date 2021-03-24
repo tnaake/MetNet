@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.2</span>
       </span>
     </div>
 
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>To install <code>MetNet</code> enter the following to the <code>R</code> console</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
-<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"MetNet"</span><span class="op">)</span> </code></pre></div>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"MetNet"</span><span class="op">)</span></code></pre></div>
 <p>Before starting with the analysis, load the <code>MetNet</code> package. This will also load the required packages <code>glmnet</code>, <code>stabs</code>, <code>randomForest</code>, <code>rfPermute</code>, <code>mpmi</code>, <code>parmigene</code>, <code>WGCNA</code> and <code>bnlearn</code> that are needed for functions in the statistical adjacency matrix inference.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">MetNet</span><span class="op">)</span></code></pre></div>
@@ -153,12 +153,33 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">struct_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/structural.html">structural</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x_test</span>, transformation <span class="op">=</span> <span class="va">transformations</span>, ppm <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
 <p>in the <code>R</code> console.</p>
-<div id="refining-the-structural-adjacency-matrix-optional" class="section level2 unnumbered">
+<div id="advanced-topic-creating-a-directed-structural-graph" class="section level2">
 <h2 class="hasAnchor">
-<a href="#refining-the-structural-adjacency-matrix-optional" class="anchor"></a>Refining the structural adjacency matrix (optional)</h2>
+<a href="#advanced-topic-creating-a-directed-structural-graph" class="anchor"></a>Advanced topic: Creating a directed structural graph</h2>
+<p>By default, an undirected structural adjacency matrix is directed (the argument is set to <code>directed = FALSE</code> by default). <code>MetNet</code>, however, also allows to include the information on the directionality of the transformation (e.g. to distinguish between additions and losses). This behaviour can be specified by setting <code>directed = TRUE</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">struct_adj_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/structural.html">structural</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x_test</span>, transformation <span class="op">=</span> <span class="va">transformations</span>, 
+    ppm <span class="op">=</span> <span class="fl">10</span>, directed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>In the following we will visualize the results from the undirected and directed structural network:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">g_undirected</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">struct_adj</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, 
+    mode <span class="op">=</span> <span class="st">"directed"</span>, weighted <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g_undirected</span>, edge.width <span class="op">=</span> <span class="fl">1</span>, edge.arrow.size <span class="op">=</span> <span class="fl">0.5</span>,
+     vertex.label.cex <span class="op">=</span> <span class="fl">0.5</span>, edge.color <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></code></pre></div>
+<p><img src="MetNet_files/figure-html/visualization_directed-1.png" width="700"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">g_directed</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">struct_adj_dir</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, 
+    mode <span class="op">=</span> <span class="st">"directed"</span>, weighted <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g_directed</span>, edge.width <span class="op">=</span> <span class="fl">1</span>, edge.arrow.size <span class="op">=</span> <span class="fl">0.5</span>,
+     vertex.label.cex <span class="op">=</span> <span class="fl">0.5</span>, edge.color <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></code></pre></div>
+<p><img src="MetNet_files/figure-html/visualization_directed-2.png" width="700"></p>
+</div>
+<div id="advanced-topic-refining-the-structural-adjacency-matrix-optional" class="section level2 unnumbered">
+<h2 class="hasAnchor">
+<a href="#advanced-topic-refining-the-structural-adjacency-matrix-optional" class="anchor"></a>Advanced topic: Refining the structural adjacency matrix (optional)</h2>
 <p>The retention time will differ depending on the chemical group added, e.g. an addition of a glycosyl group will usually result in a lower retentiom time in reverse-phase chromatography. This information can be used in refining the adjacency matrix derived from the structural matrix. The <code>rtCorrection</code> function does this check, if the predicted transformations correspond to the expected retention time shift, in an automated fashion. It requires information about the expected retention time shift in the <code>data.frame</code> passed to the <code>transformation</code> argument (in the <code>"rt"</code> column). Within this column, information about retention time shifts is encoded by <code>"-"</code>, <code>"+"</code> and <code>"?"</code>, which means the feature with higher m/z value has lower, higher or unknown retention time than the feature with the lower m/z value. The values for m/z and retention time will be taken from the object passed to the <code>x</code> argument. In case there is a discrepancy between the transformation and the retention time shift, the adjacency matrix at the specific position will be set to 0. <code>rtCorrection</code> will return the updated adjacency matrix and the updated character matrix with the descriptions of the transformation.</p>
 <p>To account for retention time shifts we enter</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">struct_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rtCorrection.html">rtCorrection</a></span><span class="op">(</span>structural <span class="op">=</span> <span class="va">struct_adj</span>, 
     x <span class="op">=</span> <span class="va">x_test</span>, transformation <span class="op">=</span> <span class="va">transformations</span><span class="op">)</span></code></pre></div>
 <p>in the <code>R</code> console.</p>
@@ -183,21 +204,22 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>For <code>type = "threshold"</code>, threshold values have to be defined in the <code>args</code> argument for each respective statistical model. Values above or below these thresholds in each respective weighted adjacency matrix will be reported as present (1) or absent (0) in the returned unweighted adjacency matrix. The unweighted adjacency matrices will be passed to the<br><code>consensus</code> function from the <code>sna</code> package <span class="citation">(Butts 2016)</span> to calculate the unweighted consensus adjacency matrix. The arguments that are accepted by this function can be passed to the <code>threshold</code> function. Furthermore, in <code>args</code> an entry <code>threshold</code> needs to be defined to threshold if the value a<sub>i,j</sub> of the consensus adjacency matrix will be reported as a connection in the returned matrix (if a<sub>i,j</sub><span class="math inline">\(\geq\)</span> <code>threshold</code>) or not. In the case of the method <code>"central.graph"</code> (default), the argument <code>threshold</code> should be set to 1.</p>
 <p>For the other three types (<code>top1</code>, <code>top2</code>, <code>mean</code>) the ranks per statistical model will be calculated and from each respective link the top1, top2 or mean rank across statistical models will be calculated (cf. <span class="citation">(Hase et al. 2013)</span>). The top n unique ranks (defined by the entry <code>n</code> in <code>args</code>) will be returned as links in the unweighted consensus adjacency matrix.</p>
 <p>In the following example, we will create a list of unweighted adjacency matrices using Pearson and Spearman correlation using the intensity values as input data.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">x_int</span> <span class="op">&lt;-</span> <span class="va">x_test</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">x_test</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>
 <span class="va">x_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">x_int</span><span class="op">)</span>
 <span class="va">stat_adj_l</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/statistical.html">statistical</a></span><span class="op">(</span><span class="va">x_int</span>, model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pearson"</span>, <span class="st">"spearman"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "pearson finished."
 ## [1] "spearman finished."</code></pre>
 <p><code>threshold</code> implements four ways to obtain an unweighted adjacency matrix. We will create here for all ways the unweighted consensus adjacency matrices.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## type = "threshold" </span>
 <span class="va">args_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"pearson"</span> <span class="op">=</span> <span class="fl">0.95</span>, <span class="st">"spearman"</span> <span class="op">=</span> <span class="fl">0.95</span>, threshold <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">stat_adj_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold.html">threshold</a></span><span class="op">(</span>statistical <span class="op">=</span> <span class="va">stat_adj_l</span>, type <span class="op">=</span> <span class="st">"threshold"</span>, 
     args <span class="op">=</span> <span class="va">args_thr</span><span class="op">)</span>
- 
+
+<span class="co">## retrieve the feature pairs which have the 100 highest coefficients</span>
+<span class="va">args_top</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
 <span class="co">## type = "top1" </span>
-<span class="va">args_top</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>
 <span class="va">stat_adj_top1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold.html">threshold</a></span><span class="op">(</span>statistical <span class="op">=</span> <span class="va">stat_adj_l</span>, type <span class="op">=</span> <span class="st">"top1"</span>, 
     args <span class="op">=</span> <span class="va">args_top</span><span class="op">)</span>
 
@@ -215,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <a href="#sec-combine" class="anchor"></a>Combining the structural and statistical matrix</h1>
 <p>After creating the unweighted structural and unweighted statistical adjacency matrices, it is time to combine these two matrices. The function <code>combine</code> will combine the matrices to the consensus matrix. The function accepts the arguments <code>structure</code> and <code>statistical</code> for the list returned by <code>structural</code> and the matrix returned by <code>threshold</code>, respectively, and the argument <code>threshold</code>, that is a numerical value (default = 1). After adding the matrices, the entries will be checked if they are greater or equal than <code>threshold</code> and the value 1 or 0 will be returned, respectively. The argument <code>threshold</code> needs to be adjusted by the user if another <code>method</code> than <code>"central.graph"</code> in <code>threshold</code> (<code>type = "threshold"</code>) is used.</p>
 <p>We will use here the unweighted statistical adjacency matrix from <code>type = "mean"</code> to combine it with the structural adjacency matrix, <code>stat_adj</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cons_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine.html">combine</a></span><span class="op">(</span>structural <span class="op">=</span> <span class="va">struct_adj</span>, statistical <span class="op">=</span> <span class="va">stat_adj_mean</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="sec-visualization" class="section level1">
@@ -223,9 +245,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <a href="#sec-visualization" class="anchor"></a>Visualization and further analyses</h1>
 <p>To display the created consensus adjacency matrix, existing visualization tools available in the <code>R</code> framework can be employed or any other visualization tool after exporting the consensus matrix as a text file. In this example, we will use the <code>igraph</code> <span class="citation">(Csardi and Nepusz 2006)</span> package to visualize the adjacency matrix.</p>
 <p><code>combine</code> returns a list of two adjacency matrices, where the first entry contains the unweighted adjacency matrix and the second entry contains a matrix given information on the type of link between features based on structural information. Only the first entry of the list will be passed to the <code>graph_from_adjacency_matrix</code> function:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">cons_adj</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mode <span class="op">=</span> <span class="st">"undirected"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, edge.width <span class="op">=</span> <span class="fl">5</span>, vertex.label.cex <span class="op">=</span> <span class="fl">0.5</span>, edge.color <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, edge.width <span class="op">=</span> <span class="fl">2</span>, vertex.label.cex <span class="op">=</span> <span class="fl">0.5</span>, edge.color <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></code></pre></div>
 <div class="figure">
 <img src="MetNet_files/figure-html/visualisation-1.png" alt="** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association." width="700"><p class="caption">
 ** <em>Ab initio</em> network inferred from structural and quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.
@@ -240,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <h2 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session information</h2>
 <p>All software and respective versions to build this vignette are listed here:</p>
-<pre><code>## R Under development (unstable) (2021-02-18 r80027)
+<pre><code>## R Under development (unstable) (2021-03-18 r80099)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Ubuntu 20.04.2 LTS
 ## 
@@ -259,33 +281,34 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] MetNet_1.9.1     knitr_1.31       BiocStyle_2.19.1
+## [1] MetNet_1.9.2     knitr_1.31       BiocStyle_2.19.1
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] sna_2.6              highr_0.8            pillar_1.4.7        
-##  [4] compiler_4.1.0       BiocManager_1.30.10  ppcor_1.1           
-##  [7] tools_4.1.0          GENIE3_1.13.0        digest_0.6.27       
-## [10] lifecycle_1.0.0      tibble_3.0.6         evaluate_0.14       
-## [13] memoise_2.0.0        parmigene_1.1.0      rle_0.9.2           
-## [16] lattice_0.20-41      pkgconfig_2.0.3      rlang_0.4.10        
-## [19] igraph_1.2.6         mpmi_0.43.1          yaml_2.2.1          
-## [22] parallel_4.1.0       pkgdown_1.6.1.9000   xfun_0.21           
-## [25] fastmap_1.1.0        coda_0.19-4          stringr_1.4.0       
-## [28] stabs_0.6-4          vctrs_0.3.6          desc_1.2.0          
-## [31] fs_1.5.0             systemfonts_1.0.1    grid_4.1.0          
-## [34] rprojroot_2.0.2      R6_2.5.0             textshaping_0.3.0   
-## [37] BiocParallel_1.25.4  bnlearn_4.6.1        rmarkdown_2.7       
-## [40] bookdown_0.21        magrittr_2.0.1       ellipsis_0.3.1      
-## [43] htmltools_0.5.1.1    MASS_7.3-53.1        assertthat_0.2.1    
-## [46] ragg_1.1.0           KernSmooth_2.23-18   stringi_1.5.3       
-## [49] network_1.16.1       cachem_1.0.4         statnet.common_4.4.1
-## [52] crayon_1.4.1</code></pre>
+##  [1] network_1.16.1       xfun_0.22            bslib_0.2.4         
+##  [4] sna_2.6              rle_0.9.2            lattice_0.20-41     
+##  [7] vctrs_0.3.6          htmltools_0.5.1.1    yaml_2.2.1          
+## [10] mpmi_0.43.1          utf8_1.2.1           rlang_0.4.10        
+## [13] pkgdown_1.6.1.9001   jquerylib_0.1.3      pillar_1.5.1        
+## [16] GENIE3_1.13.1        BiocParallel_1.25.5  lifecycle_1.0.0     
+## [19] stringr_1.4.0        ragg_1.1.2           coda_0.19-4         
+## [22] memoise_2.0.0        evaluate_0.14        fastmap_1.1.0       
+## [25] parallel_4.1.0       fansi_0.4.2          highr_0.8           
+## [28] bnlearn_4.6.1        KernSmooth_2.23-18   parmigene_1.1.0     
+## [31] ppcor_1.1            BiocManager_1.30.10  cachem_1.0.4        
+## [34] desc_1.3.0           jsonlite_1.7.2       systemfonts_1.0.1   
+## [37] fs_1.5.0             stabs_0.6-4          textshaping_0.3.3   
+## [40] digest_0.6.27        stringi_1.5.3        bookdown_0.21       
+## [43] rprojroot_2.0.2      grid_4.1.0           tools_4.1.0         
+## [46] magrittr_2.0.1       sass_0.3.1           tibble_3.1.0        
+## [49] crayon_1.4.1         pkgconfig_2.0.3      MASS_7.3-53.1       
+## [52] ellipsis_0.3.1       rmarkdown_2.7        statnet.common_4.4.1
+## [55] R6_2.5.0             igraph_1.2.6         compiler_4.1.0</code></pre>
 </div>
 <div id="transformations" class="section level2 unnumbered">
 <h2 class="hasAnchor">
 <a href="#transformations" class="anchor"></a>Transformations</h2>
 <p>The list of transformations is taken from <span class="citation">Breitling et al. (2006)</span>. The numerical m/z values were calculated by using the structural formula and the Biological Magnetic Resonance Data Bank <a href="http://www.bmrb.wisc.edu/metabolomics/mol_mass.php" class="external-link">web tool</a>.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alanine"</span>, <span class="st">"C3H5NO"</span>, <span class="st">"71.0371137878"</span><span class="op">)</span>,
     <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Arginine"</span>, <span class="st">"C6H12N4O"</span>, <span class="st">"156.1011110281"</span><span class="op">)</span>,
@@ -444,7 +467,7 @@ Tibshirani, R. 1994. <span>“Regression Shrinkage and Selection via the Lasso.�
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
