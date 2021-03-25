@@ -15,9 +15,13 @@ AdjacencyMatrix <- function(..., rowData, type, thresholded) {
     .AdjacencyMatrix(se, type = type, thresholded = thresholded)
 }
 
+
+## example to create the AdjacencyMatrix object (here the rownames are lost), 
+## for now replicate the mass_difference slot with struct_adj[[1]], this needs
+## to be changed of course
 rD <- DataFrame(names = rownames(struct_adj[[1]]))
 rownames(rD) <- rownames(struct_adj[[1]])
-adj_se <- AdjacencyMatrix(binary = t(struct_adj[[1]]), transformation = t(struct_adj[[2]]), 
+adj_se <- AdjacencyMatrix(binary = struct_adj[[1]], transformation = struct_adj[[2]], 
     mass_difference = struct_adj[[1]], rowData = rD, type = "structural", thresholded = FALSE)
 
 
