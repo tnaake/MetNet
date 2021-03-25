@@ -21,24 +21,6 @@ setMethod("thresholded", "AdjacencyMatrix",
     function(x) x@thresholded)
 
 
-# setGeneric("adjacency<-", signature=c("x", "value"),
-#     function(x, withDimnames=TRUE, ..., value) standardGeneric("adjacency<-"),
-# )
-
-# setReplaceMethod("adjacency", c("AdjacencyMatrix", "numeric"),
-#     function(x, i, withDimnames=TRUE, ..., value) {
-#         adjacency(x, withDimnames=withDimnames, ...)[[i]] <- value
-#         x
-#     }
-# )
-# 
-# setReplaceMethod("adjacency", c("AdjacencyMatrix", "character"),
-#     function(x, i, withDimnames=TRUE, ..., value) {
-#         adjacency(x, withDimnames=withDimnames, ...)[[i]] <- value
-#         x
-#     }
-# )
-
 
 ###
 ### Show
