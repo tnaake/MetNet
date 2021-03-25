@@ -5,14 +5,15 @@
 .AdjacencyMatrix <- setClass("AdjacencyMatrix",
     contains = c("SummarizedExperiment"),
     slots = c(
-        type = "character", ## structural, statistical, combined
+        type = "character", ## structural, statistical, combined,
+        directed = "logical",
         thresholded = "logical" ## thresholded, e.g. by rtCorrection or by threshold
     )
 )
 
-AdjacencyMatrix <- function(..., rowData, type, thresholded) {
+AdjacencyMatrix <- function(..., rowData, type, directed, thresholded) {
     se <- SummarizedExperiment(list(...), rowData = rowData, colData = rowData)
-    .AdjacencyMatrix(se, type = type, thresholded = thresholded)
+    .AdjacencyMatrix(se, type = type, directed = directed, thresholded = thresholded)
 }
 
 
@@ -22,7 +23,7 @@ AdjacencyMatrix <- function(..., rowData, type, thresholded) {
 rD <- DataFrame(names = rownames(struct_adj[[1]]))
 rownames(rD) <- rownames(struct_adj[[1]])
 adj_se <- AdjacencyMatrix(binary = struct_adj[[1]], transformation = struct_adj[[2]], 
-    mass_difference = struct_adj[[1]], rowData = rD, type = "structural", thresholded = FALSE)
+    mass_difference = struct_adj[[1]], rowData = rD, directed = FALSE, type = "structural", thresholded = FALSE)
 
 
 ### 

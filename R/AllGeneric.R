@@ -4,21 +4,27 @@
 ###
 
 setMethod("length", "AdjacencyMatrix",
-    function(x) nrow(assay(x, 1))
+    function(object) nrow(assay(object, 1))
 )
 
 setMethod("dim", "AdjacencyMatrix",
-    function(x) c(length(x), ncol(assay(x, 1)))
+    function(object) c(length(object), ncol(assay(object, 1)))
 )
 
 setMethod("type", "AdjacencyMatrix",
-    function(x) x@type)
+    function(object) object@type)
+
+setGeneric("directed",
+    function(object) standardGeneric("directed"))
+
+setMethod("directed", "AdjacencyMatrix",
+    function(object) object@directed)
 
 setGeneric("thresholded",
     function(object) standardGeneric("thresholded"))
 
 setMethod("thresholded", "AdjacencyMatrix",
-    function(x) x@thresholded)
+    function(object) object@thresholded)
 
 
 
@@ -37,12 +43,18 @@ setMethod("show", "AdjacencyMatrix",
         if (is.null(.type))
             .type <- character(length(type(object)))
         coolcat("type(%d): %s\n", .type)
+        
+        ## directed()
+        .directed <- directed(object)
+        if (is.null(.directed))
+            .directed <- character(length(directed(object)))
+        coolcat("directed(%d): %s\n", .directed)
               
         ## threshold()
         .threshold <- thresholded(object)
         if (is.null(.threshold))
             .threshold <- character(length(thresholded(object)))
-        coolcat("type(%d): %s\n", .threshold)
+        coolcat("thresholded(%d): %s\n", .threshold)
               
         ## assay()
         .nms <- assayNames(object)
