@@ -78,8 +78,8 @@ setMethod("as.data.frame", "AdjacencyMatrix",
             tbl <- select(l[[1]], "Row", "Col")
             l <- lapply(l, function(x) x[, 3])
             df <- do.call("cbind", l)
-            tbl <- cbind(tbl, df) %>% as.data.frame()
+            df <- cbind(tbl, df)
             
-            return(tbl)
+            return(df)
     }
 )
