@@ -64,7 +64,7 @@ setValidity2("AdjacencyMatrix", function(object) {
         
         .obj <- assay(object, "mass_difference")
         if (!is.numeric(.obj))
-            msg <- c(msg, "slot 'mass_difference' must be character")
+            msg <- c(msg, "slot 'mass_difference' must be numeric")
     }
     
     if (type_obj == "statistical" | type_obj == "combine") {

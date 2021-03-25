@@ -4,11 +4,11 @@
 ###
 
 setMethod("length", "AdjacencyMatrix",
-    function(x) nrow(x@elementMetadata)
+    function(x) nrow(assay(x, 1))
 )
 
 setMethod("dim", "AdjacencyMatrix",
-    function(x) c(length(x), length(x))
+    function(x) c(length(x), ncol(assay(x, 1)))
 )
 
 setMethod("type", "AdjacencyMatrix",
@@ -62,6 +62,9 @@ setMethod("show", "AdjacencyMatrix",
     }
 )
 
+###
+### as.data.frame
+###
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr select
