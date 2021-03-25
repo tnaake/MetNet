@@ -86,14 +86,24 @@ setMethod("as.data.frame", "AdjacencyMatrix",
     .nms <- assayNames(x)
               
     l <- lapply(seq_along(.nms),
-        function(i) assay(x, i) %>%
-                as.data.frame() %>%
-                rownames_to_column(var = "Row") %>%
-                pivot_longer(-Row, names_to = "Col", values_to = .nms[i]))
-            tbl <- select(l[[1]], "Row", "Col")
-            l <- lapply(l, function(x) x[, 3])
-            df <- do.call("cbind", l)
-            df <- cbind(tbl, df)
+        function(i) assay(x, i))
+    if (!directed(x)) {
+        l <- lapply(l, function(i) {
+            i[upper.tri(i)] <- NA
+            i   
+        })
+    }
+    l <- lapply(seq_along(l), function(i) l[[i]] %>%
+        as.data.frame() %>%
+        rownames_to_column(var = "Row") %>%
+        pivot_longer(-Row, names_to = "Col", values_to = .nms[i]) %>%
+        ## remove rows with NA (directed(x) == FALSE)
+        filter(., !is.na(get(.nms[i]))))
+    
+    tbl <- select(l[[1]], "Row", "Col")
+    l <- lapply(l, function(x) x[, 3])
+    df <- do.call("cbind", l)
+    df <- cbind(tbl, df)
             
             return(df)
     }
