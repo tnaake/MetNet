@@ -11,8 +11,9 @@
     )
 )
 
-AdjacencyMatrix <- function(..., rowData, type, directed, thresholded) {
-    se <- SummarizedExperiment(list(...), rowData = rowData, colData = rowData)
+#' @param adj_l
+AdjacencyMatrix <- function(adj_l, rowData, type, directed, thresholded) {
+    se <- SummarizedExperiment(adj_l, rowData = rowData, colData = rowData)
     .AdjacencyMatrix(se, type = type, directed = directed, thresholded = thresholded)
 }
 
@@ -22,8 +23,9 @@ AdjacencyMatrix <- function(..., rowData, type, directed, thresholded) {
 ## to be changed of course
 rD <- DataFrame(names = rownames(struct_adj[[1]]))
 rownames(rD) <- rownames(struct_adj[[1]])
-adj_se <- AdjacencyMatrix(binary = struct_adj[[1]], transformation = struct_adj[[2]], 
-    mass_difference = struct_adj[[1]], rowData = rD, directed = FALSE, type = "structural", thresholded = FALSE)
+adj_se <- AdjacencyMatrix(
+    list(binary = struct_adj[[1]], transformation = struct_adj[[2]],  mass_difference = struct_adj[[1]]), 
+    rowData = rD, directed = FALSE, type = "structural", thresholded = FALSE)
 
 
 ### 
@@ -70,7 +72,7 @@ setValidity2("AdjacencyMatrix", function(object) {
     
     if (type_obj == "statistical" | type_obj == "combine") {
         
-        if (any(!(assayNames(object) %in% validNames_stat)))
+        if (any(!(assayNames(object) %in% valid_names_stat)))
             msg <- c(msg, "assay names contain invalid entries")
         
         .nms <- assayNames(object)
@@ -79,7 +81,7 @@ setValidity2("AdjacencyMatrix", function(object) {
             .nms <- .nms[!(.nms %in% c("binary", "type", "mass_difference"))]
         
         assay_num <- lapply(seq_along(.nms),
-                                    function(x) is.numeric(assay(object, i)))
+                                    function(i) is.numeric(assay(object, i)))
         if (!all(unlist(assay_num)))
             msg <- c(msg, "assays must be all numeric")
     }
