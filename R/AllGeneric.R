@@ -100,7 +100,7 @@ setMethod("as.data.frame", "AdjacencyMatrix",
             ## remove rows with NA (directed(x) == FALSE)
             filter(., !is.na(get(.nms[i]))))
         
-        tbl <- select(l[[1]], "Row", "Col")
+        tbl <- dplyr::select(l[[1]], "Row", "Col")
         l <- lapply(l, function(x) x[, 3])
         df <- do.call("cbind", l)
         df <- cbind(tbl, df)
