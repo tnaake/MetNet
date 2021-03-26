@@ -51,11 +51,16 @@ setValidity2("AdjacencyMatrix", function(object) {
         "spearman_semipartial_coef", "spearman_semipartial_pvalue",
         "bayes_coef", "consensus")
     
+    ## check if colnames are the same
+    ## check if rownames are the same
+    ## check if colnames and rownames are the same
+    ############################################################################
+    ############################################################################
+    
     if (type_obj == "structural" | type_obj == "combine") {
         
         if (!all(valid_names_struct %in% assayNames(object)))
             msg <- c(msg, "assay names must be 'binary', 'transformation', 'mass_difference'")
-        
         
         .obj <- assay(object, "binary")
         if (!is.numeric(.obj))
@@ -66,8 +71,8 @@ setValidity2("AdjacencyMatrix", function(object) {
             msg <- c(msg, "slot 'transformation' must be character")
         
         .obj <- assay(object, "mass_difference")
-        if (!is.numeric(.obj))
-            msg <- c(msg, "slot 'mass_difference' must be numeric")
+        if (!is.character(.obj))
+            msg <- c(msg, "slot 'mass_difference' must be character")
     }
     
     if (type_obj == "statistical" | type_obj == "combine") {

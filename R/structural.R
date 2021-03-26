@@ -48,7 +48,8 @@
 #' stores the `character` `matrix` with the type (corresponding to the
 #' `"group"` column in `transformation`) is stored
 #'
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' @author Thomas Naake, \email{thomasnaake@@googlemail.com} and 
+#' Liesa Salzer \email{liesa.salzer@@helmholtz-muenchen.de}
 #'
 #' @examples
 #' data("x_test", package = "MetNet")
@@ -87,7 +88,6 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 
     ## calculate difference between rownames and colnames
     ## (difference between features)
-
     mat_1 <- mat - t(mat_1) ## max
     mat_2 <- mat - t(mat_2) ## min
 
@@ -99,33 +99,46 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     }
 
     ## create two matrices to store result
-    mat <- matrix(0, nrow = length(mass), ncol = length(mass))
+    mat_bin <- matrix(0, nrow = length(mass), ncol = length(mass))
     mat_type <- matrix("", nrow = length(mass), ncol = length(mass))
+    mat_mass <- matrix("", nrow = length(mass), ncol = length(mass))
 
     ## iterate through each column and check if the "mass" is in the interval
     ## defined by the m/z value and ppm
     for (i in seq_along(transformation[, "mass"])) {
         
-        transformation_i <- transformation[i, ]
-        ind_mat_1 <- which(mat_1 >= transformation_i[["mass"]])
-        ind_mat_2 <- which(mat_2 <= transformation_i[["mass"]])
+        transf_i <- transformation[i, ]
+        ind_mat_1 <- which(mat_1 >= transf_i[["mass"]])
+        ind_mat_2 <- which(mat_2 <= transf_i[["mass"]])
 
         ## get intersect from the two (indices where "mass" is in the interval)
         ind_hit <- intersect(ind_mat_1, ind_mat_2)
 
-        ## write to these indices 1 and the "group"
-        mat[ind_hit] <- 1
-        mat_type[ind_hit] <- ifelse(nchar(mat_type[ind_hit]) != 0,
-            yes = paste(mat_type[ind_hit], transformation_i[["group"]],
-                sep = "/"),
-            no = as.character(transformation_i[["group"]]))
+        ## write to these indices 1, the "group", and the mass 
+        ## (paste the value to group and mass if there is already a value in the
+        ## cell)
+        mat_bin[ind_hit] <- 1
+        mat_type[ind_hit] <- ifelse(mat_type[ind_hit] != "",
+            yes = paste(mat_type[ind_hit], transf_i[["group"]], sep = "/"),
+            no = as.character(transf_i[["group"]]))
+        mat_mass[ind_hit] <- ifelse(mat_mass[ind_hit] != "",
+            yes = paste(mat_mass[ind_hit], transf_i[["mass"]], sep = "/"),
+            no = as.character(transf_i[["mass"]]))
     }
 
-    rownames(mat) <- colnames(mat) <- rownames(x)
+    rownames(mat_bin) <- colnames(mat_bin) <- rownames(x)
     rownames(mat_type) <- colnames(mat_type) <- rownames(x)
-
-    return(list(mat, mat_type))
-
+    rownames(mat_mass) <- colnames(mat_mass) <- rownames(x)
+    
+    ## create the AdjacencyMatrix object
+    l <- list(binary = mat_bin, transformation = mat_type, 
+        mass_difference = mat_mass)
+    rD <- DataFrame(names = rownames(mat_bin), row.names = rownames(mat_bin))
+    
+    am <- AdjacencyMatrix(l, rowData = rD, type = "structural", 
+        directed = directed, thresholded = FALSE)
+    
+    return(am)
 }
 
 #' @name rtCorrection
@@ -208,17 +221,21 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 #' struct_adj_rt <- rtCorrection(struct_adj, x_test, transformation)
 #'
 #' @export
-rtCorrection <- function(structural, x, transformation) {
+rtCorrection <- function(am, x, transformation) {
+    
+    if (!validObject(am)) {
+        stop("'am' must be a valid 'AdjacencyMatrix' object")
+    }
+    
+    if (thresholded(am)) {
+        stop("'am' has been already thresholded")
+    }
 
-    ## check arguments
-    if (!is.list(structural)) stop("structural is not a list")
-    if (!length(structural) == 2) stop("structural is not a list of length 2")
-    ## allocate structural[[1]] and structural[[2]] to adj and group
-    adj <- structural[[1]]
-    group <- structural[[2]]
-
-    if (any(dim(adj) != dim(group)))
-        stop("dim(structural[[1]] is not equal to dim(structural[[2]])")
+    ## allocate binary, transformation, and mass_difference to mat_bin,
+    ## mat_type, and mat_mass
+    mat_bin <- assay(am, "binary")
+    mat_type <- assay(am, "transformation")
+    mat_mass <- assay(am, "mass_difference")
 
     if (!"rt" %in% colnames(x)) stop("x does not contain the column rt")
 
@@ -234,47 +251,34 @@ rtCorrection <- function(structural, x, transformation) {
     if (!all(transformation[, "rt"] %in% c("+", "-", "?")))
         stop(c("transformation[, 'rt'] does contain other levels than",
                 " '+'', '-'' or '?'"))
-
-    if (!all(colnames(adj) == rownames(adj)))
-        stop(c("colnames of structural[[1]] are not identical to rownames of",
-                " structural[[1]]"))
-
-    if (!all(colnames(group) == rownames(group)))
-        stop(c("colnames of structural[[2]] are not identical to",
-                " rownames of structural[[2]]"))
-
-    if (!all(rownames(structural[[1]]) %in% rownames(x)))
-        stop("rownames(structural[[1]]) do not fit rownames(x)")
-
-    if (!(is.matrix(adj) && is.numeric(adj)))
-        stop("structural[[1]] is not a numeric matrix")
-
-    if (!(is.matrix(group) && is.character(group)))
-        stop("structural[[2]] is not a character matrix")
-
-    mat_rt <- matrix(0, nrow = nrow(adj), ncol = ncol(adj))
-    colnames(mat_rt) <- rownames(mat_rt) <- x[rownames(adj), "rt"]
+    
+    n <- nrow(mat_bin)
+    rn_mat_bin <- rownames(mat_bin)
+    mat_rt <- matrix(0, nrow = n, ncol = n)
+    colnames(mat_rt) <- rownames(mat_rt) <- x[rn_mat_bin, "rt"]
+    
     ## create matrix which has rownmames per row
     mat_rt <- apply(mat_rt, 1, function(x) as.numeric(rownames(mat_rt)))
+    
     ## calculate difference between rownames and colnames
     ## (difference between features)
     mat_rt <- t(mat_rt) - mat_rt
-    colnames(mat_rt) <- rownames(mat_rt) <- colnames(adj)
+    colnames(mat_rt) <- rownames(mat_rt) <- rn_mat_bin
 
-    mat_mz <- matrix(0, nrow = nrow(adj), ncol = ncol(adj))
-    colnames(mat_mz) <- rownames(mat_mz) <- x[rownames(adj), "mz"]
+    mat_mz <- matrix(0, nrow = n, ncol = n)
+    colnames(mat_mz) <- rownames(mat_mz) <- x[rn_mat_bin, "mz"]
     
-    ## create matrix which has rownmames per row
+    ## create matrix which has rowmames per row
     mat_mz <- apply(mat_mz, 1, function(x) as.numeric(rownames(mat_mz)))
     
     ## calculate difference between rownames and colnames
     ## (difference between features)
     mat_mz <- mat_mz - t(mat_mz)
-    colnames(mat_mz) <- rownames(mat_mz) <- colnames(adj)
+    colnames(mat_mz) <- rownames(mat_mz) <- rn_mat_bin
 
     ## get indices of matching items
-    ind <- lapply(seq_len(dim(transformation)[1]), function(x)
-        grep(group, pattern = transformation[x, 1], fixed = TRUE))
+    ind <- lapply(seq_len(nrow(transformation)), function(x)
+        grep(mat_type, pattern = transformation[x, 1], fixed = TRUE))
 
     ## iterate through transformation rows
     for (j in seq_len(nrow(transformation))) {
@@ -282,19 +286,31 @@ rtCorrection <- function(structural, x, transformation) {
         ## check if observed rt shift corresponds to expected one and
         ## remove connection if necessary
         if (transformation[j, "rt"] == "+") {
-            adj[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- 0
-            group[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
-            adj[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- 0
-            group[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
+            mat_bin[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- 0
+            mat_type[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
+            mat_mass[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
+            mat_bin[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- 0
+            mat_type[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
+            mat_mass[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
         }
 
         if (transformation[j, "rt"] == "-") {
-            adj[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- 0
-            group[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
-            adj[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- 0
-            group[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
+            mat_bin[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- 0
+            mat_type[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
+            mat_mass[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
+            mat_bin[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- 0
+            mat_type[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
+            mat_mass[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
         }
     }
 
-    return(list(adj, group))
+    ## create the AdjacencyMatrix object
+    l <- list(binary = mat_bin, transformation = mat_type, 
+              mass_difference = mat_mass)
+    rD <- DataFrame(names = rn_mat_bin, row.names = rn_mat_bin)
+    
+    am <- AdjacencyMatrix(l, rowData = rD, type = "structural", 
+        directed = directed(am), thresholded = TRUE)
+    
+    return(am)
 }

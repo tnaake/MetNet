@@ -706,8 +706,10 @@ statistical <- function(x, model, ...) {
     rD <- DataFrame(names = rownames(l[[1]]))
     rownames(rD) <- rownames(l[[1]])
     
+    if (c("lasso", "randomForest", "bayes"), model) directed <- TRUE else directed <- FALSE
+    
     adj <- AdjacencyMatrix(l, rowData = rD,
-        type = "statistical", directed = TRUE, thresholded = FALSE)
+        type = "statistical", directed = directed, thresholded = FALSE)
     
     return(adj)
 }
@@ -844,31 +846,39 @@ getLinks <- function(mat, exclude = "== 1") {
 #' x <- as.matrix(x)
 #' model <- c("pearson", "spearman")
 #' args <- list()
-#' l <- statistical(x, model = model)
+#' adj_stat <- statistical(x, model = model)
 #'
 #' ## type = "threshold"
 #' args <- list(filter = "pearson_coef > 0.95 & spearman_coef > 0.95")
-#' threshold(statistical = l, type = "threshold", args = args)
+#' threshold(statistical = adj_stat, type = "threshold", args = args)
 #'
 #' ## type = "top1"
 #' args <- list(n = 10)
-#' threshold(statistical = l, type = "top1", args = args)
+#' threshold(statistical = adj_stat, type = "top1", args = args)
 #'
 #' ## type = "top2"
-#' threshold(statistical = l, type = "top2", args = args)
+#' threshold(statistical = adj_stat, type = "top2", args = args)
 #'
 #' ## type = "mean"
-#' threshold(statistical = l, type = "mean", args = args)
+#' threshold(statistical = adj_stat, type = "mean", args = args)
 #' @export
 #' 
 #' @importFrom rlang parse_expr
-threshold <- function(statistical, 
+threshold <- function(am, 
     type = c("threshold", "top1", "top2", "mean"), 
     args, values = c("all", "min", "max"), ...) {
 
     ## check match.arg for values
     type <- match.arg(type)
     values <- match.arg(values)
+    
+    if (!validObject(am)) {
+        stop("'am' must be a valid 'AdjacencyMatrix' object")
+    }
+
+    if (thresholded(am)) {
+        stop("'am' has been already thresholded")
+    }
     
     ## args, either N for tops
     ## or a list of threshold
@@ -886,14 +896,14 @@ threshold <- function(statistical,
     }
 
     ## create the cons matrix to store the consensus information
-    a_1 <- assay(statistical, 1)
+    a_1 <- assay(am, 1)
     cons <- matrix(0, nrow = ncol(a_1), ncol = ncol(a_1))
     rownames(cons) <- colnames(cons) <- colnames(a_1)
     diag(cons) <- NaN
     
     if (type == "threshold") {
         
-        df_filter <- as.data.frame(statistical) %>% 
+        df_filter <- as.data.frame(am) %>% 
             dplyr::filter(!!rlang::parse_expr(args$filter))
         
         inds_row <- match(df_filter[, "Row"], rownames(cons))
@@ -904,8 +914,8 @@ threshold <- function(statistical,
 
     } else { ## if type is in "top1", "top2" or "mean"
         
-        ind_coef <- grep(pattern = "_coef", x = assayNames(statistical))
-        l <- as.list(assays(statistical)[ind_coef])
+        ind_coef <- grep(pattern = "_coef", x = assayNames(am))
+        l <- as.list(assays(am)[ind_coef])
 
         l_df <- lapply(seq_along(l), function(x) {
 
@@ -955,10 +965,9 @@ threshold <- function(statistical,
         })
 
         ## bind together the ranks of the models, stored in l_df
-        names(l_df) <- names(l)
         ranks <- lapply(l_df, function(x) x$rank)
         ranks <- do.call("cbind", ranks)
-        colnames(ranks) <- names(l_df)
+        colnames(ranks) <- names(l)
 
         ## calculate the consensus information, i.e. either get the first or
         ## second top rank per row or calculate the average across rows
@@ -970,25 +979,23 @@ threshold <- function(statistical,
         ranks <- cbind(row_col, cons_val)
 
         ## get the top N features
-        n <- args$n
-        top_n <- sort(unique(cons_val))[1:n]
+        top_n <- sort(unique(cons_val))[1:args$n]
         ranks_top <- ranks[cons_val %in% top_n, ]
 
         ## write links in ranks_top to binary adjacency matrix cons
-        
         cons[as.numeric(rownames(ranks_top))] <- 1
-
     }
 
     ## assign the consensus matrix to a new slot
-    assay(statistical, "consensus") <- cons
+    assay(am, "consensus") <- cons
+    
     if (type %in% c("top1", "top2", "mean") & values %in% c("min", "max")) 
         directed(assay) <- FALSE
-    statistical@thresholded <- TRUE
+    am@thresholded <- TRUE
     
-    return(statistical)
+    return(am)
 }
-    
+
 #' @name topKnet
 #' @aliases topKnet
 #' @title Return consensus ranks from a matrix containing ranks
