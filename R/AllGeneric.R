@@ -4,15 +4,15 @@
 ###
 
 setMethod("length", "AdjacencyMatrix",
-    function(object) nrow(assay(object, 1))
+    function(x) nrow(assay(x, 1))
 )
 
 setMethod("dim", "AdjacencyMatrix",
-    function(object) c(length(object), ncol(assay(object, 1)))
+    function(x) c(length(x), ncol(assay(x, 1)))
 )
 
 setMethod("type", "AdjacencyMatrix",
-    function(object) object@type)
+    function(x) x@type)
 
 setGeneric("directed",
     function(object) standardGeneric("directed"))

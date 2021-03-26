@@ -49,7 +49,7 @@ setValidity2("AdjacencyMatrix", function(object) {
         "spearman_partial_coef", "spearman_partial_pvalue",
         "pearson_semipartial_coef", "pearson_semipartial_pvalue",
         "spearman_semipartial_coef", "spearman_semipartial_pvalue",
-        "bayes_coef")
+        "bayes_coef", "consensus")
     
     if (type_obj == "structural" | type_obj == "combine") {
         
