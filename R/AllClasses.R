@@ -40,7 +40,22 @@
 #' @description
 #' The function `AdjacencyMatrix` will create an object of type 
 #' `AdjacencyMatrix`.
+#' 
+#' @section Accessors:
+#' 
+#' - The `AdjacencyMatrix` class extends the
+#'   [SummarizedExperiment::SummarizedExperiment] class and inherits
+#'   all its accessors and replacement methods.
 #'
+#' - The `type` accessor returns the `type` (`"structural"`, `"statistical"`, 
+#'   `"combine"`) slot.
+#'   
+#' - The `directed` accessor returns the `directed` (`logical` of length 1)
+#'   slot.
+#'   
+#' - The `thresholded` accessor returns the `thresholded` 
+#' (`logical` of length 1) slot.
+##'
 #' @details
 #' `adj_l` is a list of adjacency matrices. The adjacency matrices have
 #' identical dimensions and `dimnames` and each adjacency matrix has the 
@@ -53,7 +68,7 @@
 #' @param rowData information on the features
 #' 
 #' @param type `character`, either `"structural"`, `"statistical"`, or 
-#' `"combined"`
+#' `"combine"`
 #' 
 #' @param directed `logical`, if the adjacency matrix underlying the graph is
 #' directed or undirected 
@@ -91,7 +106,7 @@
 #'
 #' @export
 AdjacencyMatrix <- function(adj_l, rowData, 
-    type = c("structural", "statistical", "combined"), 
+    type = c("structural", "statistical", "combine"), 
     directed = c(TRUE, FALSE), thresholded = c(TRUE, FALSE)) {
     
     type <- match.arg(type)
