@@ -499,18 +499,20 @@ addToList <- function(l, name, object) {
 #'
 #' @aliases statistical
 #'
-#' @title Create a list of adjacency matrices from statistical methods
+#' @title Create an `AdjacencyMatrix` object containing assays of adjacency 
+#' matrices from statistical methods
 #'
 #' @description
 #' The function `statitical` infers adjacency matrix topologies from
-#' statistical methods and returns matrices of these networks in a `list`. The
+#' statistical methods and returns matrices of these networks in an
+#' `AdjacencyMatrix` object. The
 #' function includes functionality to calculate adjacency matrices based on
 #' LASSO (L1 norm)-regression, random forests, context likelihood of
 #' relatedness (CLR), the algorithm for the reconstruction of accurate
 #' cellular networks (ARACNE), Pearson correlation (also partial and
 #' semipartial), Spearman correlation (also partial and semipartial)
-#' and score-based structure learning (Bayes). The function returns a
-#' list of adjacency matrices that are defined by `model`.
+#' and score-based structure learning (Bayes). The function returns an
+#' `AdjacencyMatrix` object of adjacency matrices that are defined by `model`.
 #'
 #' @param
 #' x `matrix` that contains intensity values of
@@ -540,14 +542,19 @@ addToList <- function(l, name, object) {
 #' `correlation` (for `"pearson"`, `"pearson_partial"`, `"pearson_semipartial"`,
 #' `"spearman"`, `"spearman_partial"`, `"spearman_semipartial"`) and/or `bayes`
 #' as specified by `model`. It will create adjacency matrices using the
-#' specified methods and will return a `list` containing the weighted
-#' adjacency matrices.
+#' specified methods and will return an `AdjacencyMatrix` containing the weighted
+#' adjacency matrices in the `assays` slot.
 #'
 #' Internally `x` will be z-scaled and the z-scaled object
 #' will be used in `lasso`, `clr` and/or `aracne`.
+#' 
+#' The slot `type` is set to `statistical`. The slot `directed` is set to
+#' `TRUE` if the methods `"lasso"`, `"randomForest"`, or `"bayes"` were used, 
+#' otherwise `directed` is set to `FALSE`.
+#' The slot `threshold` is set to `FALSE`.
 #'
-#' @return `list` containing the respective adjacency matrices specified by
-#' `model`
+#' @return `AdjacencyMatrix` containing the respective adjacency matrices in the
+#' `assay` slot as specified by `model`
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
@@ -560,6 +567,7 @@ addToList <- function(l, name, object) {
 #' @export
 #' 
 #' @importFrom S4Vectors DataFrame
+#' @importFrom mpmi cmi
 statistical <- function(x, model, ...) {
 
     ## check if model complies with the implemented model and return error
@@ -706,7 +714,7 @@ statistical <- function(x, model, ...) {
     rD <- DataFrame(names = rownames(l[[1]]))
     rownames(rD) <- rownames(l[[1]])
     
-    if (c("lasso", "randomForest", "bayes"), model) directed <- TRUE else directed <- FALSE
+    directed <- if (c("lasso", "randomForest", "bayes") %in% model) TRUE else FALSE
     
     adj <- AdjacencyMatrix(l, rowData = rD,
         type = "statistical", directed = directed, thresholded = FALSE)
@@ -778,48 +786,62 @@ getLinks <- function(mat, exclude = "== 1") {
 #' @title  Threshold the statistical adjacency matrices
 #'
 #' @description
-#' The function `threshold` takes as input a list of adjacency matrices
+#' The function `threshold` takes as input an `AdjacencyMatrix` object 
+#' containing adjacency matrices
 #' as returned from the function `statistical`. Depending on the `type`
-#' argument, 'threshold` will identify the strongest link that are
+#' argument, `threshold` will identify the strongest link that are
 #' lower or higher a certain threshold (`type = "threshold"`) or
 #' identify the top `n` links (`type` either `"top1`, `"top2` or `"mean"`).
+#' It will return this kind of information as a binary matrix in the form
+#' of an `AdjacencyMatrix` object. 
 #'
-#' @param statistical `list` containing adjacency matrices
+#' @param am `AdjacencyMatrix` object of `type` `"statistical"` as 
+#' created from the function `statistical`. The object will contain the
+#' adjacency matrices in the `assay` slot.
 #'
 #' @param type `character`, either `"threshold"`, `"top1`, `"top2` or
 #' `"mean"`
 #'
-#' @param args `list` of arguments, has to contain thresholds for weighted
-#' adjacency matrices depending on the statistical model
-#' (a named list, where names are identical to `model`s in `statistical`)
-#' or a numerical
-#' vector of length 1 that denotes the number of top ranks written to the
-#' consensus matrix (a named list with entry `n`)
+#' @param args `list`. Depending on the `type` arguments the list element
+#' will be different. 
+#' 
+#' In the case of `type == "threshold"`, `args` has the 
+#' entry `filter` (`character` of length 1). The character vector will specify the 
+#' kind of filtering applied to the adjacency matrices. Elements in `filter`
+#' will refer to the `assayNames`, e.g. 
+#' `list(filter = "pearson_coef > 0.8")` will retain all edges with Pearson
+#' correlation coefficients > 0.8. 
+#' `list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all 
+#' edges with Pearson correlation coefficients > 0.8 AND Spearman correlation
+#' coefficients > 0.5. 
+#' `list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all 
+#' edges with Pearson correlation coefficients > 0.8 and < -0.8.
+#' 
+#' In the case of `type == "top1"`, `type == "top2"`, or `type == "mean"`, 
+#' `args` has the entry `n` (`numeric` of length 1), that 
+#' denotes the number of top ranks written to the
+#' consensus matrix.
 #' 
 #' @param values `character`, take from the adjacency matrix all values ("all"),
 #' the minimum of the pairs ("min") or the maximum ("max")
 #' a^*_{ij} = min(a_ij, a_ji)
 #' a^*_{ij} = max(a_ij, a_ji)
-#' 
-#'
-#' @param ... parameters passed to the function `consensus` in the
-#' `sna` package (only for `type = "threshold"`)
 #'
 #' @details
-#' The entries of `args` differ depending on the argument `type`.
-#' If `type = "treshhold"`, then `args` has to contain numeric vector of
-#' length 1 with names equal to `names(statistical)` for each `model`
-#' (`names(statistical)`) and the entry `threshold`, a numerical `vector(1)`
-#' to threshold the consensus
-#' matrix after using the `consensus` function from the `sna` package.
-#' Depending on the chosen `method` in `consensus`, the `threshold` value of the
-#' consensus adjacency matrix should be chosen accordingly to report a
-#' connection by different statistical models.
-#'
-#' When combining the adjacency matrices the
-#' `threshold` value defines if an edge is reported or not. For
-#' `method = "central.graph"` threshold should be set to 1 by default. For other
-#' values of `method`, the value should be carefully defined by the user.
+#' `values` has to be set carefully depending on if the `AdjacencyMatrix` object
+#' `am` is `directed` or not.
+#' 
+#' In the case of `type == "threshold"`, `args` has the 
+#' entry `filter` (`character` of length 1). The character vector will specify the 
+#' kind of filtering applied to the adjacency matrices. Elements in `filter`
+#' will refer to the `assayNames`, e.g. 
+#' `list(filter = "pearson_coef > 0.8")` will retain all edges with Pearson
+#' correlation coefficients > 0.8. 
+#' `list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all 
+#' edges with Pearson correlation coefficients > 0.8 AND Spearman correlation
+#' coefficients > 0.5. 
+#' `list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all 
+#' edges with Pearson correlation coefficients > 0.8 and < -0.8.
 #'
 #' If  `type` is equal to `"top1"`, `"top2"` or
 #' `"mean"`, then `args` has to contain a numeric vector of length 1 that
@@ -830,14 +852,16 @@ getLinks <- function(mat, exclude = "== 1") {
 #' for partial and semipartial correlation) and `clr` and `aracne` are
 #' taken as they are.
 #'
-#' For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken.
+#' For `type = "top1"`, the best (i.e. lowest) rank in `am` is taken.
 #' For `type = "top2"`, the second best (i.e. second lowest) rank in
-#' `statistical` is taken.
-#' For `type = "mean"`, the average rank in `statistical` is taken.
+#' `am` is taken.
+#' For `type = "mean"`, the average rank in `am` is taken.
 #' Subsequently the first `n` unique ranks are returned.
 #'
-#' @return `matrix`, binary adjacency matrix given the links supported by the
-#' `type` and the `args`
+#' @return `AdjacencyMatrix` object containing a binary adjacency matrix
+#' given the links supported by the `type` and the `args` (in the slot 
+#' `"consensus"`. The object will furthermore contain the supplied data input,
+#' i.e. all assays from `am`. The slot `threshold` is set to `TRUE`.
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' @examples
@@ -846,21 +870,22 @@ getLinks <- function(mat, exclude = "== 1") {
 #' x <- as.matrix(x)
 #' model <- c("pearson", "spearman")
 #' args <- list()
-#' adj_stat <- statistical(x, model = model)
+#' am_stat <- statistical(x, model = model)
 #'
 #' ## type = "threshold"
 #' args <- list(filter = "pearson_coef > 0.95 & spearman_coef > 0.95")
-#' threshold(statistical = adj_stat, type = "threshold", args = args)
+#' threshold(am = am_stat, type = "threshold", args = args)
 #'
 #' ## type = "top1"
 #' args <- list(n = 10)
-#' threshold(statistical = adj_stat, type = "top1", args = args)
+#' threshold(am = am_stat, type = "top1", args = args)
 #'
 #' ## type = "top2"
-#' threshold(statistical = adj_stat, type = "top2", args = args)
+#' threshold(am = am_stat, type = "top2", args = args)
 #'
 #' ## type = "mean"
-#' threshold(statistical = adj_stat, type = "mean", args = args)
+#' threshold(am = am_stat, type = "mean", args = args)
+#'
 #' @export
 #' 
 #' @importFrom rlang parse_expr
@@ -871,6 +896,10 @@ threshold <- function(am,
     ## check match.arg for values
     type <- match.arg(type)
     values <- match.arg(values)
+    
+    if (!is(am, "AdjacencyMatrix")) {
+        stop("'am' is not an 'AdjacencyMatrix' object")
+    }
     
     if (!validObject(am)) {
         stop("'am' must be a valid 'AdjacencyMatrix' object")
