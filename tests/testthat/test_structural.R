@@ -40,23 +40,46 @@ test_that("structural", {
         "is not a data.frame")
     expect_error(structural(mat_test, transformations, ppm = "a"),
         "is not numeric")
-    expect_equal(length(struct_adj), 2)
-    expect_equal(dim(struct_adj[[1]]), c(7, 7))
-    expect_equal(dim(struct_adj[[2]]), c(7, 7))
-    expect_equal(rownames(struct_adj[[1]]), colnames(struct_adj[[1]]))
-    expect_equal(rownames(struct_adj[[2]]), colnames(struct_adj[[2]]))
-    expect_equal(rownames(struct_adj[[1]]), rownames(struct_adj[[2]]))
-    expect_equal(rownames(struct_adj[[1]]), paste0("x", 1:7))
-    expect_equal(sum(struct_adj[[1]]), 12)
-    expect_equal(sum(struct_adj_neg[[1]]), 0)
-    expect_equal(sum(struct_adj_dir[[1]]), 6)
-    expect_equal(sum(struct_adj_dir_neg[[1]]), 6)
-    expect_equal(unique(as.vector(struct_adj[[2]])),
-                c("", "Monosaccharide (-H2O)", "Malonyl group (-H2O)"))
-    expect_true(is.matrix(struct_adj[[1]]))
-    expect_true(is.matrix(struct_adj[[2]]))
-    expect_true(is.numeric(struct_adj[[1]]))
-    expect_true(is.character(struct_adj[[2]]))
+    expect_true(validObject(struct_adj))
+    expect_equal(assayNames(struct_adj), 
+        c("binary", "transformation", "mass_difference"))
+    expect_equal(length(struct_adj), 7)
+    expect_equal(dim(struct_adj), c(7, 7))
+    expect_equal(assay(struct_adj, "binary"), c(7, 7))
+    expect_equal(assay(struct_adj, "transformation"), c(7, 7))
+    expect_equal(assay(struct_adj, "mass_difference"), c(7, 7))
+    expect_equal(rownames(assay(struct_adj, 1)), colnames(assay(struct_adj, 1)))
+    expect_equal(rownames(assay(struct_adj, 2)), colnames(assay(struct_adj, 2)))
+    expect_equal(rownames(assay(struct_adj, 3)), rownames(assay(struct_adj, 3)))
+    expect_equal(rownames(assay(struct_adj, 1)), rownames(assay(struct_adj, 2)))
+    expect_equal(rownames(assay(struct_adj, 1)), rownames(assay(struct_adj, 3)))
+    expect_equal(rownames(assay(struct_adj, 1)), paste0("x", 1:7))
+    expect_equal(sum(assay(struct_adj, "binary")), 12)
+    expect_equal(sum(assay(struct_adj_neg, "binary")), 0)
+    expect_equal(sum(assay(struct_adj_dir, "binary")), 6)
+    expect_equal(sum(assay(struct_adj_dir_neg, "binary")), 6)
+    expect_equal(unique(as.vector(assay(struct_adj, "transformation"))),
+        c("", "Monosaccharide (-H2O)", "Malonyl group (-H2O)"))
+    expect_equal(unique(as.vector(assay(struct_adj, "mass_difference"))),
+                 c("", "162.0528234315", "86.0003939305"))
+    expect_true(is.matrix(assay(struct_adj, "binary")))
+    expect_true(is.matrix(assay(struct_adj, "transformation")))
+    expect_true(is.matrix(assay(struct_adj, "mass_difference")))
+    expect_true(is.numeric(assay(struct_adj, "binary")))
+    expect_true(is.character(assay(struct_adj, "transformation")))
+    expect_true(is.character(assay(struct_adj, "mass_difference")))
+    expect_equal(directed(struct_adj), FALSE)
+    expect_equal(directed(struct_adj_neg), FALSE)
+    expect_equal(directed(struct_adj_dir), TRUE)
+    expect_equal(directed(struct_adj_dir_neg), TRUE)
+    expect_equal(type(struct_adj), "structural")
+    expect_equal(type(struct_adj_neg), "structural")
+    expect_equal(type(struct_adj_dir), "structural")
+    expect_equal(type(struct_adj_dir_neg), "structural")
+    expect_equal(thresholded(struct_adj), FALSE)
+    expect_equal(thresholded(struct_adj_neg), FALSE)
+    expect_equal(thresholded(struct_adj_dir), FALSE)
+    expect_equal(thresholded(struct_adj_dir_neg), FALSE)
 })
 ## END unit test structural ##
 
@@ -66,14 +89,15 @@ struct_adj_rt_dir <- rtCorrection(struct_adj_dir, mat_test, transformations)
 
 test_that("rtCorrection", {
     expect_error(rtCorrection(struct_adj[[1]], mat_test, transformations),
-        "is not a list")
-    expect_error(
-        rtCorrection(list(struct_adj[[1]]), mat_test, transformations),
-        "is not a list of length 2")
-    expect_error(rtCorrection(list(struct_adj[[2]], struct_adj[[2]]),
-        mat_test, transformations))
-    expect_error(rtCorrection(list(struct_adj[[1]], struct_adj[[1]]),
-        mat_test, transformations), "is not a character matrix")
+        "is not an 'AdjacencyMatrix'")
+    tmp <- struct_adj
+    assay(tmp, "transformation") <- assay(tmp, "binary")
+    expect_error(rtCorrection(tmp, mat_test, transformations), 
+        "must be character")
+    tmp <- struct_adj
+    assay(tmp, "mass_difference") <- assay(tmp, "binary")
+    expect_error(rtCorrection(tmp, mat_test, transformations), 
+        "must be character")
     expect_error(rtCorrection(struct_adj, NULL, transformations),
         "does not contain the column rt")
     expect_error(rtCorrection(struct_adj, mat_test[, -1], transformations),
@@ -91,51 +115,41 @@ test_that("rtCorrection", {
     expect_error(rtCorrection(struct_adj, mat_test,
         transformation = cbind(transformations[, -4], rt = rep("a", 2))),
         "does contain other")
-    expect_true(is.matrix(struct_adj_rt[[1]]))
-    expect_true(is.numeric(struct_adj_rt[[1]]))
-    expect_true(is.matrix(struct_adj_rt[[2]]))
-    expect_true(is.character(struct_adj_rt[[2]]))
-    expect_equal(colnames(struct_adj_rt[[1]]), paste0("x", 1:7))
-    expect_equal(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[1]]))
-    expect_equal(colnames(struct_adj_rt[[1]]), colnames(struct_adj_rt[[2]]))
-    expect_equal(colnames(struct_adj_rt[[1]]), rownames(struct_adj_rt[[2]]))
-    expect_true(table(struct_adj_rt[[1]])[1] == 41)
-    expect_true(table(struct_adj_rt_dir[[1]])[1] == 45)
-    expect_equal(sum(struct_adj_rt[[1]]), 8)
-    expect_equal(sum(struct_adj_rt_dir[[1]]), 4)
+    expect_true(is.matrix(assay(struct_adj_rt, "binary")))
+    expect_true(is.numeric(assay(struct_adj_rt, "binary")))
+    expect_true(is.matrix(assay(struct_adj_rt, "transformation")))
+    expect_true(is.character(assay(struct_adj_rt, "transformation")))
+    expect_true(is.matrix(assay(struct_adj_rt, "mass_difference")))
+    expect_true(is.character(assay(struct_adj_rt, "mass_difference")))
+    expect_equal(colnames(assay(struct_adj_rt, "binary")), paste0("x", 1:7))
+    expect_equal(colnames(assay(struct_adj_rt, 1)),
+        rownames(assay(struct_adj_rt, 1)))
+    expect_equal(colnames(assay(struct_adj_rt, 2)),
+        rownames(assay(struct_adj_rt, 2)))
+    expect_equal(colnames(assay(struct_adj_rt, 3)),
+        rownames(assay(struct_adj_rt, 3)))
+    expect_equal(colnames(assay(struct_adj_rt, 1)),
+        colnames(assay(struct_adj_rt, 2)))
+    expect_equal(colnames(assay(struct_adj_rt, 1)),
+        colnames(assay(struct_adj_rt, 3)))
+    expect_true(table(assay(struct_adj_rt, "binary"))[1] == 41)
+    expect_true(table(assay(struct_adj_rt_dir, "binary"))[1] == 45)
+    expect_equal(sum(assay(struct_adj_rt, "binary")), 8)
+    expect_equal(sum(assay(struct_adj_rt_dir, "binary")), 4)
+    expect_true(all(
+        table(assay(struct_adj_rt, "transformation")) == c(41, 4, 4)))
+    expect_true(all(
+        table(assay(struct_adj_rt, "mass_difference")) == c(41, 4, 4)))
+    expect_true(all(
+        table(assay(struct_adj_rt_dir, "transformation")) == c(45, 2, 2)))
+    expect_true(all(
+        table(assay(struct_adj_rt_dir, "mass_difference")) == c(45, 2, 2)))
 
-    ## dims of struct_adj[[1]] and struct[[2]], rownames/colnames
-    foo_1 <- struct_adj[[1]]
-    foo_2 <- struct_adj[[2]]
-    foo <- list(foo_1, foo_2[, 1:6])
-    expect_error(rtCorrection(foo, mat_test, transformations),
-        " is not equal to dim")
-
-    rownames(foo_1)[1] <- "foo"
-    foo <- list(foo_1, foo_2)
-    expect_error(rtCorrection(foo, mat_test, transformations),
-        "are not identical to rownames of ")
-
-    foo_1 <- struct_adj[[1]]
-    rownames(foo_2)[1] <- "foo"
-    foo <- list(foo_1, foo_2)
-    expect_error(rtCorrection(foo, mat_test, transformations),
-        "are not identical to ")
-
-    foo_2 <- struct_adj[[2]]
-    foo <- list(foo_1, foo_2)
-    expect_error(rtCorrection(foo, mat_test[1:6, ], transformations),
-        "do not fit rownames[(]x[])]")
-
-    foo_1 <- as.data.frame(struct_adj[[1]])
-    foo <- list(foo_1, foo_2)
-    expect_error(rtCorrection(foo, mat_test, transformations),
-        "is not a numeric matrix")
-
-    foo_1 <- struct_adj[[1]]
-    foo_2 <- as.data.frame(struct_adj[[2]])
-    foo <- list(foo_1, foo_2)
-    expect_error(rtCorrection(foo, mat_test, transformations),
-        "is not a character matrix")
+    expect_equal(directed(struct_adj_rt), FALSE)
+    expect_equal(directed(struct_adj_rt_dir), TRUE)
+    expect_equal(type(struct_adj_rt), "structural")
+    expect_equal(type(struct_adj_rt_dir), "structural")
+    expect_equal(thresholded(struct_adj_rt), TRUE)
+    expect_equal(thresholded(struct_adj_rt_dir), TRUE)
 })
 ## END unit test rtCorrection ##
