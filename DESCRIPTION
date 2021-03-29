@@ -3,9 +3,10 @@ Type: Package
 Title: Inferring metabolic networks from untargeted high-resolution mass spectrometry data
 Version: 1.9.2
 Date: 2021-03-24
-Authors@R: c(person(given = "Thomas", family = "Naake",
-    email = "thomasnaake@googlemail.com",
-    role = c("aut","cre")))
+Authors@R: c(person(given = "Thomas", family = "Naake", 
+		email = "thomasnaake@googlemail.com", role = c("aut","cre")),
+	person(given = "Liesa", family = "Salzer",
+		email = "liesa.salzer@helmholtz-muenchen.de", role = "ctb"))
 VignetteBuilder: knitr
 Depends:
     R (>= 4.0)
