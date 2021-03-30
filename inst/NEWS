@@ -1,3 +1,9 @@
+Changes in version 1.9.3 (2021-03-30)
++ introduce AdjacencyMatrix S4 class, derived from SummarizedExperiment, to
+  store the adjacency matrices. AdjacencyMatrix objects can be of type
+  structural, statistical, and combine
++ adjust the documentation and tests for AdjacencyMatrix objects
+  
 Changes in version 1.9.2 (2021-03-24)
 + add section on structual matrix generation for directed=FALSE
 
@@ -6,13 +12,13 @@ Changes in version 1.9.1 (2021-02-20)
 
 Changes in version 1.5.3 (2020-03-09)
 + change tests for rtCorrection, do not use function levels to test for 
-if `+`, `.` or `?` is present in the transformation list
+  if `+`, `.` or `?` is present in the transformation list
 + update vignette that formulas are displayed properly
 
 Changes in version 1.5.2 (2020-01-12)
 + change unit tests for clr and aracne that it doesn't fail in Windows
 + change ppm calculation in structural, use m/z of precursors instead
-of m/z differences
+  of m/z differences
 
 Changes in version 1.5.2 (2019-12-11)
 + change unit tests for clr and aracne that it doesn't fail in Windows
