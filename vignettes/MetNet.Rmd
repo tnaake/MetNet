@@ -78,8 +78,8 @@ biases that are inherent in these statistical methods, followed by the
 calculation of a consensus adjacency matrix using the differently computed 
 individual adjacency matrices. 
 
-The two main functionalities of the package include the creation of an
-adjacency matrix from structural properties, based on losses/addition of
+The two main functionalities of the package include the creation of 
+adjacency matrices from structural properties, based on losses/addition of
 functional groups defined by the user, and statistical associations. Currently,
 the following statistical models are implemented to infer a statistical
 adjacency matrix: Least absolute shrinkage and selection operator
@@ -100,7 +100,18 @@ matrices can be combined to form a consensus matrix that has information
 from both structural and statistical properties of the data. This can be followed 
 by network analyses (e.g. calculation of topological parameters),
 integration with other data sources (e.g. genomic information or
-transcriptomic data) and/or visualization. 
+transcriptomic data) and/or visualization.
+
+Central to `MetNet` is the `AdjacencyMatrix` class, derived from the
+`SummarizedExperiment` S4 class. The `AdjacencyMatrix` host the adjacency
+matrices creates during the different steps within the `assays` slot. They 
+will furthermore store information on the `type` of the `AdjacencyMatrix`, 
+i.e. if it was derived from `structural` or `statistical` properties or if 
+it used the combined information from these layers (`combine`). It also 
+stores information if the information was `thresholded`, e.g. by 
+applying the `rtCorrection` or `threshold` function. Furthermore, the 
+`AdjacencyMatrix` object stores information on if the graphs are directed 
+or undirected (within the `directed` slot).
 
 # Questions and bugs {-}
 
@@ -151,16 +162,18 @@ data("x_test", package = "MetNet")
 x_test <- as.matrix(x_test)
 ```
 
-# Creating the structural matrix {#sec-structural}
+# Creating the structural adjacency {#sec-structural}
 
-The function `structural` will create the adjacency
-matrix based on structural properties (m/z values) of the features.
+The function `structural` will create an `AdjacencyMatrix` object of 
+`type` `structural` containing the adjacency
+matrices based on structural properties (m/z values) of the features.
+
 The function expects a matrix with a column `"mz"` that contains the 
 mass information of a feature (typically the m/z value). Furthermore,
 `structural` takes a `data.frame`
 object as argument `transformations` with the `colnames`
-`"mass"`, `"name"` and additional columns (e.g. `"formula"`). 
-`structural` looks for transformation (in the 
+`"mass"`, `"name"` and additional columns (e.g. `"formula"` or `"rt"`). 
+`structural` looks for transformations (in the 
 sense of additions/losses of functional groups mediated by biochemical,
 enzymatic reactions) in the data using the mass information. 
 
@@ -193,16 +206,16 @@ range is calculated depending on the supplied `ppm` value, differences
 between the m/z feature values are calculated and matched against the
 `"mass"`es of the `transformation` argument. If any
 of the additions/losses defined in `transformation` is found in the
-data, it will be reported as an (unweighted) connection in the
-returned adjacency matrix (value 1). Together with the adjacency matrix the type of
-connection (derived from the column `"name"` in the
-`transformation` object) will be written to a character matrix. These
-two matrices will be returned as a list by the function
-`structural`: the first entry contains the numerical adjacency
-matrix and the second entry the character matrix.
+data, it will be reported as an (unweighted) connection in the assay
+`"binary"` of the returned `AdjacencyMatrix` object. 
+Together with this assay, an adjacency matrix with the type of
+connection/transformation (derived from the column `"name"` in the
+`transformation` object) will be written as a character matrix to the 
+assay `"transformation"`. Furthermore, the mass difference will be written
+as a character matrix to the assay (`"mass_difference"`).
 
-Before calculating the structural matrix, one must define the search space, 
-i.e. the transformation that will be looked for in the mass spectrometric
+Before creating the `structural` `AdjacencyMatrix`, one must define the 
+search space, i.e. the transformation that will be looked for in the mass spectrometric
 data, by creating here the `transformations` object. 
 
 ```{r transformation_example,echo=TRUE,eval=TRUE}
@@ -233,7 +246,7 @@ transformations <- data.frame(
 
 The function `structural` will then check for those 
 m/z differences that are stored in the column `"mass"` in the 
-object `transformations`. To create the adjacency matrix derived 
+object `transformations`. To create the `AdjacencyMatrix` object derived 
 from these structural information we enter
 
 ```{r structure, eval=TRUE,echo=TRUE}
@@ -243,8 +256,10 @@ in the `R` console.
 
 ## Advanced topic: Creating a directed structural graph
 
-By default, an undirected structural adjacency matrix is directed (the
-argument is set to `directed = FALSE` by default). `MetNet`,
+By default, the `structural` `AdjacencyMatrix` object and the contained
+adjacency matrices are undirected (the
+argument in `structural` is set to `directed = FALSE` by default; i.e. the
+matrices are symmetric). `MetNet`,
 however, also allows to include the information on the directionality of 
 the transformation (e.g. to distinguish between additions and losses).
 This behaviour can be specified by setting `directed = TRUE`:
@@ -258,18 +273,18 @@ In the following we will visualize the results from the undirected and
 directed structural network:
 
 ```{r visualization_directed}
-g_undirected <- igraph::graph_from_adjacency_matrix(struct_adj[[1]], 
-    mode = "directed", weighted = NULL)
+g_undirected <- igraph::graph_from_adjacency_matrix(
+    assay(struct_adj, "binary"), mode = "directed", weighted = NULL)
 plot(g_undirected, edge.width = 1, edge.arrow.size = 0.5,
      vertex.label.cex = 0.5, edge.color = "grey")
-g_directed <- igraph::graph_from_adjacency_matrix(struct_adj_dir[[1]], 
-    mode = "directed", weighted = NULL)
+g_directed <- igraph::graph_from_adjacency_matrix(
+    assay(struct_adj_dir, "binary"), mode = "directed", weighted = NULL)
 plot(g_directed, edge.width = 1, edge.arrow.size = 0.5,
      vertex.label.cex = 0.5, edge.color = "grey")
 ```
 
 
-## Advanced topic: Refining the structural adjacency matrix (optional) {-}
+## Advanced topic: Refining the structural adjacency (optional) {-}
 The retention time will differ depending
 on the chemical group added, e.g. an addition of a glycosyl group will 
 usually result in a lower retentiom time in reverse-phase chromatography.
@@ -285,25 +300,26 @@ retention time than the feature with the lower m/z value. The values for
 m/z and retention time will be taken from the object passed to the 
 `x` argument. In case there is a discrepancy between the transformation
 and the retention time shift, the adjacency matrix at the specific position
-will be set to 0. `rtCorrection` will return the 
-updated adjacency matrix and the updated character matrix with the descriptions 
-of the transformation. 
+will be set to 0. `rtCorrection` will return the an `AdjacencyMatrix` object
+with updated adjacency matrices (`"binary"`, `"transformation"`, and 
+`"mass_difference"`). 
 
 To account for retention time shifts we enter
 
 ```{r rt_correction, eval=TRUE, echo=TRUE}
-struct_adj <- rtCorrection(structural = struct_adj, 
-    x = x_test, transformation = transformations)
+struct_adj <- rtCorrection(am = struct_adj, x = x_test, 
+    transformation = transformations)
 ```
 in the `R` console. 
 
 
-# Creating the statistical matrix {#sec-statistical}
+# Creating the statistical adjacency {#sec-statistical}
 
 ## Creating weighted adjacency matrices using `statistical` {#subsec-statistical}
-The function `statistical` will create the adjacency
-matrix based on statistical associations. The function will create a 
-list of weighted adjacency matrices using the statistical models defined by the 
+The function `statistical` will create an `AdjacencyMatrix` object of type 
+`statistical` containing the adjacency
+matrices based on statistical associations. The function will create  
+weighted adjacency matrices using the statistical models defined by the 
 `model` argument. Currently, the following models are available: 
 LASSO (using `stabs`,
 [@Hofner2015;@Thomas2017]), Random Forest (using `GENIE3`, 
@@ -333,38 +349,11 @@ arguments that are defined in the functions `lasso`,
 
 ## Creating an unweighted adjacency matrix using `threshold` {#subsec-threshold}
 
-From the list of adjacency matrices the function `threshold`
-will create an unweighted adjacency matrix from the weighted adjacency matrices
-unifying the information present from all statistical models. 
-The reasoning behind this step is to circumvent disadvantages arising from each 
-model and creating a statistically reliable topology that reflects the actual 
-metabolic relations. `threshold` returns an unweighted adjacency
-matrix with connections inferred from the respective models.
-
-There are four different types implemented how the unweighted adjacency 
-matrix can be created: `threshold`, `top1`, `top2`, `mean`.
-
-For `type = "threshold"`, threshold values have to be defined in the 
-`args` argument for each respective statistical model. Values above or below 
-these thresholds in each respective weighted adjacency matrix will be 
-reported as present (1) or absent (0) in the returned unweighted adjacency 
-matrix. The unweighted adjacency matrices will be passed to the  
-`consensus` function from the `sna` package [@Butts2016] 
-to calculate the unweighted consensus adjacency matrix. 
-The arguments that are accepted by this function can be passed to the 
-`threshold` 
-function. Furthermore, in `args` an entry `threshold` needs 
-to be defined to threshold if the value a~i,j~ of the consensus adjacency 
-matrix will be reported as a connection in the returned matrix 
-(if a~i,j~ \( \geq \) `threshold`) or not. In the case of the method 
-`"central.graph"` (default), the argument `threshold` should be 
-set to 1. 
-
-For the other three types (`top1`, `top2`, `mean`) the ranks per statistical model
-will be calculated and from each respective link the top1, top2 or mean rank 
-across statistical models will be calculated (cf. [@Hase2013]). The 
-top n unique ranks (defined by the entry `n` in `args`) will be returned
-as links in the unweighted consensus adjacency matrix. 
+From the `statistical` `AdjacencyMatrix` object the function `threshold`
+will create an `AdjacencyMatrix` object with the derived 
+unweighted adjacency matrix from the weighted adjacency matrices
+unifying the information present from all statistical models. This 
+unweighted adjacency matrix is stored in the assay `"consensus"`.
 
 In the following example, we will create a list of unweighted adjacency matrices 
 using 
@@ -373,53 +362,98 @@ Pearson and Spearman correlation using the intensity values as input data.
 ```{r statistical,eval=TRUE,echo=TRUE}
 x_int <- x_test[, 3:dim(x_test)[2]]
 x_int <- as.matrix(x_int)
-stat_adj_l <- statistical(x_int, model = c("pearson", "spearman"))
+stat_adj <- statistical(x_int, model = c("pearson", "spearman"))
 ```
 
-`threshold` implements four ways to obtain an unweighted adjacency
-matrix. We will create here for all ways the unweighted consensus adjacency 
-matrices.
+The reasoning behind this step is to circumvent disadvantages arising from each 
+model and creating a statistically reliable topology that reflects the actual 
+metabolic relations. `threshold` returns an unweighted adjacency
+matrix with connections inferred from the respective models (in the 
+`"consensus"` assay).
+
+There are four different types implemented how the unweighted adjacency 
+matrix can be created: `threshold`, `top1`, `top2`, `mean`.
+
+For `type = "threshold"`, threshold values have to be defined in the 
+`args` argument for the respective statistical model within the list entry
+`filter`. Values above or below 
+these thresholds in each respective weighted adjacency matrix will be 
+reported as present (1) or absent (0) in the returned unweighted adjacency 
+matrix. 
+
+For the other three types (`top1`, `top2`, `mean`) the ranks per statistical model
+will be calculated and from each respective link the top1, top2 or mean rank 
+across statistical models will be calculated (cf. [@Hase2013]). The 
+top n unique ranks (defined by the entry `n` in `args`) will be returned
+as links in the unweighted consensus adjacency matrix. 
+
+
+We will create here for all ways the thresholded `AdjacencyMatrix` objects of 
+type `statistical` containing the consensus adjacency matrix.
 
 ```{r threshold,eval=TRUE,echo=TRUE}
 ## type = "threshold" 
-args_thr <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
-stat_adj_thr <- threshold(statistical = stat_adj_l, type = "threshold", 
+
+## the assayNames in stat_adj are used to define the filter criteria
+assayNames(stat_adj)
+
+## return edges with positive Pearson correlation coefficients > 0.95
+args_thr <- list(filter = "pearson_coef > 0.95")
+
+## return edges with positive Spearman correlation coefficients > 0.95
+args_thr <- list(filter = "spearman_coef > 0.95")
+
+## return edges with absolute Pearson correlation coefficients > 0.95 and 
+## associated p-values <= 0.05
+args_thr <- list(filter = "abs(pearson_coef) > 0.95 & pearson_pvalue <= 0.05")
+
+## return edges with absolute Pearson OR Spearman correlation coefficients > 0.95
+args_thr <- list(filter = "abs(pearson_coef) > 0.95 | abs(spearman_coef) > 0.95")
+
+## return edges with absolute Pearson AND Spearman correlation coefficients > 0.95
+args_thr <- list(filter = "abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95")
+
+## pass the filtering criteria to the args argument and set type to "threshold"
+stat_adj_thr <- threshold(am = stat_adj, type = "threshold", 
     args = args_thr)
 
+## alternatively, use the types "top1", "top2", "mean"
 ## retrieve the feature pairs which have the 100 highest coefficients
 args_top <- list(n = 100)
 ## type = "top1" 
-stat_adj_top1 <- threshold(statistical = stat_adj_l, type = "top1", 
+stat_adj_top1 <- threshold(am = stat_adj, type = "top1", 
     args = args_top)
 
 ## type = "top2"
-stat_adj_top2 <- threshold(statistical = stat_adj_l, type = "top2", 
+stat_adj_top2 <- threshold(am = stat_adj, type = "top2", 
     args = args_top)
  
 ## type = "mean"
-stat_adj_mean <- threshold(statistical = stat_adj_l, type = "mean", 
+stat_adj_mean <- threshold(am = stat_adj, type = "mean", 
     args = args_top)
 ```
 
 # Combining the structural and statistical matrix {#sec-combine}
-After creating the unweighted structural and unweighted statistical adjacency 
-matrices, it is time to combine 
-these two matrices. The function `combine` 
-will combine the matrices to the consensus matrix. The function accepts 
-the arguments `structure` and `statistical` for the list returned 
-by `structural` and the matrix returned 
-by `threshold`,
-respectively, and the argument `threshold`, that is a numerical value 
-(default = 1). After adding the matrices, the entries will be checked if 
-they are greater or equal than `threshold` and the value 1 or 0 will be returned,
-respectively. The argument `threshold` needs to be adjusted by the user 
-if another `method` than `"central.graph"` in 
-`threshold` (`type = "threshold"`) is used. 
+After creating the `structural`  and `statistical` `AdjacencyMatrix` objects, 
+the two objects are combined. The function `combine` 
+will combine these two objects and create an `AdjacencyMatrix` object of type
+`combine`. The function accepts 
+the arguments `am_structural` and `am_statistical` for the respective
+`AdjacencyMatrix` objects. Please note that for `am_structural` the 
+`AdjacencyMatrix` obtained via `structural` or `rtCorrection` can be used,
+while for `am_statistical` the `AdjacencyMatrix` from `threshold` has to be 
+used. 
+The edges that are present both in the `binary` assay and the `consensus` assay
+will be reported within the `combine_binary` assay in a `combine` 
+`AdjacencyMatrix` object. Furthermore, the information on the type of 
+transformation and the mass difference are returned in the 
+assays `"combine_transformation"` and `combine_mass_difference`.
 
-We will use here the unweighted statistical adjacency matrix from 
-`type = "mean"` to combine it with the structural adjacency matrix, `stat_adj`: 
+We will use here the thresholded `statistical` `AdjacencyMatrix` from 
+`type = "mean"` to combine it with the `structural` `AdjacencyMatrix`, 
+`stat_adj`: 
 ```{r combine,eval=TRUE,echo=TRUE}
-cons_adj <- combine(structural = struct_adj, statistical = stat_adj_mean)
+comb_adj <- combine(am_structural = struct_adj, am_statistical = stat_adj_mean)
 ```
 
 # Visualization and further analyses {#sec-visualization}
@@ -430,13 +464,11 @@ tool after exporting the consensus matrix as a text file. In this example,
 we will use the `igraph` [@Csardi2006] package to visualize the 
 adjacency matrix. 
 
-`combine` returns a list of two adjacency matrices, where the 
-first entry contains the unweighted adjacency matrix and the second entry 
-contains a matrix given information on the type of link between features
-based on structural information. Only the first entry of the list will be 
-passed to the `graph_from_adjacency_matrix` function:
+We use here the assay `"combine_binary"` from the `AdjacencyMatrix` of type
+`combine` and pass it to the `graph_from_adjacency_matrix` function:
 ```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.'}
-g <- igraph::graph_from_adjacency_matrix(cons_adj[[1]], mode = "undirected")
+adj <- assay(comb_adj, "combine_binary")
+g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected")
 plot(g, edge.width = 2, vertex.label.cex = 0.5, edge.color = "grey")
 ```
 
