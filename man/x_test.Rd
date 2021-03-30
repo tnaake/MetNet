@@ -4,7 +4,9 @@
 \name{x_test}
 \alias{x_test}
 \title{Example data for \code{MetNet}: data input}
-\format{\code{matrix}}
+\format{
+\code{matrix}
+}
 \source{
 data("peaklist_example", package = "MetNet")
 peaklist[, 3:dim(peaklist)[2]] <- apply(peaklist[, 3:dim(peaklist)[2]], 2,

@@ -2,7 +2,8 @@
 % Please edit documentation in R/statistical.R
 \name{statistical}
 \alias{statistical}
-\title{Create a list of adjacency matrices from statistical methods}
+\title{Create an `AdjacencyMatrix` object containing assays of adjacency 
+matrices from statistical methods}
 \usage{
 statistical(x, model, ...)
 }
@@ -19,19 +20,20 @@ features/metabolites (rows) per sample (columns).}
 `clr`, `aracne`, `correlation` and/or `bayes`}
 }
 \value{
-`list` containing the respective adjacency matrices specified by
-`model`
+`AdjacencyMatrix` containing the respective adjacency matrices in the
+`assay` slot as specified by `model`
 }
 \description{
 The function `statitical` infers adjacency matrix topologies from
-statistical methods and returns matrices of these networks in a `list`. The
+statistical methods and returns matrices of these networks in an
+`AdjacencyMatrix` object. The
 function includes functionality to calculate adjacency matrices based on
 LASSO (L1 norm)-regression, random forests, context likelihood of
 relatedness (CLR), the algorithm for the reconstruction of accurate
 cellular networks (ARACNE), Pearson correlation (also partial and
 semipartial), Spearman correlation (also partial and semipartial)
-and score-based structure learning (Bayes). The function returns a
-list of adjacency matrices that are defined by `model`.
+and score-based structure learning (Bayes). The function returns an
+`AdjacencyMatrix` object of adjacency matrices that are defined by `model`.
 }
 \details{
 The function `statistical` includes functionality to calculate adjacency
@@ -47,11 +49,16 @@ and Constraint-based structure learning (Bayes).
 `correlation` (for `"pearson"`, `"pearson_partial"`, `"pearson_semipartial"`,
 `"spearman"`, `"spearman_partial"`, `"spearman_semipartial"`) and/or `bayes`
 as specified by `model`. It will create adjacency matrices using the
-specified methods and will return a `list` containing the weighted
-adjacency matrices.
+specified methods and will return an `AdjacencyMatrix` containing the weighted
+adjacency matrices in the `assays` slot.
 
 Internally `x` will be z-scaled and the z-scaled object
 will be used in `lasso`, `clr` and/or `aracne`.
+
+The slot `type` is set to `statistical`. The slot `directed` is set to
+`TRUE` if the methods `"lasso"`, `"randomForest"`, or `"bayes"` were used, 
+otherwise `directed` is set to `FALSE`.
+The slot `threshold` is set to `FALSE`.
 }
 \examples{
 data("x_test", package = "MetNet")

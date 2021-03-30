@@ -4,7 +4,9 @@
 \name{mat_test_z}
 \alias{mat_test_z}
 \title{Example data for \code{MetNet}: unit tests}
-\format{\code{matrix}}
+\format{
+\code{matrix}
+}
 \source{
 set.seed(1)
 random_numbers <- rnorm(140, mean = 10, sd = 2)

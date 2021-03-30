@@ -20,23 +20,32 @@ and `"mass"` that will be used for detection of transformation of
 
 \item{directed}{`logical`, if `TRUE` absolute values of m/z differences will be
 taken to query against `transformation`  (irrespective the sign of `mass`)
-and an undirected adjacency matrix will be returned, if `FALSE` a directed
-adjacency matrix will be returned with links reported that match the
-transformations defined in `transformation` (respecting the sign of `mass`)}
+and undirected adjacency matrices will be returned as the respective
+assays. if `FALSE` directed
+adjacency matrices will be returned with links reported that match the
+transformations defined in `transformation` (respecting the sign of `mass`).
+The `directed` slot of the returned `AdjacencyMatrix` object will contain
+the information on `directed`.}
 }
 \value{
-`list` containing two matrices. The first entry stores the `numeric`
-`matrix` with edges inferred from mass differences. The second entry
+`AdjacencyMatrix` object. The object will store the adjacency matrices
+in the assay slots. The first entry stores the `numeric`
+`matrix` with binary edges inferred from mass differences. The second entry
 stores the `character` `matrix` with the type (corresponding to the
-`"group"` column in `transformation`) is stored
+`"group"` column in `transformation`) is stored. The third entry
+stores the `character` `matrix` with the `mass_difference` information
+(corresponding to the `"mass"` column in `transformation`).
 }
 \description{
 The function `structural` infers an unweighted
 adjacency matrix using differences in m/z values that are matched against a
 `data.frame` of calculated theoretical differences of
 loss/addition of functional groups. `structural` returns
-the unweighted `numeric` `matrix` together with a `character` `matrix` with
-the type of loss/addition as a list at the specific positions.
+an `AdjacencyMatrix` object containing
+the unweighted `numeric` `matrix` (assay `binary`), together with a 
+`character` `matrix` with the type of loss/addition (assay `transformation`), 
+and the `character` `matrix` with the mass differences (assay 
+`mass_difference`).
 }
 \details{
 `structural` accesses the column `"mz"` of
@@ -46,6 +55,12 @@ the dataset `x`, the user can specify the accuracy of m/z features
 in parts per million (ppm) by the `ppm` argument. The m/z values in the
 `"mz"` column of `x`" will be converted to m/z ranges according to
 the `ppm` argument (default `ppm = 5`).
+
+The returned `AdjacencyMatrix` object contains the assays 
+`binary`, `transformation`, and `mass_difference`. The `type` slot is
+set to `structural`. The `directed` slot is set accordingly to the 
+`directed` argument of the function `structural`.
+The `thresholded` slot is set to `FALSE`
 }
 \examples{
 data("x_test", package = "MetNet")
@@ -56,9 +71,10 @@ transformation <- rbind(
 transformation <- data.frame(group = transformation[, 1],
                                 formula = transformation[, 2],
                                 mass = as.numeric(transformation[, 3]))
-struct_adj <- structural(x_test, transformation, ppm = 5, directed = TRUE)
+am_struct <- structural(x_test, transformation, ppm = 5, directed = TRUE)
 
 }
 \author{
-Thomas Naake, \email{thomasnaake@googlemail.com}
+Thomas Naake, \email{thomasnaake@googlemail.com} and 
+Liesa Salzer \email{liesa.salzer@helmholtz-muenchen.de}
 }

@@ -2,55 +2,62 @@
 % Please edit documentation in R/combine.R
 \name{combine}
 \alias{combine}
-\title{Combine structural and statistical adjacency matrix}
+\title{Combine structural and statistical `AdjacencyMatrix` objects}
 \usage{
-combine(structural, statistical, threshold = 1)
+combine(am_structural, am_statistical)
 }
 \arguments{
-\item{structural}{list containing `numeric` structural adjacency matrix in
-the first entry and `character` structural adjanceny matrix in the second
-entry}
+\item{am_structural}{`AdjacencyMatrix` containing `numeric` structural 
+adjacency matrices (assays `binary`, `transformation`, and 
+`mass_difference`).}
 
-\item{statistical}{matrix containing `numeric` statistical adjacency matrix}
-
-\item{threshold}{numeric, threshold value to be applied to define a
-connection as present}
+\item{am_statistical}{`AdjacencyMatrix` containing the assay `consensus`}
 }
 \value{
-`list`, in the first entry `matrix` of type `numeric`containing the
-consensus adjacency matrix as described
-above harbouring connections reported by the structual and
-statistcal adjacency matrices. In the second entry a `matrix` of type
-`character` the corresonding type/putative link at this position.
+`AdjacencyMatrix` object containing the assays
+`combine_binary` (`numeric` adjacency matrix), 
+`combine_transformation` (`character` adjacency matrix), and 
+`combine_mass_difference` (`character` adjacency matrix). 
+
+The `AdjacencyMatrix` object will also contain all other assays contained
+in `am_structural` and `am_statistical`.
 }
 \description{
 The function `combine` takes as
-input the structural and statistical adjacency matrix, created in former
-steps, adds them together and will report a connection between metabolites
-in the returned when the sum exceeds the `threshold`.
-\code{combine} returns this consensus matrix supported
-by the structural and statistical adjacency matrices.
+input the structural and statistical `AdjacencyMatrix` objects, created in former
+steps. It will access the assays `binary` and `consensus`, adds them 
+together and will report a connection between metabolites
+if the edge is present in both matrices. 
+
+`combine` returns an `AdjacencyMatrix` containing this consensus matrix 
+supported by the structural and statistical adjacency matrices (assays
+`combine_binary`, `combine_transformation`, and `combine_mass_difference`.
 }
 \details{
-The matrices will be added and a unweighted connection will
-be reported when the value exceeds a certain value.
+The matrices from the assays `binary` and `consensus` will be added 
+and an unweighted connection will
+be reported when the edges are respectively present in both `binary` and 
+`consensus`.
 }
 \examples{
 data("x_test", package = "MetNet")
 x_test <- as.matrix(x_test)
-functional_groups <- rbind(
+transformation <- rbind(
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
-functional_groups <- data.frame(group = functional_groups[, 1],
-     formula = functional_groups[, 2],
-     mass = as.numeric(functional_groups[, 3]))
-struct_adj <- structural(x_test, functional_groups, ppm = 5)
-stat_adj_l <- statistical(x_test,
-    model = c("pearson", "spearman"),
+transformation <- data.frame(group = transformation[, 1],
+     formula = transformation[, 2],
+     mass = as.numeric(transformation[, 3]))
+     
+am_struct <- structural(x_test, transformation, ppm = 5)
+x_test_cut <- as.matrix(x_test[, -c(1:2)])
+am_stat <- statistical(x_test_cut, model = c("pearson", "spearman"),
     correlation_adjust = "bonferroni")
-stat_adj <- threshold(stat_adj_l, type = "top2", args = list(n = 10))
-combine(struct_adj, stat_adj)
+am_stat <- threshold(am_stat, type = "top2", args = list(n = 10))
+
+## combine
+combine(am_structural = am_struct, am_statistical = am_stat)
 
 }
 \author{

@@ -32,7 +32,7 @@ x <- as.matrix(x)
 cor_pearson <- correlation(x, type = "pearson")
 cor_spearman <- correlation(x, type = "spearman")
 l <- list(pearson = cor_pearson)
-MetNet:::addToList(l, "spearman", cor_spearman)
+MetNet:::addToList(l, "spearman_coef", cor_spearman$r)
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}

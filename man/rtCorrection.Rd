@@ -2,16 +2,21 @@
 % Please edit documentation in R/structural.R
 \name{rtCorrection}
 \alias{rtCorrection}
-\title{Correct connections in the structural adjacency matrix by
+\title{Correct connections in the structural adjacency matrices by
 retention time}
 \usage{
-rtCorrection(structural, x, transformation)
+rtCorrection(am, x, transformation)
 }
 \arguments{
-\item{structural}{`list` returned by the function `structural`. The first entry
-stores the `numeric` matrix with edges inferred by mass
-differences. The second entry stores the `character` matrix with the type
-(corresponding to the `"group"` column in `transformation`).}
+\item{am}{`AdjacencyMatrix` object returned by the function `structural`. 
+The object contains the assays `"binary"`, `"transformation"`, and 
+`"mass_difference"`. 
+The assay `"binary"` stores the `numeric` matrix with edges inferred by mass
+differences. 
+The assay `"transformation"` stores the `character` matrix with the type 
+(corresponding to the `"group"` column in `transformation`).
+The assay `"mass_difference"` stores the `character` matrix with the type 
+(corresponding to the `"mass"` column in `transformation`).}
 
 \item{x}{`matrix`, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values, `x` contains the
@@ -24,7 +29,11 @@ and `"rt"` that will be used for correction of transformation of
 (functional) groups based on retention time shifts derived from `x`}
 }
 \value{
-`list` containing two matrices. The first entry stores the
+`AdjacencyMatrix` containing the slots `binary`, `transformation`, and 
+`mass_difference`.
+The slot `directed` is inherited from `am`
+
+. The first entry stores the
 `numeric` `matrix` with edges inferred mass differences corrected by
 retention time shifts. The second entry stores the `character` matrix with
 the type (corresponding to the `"group`" column
@@ -41,15 +50,15 @@ fit the expected behaviour, the connection will be removed (otherwise
 sustained).
 }
 \details{
-`rtCorrection` is used to correct the unweighted adjacency matrix
+`rtCorrection` is used to correct the (unweighted) adjacency matrices
 returned by `structural` when information is available
 about the retention time and shifts when certain transformation occur
 (it is meant to filter out connections that were created by
 m/z differences that have by chance the same m/z difference but
 different/unexpected retention time behaviour).
 
-`rtCorrection` accesses the second list element of
-`structural` and matches the elements in the `"group"` column
+`rtCorrection` accesses the assay `transformation` of 
+`am` and matches the elements in the `"group"` column
 against the character matrix. In case of matches, `rtCorrection`
 accesses the `"rt"` column of `x` and calculates the retention
 time difference between the features. `rtCorrection` then checks
@@ -68,12 +77,13 @@ transformation <- rbind(
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315", "-"),
     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851", "-"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945", "-"))
-transformation <- data.frame(group = transformation[,1 ],
-                                formula = transformation[,2 ],
-                                mass = as.numeric(transformation[,3 ]),
-                                rt = transformation[, 4])
-struct_adj <- structural(x_test, transformation, ppm = 5)
-struct_adj_rt <- rtCorrection(struct_adj, x_test, transformation)
+transformation <- data.frame(group = transformation[, 1],
+         formula = transformation[, 2],
+         mass = as.numeric(transformation[, 3]),
+         rt = transformation[, 4])
+am_struct <- structural(x = x_test, transformation = transformation, ppm = 5)
+am_struct_rt <- rtCorrection(am = am_struct, x = x_test, 
+     transformation = transformation)
 
 }
 \author{

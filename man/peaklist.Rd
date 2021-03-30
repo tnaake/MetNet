@@ -4,7 +4,9 @@
 \name{peaklist}
 \alias{peaklist}
 \title{Example data for \code{MetNet}: data input}
-\format{\code{data.frame}}
+\format{
+\code{data.frame}
+}
 \source{
 Internal peaklist from metabolite profiling of Nicotiana species
 after W+OS and MeJA treatment. The data was processed by \code{xcms} and

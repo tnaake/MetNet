@@ -4,7 +4,7 @@
 \alias{correlation}
 \title{Create an adjacency matrix based on correlation}
 \usage{
-correlation(x, type = "pearson", use = "pairwise.complete.obs")
+correlation(x, type = "pearson")
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features
@@ -12,10 +12,6 @@ correlation(x, type = "pearson", use = "pairwise.complete.obs")
 
 \item{type}{`character`, either "pearson", "spearman", "pearson_partial",
 "spearman_partial", "pearson_semipartial" or "spearman_semipartial".}
-
-\item{use}{`character` string giving a method for computing covariance in the
-presence of missing values, Only for `type = "pearson"` or
-`type = "spearman"`. For further information see `?stats::cor`}
 }
 \value{
 matrix, matrix with edges inferred from correlation algorithm

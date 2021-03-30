@@ -4,55 +4,77 @@
 \alias{threshold}
 \title{Threshold the statistical adjacency matrices}
 \usage{
-threshold(statistical, type, args, values = c("all", "min", "max"), ...)
+threshold(
+  am,
+  type = c("threshold", "top1", "top2", "mean"),
+  args,
+  values = c("all", "min", "max")
+)
 }
 \arguments{
-\item{statistical}{`list` containing adjacency matrices}
+\item{am}{`AdjacencyMatrix` object of `type` `"statistical"` as 
+created from the function `statistical`. The object will contain the
+adjacency matrices in the `assay` slot.}
 
 \item{type}{`character`, either `"threshold"`, `"top1`, `"top2` or
 `"mean"`}
 
-\item{args}{`list` of arguments, has to contain thresholds for weighted
-adjacency matrices depending on the statistical model
-(a named list, where names are identical to `model`s in `statistical`)
-or a numerical
-vector of length 1 that denotes the number of top ranks written to the
-consensus matrix (a named list with entry `n`)}
+\item{args}{`list`. Depending on the `type` arguments the list element
+will be different. 
+
+In the case of `type == "threshold"`, `args` has the 
+entry `filter` (`character` of length 1). The character vector will specify the 
+kind of filtering applied to the adjacency matrices. Elements in `filter`
+will refer to the `assayNames`, e.g. 
+`list(filter = "pearson_coef > 0.8")` will retain all edges with Pearson
+correlation coefficients > 0.8. 
+`list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all 
+edges with Pearson correlation coefficients > 0.8 AND Spearman correlation
+coefficients > 0.5. 
+`list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all 
+edges with Pearson correlation coefficients > 0.8 and < -0.8.
+
+In the case of `type == "top1"`, `type == "top2"`, or `type == "mean"`, 
+`args` has the entry `n` (`numeric` of length 1), that 
+denotes the number of top ranks written to the
+consensus matrix.}
 
 \item{values}{`character`, take from the adjacency matrix all values ("all"),
 the minimum of the pairs ("min") or the maximum ("max")
 a^*_{ij} = min(a_ij, a_ji)
 a^*_{ij} = max(a_ij, a_ji)}
-
-\item{...}{parameters passed to the function `consensus` in the
-`sna` package (only for `type = "threshold"`)}
 }
 \value{
-`matrix`, binary adjacency matrix given the links supported by the
-`type` and the `args`
+`AdjacencyMatrix` object containing a binary adjacency matrix
+given the links supported by the `type` and the `args` (in the slot 
+`"consensus"`. The object will furthermore contain the supplied data input,
+i.e. all assays from `am`. The slot `threshold` is set to `TRUE`.
 }
 \description{
-The function `threshold` takes as input a list of adjacency matrices
+The function `threshold` takes as input an `AdjacencyMatrix` object 
+containing adjacency matrices
 as returned from the function `statistical`. Depending on the `type`
-argument, 'threshold` will identify the strongest link that are
+argument, `threshold` will identify the strongest link that are
 lower or higher a certain threshold (`type = "threshold"`) or
 identify the top `n` links (`type` either `"top1`, `"top2` or `"mean"`).
+It will return this kind of information as a binary matrix in the form
+of an `AdjacencyMatrix` object.
 }
 \details{
-The entries of `args` differ depending on the argument `type`.
-If `type = "treshhold"`, then `args` has to contain numeric vector of
-length 1 with names equal to `names(statistical)` for each `model`
-(`names(statistical)`) and the entry `threshold`, a numerical `vector(1)`
-to threshold the consensus
-matrix after using the `consensus` function from the `sna` package.
-Depending on the chosen `method` in `consensus`, the `threshold` value of the
-consensus adjacency matrix should be chosen accordingly to report a
-connection by different statistical modelss.
+`values` has to be set carefully depending on if the `AdjacencyMatrix` object
+`am` is `directed` or not.
 
-When combining the adjacency matrices the
-`threshold` value defines if an edge is reported or not. For
-`method = "central.graph"` threshold should be set to 1 by default. For other
-values of `method`, the value should be carefully defined by the user.
+In the case of `type == "threshold"`, `args` has the 
+entry `filter` (`character` of length 1). The character vector will specify the 
+kind of filtering applied to the adjacency matrices. Elements in `filter`
+will refer to the `assayNames`, e.g. 
+`list(filter = "pearson_coef > 0.8")` will retain all edges with Pearson
+correlation coefficients > 0.8. 
+`list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all 
+edges with Pearson correlation coefficients > 0.8 AND Spearman correlation
+coefficients > 0.5. 
+`list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all 
+edges with Pearson correlation coefficients > 0.8 and < -0.8.
 
 If  `type` is equal to `"top1"`, `"top2"` or
 `"mean"`, then `args` has to contain a numeric vector of length 1 that
@@ -63,10 +85,10 @@ set to `NaN`; values from correlation (Pearson and Spearman, including
 for partial and semipartial correlation) and `clr` and `aracne` are
 taken as they are.
 
-For `type = "top1"`, the best (i.e. lowest) rank in `statistical` is taken.
+For `type = "top1"`, the best (i.e. lowest) rank in `am` is taken.
 For `type = "top2"`, the second best (i.e. second lowest) rank in
-`statistical` is taken.
-For `type = "mean"`, the average rank in `statistical` is taken.
+`am` is taken.
+For `type = "mean"`, the average rank in `am` is taken.
 Subsequently the first `n` unique ranks are returned.
 }
 \examples{
@@ -74,22 +96,23 @@ data("x_test", package = "MetNet")
 x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 model <- c("pearson", "spearman")
-args <- list("pearson" = 0.95, "spearman" = 0.95, n = 10)
-l <- statistical(x, model = model)
+args <- list()
+am_stat <- statistical(x, model = model)
 
 ## type = "threshold"
-args <- list("pearson" = 0.95, "spearman" = 0.95, threshold = 1)
-threshold(statistical = l, type = "threshold", args = args)
+args <- list(filter = "pearson_coef > 0.95 & spearman_coef > 0.95")
+threshold(am = am_stat, type = "threshold", args = args)
 
 ## type = "top1"
 args <- list(n = 10)
-threshold(statistical = l, type = "top1", args = args)
+threshold(am = am_stat, type = "top1", args = args)
 
 ## type = "top2"
-threshold(statistical = l, type = "top2", args = args)
+threshold(am = am_stat, type = "top2", args = args)
 
 ## type = "mean"
-threshold(statistical = l, type = "mean", args = args)
+threshold(am = am_stat, type = "mean", args = args)
+
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}
