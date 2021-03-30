@@ -469,7 +469,7 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
 #' cor_pearson <- correlation(x, type = "pearson")
 #' cor_spearman <- correlation(x, type = "spearman")
 #' l <- list(pearson = cor_pearson)
-#' MetNet:::addToList(l, "spearman", cor_spearman)
+#' MetNet:::addToList(l, "spearman_coef", cor_spearman$r)
 addToList <- function(l, name, object) {
 
     ## test validity of objects
@@ -657,7 +657,7 @@ statistical <- function(x, model, ...) {
         res <- threeDotsCall("correlation", x = x,
             type = "pearson_semipartial", ...)
         pearson_sp_coef <- res[["estimate"]]
-        diag(pearson_sp_pvalue) <- NaN
+        diag(pearson_sp_coef) <- NaN
         pearson_sp_pvalue <- res[["p.value"]]
         diag(pearson_sp_pvalue) <- NaN
         l <- addToList(l, "pearson_semipartial_coef", pearson_sp_coef)
@@ -714,8 +714,12 @@ statistical <- function(x, model, ...) {
     rD <- DataFrame(names = rownames(l[[1]]))
     rownames(rD) <- rownames(l[[1]])
     
-    directed <- if (c("lasso", "randomForest", "bayes") %in% model) TRUE else FALSE
-    
+    directed <- if (any(c("lasso", "randomForest", "bayes") %in% model)) {
+        TRUE
+    } else {
+        FALSE
+    }
+
     adj <- AdjacencyMatrix(l, rowData = rD,
         type = "statistical", directed = directed, thresholded = FALSE)
     
@@ -891,7 +895,7 @@ getLinks <- function(mat, exclude = "== 1") {
 #' @importFrom rlang parse_expr
 threshold <- function(am, 
     type = c("threshold", "top1", "top2", "mean"), 
-    args, values = c("all", "min", "max"), ...) {
+    args, values = c("all", "min", "max")) {
 
     ## check match.arg for values
     type <- match.arg(type)
@@ -985,7 +989,7 @@ threshold <- function(am,
                 res <- getLinks(l_x, exclude = "== 0")
             }
             if (grepl(name_x, 
-                pattern = "pearson_coef|spearman_coef|clr_coef|aracne_coef")) {
+                pattern = "pearson_coef|pearson_partial_coef|pearson_semipartial_coef|spearman_coef|spearman_partial_coef|spearman_semipartial_coef|clr_coef|aracne_coef")) {
                 
                 res <- getLinks(l_x, exclude = NULL)
             }
@@ -1019,7 +1023,7 @@ threshold <- function(am,
     assay(am, "consensus") <- cons
     
     if (type %in% c("top1", "top2", "mean") & values %in% c("min", "max")) 
-        directed(assay) <- FALSE
+        am@directed <- FALSE
     am@thresholded <- TRUE
     
     return(am)

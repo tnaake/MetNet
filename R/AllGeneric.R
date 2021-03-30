@@ -1,6 +1,7 @@
 ##' @title Placeholder for generics functions documentation
 ##'
 ##' @name AllGenerics
+##' 
 ##' @rdname AllGenerics
 NULL
 
@@ -9,69 +10,57 @@ NULL
 ### Accessors
 ###
 
-#' @name length.AdjacencyMatrix
-#' 
-#' @aliases length
+#' @name AdjacencyMatrix-class
 #' 
 #' @rdname AdjacencyMatrix-class
 #' 
-#' @title Return length of `AdjacencyMatrix` object
-#' 
-#' @description 
-#' `length` will return the length of an `AdjacencyMatrix` object
-#' (number of rows of an assay).
-#' 
-#' @param x an instance of class `AdjacencyMatrix`
-#' 
-#' @return `numeric` of length ``
+#' @title Methods for `AdjacencyMatrix` objects
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+NULL
+
+#' @rdname AdjacencyMatrix-class
+#' 
+#' @description 
+#' `length` returns the length of an `AdjacencyMatrix` object
+#' (number of rows of an assay). `length` returns a `numeric` of length 1.
+#' 
+#' @param x an instance of class `AdjacencyMatrix`
 #' 
 #' @exportMethod length
 setMethod("length", "AdjacencyMatrix",
     function(x) nrow(assay(x, 1))
 )
 
-#' @name dim.AdjacencyMatrix
+ 
+#' @rdname AdjacencyMatrix-class
 #' 
 #' @aliases dim
 #' 
-#' @rdname AdjacencyMatrix-class
-#' 
-#' @title Return dimension of `AdjacencyMatrix` object
-#' 
 #' @description 
-#' `dim` will return the length of an `AdjacencyMatrix` object
-#' (number of rows of an assay, number of cols of an assay).
+#' `dim` returns the length of an `AdjacencyMatrix` object
+#' (number of rows of an assay, number of cols of an assay). `dim` returns
+#' a `numeric` of length 2.
 #' 
 #' @param x an instance of class `AdjacencyMatrix`
-#' 
-#' @return `numeric` of length 2
-#' 
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
 #' @exportMethod dim
 setMethod("dim", "AdjacencyMatrix",
     function(x) c(nrow(assay(x, 1)), ncol(assay(x, 1)))
 )
 
-#' @name type.AdjacencyMatrix
+setGeneric("type",
+    function(x) standardGeneric("type"))
+
+#' @rdname AdjacencyMatrix-class
 #' 
 #' @aliases type
 #' 
-#' @rdname AdjacencyMatrix-class
-#' 
-#' @title Return type of `AdjacencyMatrix` object
-#' 
 #' @description 
 #' `type` will return the type of an `AdjacencyMatrix` (`statistical`, 
-#' `structural` or `combine`).
+#' `structural` or `combine`). `type` returns a `character` of length 1
 #' 
 #' @param x instance of class `AdjacencyMatrix`
-#' 
-#' @return `character` of length 1
-#' 
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
 #' @exportMethod type
 setMethod("type", "AdjacencyMatrix",
@@ -80,22 +69,16 @@ setMethod("type", "AdjacencyMatrix",
 setGeneric("directed",
     function(object) standardGeneric("directed"))
 
-#' @name directed.AdjacencyMatrix
+#' @rdname AdjacencyMatrix-class
 #' 
 #' @aliases directed
 #' 
-#' @title Return the information on directed of an `AdjacencyMatrix`
-#' 
-#' @rdname AdjacencyMatrix-class
-#' 
 #' @description 
-#' `directed` will return the information on directed of an `AdjacencyMatrix`
+#' `directed` returns the information on directed of an `AdjacencyMatrix`, i.e.
+#' if the underlying graph is directed or undirected.
+#' `directed` returns `logical` of length 1.
 #' 
 #' @param object instance of class `AdjacencyMatrix`
-#' 
-#' @return `character` of length 1
-#' 
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
 #' @exportMethod directed
 setMethod("directed", "AdjacencyMatrix",
@@ -104,22 +87,17 @@ setMethod("directed", "AdjacencyMatrix",
 setGeneric("thresholded",
     function(object) standardGeneric("thresholded"))
 
-#' @name thresholded.AdjacencyMatrix
+#' @rdname AdjacencyMatrix-class
 #' 
 #' @aliases thresholded
 #' 
-#' @title Return the information on thresholded of an `AdjacencyMatrix`
-#' 
-#' @rdname AdjacencyMatrix-class
-#' 
 #' @description 
-#' `thresholded` will return the information on directed of an `AdjacencyMatrix`
+#' `thresholded` returns the information if the adjacency matrix is 
+#' thresholded, i.e. if the function `rtCorrection` or `threshold` was applied
+#' to the `AdjacencyMatrix` object. `thresholded` returns a `logical` of length 
+#' 1.
 #' 
 #' @param object instance of class `AdjacencyMatrix`
-#' 
-#' @return `logical` of length 1
-#' 
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
 #' @exportMethod thresholded
 setMethod("thresholded", "AdjacencyMatrix",
@@ -130,23 +108,20 @@ setMethod("thresholded", "AdjacencyMatrix",
 ###
 ### Show
 ###
-
-#' @name show.AdjacencyMatrix
-#' 
+#' @rdname AdjacencyMatrix-class
+#'
 #' @aliases show
 #' 
-#' @rdname AdjacencyMatrix-class
-#' 
-#' @title show method for object of class `AdjacencyMatrix`
-#' 
 #' @description 
-#' `show` will print summary information on an object of class `AdjacencyMatrix`
+#' `show` prints summary information on an object of class 
+#' `AdjacencyMatrix`.
 #' 
 #' @param object instance of class `AdjacencyMatrix`
 #' 
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#' 
 #' @exportMethod show
+#' 
+#' @importFrom S4Vectors coolcat
+#' @importFrom methods show
 setMethod("show", "AdjacencyMatrix",
     function(object) {
           
@@ -192,30 +167,23 @@ setMethod("show", "AdjacencyMatrix",
 ###
 ### as.data.frame
 ###
-#' @name as.data.frame.AdjacencyMatrix
-#' 
-#' @aliases as.data.frame
-#' 
+
 #' @rdname AdjacencyMatrix-class
-#' 
-#' @title Return `data.frame` of adjacency matrices
-#' 
+#'
+#' @aliases as.data.frame
+#'
 #' @description 
 #' `as.data.frame` returns the adjacency matrices (stored in the `assays` slot)
 #' and returns information on the nodes and the associated information on 
-#' edges as a data frame.
+#' edges as a data frame. `as.data.frame` returns a `data.frame`.
 #' 
 #' @param x instance of class `AdjacencyMatrix` 
-#' 
-#' @return `data.frame`
-#' 
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
 #' @export
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble rownames_to_column
-#' @importFrom dplyr select
+#' @importFrom dplyr select `%>%`
 setMethod("as.data.frame", "AdjacencyMatrix",
     function(x) {
               
@@ -232,14 +200,16 @@ setMethod("as.data.frame", "AdjacencyMatrix",
         l <- lapply(seq_along(l), function(i) l[[i]] %>%
             as.data.frame() %>%
             rownames_to_column(var = "Row") %>%
-            pivot_longer(-Row, names_to = "Col", values_to = .nms[i]) %>%
-            ## remove rows with NA (directed(x) == FALSE)
-            filter(., !is.na(get(.nms[i]))))
+            pivot_longer(-"Row", names_to = "Col", values_to = .nms[i]))
+            
         
         tbl <- dplyr::select(l[[1]], "Row", "Col")
         l <- lapply(l, function(x) x[, 3])
         df <- do.call("cbind", l)
         df <- cbind(tbl, df)
+        
+        ## remove rows with NA (directed(x) == FALSE)
+        df <- df[!apply(df[, .nms], 1, function(x) all(is.na(x))), ]
                 
         return(df)
     }

@@ -49,10 +49,12 @@
 #'      mass = as.numeric(transformation[, 3]))
 #'      
 #' am_struct <- structural(x_test, transformation, ppm = 5)
-#' am_stat <- statistical(x_test, model = c("pearson", "spearman"),
+#' x_test_cut <- as.matrix(x_test[, -c(1:2)])
+#' am_stat <- statistical(x_test_cut, model = c("pearson", "spearman"),
 #'     correlation_adjust = "bonferroni")
-#' 
 #' am_stat <- threshold(am_stat, type = "top2", args = list(n = 10))
+#' 
+#' ## combine
 #' combine(am_structural = am_struct, am_statistical = am_stat)
 #'
 #' @export
@@ -65,16 +67,13 @@ combine <- function(am_structural, am_statistical) {
         stop("'am_structural' must be a valid 'AdjacencyMatrix' object")
     
     if (!is(am_statistical, "AdjacencyMatrix")) 
-        stop("'am_structural' is not an 'AdjacencyMatrix' object")
+        stop("'am_statistical' is not an 'AdjacencyMatrix' object")
     
     if (!validObject(am_statistical)) 
-        stop("'am_structural' must be a valid 'AdjacencyMatrix' object")
+        stop("'am_statistical' must be a valid 'AdjacencyMatrix' object")
     
     if (!("consensus" %in% assayNames(am_statistical))) 
         stop("'am_statistical' must contain assay 'consensus'")
-    
-    ## create list to store results
-    res <- list()
 
     ## create the first entry of the list
     ## sum the matrices structural and statistical, if the value is above
@@ -93,16 +92,33 @@ combine <- function(am_structural, am_statistical) {
     mat_mass <- ifelse(mat_bin == 1, assay(am_structural, "mass_difference"), "")
     
     ## create the AdjacencyMatrix object
-    l <- list(combine_binary = mat_bin, combine_transformation = mat_type, 
-        combine_mass_difference = mat_mass)
-    rD <- DataFrame(names = rownames(mat_bin), row.names = rownames(mat_bin))
+    am <- am_statistical
+    assay(am, "binary") <- assay(am_structural, "binary")
+    assay(am, "transformation") <- assay(am_structural, "transformation")
+    assay(am, "mass_difference") <- assay(am_structural, "mass_difference")
+    assay(am, "combine_binary") <- mat_bin
+    assay(am, "combine_transformation") <- mat_type
+    assay(am, "combine_mass_difference") <- mat_mass    
     
-    directed <- if (directed(am_structural) | directed(am_statistical)) TRUE else FALSE
-    thresholded <- if (thresholded(am_structural) | thresholded(am_statistical)) TRUE else FALSE
+    ## directed slot
+    directed <- if (directed(am_structural) | directed(am_statistical)) {
+        TRUE 
+    } else {
+        FALSE
+    }
+    am@directed <- directed
     
-    am <- AdjacencyMatrix(l, rowData = rD, type = "combine", 
-        directed = directed, thresholded = thresholded)
+    ## thresholded slot
+    thresholded <- if (thresholded(am_structural) | thresholded(am_statistical)) {
+        TRUE 
+    } else {
+        FALSE
+    }
+    am@thresholded <- thresholded
+    
+    ## type slot
+    am@type <- "combine"
     
     return(am)
-    
 }
+

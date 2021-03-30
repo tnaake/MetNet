@@ -237,13 +237,13 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 #'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315", "-"),
 #'     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851", "-"),
 #'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945", "-"))
-#' transformation <- data.frame(group = transformation[,1 ],
+#' transformation <- data.frame(group = transformation[, 1],
 #'          formula = transformation[, 2],
 #'          mass = as.numeric(transformation[, 3]),
 #'          rt = transformation[, 4])
 #' am_struct <- structural(x = x_test, transformation = transformation, ppm = 5)
 #' am_struct_rt <- rtCorrection(am = am_struct, x = x_test, 
-#      transformation = transformation)
+#'      transformation = transformation)
 #'
 #' @export
 rtCorrection <- function(am, x, transformation) {

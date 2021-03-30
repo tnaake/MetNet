@@ -23,7 +23,9 @@
 #' class generator function for class `AdjacencyMatrix`
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#'
+#' 
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom SummarizedExperiment assay `assay<-` assays assayNames
 .AdjacencyMatrix <- setClass("AdjacencyMatrix",
     contains = c("SummarizedExperiment"),
     slots = c(
@@ -84,12 +86,10 @@
 #' @examples
 #' binary <- matrix(0, ncol = 10, nrow = 10)
 #' type <- matrix("", ncol = 10, nrow = 10)
-#' mass_differene("", ncol = 10, nrow = 10)
+#' mass_difference <- matrix("", ncol = 10, nrow = 10)
 #' 
-#' rownames(binary) <- rownames(type) <- rownames(mass_difference) <- 
-#'     paste("feature", 1:10)
-#' colnames(binary) <- rownames(type) <- rownames(mass_difference) <- 
-#'     paste("feature", 1:10)
+#' rownames(binary) <- rownames(type) <- rownames(mass_difference) <- paste("feature", 1:10)
+#' colnames(binary) <- rownames(type) <- rownames(mass_difference) <- paste("feature", 1:10)
 #' 
 #' binary[5, 4] <- 1
 #' type[5, 4] <- "glucose addition"
@@ -105,13 +105,14 @@
 #'     directed = TRUE, thresholded = FALSE)
 #'
 #' @export
+#' 
+#' @importFrom SummarizedExperiment SummarizedExperiment assays 
+#' @importFrom methods new is
 AdjacencyMatrix <- function(adj_l, rowData, 
     type = c("structural", "statistical", "combine"), 
     directed = c(TRUE, FALSE), thresholded = c(TRUE, FALSE)) {
     
     type <- match.arg(type)
-    directed <- match.arg(directed)
-    thresholded <- match.arg(thresholded)
     
     se <- SummarizedExperiment(adj_l, rowData = rowData, colData = rowData)
     .AdjacencyMatrix(se, type = type, directed = directed, 
@@ -122,6 +123,9 @@ AdjacencyMatrix <- function(adj_l, rowData,
 ### 
 ### Validity
 ###
+#' @importFrom S4Vectors setValidity2
+#' @importFrom SummarizedExperiment assay assays assayNames
+#' @importFrom methods validObject
 setValidity2("AdjacencyMatrix", function(object) {
     msg <- NULL
     
@@ -157,7 +161,8 @@ setValidity2("AdjacencyMatrix", function(object) {
     if (type_obj == "structural" | type_obj == "combine") {
         
         if (!all(valid_names_struct %in% assayNames(object)))
-            msg <- c(msg, "assay names must be 'binary', 'transformation', 'mass_difference'")
+            msg <- c(msg, 
+                "assay names must be 'binary', 'transformation', 'mass_difference'")
         
         .obj <- assay(object, "binary")
         if (!is.numeric(.obj))
@@ -174,13 +179,14 @@ setValidity2("AdjacencyMatrix", function(object) {
     
     if (type_obj == "statistical" | type_obj == "combine") {
         
-        if (any(!(assayNames(object) %in% valid_names_stat)))
-            msg <- c(msg, "assay names contain invalid entries")
-        
         .nms <- assayNames(object)
         
         if (type_obj == "combine")
-            .nms <- .nms[!(.nms %in% c("binary", "type", "mass_difference"))]
+            .nms <- .nms[!(.nms %in% c("binary", "transformation", "mass_difference",
+                "combine_binary", "combine_transformation", "combine_mass_difference"))]
+        
+        if (any(!(.nms %in% valid_names_stat)))
+            msg <- c(msg, "assay names contain invalid entries")
         
         assay_num <- lapply(seq_along(.nms),
                                     function(i) is.numeric(assay(object, i)))
@@ -192,7 +198,7 @@ setValidity2("AdjacencyMatrix", function(object) {
         
         if (!all(valid_names_combine %in% assayNames(object)))
             msg <- c(msg, 
-                "assay names must be 'comine_binary', 'combine_transformation', 'combine_mass_difference'")
+                "assay names must be 'combine_binary', 'combine_transformation', 'combine_mass_difference'")
         
         .obj <- assay(object, "combine_binary")
         if (!is.numeric(.obj))
@@ -232,6 +238,8 @@ setValidity2("AdjacencyMatrix", function(object) {
 #' @return `logical` of length 1
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' 
+#' @importFrom S4Vectors getListElement
 .assays_have_identical_dimnames <- function(object) {
     .assays <- assays(object)
     a_1 <- getListElement(.assays, 1)
