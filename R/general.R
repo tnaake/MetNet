@@ -54,9 +54,9 @@ mz_summary <- function(x, filter = F, ...){
   x_df <- as.data.frame(x)
   x_df <- x_df[x_df$binary == 1, ]
 
-    sum_mass <- x_df %>% group_by(`mass_difference`) %>% summarise(count=n()) %>%
+    sum_mass <- x_df %>% group_by(`mass_difference`) %>%  dplyr::summarise(count=n()) %>%
       as.data.frame()
-    sum_transform <- x_df %>% group_by(`transformation`) %>% summarise(count=n()) %>%
+    sum_transform <- x_df %>% group_by(`transformation`) %>% dplyr::summarise(count=n()) %>%
       as.data.frame()  %>% add_column(sum_mass$`mass_difference`)
     colnames(sum_transform) <- c("transformation", "counts", "mass_difference")
     sum_transform <- sum_transform %>% select(transformation, `mass_difference`, counts)
