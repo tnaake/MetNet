@@ -312,6 +312,22 @@ struct_adj <- rtCorrection(am = struct_adj, x = x_test,
 ```
 in the `R` console. 
 
+Some overview on the mass-difference distribution of the data can be observed using the `mz_summary` function. For larger data-sets, also a `filter` can be applied to visualize mass-difference above a defined threshold.
+
+```{r,eval=TRUE,echo=TRUE}
+mz_summary(struct_adj)
+```
+
+The `AdjacencyMatrix` class allows storing further information on the features, as putative annotations, database identifier, SMILES, etc. using `rowData()`. A `data.frame` containing the same `rownames` as the test data needs to be provided. The columns can store different information as annotations, identifier, etc.
+We will load the `x_annotation` file, which contains an example annotation and other identifier for feature x1856. All the other features contain `NA`'s in corresponding columns. 
+
+```{r,eval=TRUE,echo=TRUE}
+data("x_annotation", package = "MetNet")
+x_annotation <- as.data.frame(x_annotation)
+
+rowData(struct_adj) <- x_annotation
+rowData(struct_adj)
+```
 
 # Creating the statistical adjacency {#sec-statistical}
 
