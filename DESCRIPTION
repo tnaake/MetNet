@@ -15,7 +15,9 @@ Depends:
 Imports:
     bnlearn (>= 4.3), 
     BiocParallel (>= 1.12.0),
-	dplyr (>= 1.0.2),
+	dplyr (>= 1.0.3),
+	magrittr (>= 2.0.1), 
+	ggplot2 (>= 3.3.3),
 	Hmisc (>= 4.4-2),
     GENIE3 (>= 1.7.0),
     methods (>= 3.5),
