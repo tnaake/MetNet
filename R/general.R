@@ -51,25 +51,32 @@
 #'
 #'@export
 #'
-#'@import(dplyr)
+#'@importFrom magrittr %>%
 mz_summary <- function(x, filter = F, ...){
   x_df <- as.data.frame(x)
   x_df <- x_df[x_df$binary == 1, ]
 
-    sum_mass <- x_df %>% group_by(`mass_difference`) %>%  dplyr::summarise(count=n()) %>%
+    sum_mass <- x_df %>% 
+      dplyr::group_by(`mass_difference`) %>%  
+      dplyr::summarise(count=n()) %>%
       as.data.frame()
-    sum_transform <- x_df %>% group_by(`transformation`) %>% dplyr::summarise(count=n()) %>%
-      as.data.frame()  %>% add_column(sum_mass$`mass_difference`)
+    
+    sum_transform <- x_df %>% 
+      dplyr::group_by(`transformation`) %>% 
+      dplyr::summarise(count=n()) %>%
+      as.data.frame()  %>% 
+      tibble::add_column(sum_mass$`mass_difference`)
+    
     colnames(sum_transform) <- c("transformation", "counts", "mass_difference")
-    sum_transform <- sum_transform %>% select(transformation, `mass_difference`, counts)
-  
+    sum_transform <- sum_transform %>% 
+      dplyr::select(transformation, `mass_difference`, counts)
   
   if (filter == F) {
-    plot_list <- ggplot(sum_transform, aes(x=transformation, y=counts)) + 
-      geom_bar(stat = "identity") + 
-      theme_minimal() + 
-      coord_flip() + 
-      labs(title = "Numbers of determined mass differences")
+    plot_list <- ggplot2::ggplot(sum_transform, aes(x=transformation, y=counts)) + 
+      ggplot2::geom_bar(stat = "identity") + 
+      ggplot2::theme_minimal() + 
+      ggplot2::coord_flip() + 
+      ggplot2::labs(title = "Numbers of determined mass differences")
     
     plot(plot_list)
     
@@ -78,11 +85,11 @@ mz_summary <- function(x, filter = F, ...){
   
   else if (filter != F) {
     sum_f <- filter(sum_transform,sum_transform$counts >= filter)
-    plot_list_f <- ggplot(sum_f, aes(x=transformation, y=counts)) + 
-      geom_bar(stat = "identity") + 
-      theme_minimal() + 
-      coord_flip() + 
-      labs(title = "Numbers of determined mass differences", 
+    plot_list_f <- ggplot2::ggplot(sum_f, aes(x=transformation, y=counts)) + 
+      ggplot2::geom_bar(stat = "identity") + 
+      ggplot2::theme_minimal() + 
+      ggplot2::coord_flip() + 
+      ggplot2::labs(title = "Numbers of determined mass differences", 
            subtitle = "(filtered)")
     
     plot(plot_list_f)
