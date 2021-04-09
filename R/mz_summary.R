@@ -53,9 +53,39 @@
 #'
 #'@importFrom magrittr %>%
 mz_summary <- function(x, filter = F, ...){
+  
+  if (!"AdjacencyMatrix" %in% class(x)) 
+    stop("x is not class AdjacencyMatrix")
+  
   x_df <- as.data.frame(x)
-  x_df <- x_df[x_df$binary == 1, ]
 
+  if (!"mass_difference" %in% colnames(x_df)) 
+    stop("x does not contain a mass-difference adjacency matrix")
+  
+  if (!1 %in% x_df$binary) 
+    stop("x does not contain any mass-differences")
+  
+  # if AdjacencyMatrix from `combine` is used 
+  if("combine_mass_difference" %in% colnames(x_df)){
+    x_df <- x_df[x_df$combine_binary == 1, ]
+    x_df <- na.omit(x_df, "combine_binary")
+    
+    sum_mass <- x_df %>% 
+      dplyr::group_by(`combine_mass_difference`) %>%  
+      dplyr::summarise(count = dplyr::n()) %>%
+      as.data.frame()
+    
+    sum_transform <- x_df %>% 
+      dplyr::group_by(`combine_transformation`) %>% 
+      dplyr::summarise(count = dplyr::n()) %>%
+      as.data.frame()  %>% 
+      tibble::add_column(sum_mass$`combine_mass_difference`)
+  }
+  
+  # if AdjacencyMatrix from `structural` is used 
+  else {
+    x_df <- x_df[x_df$binary == 1, ]
+    
     sum_mass <- x_df %>% 
       dplyr::group_by(`mass_difference`) %>%  
       dplyr::summarise(count = dplyr::n()) %>%
@@ -66,7 +96,8 @@ mz_summary <- function(x, filter = F, ...){
       dplyr::summarise(count = dplyr::n()) %>%
       as.data.frame()  %>% 
       tibble::add_column(sum_mass$`mass_difference`)
-    
+  }
+  
     colnames(sum_transform) <- c("transformation", "counts", "mass_difference")
     sum_transform <- sum_transform %>% 
       dplyr::select(transformation, `mass_difference`, counts)
