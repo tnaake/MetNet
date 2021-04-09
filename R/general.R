@@ -63,7 +63,7 @@ mz_summary <- function(x, filter = F, ...){
     
     sum_transform <- x_df %>% 
       dplyr::group_by(`transformation`) %>% 
-      dplyr::summarise(count=n()) %>%
+      dplyr::summarise(count = dplyr::n()) %>%
       as.data.frame()  %>% 
       tibble::add_column(sum_mass$`mass_difference`)
     
