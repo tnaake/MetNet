@@ -50,6 +50,9 @@
 #'
 #'
 #'@export
+#'
+#'@importFrom dplyr
+#'@importFrom magrittr
 mz_summary <- function(x, filter = F, ...){
   x_df <- as.data.frame(x)
   x_df <- x_df[x_df$binary == 1, ]
