@@ -72,7 +72,8 @@ mz_summary <- function(x, filter = F, ...){
       dplyr::select(transformation, `mass_difference`, counts)
   
   if (filter == F) {
-    plot_list <- ggplot2::ggplot(sum_transform, aes(x=transformation, y=counts)) + 
+    plot_list <- ggplot2::ggplot(sum_transform, 
+                                 ggplot2::aes(x=transformation, y=counts)) + 
       ggplot2::geom_bar(stat = "identity") + 
       ggplot2::theme_minimal() + 
       ggplot2::coord_flip() + 
@@ -85,7 +86,8 @@ mz_summary <- function(x, filter = F, ...){
   
   else if (filter != F) {
     sum_f <- filter(sum_transform,sum_transform$counts >= filter)
-    plot_list_f <- ggplot2::ggplot(sum_f, aes(x=transformation, y=counts)) + 
+    plot_list_f <- ggplot2::ggplot(sum_f, 
+                                   ggplot2::aes(x=transformation, y=counts)) + 
       ggplot2::geom_bar(stat = "identity") + 
       ggplot2::theme_minimal() + 
       ggplot2::coord_flip() + 
