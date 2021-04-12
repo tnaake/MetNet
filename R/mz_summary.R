@@ -53,8 +53,12 @@
 #'@importFrom dplyr %>%
 mz_summary <- function(x, filter = FALSE, ...){
   
+  if (!is(x, "AdjacencyMatrix")) {
+    stop("'x' is not an 'AdjacencyMatrix' object")
+  }
+  
   if (!validObject(x)) 
-    stop("'x' must be a valid 'AdjacencyMatrix' object")  
+    stop("'x' must be a valid 'AdjacencyMatrix' object") 
   
   x_df <- as.data.frame(x)
   

@@ -41,7 +41,7 @@ summary_cons_adj <- mz_summary(cons_adj)
 
 test_that("mz_summary", {
   expect_error(mz_summary(transformations),
-               "'x' must be a valid 'AdjacencyMatrix' object")
+               "'x' is not an 'AdjacencyMatrix' object")
   expect_error(mz_summary(struct_adj_neg),
                "'x' does not contain any mass-differences")
   expect_error(mz_summary(stat_adj),
