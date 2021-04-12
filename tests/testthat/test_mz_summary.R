@@ -5,7 +5,7 @@ mz <- c(100, 150, 262.0528, 262.0528, 262.0528, 348.0532, 448.0532)
 rt <- c(100, 100, 50, 150, 150, 150, 150)
 mat_test <- cbind(mz = mz, rt = rt, mat_test)
 
-## transformations object for structual calculation
+## transformations object for structural calculation
 transformations <- rbind(
   c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "+"),
   c("Monosaccharide (-H2O)", "C6H10O5", 162.0528234315, "-"))
@@ -20,6 +20,7 @@ transformations_neg[, 3] <- -1 * transformations_neg[, 3]
 ## structural calculation
 struct_adj <- structural(mat_test,
                          transformation = transformations, ppm = 5, directed = FALSE)
+
 struct_adj_neg <- structural(mat_test,
                              transformation = transformations_neg, ppm = 5, directed = FALSE)
 
@@ -40,11 +41,13 @@ summary_cons_adj <- mz_summary(cons_adj)
 
 test_that("mz_summary", {
   expect_error(mz_summary(transformations),
-               "x is not class AdjacencyMatrix")
+               "'x' must be a valid 'AdjacencyMatrix' object")
   expect_error(mz_summary(struct_adj_neg),
-               "x does not contain any mass-differences")
+               "'x' does not contain any mass-differences")
   expect_error(mz_summary(stat_adj),
-               "x does not contain a mass-difference adjacency matrix")
+               "'x' does not contain a mass-difference adjacency matrix")
+  expect_error(mz_summary(struct_adj, filter = TRUE),
+               "'filter' needs to be numeric or 'FALSE'")
   expect_equal(colnames(summary_struct_adj), 
                c("transformation",  "mass_difference", "counts"))
   expect_equal(length(summary_struct_adj), 3)

@@ -23,8 +23,8 @@
 #'                      "charge" = NA,
 #'                      "database" = NA)
 #'
-#'x1856 <- cbind(x_annotation[rownames(x_annotation) == "x1856","mz"],
-#'               x_annotation[rownames(x_annotation) == "x1856","rt"],
+#'x1856 <- cbind(x_annotation["x1856", "mz"],
+#'               x_annotation["x1856", "rt"],
 #'               "database_mz" = 	308.2,
 #'               "database_identifier" = "N-caffeoylspermidine",
 #'               "chemical_formula" = "C16H25N3O3",
