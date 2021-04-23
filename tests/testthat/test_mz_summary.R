@@ -66,13 +66,13 @@ test_that("mz_summary", {
   expect_equal(summary_struct_adj$counts,
                c(3,3))
   expect_true(is.data.frame(summary_struct_adj))
-  expect_equal(length(struct_adj_neg_dir), 3)
-  expect_equal(dim(struct_adj_neg_dir), c(2, 3))
-  expect_equal(struct_adj_neg_dir$transformation,
+  expect_equal(length(summary_struct_adj_neg_dir), 3)
+  expect_equal(dim(summary_struct_adj_neg_dir), c(2, 3))
+  expect_equal(summary_struct_adj_neg_dir$transformation,
                c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
-  expect_equal(struct_adj_neg_dir$mass_difference,
+  expect_equal(summary_struct_adj_neg_dir$mass_difference,
                c("-162.0528234315", "-86.0003939305"))
-  expect_equal(struct_adj_neg_dir$counts,
+  expect_equal(summary_struct_adj_neg_dir$counts,
                c(3,3))
   expect_equal(length(summary_cons_adj), 3)
   expect_equal(dim(summary_cons_adj), c(2, 3))
