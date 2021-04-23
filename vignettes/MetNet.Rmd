@@ -326,7 +326,14 @@ using the `mz_summary` function. For larger data-sets, also a `filter` can be
 applied to visualize mass-difference above a defined threshold.
 
 ```{r,eval=TRUE,echo=TRUE}
-mz_summary(struct_adj)
+mz_sum <- mz_summary(struct_adj)
+
+mz_vis(mz_sum)
+
+# A filter can be applied, by `filter`. Since the maximum count of any mass difference 
+# in `struct_adj` is 3, a filter of 4 results in 0 mass differences 
+mz_summary(struct_adj, filter = 4)
+
 ```
 
 The `AdjacencyMatrix` class allows storing further information on the features 

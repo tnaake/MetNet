@@ -1,11 +1,17 @@
 #' @name x_annotation
+#' 
 #' @title Example annotation for \code{MetNet}: data input
+#' 
 #' @description \code{x_annotation} contains one selected putative annotation of
 #' \code{x_test}. Missing annotations are filled with `NA`'s. It will be used as an example annotation in the vignette to
 #' show the functionality of the packages.
+#' 
 #' @docType data
+#' 
 #' @return \code{matrix}
+#' 
 #' @format \code{matrix}
+#' 
 #' @source
 #' data("x_test", package = "MetNet")
 #' 

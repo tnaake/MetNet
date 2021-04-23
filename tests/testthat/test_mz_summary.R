@@ -16,13 +16,17 @@ transformations_neg <- transformations <- data.frame(
   rt = transformations[, 4])
 transformations_neg[, 3] <- -1 * transformations_neg[, 3]
 
-
+mz_summary(structural(mat_test,
+                     transformation = transformations, ppm = 5, directed = T))
 ## structural calculation
 struct_adj <- structural(mat_test,
                          transformation = transformations, ppm = 5, directed = FALSE)
 
 struct_adj_neg <- structural(mat_test,
                              transformation = transformations_neg, ppm = 5, directed = FALSE)
+
+struct_adj_neg_dir <- structural(mat_test,
+                             transformation = transformations_neg, ppm = 5, directed = TRUE)
 
 ## statistical calculation
 stat_adj <- statistical(mat_test[, -1],
@@ -36,18 +40,21 @@ cons_adj <- combine(struct_adj, stat_adj_thr)
 ## START unit test mz_summary##
 
 summary_struct_adj <- mz_summary(struct_adj)
+summary_struct_adj_neg_dir <- mz_summary(struct_adj_neg_dir)
 summary_cons_adj <- mz_summary(cons_adj)
 
 
 test_that("mz_summary", {
   expect_error(mz_summary(transformations),
-               "'x' is not an 'AdjacencyMatrix' object")
+               "'am' is not an 'AdjacencyMatrix' object")
   expect_error(mz_summary(struct_adj_neg),
-               "'x' does not contain any mass-differences")
+               "'am' does not contain any mass-differences")
   expect_error(mz_summary(stat_adj),
-               "'x' does not contain a mass-difference adjacency matrix")
+               "'am' is not a type 'structural' or 'combine'")
   expect_error(mz_summary(struct_adj, filter = TRUE),
-               "'filter' needs to be numeric or 'FALSE'")
+               "'filter' needs to be numeric")
+  expect_error(mz_summary(struct_adj, filter = -1),
+               "'filter' needs to be 0 or positive numeric")
   expect_equal(colnames(summary_struct_adj), 
                c("transformation",  "mass_difference", "counts"))
   expect_equal(length(summary_struct_adj), 3)
@@ -59,6 +66,14 @@ test_that("mz_summary", {
   expect_equal(summary_struct_adj$counts,
                c(3,3))
   expect_true(is.data.frame(summary_struct_adj))
+  expect_equal(length(struct_adj_neg_dir), 3)
+  expect_equal(dim(struct_adj_neg_dir), c(2, 3))
+  expect_equal(struct_adj_neg_dir$transformation,
+               c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
+  expect_equal(struct_adj_neg_dir$mass_difference,
+               c("-162.0528234315", "-86.0003939305"))
+  expect_equal(struct_adj_neg_dir$counts,
+               c(3,3))
   expect_equal(length(summary_cons_adj), 3)
   expect_equal(dim(summary_cons_adj), c(2, 3))
   expect_equal(summary_cons_adj$transformation,
@@ -70,3 +85,28 @@ test_that("mz_summary", {
   expect_true(is.data.frame(summary_cons_adj))
 })
 ## END unit test mz_summary ##
+
+
+
+## START unit test mz_vis ##
+
+# create mass-difference counts test file missing counts
+transformation <- c("Malonyl group (-H2O)", "Monosaccharide (-H2O)")
+mass_difference <- c("162.0528234315", "86.0003939305")
+sum_test <- cbind(transformation, mass_difference)
+
+vis <- mz_vis(summary_struct_adj)
+
+test_that("mz_vis", {
+  expect_error(mz_vis(sum_test),
+               "'x' has not the right columns 'transformation', 'mass_difference', 'counts'")
+  expect_true(ggplot2::is.ggplot(vis))
+  expect_identical(vis$labels$title,
+                   "Numbers of determined mass differences")
+  expect_identical(vis$labels$y,
+                   "counts")
+  expect_identical(vis$labels$x,
+                   "transformation")
+  expect_equal(vis$data, summary_struct_adj)
+})
+## END unit test mz_vis ##
