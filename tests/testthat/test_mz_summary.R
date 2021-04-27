@@ -50,7 +50,7 @@ test_that("mz_summary", {
   expect_error(mz_summary(struct_adj_neg),
                "'am' does not contain any mass-differences")
   expect_error(mz_summary(stat_adj),
-               "'am' is not a type 'structural' or 'combine'")
+               "'am' is not of type 'structural' or 'combine'")
   expect_error(mz_summary(struct_adj, filter = TRUE),
                "'filter' needs to be numeric")
   expect_error(mz_summary(struct_adj, filter = -1),
@@ -94,12 +94,15 @@ test_that("mz_summary", {
 transformation <- c("Malonyl group (-H2O)", "Monosaccharide (-H2O)")
 mass_difference <- c("162.0528234315", "86.0003939305")
 sum_test <- cbind(transformation, mass_difference)
+sum_test_df <- as.data.frame(sum_test)
 
 vis <- mz_vis(summary_struct_adj)
 
 test_that("mz_vis", {
   expect_error(mz_vis(sum_test),
-               "'x' has not the right columns 'transformation', 'mass_difference', 'counts'")
+               "'df' is not a data.frame")
+  expect_error(mz_vis(sum_test_df),
+               "'df' has not the right columns 'transformation', 'mass_difference', 'counts'")
   expect_true(ggplot2::is.ggplot(vis))
   expect_identical(vis$labels$title,
                    "Numbers of determined mass differences")
