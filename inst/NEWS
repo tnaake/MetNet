@@ -1,8 +1,9 @@
-Changes in version 1.9.3 (2021-03-30)
+Changes in version 1.9.3 (2021-04-28)
 + introduce AdjacencyMatrix S4 class, derived from SummarizedExperiment, to
   store the adjacency matrices. AdjacencyMatrix objects can be of type
   structural, statistical, and combine
 + adjust the documentation and tests for AdjacencyMatrix objects
++ add the functions mz_summary and mz_vis (contribution of Liesa Salzer)
   
 Changes in version 1.9.2 (2021-03-24)
 + add section on structual matrix generation for directed=FALSE
