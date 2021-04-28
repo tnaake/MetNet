@@ -10,25 +10,25 @@ Authors@R: c(person(given = "Thomas", family = "Naake",
 VignetteBuilder: knitr
 Depends:
     R (>= 4.0),
-	S4Vectors (>= 0.28.1),
+    S4Vectors (>= 0.28.1),
     SummarizedExperiment (>= 1.20.0)
 Imports:
     bnlearn (>= 4.3), 
     BiocParallel (>= 1.12.0),
-	dplyr (>= 1.0.3),
-	ggplot2 (>= 3.3.3),
-	Hmisc (>= 4.4-2),
+    dplyr (>= 1.0.3),
+    ggplot2 (>= 3.3.3),
+    Hmisc (>= 4.4-2),
     GENIE3 (>= 1.7.0),
     methods (>= 3.5),
     mpmi (>= 0.42), 
     parmigene (>= 1.0.2),
     ppcor (>= 1.1),
-	rlang (>= 0.4.10),
+    rlang (>= 0.4.10),
     sna (>= 2.4),
     stabs (>= 0.6),
     stats (>= 3.6),
 	tibble (>= 3.0.5),
-	tidyr (>= 1.1.2)
+    tidyr (>= 1.1.2)
 Suggests:
     BiocGenerics (>= 0.24.0),
     BiocStyle (>= 2.6.1), 
