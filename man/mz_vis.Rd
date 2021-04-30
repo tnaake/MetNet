@@ -2,7 +2,7 @@
 % Please edit documentation in R/mz_summary.R
 \name{mz_vis}
 \alias{mz_vis}
-\title{Visualize mass-difference distribution}
+\title{Visualize mass difference distribution}
 \usage{
 mz_vis(df)
 }
@@ -14,11 +14,11 @@ the columns "transformation", "mass_difference" and "counts".}
 `ggplot` object and corresponding barplot for visualizations
 }
 \description{
-The function `mz_vis` visualizes the mass-difference distribution,
+The function `mz_vis` visualizes the mass difference distribution,
 which has been summarized by `mz_summary`.
 }
 \details{
-Plots the mass-difference distribution, summarized
+Plots the mass difference distribution, summarized
 by `mz_summary`. 
 Visualization is performed using ggplot2
 }

@@ -15,7 +15,7 @@ AdjacencyMatrix(
 \arguments{
 \item{adj_l}{`list` of adjacency matrices}
 
-\item{rowData}{information on the features}
+\item{rowData}{`data.frame`, containing information on the features}
 
 \item{type}{`character`, either `"structural"`, `"statistical"`, or 
 `"combine"`}
@@ -57,6 +57,28 @@ and `colnames` are identical).
 (`logical` of length 1) slot.
 }
 
+\examples{
+binary <- matrix(0, ncol = 10, nrow = 10)
+transformation <- matrix("", ncol = 10, nrow = 10)
+mass_difference <- matrix("", ncol = 10, nrow = 10)
+
+rownames(binary) <- rownames(transformation) <- rownames(mass_difference) <- paste("feature", 1:10)
+colnames(binary) <- rownames(transformation) <- rownames(mass_difference) <- paste("feature", 1:10)
+
+binary[5, 4] <- 1
+transformation[5, 4] <- "glucose addition"
+mass_difference[5, 4] <- "162"
+
+## create adj_l and rowData
+adj_l <- list(binary = binary, transformation = transformation, 
+    mass_difference = mass_difference)
+rowData <- DataFrame(features = rownames(binary), 
+    row.names = rownames(binary))
+
+AdjacencyMatrix(adj_l = adj_l, rowData = rowData, type = "structural", 
+    directed = TRUE, thresholded = FALSE)
+
+}
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com}
 }

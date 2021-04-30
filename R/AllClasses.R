@@ -67,7 +67,7 @@
 #'
 #' @param adj_l `list` of adjacency matrices
 #' 
-#' @param rowData information on the features
+#' @param rowData `data.frame`, containing information on the features
 #' 
 #' @param type `character`, either `"structural"`, `"statistical"`, or 
 #' `"combine"`
@@ -85,23 +85,23 @@
 #'
 #' @examples
 #' binary <- matrix(0, ncol = 10, nrow = 10)
-#' type <- matrix("", ncol = 10, nrow = 10)
+#' transformation <- matrix("", ncol = 10, nrow = 10)
 #' mass_difference <- matrix("", ncol = 10, nrow = 10)
 #' 
-#' rownames(binary) <- rownames(type) <- rownames(mass_difference) <- paste("feature", 1:10)
-#' colnames(binary) <- rownames(type) <- rownames(mass_difference) <- paste("feature", 1:10)
+#' rownames(binary) <- rownames(transformation) <- rownames(mass_difference) <- paste("feature", 1:10)
+#' colnames(binary) <- rownames(transformation) <- rownames(mass_difference) <- paste("feature", 1:10)
 #' 
 #' binary[5, 4] <- 1
-#' type[5, 4] <- "glucose addition"
+#' transformation[5, 4] <- "glucose addition"
 #' mass_difference[5, 4] <- "162"
 #' 
 #' ## create adj_l and rowData
-#' adj_l <- list(binary = binary, type = type, 
+#' adj_l <- list(binary = binary, transformation = transformation, 
 #'     mass_difference = mass_difference)
 #' rowData <- DataFrame(features = rownames(binary), 
 #'     row.names = rownames(binary))
-#'     
-#' AdjacencyMatrix(adj_l = adj_l, rowData = rowData, type = structural", 
+#' 
+#' AdjacencyMatrix(adj_l = adj_l, rowData = rowData, type = "structural", 
 #'     directed = TRUE, thresholded = FALSE)
 #'
 #' @export
@@ -114,7 +114,8 @@ AdjacencyMatrix <- function(adj_l, rowData,
     
     type <- match.arg(type)
     
-    se <- SummarizedExperiment(adj_l, rowData = rowData, colData = rowData)
+    se <- SummarizedExperiment::SummarizedExperiment(adj_l, 
+        rowData = rowData, colData = rowData)
     .AdjacencyMatrix(se, type = type, directed = directed, 
         thresholded = thresholded)
 }
@@ -131,7 +132,7 @@ setValidity2("AdjacencyMatrix", function(object) {
     
     type_obj <- type(object)
     
-    a <- assays(object)[[1]]
+    a <- SummarizedExperiment::assays(object)[[1]]
     if (nrow(a) != ncol(a)) {
         msg <- c(msg, "nrow not equal ncol for assays")
     }
@@ -164,15 +165,15 @@ setValidity2("AdjacencyMatrix", function(object) {
             msg <- c(msg, 
                 "assay names must be 'binary', 'transformation', 'mass_difference'")
         
-        .obj <- assay(object, "binary")
+        .obj <- SummarizedExperiment::assay(object, "binary")
         if (!is.numeric(.obj))
             msg <- c(msg, "slot 'binary' must be numeric")
         
-        .obj <- assay(object, "transformation")
+        .obj <- SummarizedExperiment::assay(object, "transformation")
         if (!is.character(.obj))
             msg <- c(msg, "slot 'transformation' must be character")
         
-        .obj <- assay(object, "mass_difference")
+        .obj <- SummarizedExperiment::assay(object, "mass_difference")
         if (!is.character(.obj))
             msg <- c(msg, "slot 'mass_difference' must be character")
     }
@@ -196,19 +197,19 @@ setValidity2("AdjacencyMatrix", function(object) {
     
     if (type_obj == "combine") {
         
-        if (!all(valid_names_combine %in% assayNames(object)))
+        if (!all(valid_names_combine %in% SummarizedExperiment::assayNames(object)))
             msg <- c(msg, 
                 "assay names must be 'combine_binary', 'combine_transformation', 'combine_mass_difference'")
         
-        .obj <- assay(object, "combine_binary")
+        .obj <- SummarizedExperiment::assay(object, "combine_binary")
         if (!is.numeric(.obj))
             msg <- c(msg, "slot 'combine_binary' must be numeric")
 
-        .obj <- assay(object, "combine_transformation")
+        .obj <- SummarizedExperiment::assay(object, "combine_transformation")
         if (!is.character(.obj))
             msg <- c(msg, "slot 'combine_transformation' must be character")
 
-        .obj <- assay(object, "combine_mass_difference")
+        .obj <- SummarizedExperiment::assay(object, "combine_mass_difference")
         if (!is.character(.obj))
             msg <- c(msg, "slot 'combine_mass_difference' must be character")
     }
@@ -240,12 +241,13 @@ setValidity2("AdjacencyMatrix", function(object) {
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
 #' @importFrom S4Vectors getListElement
+#' @importFrom SummarizedExperiment SummarizedExperiment
 .assays_have_identical_dimnames <- function(object) {
-    .assays <- assays(object)
-    a_1 <- getListElement(.assays, 1)
+    .assays <- SummarizedExperiment::assays(object)
+    a_1 <- S4Vectors::getListElement(.assays, 1)
     ident <- vapply(seq_along(.assays),
         function(i) {
-            a <- getListElement(.assays, i)
+            a <- S4Vectors::getListElement(.assays, i)
             a_dimnames <- dimnames(a)
             identical(rownames(a_dimnames), dimnames(a_1))
             },
@@ -271,11 +273,14 @@ setValidity2("AdjacencyMatrix", function(object) {
 #' @return `logical` of length 1
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' 
+#' @importFrom S4Vectors getListElement
+#' @importFrom SummarizedExperiment SummarizedExperiment
 .assays_have_identical_colnames_rownames <- function(object) {
-    .assays <- assays(object)
+    .assays <- SummarizedExperiment::assays(object)
     ident <- vapply(seq_along(.assays),
         function(i) {
-            a <- getListElement(.assays, i)
+            a <- S4Vectors::getListElement(.assays, i)
             identical(colnames(a), rownames(a))
         }, 
         logical(1)

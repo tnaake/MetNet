@@ -1,3 +1,7 @@
+Changes in version 1.9.4 (2021-04-30)
++ add font in mz_vis to mono
++ split the example on how to use filter in mz_summary from the visualisation
+
 Changes in version 1.9.3 (2021-04-28)
 + introduce AdjacencyMatrix S4 class, derived from SummarizedExperiment, to
   store the adjacency matrices. AdjacencyMatrix objects can be of type

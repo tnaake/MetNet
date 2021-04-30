@@ -125,7 +125,9 @@ send a mail to the developer.
 To install `MetNet` enter the following to the `R` console
 
 ```{r install, eval=FALSE}
-install.packages("BiocManager")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
 BiocManager::install("MetNet")
 ```
 
@@ -322,18 +324,19 @@ struct_df <- struct_df[struct_df$binary == 1, ]
 ```
 
 Some overview on the mass-difference distribution of the data can be observed 
-using the `mz_summary` function. For larger data-sets, also a `filter` can be 
-applied to visualize mass-difference above a defined threshold.
+using the `mz_summary` function. The number of determined mass differences
+can be displayed by using the `mz_vis` function.
 
-```{r,eval=TRUE,echo=TRUE}
+```{r mz_summary,eval=TRUE,echo=TRUE}
 mz_sum <- mz_summary(struct_adj)
-
 mz_vis(mz_sum)
-
-# A filter can be applied, by `filter`. Since the maximum count of any mass difference 
-# in `struct_adj` is 3, a filter of 4 results in 0 mass differences 
+```
+For larger data-sets, also a `filter` can be 
+applied to visualize mass-difference above a defined threshold.
+A filter can be applied, by `filter`. Since the maximum count of any mass difference in `struct_adj` is 4, a filter of `5` results in 0 mass differences.
+```{r mz_summary_filter}
 mz_summary(struct_adj, filter = 4)
-
+mz_summary(struct_adj, filter = 5)
 ```
 
 The `AdjacencyMatrix` class allows storing further information on the features 
@@ -341,17 +344,18 @@ as putative annotations, database identifier, SMILES, etc. using `rowData()`.
 A `data.frame` containing the same `rownames` as the test data needs to be 
 provided. The columns can store different information as annotations, identifier, etc.
 We will load the `x_annotation` file, which contains an example annotation 
-and other identifier for feature x1856. All the other features contain `NA`'s 
+and other identifier for feature `x1856`. All the other features contain `NA`s 
 in corresponding columns. 
 
 ```{r,eval=TRUE,echo=TRUE}
 data("x_annotation", package = "MetNet")
 x_annotation <- as.data.frame(x_annotation)
 
-# Add annotations to the structural AdjacencyMatrix object
+## add annotations to the structural AdjacencyMatrix object
 rowData(struct_adj) <- x_annotation
-# And display of annotations (or other feature information)
-rowData(struct_adj)
+
+## display annotation for the feature "1856"
+rowData(struct_adj)["x1856", ]
 ```
 
 # Creating the statistical adjacency {#sec-statistical}
@@ -507,7 +511,7 @@ adjacency matrix.
 
 We use here the assay `"combine_binary"` from the `AdjacencyMatrix` of type
 `combine` and pass it to the `graph_from_adjacency_matrix` function:
-```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.'}
+```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='_Ab initio_ network inferred from structural and  quantitative mass spectrometry data. Vertices are connected that are separated by given metabolic transformation and statistical association.'}
 adj <- assay(comb_adj, "combine_binary")
 g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected")
 plot(g, edge.width = 2, vertex.label.cex = 0.5, edge.color = "grey")
