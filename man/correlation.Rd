@@ -16,13 +16,17 @@ correlation(x, type = "pearson", p.adjust = "none")
 \item{p.adjust}{`character`, method of p-value adjustment passed to `p.adjust`}
 }
 \value{
-matrix, matrix with edges inferred from correlation algorithm
-`corAndPvalue`, `pcor` or `spcor` (depending on the chosen `method`)
+list containing two matrix, 
+the first matrix contains correlation coefficients and 
+the second matrix contains the corresponding p-values as obtained from the 
+correlation algorithms `rcorr`, `pcor` or `spcor` (depending on the 
+chosen `method`) and optionally the adjusted p.values (argument
+`p.adjust`)
 }
 \description{
 `correlation` infers an adjacency matrix using
-correlation using the `cor` function (from the
-`stats` package), `pcor` (from `ppcor`) or
+correlation using the `rcorr` function (from the
+`Hmisc` package), `pcor` (from `ppcor`) or
 `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
 correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
 and will return
@@ -30,15 +34,15 @@ the weighted adjacency matrix of the absolute correlation values.
 }
 \details{
 If `"pearson"` or `"spearman"` is used as a `method`, the function
-`corAndPvalue` from `stats` will be employed.
+`rcorr` from `Hmisc` will be employed.
 
-If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the
+If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
 function `pcor` from `spcor` will be employed.
 
 If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
 `method` the function `spcor` from `spcor` will be employed.
 
-`type` will be passed to argument `method` in `cor`
+`type` will be passed to argument `method` in `rcorr`
 (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
 (`"pearson"` and `"spearman"` for `"pearson_partial"` and
 `"spearman_partial"`, respectively) or to `method` in `spcor`
