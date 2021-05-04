@@ -4,7 +4,7 @@
 \alias{correlation}
 \title{Create an adjacency matrix based on correlation}
 \usage{
-correlation(x, type = "pearson")
+correlation(x, type = "pearson", p.adjust = "none")
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features
@@ -12,6 +12,8 @@ correlation(x, type = "pearson")
 
 \item{type}{`character`, either "pearson", "spearman", "pearson_partial",
 "spearman_partial", "pearson_semipartial" or "spearman_semipartial".}
+
+\item{p.adjust}{`character`, method of p-value adjustment passed to `p.adjust`}
 }
 \value{
 matrix, matrix with edges inferred from correlation algorithm

@@ -287,6 +287,9 @@ aracne <- function(mi, eps = 0.05) {
 #' @param
 #' type `character`, either "pearson", "spearman", "pearson_partial",
 #' "spearman_partial", "pearson_semipartial" or "spearman_semipartial".
+#' 
+#' @param 
+#' p.adjust `character`, method of p-value adjustment passed to `p.adjust`
 #'
 #' @details
 #' If `"pearson"` or `"spearman"` is used as a `method`, the function
@@ -321,11 +324,13 @@ aracne <- function(mi, eps = 0.05) {
 #' 
 #' @importFrom Hmisc rcorr
 #' @importFrom ppcor pcor spcor
-correlation <- function(x, type = "pearson") {
+correlation <- function(x, type = "pearson", p.adjust = "none") {
 
     ## for pearson/spearman correlation
     if (type %in% c("pearson", "spearman")) {
         cor_mat <- Hmisc::rcorr(x = t(x), type = type)
+        cor_mat$P <- matrix(p.adjust(as.vector(cor_mat$P), method = p.adjust),
+            ncol = ncol(cor_mat$P), nrow = nrow(cor_mat$P), byrow = TRUE)
     }
 
     ## for partial pearson/spearman correlation
@@ -333,6 +338,10 @@ correlation <- function(x, type = "pearson") {
         if (type == "pearson_partial") method <- "pearson"
         if (type == "spearman_partial") method <- "spearman"
         cor_mat <- ppcor::pcor(t(x), method = method)
+        cor_mat$p.value <- matrix(
+            p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
+            ncol = ncol(cor_mat$p.value), nrow = nrow(cor_mat$p.value), 
+            byrow = TRUE)
     }
 
     ## for semipartial pearson/spearman corelation
@@ -340,6 +349,10 @@ correlation <- function(x, type = "pearson") {
         if (type == "pearson_semipartial") method <- "pearson"
         if (type == "spearman_semipartial") method <- "spearman"
         cor_mat <- ppcor::spcor(t(x), method = method)
+        cor_mat$p.value <- matrix(
+            p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
+            ncol = ncol(cor_mat$p.value), nrow = nrow(cor_mat$p.value), 
+            byrow = TRUE)
     }
 
     ## assign col- and rownames to cor_mat
@@ -563,6 +576,7 @@ addToList <- function(l, name, object) {
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' statistical(x = x, model = c("pearson", "spearman"))
+#' statistical(x = x, model = c("pearson", "spearman"), p.adjust = "BH")
 #'
 #' @export
 #' 

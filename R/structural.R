@@ -94,7 +94,7 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
     rownames(mat) <- colnames(mat) <- mass
 
-    ## create matrix which has rowmames per row
+    ## create matrix which has rownames per row
     mat <- apply(mat, 1, function(x) as.numeric(mass))
 
     ## calculate ppm deviation
