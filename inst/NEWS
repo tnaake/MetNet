@@ -1,3 +1,7 @@
+Changes in version 1.9.5 (2021-05-04)
++ add functionality to adjust for multiple testing in correlation
++ return symmetric matrices when returning ppm ranges in structural
+
 Changes in version 1.9.4 (2021-04-30)
 + add font in mz_vis to mono
 + split the example on how to use filter in mz_summary from the visualisation
