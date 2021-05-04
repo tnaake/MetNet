@@ -24,15 +24,13 @@ Imports:
     parmigene (>= 1.0.2),
     ppcor (>= 1.1),
     rlang (>= 0.4.10),
-    sna (>= 2.4),
     stabs (>= 0.6),
     stats (>= 3.6),
-	tibble (>= 3.0.5),
+    tibble (>= 3.0.5),
     tidyr (>= 1.1.2)
 Suggests:
     BiocGenerics (>= 0.24.0),
     BiocStyle (>= 2.6.1), 
-    glmnet (>= 2.0-18),
     igraph (>= 1.1.2), 
     knitr (>= 1.11),
     rmarkdown (>= 1.15),

@@ -1,24 +1,3 @@
-#' @importFrom stabs stabsel.matrix glmnet.lasso
-NULL
-#' @importFrom GENIE3 GENIE3
-NULL
-#' @importFrom mpmi cmi
-NULL
-#' @importFrom parmigene clr aracne.a
-NULL
-#' @importFrom bnlearn fast.iamb arcs
-NULL
-#' @importFrom sna consensus
-NULL
-#' @importFrom BiocParallel bplapply
-NULL
-#' @importFrom stats formula p.adjust sd cor
-NULL
-#' @importFrom methods formalArgs
-NULL
-#' @importFrom ppcor pcor spcor
-NULL
-
 #' @name lasso
 #' @aliases lasso
 #' @title Create an adjacency matrix based on LASSO
@@ -56,19 +35,22 @@ NULL
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
 #' \dontrun{lasso(x_z, PFER = 0.95, cutoff = 0.95)}
-#'
+#' 
+#' @importFrom BiocParallel bplapply
+#' @importFrom stabs stabsel.matrix glmnet.lasso
+#' 
 #' @export
 lasso <- function(x, parallel = FALSE, ...) {
 
     ## x should be z-scaled
     if (parallel) {
-        l1 <- bplapply(seq_len(nrow(x)), function(i) {
+        l1 <- BiocParallel::bplapply(seq_len(nrow(x)), function(i) {
             x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
 
             ## lasso: alpha set to 1
             ## allow for compatibility of arguments
             l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
-                    y = y_l1, fitfun = glmnet.lasso,
+                    y = y_l1, fitfun = stabs::glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
 
             ## return selection probabilities of features that are not 0
@@ -82,7 +64,7 @@ lasso <- function(x, parallel = FALSE, ...) {
             ## lasso: alpha set to 1
             ## allow for compatibility of arguments
             l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
-                    y = y_l1, fitfun = glmnet.lasso,
+                    y = y_l1, fitfun = stabs::glmnet.lasso,
                     args.fitfun = list("alpha" = 1), ...)
 
             ## return selection probabilities of features that are not 0
@@ -135,6 +117,8 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' randomForest(x)
+#'
+#' @importFrom GENIE3 GENIE3
 #'
 #' @export
 randomForest <- function(x, ...) {
@@ -196,6 +180,9 @@ randomForest <- function(x, ...) {
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
 #' clr(mi_x_z)
 #'
+#' @importFrom parmigene clr
+#' @importFrom stats sd
+#' 
 #' @export
 clr <- function(mi) {
 
@@ -254,6 +241,9 @@ clr <- function(mi) {
 #' mi_x_z <- mpmi::cmi(x_z)$bcmi
 #' aracne(mi_x_z, eps = 0.05)
 #'
+#' @importFrom parmigene aracne.a
+#' @importFrom stats sd
+#'
 #' @export
 aracne <- function(mi, eps = 0.05) {
 
@@ -273,8 +263,8 @@ aracne <- function(mi, eps = 0.05) {
 #'
 #' @description
 #' `correlation` infers an adjacency matrix using
-#' correlation using the `cor` function (from the
-#' `stats` package), `pcor` (from `ppcor`) or
+#' correlation using the `rcorr` function (from the
+#' `Hmisc` package), `pcor` (from `ppcor`) or
 #' `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
 #' correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
 #' and will return
@@ -293,15 +283,15 @@ aracne <- function(mi, eps = 0.05) {
 #'
 #' @details
 #' If `"pearson"` or `"spearman"` is used as a `method`, the function
-#' `corAndPvalue` from `stats` will be employed.
+#' `rcorr` from `Hmisc` will be employed.
 #'
-#' If `"pearson_partial"` or `"spearman_partial"?` is used as a `method` the
+#' If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
 #' function `pcor` from `spcor` will be employed.
 #'
 #' If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
 #' `method` the function `spcor` from `spcor` will be employed.
 #'
-#' `type` will be passed to argument `method` in `cor`
+#' `type` will be passed to argument `method` in `rcorr`
 #' (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
 #' (`"pearson"` and `"spearman"` for `"pearson_partial"` and
 #' `"spearman_partial"`, respectively) or to `method` in `spcor`
@@ -309,8 +299,12 @@ aracne <- function(mi, eps = 0.05) {
 #' `"spearman_semipartial"`, respectively).
 #'
 #' @return
-#' matrix, matrix with edges inferred from correlation algorithm
-#' `corAndPvalue`, `pcor` or `spcor` (depending on the chosen `method`)
+#' list containing two matrix, 
+#' the first matrix contains correlation coefficients and 
+#' the second matrix contains the corresponding p-values as obtained from the 
+#' correlation algorithms `rcorr`, `pcor` or `spcor` (depending on the 
+#' chosen `method`) and optionally the adjusted p.values (argument
+#' `p.adjust`)
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
@@ -324,12 +318,14 @@ aracne <- function(mi, eps = 0.05) {
 #' 
 #' @importFrom Hmisc rcorr
 #' @importFrom ppcor pcor spcor
+#' @importFrom stats p.adjust
 correlation <- function(x, type = "pearson", p.adjust = "none") {
 
     ## for pearson/spearman correlation
     if (type %in% c("pearson", "spearman")) {
         cor_mat <- Hmisc::rcorr(x = t(x), type = type)
-        cor_mat$P <- matrix(p.adjust(as.vector(cor_mat$P), method = p.adjust),
+        cor_mat$P <- matrix(
+            stats::p.adjust(as.vector(cor_mat$P), method = p.adjust),
             ncol = ncol(cor_mat$P), nrow = nrow(cor_mat$P), byrow = TRUE)
     }
 
@@ -339,7 +335,7 @@ correlation <- function(x, type = "pearson", p.adjust = "none") {
         if (type == "spearman_partial") method <- "spearman"
         cor_mat <- ppcor::pcor(t(x), method = method)
         cor_mat$p.value <- matrix(
-            p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
+            stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
             ncol = ncol(cor_mat$p.value), nrow = nrow(cor_mat$p.value), 
             byrow = TRUE)
     }
@@ -350,7 +346,7 @@ correlation <- function(x, type = "pearson", p.adjust = "none") {
         if (type == "spearman_semipartial") method <- "spearman"
         cor_mat <- ppcor::spcor(t(x), method = method)
         cor_mat$p.value <- matrix(
-            p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
+            stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
             ncol = ncol(cor_mat$p.value), nrow = nrow(cor_mat$p.value), 
             byrow = TRUE)
     }
@@ -423,6 +419,8 @@ correlation <- function(x, type = "pearson", p.adjust = "none") {
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' bayes(x, algorithm = "tabu", R = 100)
+#' 
+#' @importFrom bnlearn boot.strength
 #'
 #' @export
 bayes <- function(x, algorithm = "tabu", R = 100, ...) {
@@ -582,6 +580,7 @@ addToList <- function(l, name, object) {
 #' 
 #' @importFrom S4Vectors DataFrame
 #' @importFrom mpmi cmi
+#' @importFrom stats sd
 statistical <- function(x, model, ...) {
 
     ## check if model complies with the implemented model and return error
@@ -596,7 +595,7 @@ statistical <- function(x, model, ...) {
 
     ## z-scale x and transpose
     x_z <- apply(x, 1, function(y) {
-        (y - mean(y, na.rm = TRUE)) / sd(y, na.rm = TRUE)
+        (y - mean(y, na.rm = TRUE)) / stats::sd(y, na.rm = TRUE)
     })
     x_z <- t(x_z)
 
@@ -1160,6 +1159,7 @@ topKnet <- function(ranks, type) {
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
+#' @importFrom methods formalArgs
 #' @examples
 #' MetNet:::threeDotsCall(stats::sd, x = 1:10, y = 1:10)
 #' ## in contrast to the above example, the following example will result in an
@@ -1167,7 +1167,7 @@ topKnet <- function(ranks, type) {
 #' \dontrun{stats::sd(x = 1:10, y = 1:10)}
 threeDotsCall <- function(fun, ...) {
 
-    formal_args <- formalArgs(fun)
+    formal_args <- methods::formalArgs(fun)
     args <- list(...)
     if (any(duplicated(names(args)))) stop("duplicated args in ...")
 
