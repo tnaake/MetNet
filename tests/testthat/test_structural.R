@@ -27,6 +27,24 @@ struct_adj_dir <- structural(mat_test,
 struct_adj_dir_neg <- structural(mat_test,
         transformation = transformations_neg, ppm = 5, directed = TRUE)
 
+g_undir <- igraph::graph_from_adjacency_matrix(
+    assay(struct_adj, "binary", mode = "directed", weighted = NULL))
+g_undir_neg <- igraph::graph_from_adjacency_matrix(
+    assay(struct_adj_neg, "binary", mode = "directed", weighted = NULL))
+g_dir <- igraph::graph_from_adjacency_matrix(
+    assay(struct_adj_dir, "binary"), mode = "directed", weighted = NULL)
+g_dir_neg <- igraph::graph_from_adjacency_matrix(
+    assay(struct_adj_dir_neg, "binary"), mode = "directed", weighted = NULL)
+
+plot(g_undir, edge.width = 1, edge.arrow.size = 0.5, 
+    vertex.label.cex = 0.8, edge.color = "grey")
+plot(g_undir_neg, edge.width = 1, edge.arrow.size = 0.5, 
+     vertex.label.cex = 0.8, edge.color = "grey")
+plot(g_dir, edge.width = 1, edge.arrow.size = 0.5, 
+     vertex.label.cex = 0.8, edge.color = "grey")
+plot(g_dir_neg, edge.width = 1, edge.arrow.size = 0.5, 
+     vertex.label.cex = 0.8, edge.color = "grey")
+
 test_that("structural", {
     expect_error(structural(mat_test[, -1], transformations),
         "does not contain the column mz")
@@ -58,10 +76,70 @@ test_that("structural", {
     expect_equal(sum(assay(struct_adj_neg, "binary")), 0)
     expect_equal(sum(assay(struct_adj_dir, "binary")), 6)
     expect_equal(sum(assay(struct_adj_dir_neg, "binary")), 6)
+    expect_equal(as.vector(assay(struct_adj, "transformation")[, 1]),
+        c("", "", "Monosaccharide (-H2O)", "Monosaccharide (-H2O)", 
+            "Monosaccharide (-H2O)", "", ""))
+    expect_equal(as.vector(assay(struct_adj, "transformation")[, 2]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj, "transformation")[, 3]),
+        c("Monosaccharide (-H2O)", "", "", "", "", "Malonyl group (-H2O)", ""))
+    expect_equal(as.vector(assay(struct_adj, "transformation")[, 4]),
+        c("Monosaccharide (-H2O)", "", "", "", "", "Malonyl group (-H2O)", ""))
+    expect_equal(as.vector(assay(struct_adj, "transformation")[, 5]),
+        c("Monosaccharide (-H2O)", "", "", "", "", "Malonyl group (-H2O)", ""))
+    expect_equal(as.vector(assay(struct_adj, "transformation")[, 6]),
+        c("", "", "Malonyl group (-H2O)", "Malonyl group (-H2O)", 
+            "Malonyl group (-H2O)", "", ""))
+    expect_equal(as.vector(assay(struct_adj, "transformation")[, 7]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 1]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 2]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 3]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 4]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 5]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 6]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 7]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 1]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 2]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 3]),
+        c("Monosaccharide (-H2O)", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 4]),
+        c("Monosaccharide (-H2O)", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 5]),
+        c("Monosaccharide (-H2O)", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 6]),
+        c("", "", "Malonyl group (-H2O)", "Malonyl group (-H2O)", 
+            "Malonyl group (-H2O)", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 7]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 1]),
+        c("", "", "Monosaccharide (-H2O)", "Monosaccharide (-H2O)", 
+          "Monosaccharide (-H2O)", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 2]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 3]),
+        c("", "", "", "", "", "Malonyl group (-H2O)", ""))
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 4]),
+        c("", "", "", "", "", "Malonyl group (-H2O)", ""))
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 5]),
+        c("", "", "", "", "", "Malonyl group (-H2O)", ""))
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 6]),
+        c("", "", "", "", "", "", ""))
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 7]),
+        c("", "", "", "", "", "", ""))
     expect_equal(unique(as.vector(assay(struct_adj, "transformation"))),
         c("", "Monosaccharide (-H2O)", "Malonyl group (-H2O)"))
     expect_equal(unique(as.vector(assay(struct_adj, "mass_difference"))),
-                 c("", "162.0528234315", "86.0003939305"))
+        c("", "162.0528234315", "86.0003939305"))
     expect_true(is.matrix(assay(struct_adj, "binary")))
     expect_true(is.matrix(assay(struct_adj, "transformation")))
     expect_true(is.matrix(assay(struct_adj, "mass_difference")))

@@ -18,10 +18,12 @@ and `"mass"` that will be used for detection of transformation of
 
 \item{ppm}{`numeric`, mass accuracy of m/z features in parts per million (ppm)}
 
-\item{directed}{`logical`, if `TRUE` absolute values of m/z differences will be
+\item{directed}{`logical`, if `TRUE`, absolute values of m/z differences will be
 taken to query against `transformation`  (irrespective the sign of `mass`)
 and undirected adjacency matrices will be returned as the respective
-assays. if `FALSE` directed
+assays. This means, if there is a negative mass in 
+`transformation[, "mass"]`, this negative mass will not be reported. 
+If `FALSE`, directed
 adjacency matrices will be returned with links reported that match the
 transformations defined in `transformation` (respecting the sign of `mass`).
 The `directed` slot of the returned `AdjacencyMatrix` object will contain

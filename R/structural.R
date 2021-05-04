@@ -30,10 +30,12 @@
 #' ppm `numeric`, mass accuracy of m/z features in parts per million (ppm)
 #' 
 #' @param
-#' directed `logical`, if `TRUE` absolute values of m/z differences will be
+#' directed `logical`, if `TRUE`, absolute values of m/z differences will be
 #' taken to query against `transformation`  (irrespective the sign of `mass`)
 #' and undirected adjacency matrices will be returned as the respective
-#' assays. if `FALSE` directed
+#' assays. This means, if there is a negative mass in 
+#' `transformation[, "mass"]`, this negative mass will not be reported. 
+#' If `FALSE`, directed
 #' adjacency matrices will be returned with links reported that match the
 #' transformations defined in `transformation` (respecting the sign of `mass`).
 #' The `directed` slot of the returned `AdjacencyMatrix` object will contain
@@ -103,9 +105,22 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 
     ## calculate difference between rownames and colnames
     ## (difference between features)
-    mat_1 <- mat - t(mat_1) ## max
-    mat_2 <- mat - t(mat_2) ## min
-
+    
+    ## lower triangle
+    .mat_1 <- mat
+    tmp <- t(mat_1) - mat
+    .mat_1[upper.tri(tmp, diag = TRUE)] <- tmp[upper.tri(tmp, diag = TRUE)]
+    tmp <- -1 * (mat_1 - t(mat))
+    .mat_1[lower.tri(tmp)] <- tmp[lower.tri(tmp)]
+    mat_1 <- .mat_1 ## max in lower.tri, min in upper.tri
+    
+    .mat_2 <- mat
+    tmp <- t(mat_2) - mat
+    .mat_2[upper.tri(tmp, diag = TRUE)] <- tmp[upper.tri(tmp, diag = TRUE)]
+    tmp <- -1 * (mat_2 - t(mat))
+    .mat_2[lower.tri(tmp)] <- tmp[lower.tri(tmp)]
+    mat_2 <- .mat_2 ## min in lower.tri, max in upper.tri
+    
     if (!directed) {
         mat_1_abs <- abs(mat_1)
         mat_2_abs <- abs(mat_2)
@@ -123,12 +138,12 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     for (i in seq_along(transformation[, "mass"])) {
         
         transf_i <- transformation[i, ]
-        ind_mat_1 <- which(mat_1 >= transf_i[["mass"]])
-        ind_mat_2 <- which(mat_2 <= transf_i[["mass"]])
-
+        
         ## get intersect from the two (indices where "mass" is in the interval)
-        ind_hit <- intersect(ind_mat_1, ind_mat_2)
-
+        ind_hit <- which(
+            (mat_1 >= transf_i[["mass"]] & mat_2 <= transf_i[["mass"]]) |
+                (mat_1 <= transf_i[["mass"]] & mat_2 >= transf_i[["mass"]]))
+        
         ## write to these indices 1, the "group", and the mass 
         ## (paste the value to group and mass if there is already a value in the
         ## cell)
