@@ -272,7 +272,14 @@ struct_adj_dir <- structural(x = x_test, transformation = transformations,
 ```
 
 In the following we will visualize the results from the undirected and 
-directed structural network:
+directed structural network. 
+
+We will set the mode of the `igraph` object
+to `"directed"` in both cases to make the distinction between the returned
+outputs of `structural` for setting `directed = FALSE` and `directed = TRUE`.
+Alternatively, we could also set the `mode` for the first `igraph` object
+(using the undirected output of `structural`) to `"undirected"` which results
+in an `igraph` object where the directionality of the edges is not retained. 
 
 ```{r visualization_directed}
 g_undirected <- igraph::graph_from_adjacency_matrix(
