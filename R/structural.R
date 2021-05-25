@@ -81,7 +81,6 @@
 #'
 #' @export
 structural <- function(x, transformation, ppm = 5, directed = FALSE) {
-
     if (!is.data.frame(transformation))
         stop("transformation is not a data.frame")
     if (!"group" %in% colnames(transformation))
@@ -89,38 +88,36 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     if (!"mass" %in% colnames(transformation))
         stop("transformation does not contain the column mass")
     if (!"mz" %in% colnames(x)) stop("x does not contain the column mz")
-
+    
     if (!is.numeric(ppm)) stop("ppm is not numeric")
-
+    
     masses_order <- order(x[, "mz"], decreasing = TRUE)
     mass <- x[masses_order, "mz"] # original order 'order(masses_order)'
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
     rownames(mat) <- colnames(mat) <- mass
-
+    
     ## create matrix which has rownames per row
     mat <- apply(mat, 1, function(x) as.numeric(mass))
-
+    
     ## calculate difference between masses, considering the ppm deviations
     ## (difference between features)
-    tmp <- (mat / abs(ppm / 10 ^ 6 + 1)) - t(mat / abs(ppm / 10 ^ 6 - 1))
+    tmp <- (mat / abs(ppm / 10 ^ 6 - 1)) - t(mat / abs(ppm / 10 ^ 6 + 1))
     tmp[lower.tri(tmp)] <- -1 * tmp[lower.tri(tmp)]
     
     ## get upper and bounds
     bounds <- rbind(t(tmp)[lower.tri(tmp)], tmp[lower.tri(tmp)])
-
+    
     ## set overlapping bounds (negative values) to zero
     bounds[bounds < 0] <- 0
-
-    ## upper bounds
-    upper <- bounds[1, ]
     
-    ## lower bounds 
+    ## upper and lower bounds
+    upper <- bounds[1, ]
     lower <- bounds[2, ]
     
     ## create matrices and arrays to store result
-    mat_bin <- matrix(0, nrow = length(mass), ncol = length(mass), dimnames = list(mass, mass))
-    mat_type <- matrix("", nrow = length(mass), ncol = length(mass), dimnames = list(mass, mass))
-    mat_mass <- matrix("", nrow = length(mass), ncol = length(mass), dimnames = list(mass, mass))
+    mat_bin <- matrix(0, nrow = length(mass), ncol = length(mass))
+    mat_type <- matrix("", nrow = length(mass), ncol = length(mass))
+    mat_mass <- matrix("", nrow = length(mass), ncol = length(mass))
     arr_bin <- array(data = 0, dim = length(lower))
     arr_type <- array(data = "", dim = length(lower))
     arr_mass <- array(data = "", dim = length(lower))
@@ -135,18 +132,17 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
         ind_hit <- 
             which(upper >= transf_i[["mass"]] & lower <= transf_i[["mass"]]) 
         
-        ## write on these indices 1, the "group", and the mass 
-        ## (paste the value to group and mass if there is already a value in the
-        ## cell)
+        ## write on these indices 1, the "group", and the mass (paste the value
+        ## to group and mass if there is already a value in the cell)
         arr_bin[ind_hit] <- 1
         arr_type[ind_hit] <- ifelse(arr_type[ind_hit] != "",
-            yes = paste(arr_type[ind_hit], transf_i[["group"]], sep = "/"),
-            no = as.character(transf_i[["group"]]))
+                                    yes = paste(arr_type[ind_hit], transf_i[["group"]], sep = "/"),
+                                    no = as.character(transf_i[["group"]]))
         arr_mass[ind_hit] <- ifelse(arr_mass[ind_hit] != "",
-            yes = paste(arr_mass[ind_hit], transf_i[["mass"]], sep = "/"),
-            no = as.character(transf_i[["mass"]]))
+                                    yes = paste(arr_mass[ind_hit], transf_i[["mass"]], sep = "/"),
+                                    no = as.character(transf_i[["mass"]]))
     }
-
+    
     ## fill the matrices with the corresponding transformation values
     mat_bin[lower.tri(mat_bin)] <- arr_bin
     mat_bin <- t(mat_bin)
@@ -160,7 +156,6 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     mat_mass <- t(mat_mass)
     mat_mass[lower.tri(mat_mass)] <- arr_mass
     
-
     ## reorder matrices to match the initial ordering (order(masses_order))
     mat_mass <- mat_mass[order(masses_order), order(masses_order)]
     mat_bin <- mat_bin[order(masses_order), order(masses_order)]
@@ -172,11 +167,11 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     
     ## create the AdjacencyMatrix object
     l <- list(binary = mat_bin, transformation = mat_type, 
-        mass_difference = mat_mass)
+              mass_difference = mat_mass)
     rD <- DataFrame(names = rownames(mat_bin), row.names = rownames(mat_bin))
     
     am <- AdjacencyMatrix(l, rowData = rD, type = "structural", 
-        directed = directed, thresholded = FALSE)
+                          directed = directed, thresholded = FALSE)
     
     return(am)
 }
