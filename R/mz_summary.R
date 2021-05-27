@@ -82,16 +82,17 @@ mz_summary <- function(am, filter = 0){
         am_df <- am_df[am_df$combine_binary == 1, ]
         am_df <- stats::na.omit(am_df, "combine_binary")
     
-        sum_mass <- am_df %>% 
-            dplyr::group_by(.data$combine_mass_difference) %>%  
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()
-        
         sum_transform <- am_df %>% 
-            dplyr::group_by(.data$combine_transformation) %>% 
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()  %>% 
-            tibble::add_column(sum_mass$combine_mass_difference)
+            dplyr::group_by(.data$transformation) %>% 
+            dplyr::summarise(count = dplyr::n()) %>% 
+            as.data.frame() 
+        
+        sum_transform <- 
+            dplyr::left_join(
+                sum_transform, 
+                unique(am_df[, c("transformation", "mass_difference")]), 
+                by="transformation"
+            )
     }
   
     ## if AdjacencyMatrix of type `structural` is used 
@@ -102,16 +103,17 @@ mz_summary <- function(am, filter = 0){
         
         am_df <- am_df[am_df$binary == 1, ]
         
-        sum_mass <- am_df %>% 
-            dplyr::group_by(.data$mass_difference) %>%  
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()
-        
         sum_transform <- am_df %>% 
             dplyr::group_by(.data$transformation) %>% 
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()  %>% 
-            tibble::add_column(sum_mass$mass_difference)
+            dplyr::summarise(count = dplyr::n()) %>% 
+            as.data.frame() 
+        
+        sum_transform <- 
+            dplyr::left_join(
+                sum_transform, 
+                unique(am_df[, c("transformation", "mass_difference")]), 
+                by="transformation"
+            )
     }
   
     colnames(sum_transform) <- c("transformation", "counts", "mass_difference")
