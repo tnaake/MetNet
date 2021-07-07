@@ -100,25 +100,29 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     mat <- apply(mat, 1, function(x) as.numeric(mass))
 
     ## calculate ppm deviation
-    mat_1 <- mat / abs(ppm / 10 ^ 6 + 1)
-    mat_2 <- mat / abs(ppm / 10 ^ 6 - 1)
+    ## mat_1 contains lower values than mat, 
+    ## it contains the mz values for M - ppm
+    mat_1 <- mat / abs(ppm / 10 ^ 6 + 1) 
+    ## mat_2 contains higher values than mat
+    ## it contains the mz values for M + ppm
+    mat_2 <- mat / abs(ppm / 10 ^ 6 - 1) 
 
     ## calculate difference between rownames and colnames
-    ## (difference between features)
-    
+    ## (hypothetically possible differences between features)
     ## lower triangle
+    lt <- lower.tri(mat)
     .mat_1 <- mat
     tmp <- t(mat_1) - mat
     .mat_1[upper.tri(tmp, diag = TRUE)] <- tmp[upper.tri(tmp, diag = TRUE)]
     tmp <- -1 * (mat_1 - t(mat))
-    .mat_1[lower.tri(tmp)] <- tmp[lower.tri(tmp)]
+    .mat_1[lt] <- tmp[lt]
     mat_1 <- .mat_1 ## max in lower.tri, min in upper.tri
     
     .mat_2 <- mat
     tmp <- t(mat_2) - mat
     .mat_2[upper.tri(tmp, diag = TRUE)] <- tmp[upper.tri(tmp, diag = TRUE)]
     tmp <- -1 * (mat_2 - t(mat))
-    .mat_2[lower.tri(tmp)] <- tmp[lower.tri(tmp)]
+    .mat_2[lt] <- tmp[lt]
     mat_2 <- .mat_2 ## min in lower.tri, max in upper.tri
     
     if (!directed) {
