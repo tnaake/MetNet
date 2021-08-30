@@ -116,7 +116,7 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
     ## calculate ppm deviation
     ## mat_1 contains lower values than mat, 
     ## it contains the mz values for M - ppm
-    mat_1 <- p
+    mat_1 <- mat / abs(ppm / 10 ^ 6 + 1) 
     ## mat_2 contains higher values than mat
     ## it contains the mz values for M + ppm
     mat_2 <- mat / abs(ppm / 10 ^ 6 - 1) 
