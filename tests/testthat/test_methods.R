@@ -83,12 +83,14 @@ test_that("as.data.frame", {
         c("Row", "Col", "binary", "transformation", "mass_difference"))
     expect_equal(df$Row[1:5], c("x9485", "x7449", "x7449", "x11179", "x11179"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449")) 
-    expect_equal(df$binary[1:5], c(0, 0, 0, 0, 1))
-    expect_equal(as.vector(table(df$binary)), c(650, 16))
-    expect_equal(df$transformation[1:5], c(rep("", 4), "Monosaccharide (-H2O)"))
-    expect_equal(as.vector(table(df$transformation)), c(650, 10, 6))
-    expect_equal(df$mass_difference[1:5], c(rep("", 4), "162.0528234315"))
-    expect_equal(as.vector(table(df$mass_difference)), c(650, 6, 10))
+    expect_equal(df$binary[1:5], c(0, 1, 0, 0, 1))
+    expect_equal(as.vector(table(df$binary)), c(649, 17))
+    expect_equal(df$transformation[1:5], 
+        c("", "Malonyl group (-H2O)", "", "", "Monosaccharide (-H2O)"))
+    expect_equal(as.vector(table(df$transformation)), c(649, 11, 6))
+    expect_equal(df$mass_difference[1:5], 
+        c("", "86.0003939305", "", "", "162.0528234315"))
+    expect_equal(as.vector(table(df$mass_difference)), c(649, 6, 11))
     
     ## struct_adj_thr
     df <- as.data.frame(struct_adj_thr)
@@ -97,12 +99,14 @@ test_that("as.data.frame", {
         c("Row", "Col", "binary", "transformation", "mass_difference"))
     expect_equal(df$Row[1:5], c("x9485", "x7449", "x7449", "x11179", "x11179"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
-    expect_equal(df$binary[1:5], c(0, 0, 0, 0, 0))
-    expect_equal(as.vector(table(df$binary)), c(656, 10))
-    expect_equal(df$transformation[1:5], rep("", 5))
-    expect_equal(as.vector(table(df$transformation)), c(656, 10))
-    expect_equal(df$mass_difference[1:5], rep("", 5))
-    expect_equal(as.vector(table(df$mass_difference)), c(656, 10))
+    expect_equal(df$binary[1:5], c(0, 1, 0, 0, 0))
+    expect_equal(as.vector(table(df$binary)), c(655, 11))
+    expect_equal(df$transformation[1:5], 
+        c("", "Malonyl group (-H2O)", "", "", ""))
+    expect_equal(as.vector(table(df$transformation)), c(655, 11))
+    expect_equal(df$mass_difference[1:5], 
+        c("", "86.0003939305", "", "", ""))
+    expect_equal(as.vector(table(df$mass_difference)), c(655, 11))
     
     ## stat_adj
     df <- as.data.frame(stat_adj)
@@ -159,17 +163,18 @@ test_that("as.data.frame", {
     expect_equal(sum(df$spearman_pvalue, na.rm = TRUE), 58.33817,
         tolerance = 1e-06)
     expect_equal(sum(df$consensus, na.rm = TRUE), 14)
-    expect_equal(df$binary[1:5], c(0, 0, 0, 0, 1))
-    expect_equal(as.vector(table(df$binary)), c(650, 16))
-    expect_equal(df$transformation[1:5], c(rep("", 4), "Monosaccharide (-H2O)"))
-    expect_equal(as.vector(table(df$transformation)), c(650, 10, 6))
-    expect_equal(df$mass_difference[1:5], c(rep("", 4), "162.0528234315"))
-    expect_equal(as.vector(table(df$mass_difference)), c(650, 6, 10))
+    expect_equal(df$binary[1:5], c(0, 1, 0, 0, 1))
+    expect_equal(as.vector(table(df$binary)), c(649, 17))
+    expect_equal(df$transformation[1:5], 
+        c("", "Malonyl group (-H2O)", "", "", "Monosaccharide (-H2O)"))
+    expect_equal(as.vector(table(df$transformation)), c(649, 11, 6))
+    expect_equal(df$mass_difference[1:5], 
+        c("", "86.0003939305", "", "", "162.0528234315"))
+    expect_equal(as.vector(table(df$mass_difference)), c(649, 6, 11))
     expect_equal(df$combine_binary[1:5], c(NA, 0, NA, 0, 0))
     expect_equal(as.vector(table(df$combine_binary)), c(623, 7))
     expect_equal(df$combine_transformation[1:5], c(NA, "", NA, "", ""))
     expect_equal(as.vector(table(df$combine_transformation)), c(623, 6, 1))
     expect_equal(df$combine_mass_difference[1:5], c(NA, "", NA, "", ""))
     expect_equal(as.vector(table(df$combine_mass_difference)), c(623, 1, 6))
-    
 })

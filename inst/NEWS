@@ -1,3 +1,8 @@
+Changes in version 1.11.3 (2021-08-30)
++ change calculation of mass differences, use the differences between 
+  (M_2+ppm)-(M_1-ppm) and (M_2-ppm)-(M_1+ppm) instead of (M_1-ppm)-(M_1) and 
+  (M_2+ppm)-(M_1) for querying against the list of transformations
+
 Changes in version 1.11.2 (2021-08-30)
 + change error message in test_combine
 

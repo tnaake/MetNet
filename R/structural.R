@@ -98,31 +98,46 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 
     ## create matrix which has rownames per row
     mat <- apply(mat, 1, function(x) as.numeric(mass))
+    
+    ## receive indices of lower triangle
+    lt <- lower.tri(mat)
 
+    ## outline of the function here
+    ## example: we have the two features M_1 and M_2, mz(M_1) > mz(M_2), 
+    ## we calculate the ppm deviations from M_1 and M_2
+    ## M_2+ppm, M_2, M_2-ppm
+    ## M_1+ppm, M_1, M_1-ppm
+    ## we denote as A = (M_2-ppm) - (M_1+ppm) and B = (M_2+ppm) - (M_1-ppm)
+    ## we are interested in the distances A and B between each feature pair in 
+    ## the data set and check then in the following if A <= transf <= B, 
+    ## where transf is a queried transformation, ## e.g. glucose 
+    ## transformation (+162)
+    
     ## calculate ppm deviation
     ## mat_1 contains lower values than mat, 
     ## it contains the mz values for M - ppm
-    mat_1 <- mat / abs(ppm / 10 ^ 6 + 1) 
+    mat_1 <- p
     ## mat_2 contains higher values than mat
     ## it contains the mz values for M + ppm
     mat_2 <- mat / abs(ppm / 10 ^ 6 - 1) 
-
+    
     ## calculate difference between rownames and colnames
     ## (hypothetically possible differences between features)
-    ## lower triangle
-    lt <- lower.tri(mat)
     .mat_1 <- mat
-    tmp <- t(mat_1) - mat
+    tmp <- t(mat_1) - mat_2
     .mat_1[upper.tri(tmp, diag = TRUE)] <- tmp[upper.tri(tmp, diag = TRUE)]
-    tmp <- -1 * (mat_1 - t(mat))
+    tmp <- -1 * (mat_1 - t(mat_2))
     .mat_1[lt] <- tmp[lt]
-    mat_1 <- .mat_1 ## max in lower.tri, min in upper.tri
+   
     
     .mat_2 <- mat
-    tmp <- t(mat_2) - mat
+    tmp <- t(mat_2) - mat_1
     .mat_2[upper.tri(tmp, diag = TRUE)] <- tmp[upper.tri(tmp, diag = TRUE)]
-    tmp <- -1 * (mat_2 - t(mat))
+    tmp <- -1 * (mat_2 - t(mat_1))
     .mat_2[lt] <- tmp[lt]
+    
+    ## write the A and B values back to mat_1 and mat_2
+    mat_1 <- .mat_1 ## max in lower.tri, min in upper.tri
     mat_2 <- .mat_2 ## min in lower.tri, max in upper.tri
     
     if (!directed) {
@@ -132,7 +147,11 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
         mat_2 <- ifelse(mat_1_abs > mat_2_abs, mat_2_abs, mat_1_abs) ## min
     }
 
-    ## create two matrices to store result
+    ## create three matrices to store result, 
+    ## mat_bin contains binary information (0/1) if a connection between two
+    ## features is present
+    ## mat_type contains information on the type of transformation
+    ## mat_mass contains information on the mass difference
     mat_bin <- matrix(0, nrow = length(mass), ncol = length(mass))
     mat_type <- matrix("", nrow = length(mass), ncol = length(mass))
     mat_mass <- matrix("", nrow = length(mass), ncol = length(mass))
