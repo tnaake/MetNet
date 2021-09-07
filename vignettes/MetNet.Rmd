@@ -132,9 +132,8 @@ BiocManager::install("MetNet")
 ```
 
 Before starting with the analysis, load the `MetNet` package. This 
-will also load the required packages `glmnet`, `stabs`,
-`randomForest`, `rfPermute`, `mpmi`,
-`parmigene`, `WGCNA` and `bnlearn` that are needed
+will also load the required packages `glmnet`, `stabs`, `GENIE3`, `mpmi`,
+`parmigene`, `ppcor` and `bnlearn` that are needed
 for functions in the statistical adjacency matrix inference.
 ```{r load_MetNet,eval=TRUE}
 library(MetNet)
