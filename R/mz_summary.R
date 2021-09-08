@@ -55,23 +55,22 @@
 #' @importFrom rlang .data
 mz_summary <- function(am, filter = 0){
   
-    if (!is(am, "AdjacencyMatrix")) {
+    if (!is(am, "AdjacencyMatrix")) 
         stop("'am' is not an 'AdjacencyMatrix' object")
-    }
   
     if (!validObject(am)) 
         stop("'am' must be a valid 'AdjacencyMatrix' object") 
 
-    am_df <- as.data.frame(am)
-
-    if (!"combine" %in% type(am) & !"structural" %in% type(am) ) 
+    if (!"combine" %in% type(am) & !"structural" %in% type(am)) 
         stop("'am' is not of type 'structural' or 'combine'")
-
+  
     if (!is.numeric(filter)) 
         stop("'filter' needs to be numeric")
   
     if (filter < 0) 
         stop("'filter' needs to be 0 or positive numeric")
+
+    am_df <- as.data.frame(am)
   
     ## if AdjacencyMatrix of type `combine` is used 
     if("combine" %in% type(am)) {
