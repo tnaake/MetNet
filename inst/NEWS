@@ -1,3 +1,8 @@
+Changes in version 1.11.4 (2021-09-09)
++ shift calculation of as.data.frame(am) in mz_summary
++ several fixes of typos in the comments and vignette
++ fix rtCorrection function
+
 Changes in version 1.11.3 (2021-08-30)
 + change calculation of mass differences, use the differences between 
   (M_2+ppm)-(M_1-ppm) and (M_2-ppm)-(M_1+ppm) instead of (M_1-ppm)-(M_1) and 
