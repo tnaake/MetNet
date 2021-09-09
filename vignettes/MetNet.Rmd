@@ -133,7 +133,7 @@ BiocManager::install("MetNet")
 
 Before starting with the analysis, load the `MetNet` package. This 
 will also load the required packages `glmnet`, `stabs`, `GENIE3`, `mpmi`,
-`parmigene`, `ppcor` and `bnlearn` that are needed
+`parmigene`, `Hmisc`, `ppcor` and `bnlearn` that are needed
 for functions in the statistical adjacency matrix inference.
 ```{r load_MetNet,eval=TRUE}
 library(MetNet)
@@ -379,7 +379,7 @@ Mutual Information using a nonparametric bias correction by
 Bias Corrected Mutual Information, and the functions `clr` and 
 `aracne.a` from the `parmigene` package), Pearson and 
 Spearman correlation (based on the 
-`stats` package), partial and semipartial 
+`Hmisc` package), partial and semipartial 
 Pearson and Spearman correlation (using the `ppcor` package) and 
 score-based structure learning returning the strength of the probabilistic 
 relationships of the arcs of 

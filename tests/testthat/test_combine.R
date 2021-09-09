@@ -64,6 +64,6 @@ test_that("combine", {
         transformation = transformations, ppm = 5)
     
     expect_error(combine(struct_adj_rev, stat_adj_thr),
-        "are not identical to those of the receiving\n  AdjacencyMatrix object")
+        "when the dimnames on the supplied assay[(]s[)] are not|n")
 })
 ## END unit test combine ##

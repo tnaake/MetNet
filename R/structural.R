@@ -251,17 +251,18 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 #' (indicated by `"+"` for a higher retention time of the feature with
 #' the putative group, `"-"` for a lower retention time of the feature
 #' with the putative group or `"?"` when there is no information
-#' available or features with that group should not be checked). In case
-#' several transformation were assigned to a feature/feature pair connections
-#' will always be removed if there is an inconsistency with any of the given
-#' transformation.
+#' available or features with that group should not be checked). 
+#' 
+#' In case several transformation were assigned to a feature/feature pair,
+#' the connection will always be removed if there is an inconsistency with any 
+#' of the given transformations.
 #'
 #' @return
 #' `AdjacencyMatrix` containing the slots `binary`, `transformation`, and 
 #' `mass_difference`.
 #' The slot `directed` is inherited from `am`
 #' 
-#' . The first entry stores the
+#' The first entry stores the
 #' `numeric` `matrix` with edges inferred mass differences corrected by
 #' retention time shifts. The second entry stores the `character` matrix with
 #' the type (corresponding to the `"group`" column
@@ -271,7 +272,11 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 #'
 #' @examples
 #' data("x_test", package = "MetNet")
+#' rownames(x_test) <- paste(round(x_test[, "mz"], 2),
+#'     round(x_test[, "rt"]), sep = "_")
 #' transformation <- rbind(
+#'     c("Hydroxylation (-H)", "O", 15.9949146221, "+"),
+#'     c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "+"),
 #'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315", "-"),
 #'     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851", "-"),
 #'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945", "-"))
@@ -279,9 +284,19 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 #'          formula = transformation[, 2],
 #'          mass = as.numeric(transformation[, 3]),
 #'          rt = transformation[, 4])
-#' am_struct <- structural(x = x_test, transformation = transformation, ppm = 5)
-#' am_struct_rt <- rtCorrection(am = am_struct, x = x_test, 
+#' am_struct <- structural(x = x_test, transformation = transformation, ppm = 10)
+#' am_struct_rt <- rtCorrection(am = am_struct, x = x_test,
 #'      transformation = transformation)
+#'
+#' ## visualize the adjacency matrices
+#' library(igraph)
+#' g <- graph_from_adjacency_matrix(assay(am_struct, "binary"),
+#'     mode = "undirected")
+#' g_rt <- graph_from_adjacency_matrix(assay(am_struct_rt, "binary"),
+#'     mode = "undirected")
+#'
+#' plot(g, edge.width = 2, edge.arrow.size = 0.5, vertex.label.cex = 0.7)
+#' plot(g_rt, edge.width = 2, edge.arrow.size = 0.5, vertex.label.cex = 0.7)
 #'
 #' @export
 rtCorrection <- function(am, x, transformation) {
@@ -324,7 +339,7 @@ rtCorrection <- function(am, x, transformation) {
     mat_rt <- matrix(0, nrow = n, ncol = n)
     colnames(mat_rt) <- rownames(mat_rt) <- x[rn_mat_bin, "rt"]
     
-    ## create matrix which has rownmames per row
+    ## create matrix which has rownames per row
     mat_rt <- apply(mat_rt, 1, function(x) as.numeric(rownames(mat_rt)))
     
     ## calculate difference between rownames and colnames
@@ -335,7 +350,7 @@ rtCorrection <- function(am, x, transformation) {
     mat_mz <- matrix(0, nrow = n, ncol = n)
     colnames(mat_mz) <- rownames(mat_mz) <- x[rn_mat_bin, "mz"]
     
-    ## create matrix which has rowmames per row
+    ## create matrix which has rownames per row
     mat_mz <- apply(mat_mz, 1, function(x) as.numeric(rownames(mat_mz)))
     
     ## calculate difference between rownames and colnames
@@ -353,21 +368,21 @@ rtCorrection <- function(am, x, transformation) {
         ## check if observed rt shift corresponds to expected one and
         ## remove connection if necessary
         if (transformation[j, "rt"] == "+") {
-            mat_bin[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- 0
-            mat_type[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
-            mat_mass[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
-            mat_bin[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- 0
-            mat_type[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
-            mat_mass[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
-        }
-
-        if (transformation[j, "rt"] == "-") {
             mat_bin[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- 0
             mat_type[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
             mat_mass[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
             mat_bin[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- 0
             mat_type[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
             mat_mass[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
+        }
+
+        if (transformation[j, "rt"] == "-") {
+            mat_bin[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- 0
+            mat_type[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
+            mat_mass[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
+            mat_bin[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- 0
+            mat_type[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
+            mat_mass[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
         }
     }
 
