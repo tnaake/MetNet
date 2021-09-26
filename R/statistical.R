@@ -263,8 +263,8 @@ aracne <- function(mi, eps = 0.05) {
 #'
 #' @description
 #' `correlation` infers an adjacency matrix using
-#' correlation using the `rcorr` function (from the
-#' `Hmisc` package), `pcor` (from `ppcor`) or
+#' correlation using the `corr.test` function (from the
+#' `psych` package), `pcor` (from `ppcor`) or
 #' `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
 #' correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
 #' and will return
@@ -283,7 +283,7 @@ aracne <- function(mi, eps = 0.05) {
 #'
 #' @details
 #' If `"pearson"` or `"spearman"` is used as a `method`, the function
-#' `rcorr` from `Hmisc` will be employed.
+#' `corr.test` from `psych` will be employed.
 #'
 #' If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
 #' function `pcor` from `spcor` will be employed.
@@ -291,7 +291,7 @@ aracne <- function(mi, eps = 0.05) {
 #' If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
 #' `method` the function `spcor` from `spcor` will be employed.
 #'
-#' `type` will be passed to argument `method` in `rcorr`
+#' `method` will be passed to argument `method` in `corr.test`
 #' (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
 #' (`"pearson"` and `"spearman"` for `"pearson_partial"` and
 #' `"spearman_partial"`, respectively) or to `method` in `spcor`
@@ -312,27 +312,25 @@ aracne <- function(mi, eps = 0.05) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
-#' correlation(x, type = "pearson")
+#' correlation(x, method = "pearson")
 #'
 #' @export
 #' 
-#' @importFrom Hmisc rcorr
+#' @importFrom psych corr.test
 #' @importFrom ppcor pcor spcor
 #' @importFrom stats p.adjust
-correlation <- function(x, type = "pearson", p.adjust = "none") {
+correlation <- function(x, method = "pearson", p.adjust = "none") {
 
     ## for pearson/spearman correlation
-    if (type %in% c("pearson", "spearman")) {
-        cor_mat <- Hmisc::rcorr(x = t(x), type = type)
-        cor_mat$P <- matrix(
+    if (method %in% c("pearson", "spearman")) {
+        cor_mat <- psych::corr.test(x = t(x), method = method, adjust = "none")
+        cor_mat$p.adj <- matrix(
             stats::p.adjust(as.vector(cor_mat$P), method = p.adjust),
             ncol = ncol(cor_mat$P), nrow = nrow(cor_mat$P), byrow = TRUE)
     }
 
     ## for partial pearson/spearman correlation
-    if (type %in% c("pearson_partial", "spearman_partial")) {
-        if (type == "pearson_partial") method <- "pearson"
-        if (type == "spearman_partial") method <- "spearman"
+    if (method %in% c("pearson_partial", "spearman_partial")) {
         cor_mat <- ppcor::pcor(t(x), method = method)
         cor_mat$p.value <- matrix(
             stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
@@ -341,9 +339,7 @@ correlation <- function(x, type = "pearson", p.adjust = "none") {
     }
 
     ## for semipartial pearson/spearman corelation
-    if (type %in% c("pearson_semipartial", "spearman_semipartial")) {
-        if (type == "pearson_semipartial") method <- "pearson"
-        if (type == "spearman_semipartial") method <- "spearman"
+    if (method %in% c("pearson_semipartial", "spearman_semipartial")) {
         cor_mat <- ppcor::spcor(t(x), method = method)
         cor_mat$p.value <- matrix(
             stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
@@ -477,8 +473,8 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
-#' cor_pearson <- correlation(x, type = "pearson")
-#' cor_spearman <- correlation(x, type = "spearman")
+#' cor_pearson <- correlation(x, method = "pearson")
+#' cor_spearman <- correlation(x, method = "spearman")
 #' l <- list(pearson = cor_pearson)
 #' MetNet:::addToList(l, "spearman_coef", cor_spearman$r)
 addToList <- function(l, name, object) {
@@ -642,10 +638,10 @@ statistical <- function(x, model, ...) {
 
     ## add entry for pearson if "pearson" is in model
     if ("pearson" %in% model) {
-        res <- threeDotsCall("correlation", x = x, type = "pearson", ...)
+        res <- threeDotsCall("correlation", x = x, method = "pearson", ...)
         pearson_coef <- res[["r"]]
         diag(pearson_coef) <- NaN
-        pearson_pvalue <- res[["P"]]
+        pearson_pvalue <- res[["p"]]
         diag(pearson_pvalue) <- NaN
         l <- addToList(l, "pearson_coef", pearson_coef)
         l <- addToList(l, "pearson_pvalue", pearson_pvalue)
@@ -655,7 +651,7 @@ statistical <- function(x, model, ...) {
     ## add entry for pearson_partial if "pearson_partial" is in model
     if ("pearson_partial" %in% model) {
         res <- threeDotsCall("correlation", x = x,
-            type = "pearson_partial", ...)
+            method = "pearson_partial", ...)
         pearson_p_coef <- res[["estimate"]]
         diag(pearson_p_coef) <- NaN
         pearson_p_pvalue <- res[["p.value"]]
@@ -668,7 +664,7 @@ statistical <- function(x, model, ...) {
     ## add entry for pearson_semipartial if "pearson_semipartial" is in model
     if ("pearson_semipartial" %in% model) {
         res <- threeDotsCall("correlation", x = x,
-            type = "pearson_semipartial", ...)
+            method = "pearson_semipartial", ...)
         pearson_sp_coef <- res[["estimate"]]
         diag(pearson_sp_coef) <- NaN
         pearson_sp_pvalue <- res[["p.value"]]
@@ -680,7 +676,7 @@ statistical <- function(x, model, ...) {
 
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
-        res <- threeDotsCall("correlation", x = x, type = "spearman", ...)
+        res <- threeDotsCall("correlation", x = x, method = "spearman", ...)
         spearman_coef <- res[["r"]]
         diag(spearman_coef) <- NaN
         spearman_pvalue <- res[["P"]]
@@ -693,7 +689,7 @@ statistical <- function(x, model, ...) {
     ## add entry for spearman_partial if "spearman_partial" is in model
     if ("spearman_partial" %in% model) {
         res <- threeDotsCall("correlation", x = x, 
-            type = "spearman_partial", ...)
+            method = "spearman_partial", ...)
         spearman_p_coef <- res[["estimate"]]
         diag(spearman_p_coef) <- NaN
         spearman_p_pvalue <- res[["p.value"]]
@@ -706,7 +702,7 @@ statistical <- function(x, model, ...) {
     ## add entry for spearman_semipartial if "spearman_semipartial" is in model
     if ("spearman_semipartial" %in% model) {
         res <- threeDotsCall("correlation", x = x,
-            type = "spearman_semipartial", ...)
+            method = "spearman_semipartial", ...)
         spearman_sp_coef <- res[["estimate"]]
         diag(spearman_sp_coef) <- NaN
         spearman_sp_pvalue <- res[["p.value"]]
