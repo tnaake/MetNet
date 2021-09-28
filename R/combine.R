@@ -78,46 +78,63 @@ combine <- function(am_structural, am_statistical) {
     ## create the first entry of the list
     ## sum the matrices structural and statistical, if the value is above
     ## threshold then assign 1, otherwise 0
-    mat_bin <- assay(am_structural, "binary") + assay(am_statistical, "consensus")
-    mat_bin <- ifelse(mat_bin > 1, 1, 0)
+    l_comb_binary <- assay(am_structural, "binary") + assay(am_statistical, "consensus")
+    l_comb_binary <- ifelse(l_comb_binary > 1, 1, 0)
     
-    ## create the second entry of the list
+    ## create the entries of the list
     ## if element in mat_bin is equal to 1, take the element in 
-    ## the assay "transformation" (the type of link), otherwise ""
-    mat_type <- ifelse(mat_bin == 1, assay(am_structural, "transformation"), "")
+    ## the assay .nms_i, otherwise take ""
+    .nms <- SummarizedExperiment::assayNames(am_structural)
+    .nms_cut <- .nms[!.nms %in% "binary"]
     
-    ## create the third entry of the list
-    ## if element in mat_bin is equal to 1, take the element in 
-    ## the assay "mass_difference" (the mass difference of link), otherwise ""
-    mat_mass <- ifelse(mat_bin == 1, assay(am_structural, "mass_difference"), "")
+    l_comb <- lapply(.nms_cut, function(.nms_cut_i) {
+        l_comb_i <- ifelse(l_comb_binary == 1 & !is.na(l_comb_binary), 
+                            yes = assay(am_structural, .nms_cut_i), no = "")
+        l_comb_i
+    })
+    names(l_comb) <- .nms_cut
     
-    ## create the AdjacencyMatrix object
-    am <- am_statistical
-    assay(am, "binary") <- assay(am_structural, "binary")
-    assay(am, "transformation") <- assay(am_structural, "transformation")
-    assay(am, "mass_difference") <- assay(am_structural, "mass_difference")
-    assay(am, "combine_binary") <- mat_bin
-    assay(am, "combine_transformation") <- mat_type
-    assay(am, "combine_mass_difference") <- mat_mass    
+    ## add the l_comb_binary to l_comb
+    l_comb <- c(list(binary = l_comb_binary), l_comb)
+    names(l_comb) <- paste("combine_", names(l_comb), sep = "")
+    
+   
+    ## create the AdjacencyMatrix object, start with the structural 
+    ## AdjacencyMatrix, then the statistical AdjacencyMatrix and add 
+    ## the l_comb
+    .nms <- SummarizedExperiment::assayNames(am_structural)
+    l_structural <- lapply(.nms, function(.nms_i) 
+        SummarizedExperiment::assay(am_structural, .nms_i))
+    names(l_structural) <- .nms
+    
+    .nms <- SummarizedExperiment::assayNames(am_statistical)
+    l_statistical <- lapply(.nms, function(.nms_i) 
+        SummarizedExperiment::assay(am_statistical, .nms_i))
+    names(l_statistical) <- .nms
+    
+    ## concatenate the lists from structural, statistical and combine
+    l <- c(l_structural, l_statistical, l_comb)
     
     ## directed slot
-    directed <- if (directed(am_structural) | directed(am_statistical)) {
-        TRUE 
+    if (directed(am_structural) | directed(am_statistical)) {
+        directed <- TRUE 
     } else {
-        FALSE
+        directed <- FALSE
     }
-    am@directed <- directed
     
     ## thresholded slot
-    thresholded <- if (thresholded(am_structural) | thresholded(am_statistical)) {
-        TRUE 
+    if (am_structural@thresholded | am_statistical@thresholded) {
+        thresholded <- TRUE 
     } else {
-        FALSE
+        thresholded <- FALSE
     }
-    am@thresholded <- thresholded
     
-    ## type slot
-    am@type <- "combine"
+    ## create the rowData
+    rD <- rowData(am_statistical)
+    
+    ## finally, combine the information and create the AdjacencyMatrix object
+    am <- AdjacencyMatrix(l, rowData = rD, type = "combine", 
+        directed = directed, thresholded = thresholded)
     
     return(am)
 }

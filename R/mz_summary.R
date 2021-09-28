@@ -53,17 +53,21 @@
 #' @importFrom dplyr `%>%`
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
-mz_summary <- function(am, filter = 0){
+mz_summary <- function(am, var = c("group", "formula"), filter = 0){
   
     if (!is(am, "AdjacencyMatrix")) 
         stop("'am' is not an 'AdjacencyMatrix' object")
   
-    if (!validObject(am)) 
+    if (!validObject(am))
         stop("'am' must be a valid 'AdjacencyMatrix' object") 
 
-    if (!"combine" %in% type(am) & !"structural" %in% type(am)) 
+    if (!"combine" %in% am@type & !"structural" %in% am@type)
         stop("'am' is not of type 'structural' or 'combine'")
   
+    var_err <- var[!var %in% SummarizedExperiment::assayNames(am)]
+    if (length(var_err) > 0)
+        stop(sprintf("assays '%s' not in 'am'", paste(var_err, collapse = "', '")))
+      
     if (!is.numeric(filter)) 
         stop("'filter' needs to be numeric")
   
@@ -73,52 +77,31 @@ mz_summary <- function(am, filter = 0){
     am_df <- as.data.frame(am)
   
     ## if AdjacencyMatrix of type `combine` is used 
-    if("combine" %in% type(am)) {
+    if("combine" %in% am@type) {
       
         if (!1 %in% am_df$combine_binary) 
-            stop("'am' does not contain any mass differences")
+            stop("assay 'combine_binary' does not contain any mass differences")
         
         am_df <- am_df[am_df$combine_binary == 1, ]
         am_df <- stats::na.omit(am_df, "combine_binary")
-    
-        sum_mass <- am_df %>% 
-            dplyr::group_by(.data$combine_mass_difference) %>%  
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()
-        
-        sum_transform <- am_df %>% 
-            dplyr::group_by(.data$combine_transformation) %>% 
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()  %>% 
-            tibble::add_column(sum_mass$combine_mass_difference)
     }
   
     ## if AdjacencyMatrix of type `structural` is used 
     else {
       
         if (!1 %in% am_df$binary)
-            stop("'am' does not contain any mass differences")
-        
+            stop("assay 'binary' does not contain any mass differences")
         am_df <- am_df[am_df$binary == 1, ]
-        
-        sum_mass <- am_df %>% 
-            dplyr::group_by(.data$mass_difference) %>%  
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()
-        
-        sum_transform <- am_df %>% 
-            dplyr::group_by(.data$transformation) %>% 
-            dplyr::summarise(count = dplyr::n()) %>%
-            as.data.frame()  %>% 
-            tibble::add_column(sum_mass$mass_difference)
     }
-  
-    colnames(sum_transform) <- c("transformation", "counts", "mass_difference")
-    sum_transform <- sum_transform %>% 
-        dplyr::select(.data$transformation, .data$mass_difference, .data$counts)
-  
-    sum_f <- sum_transform[sum_transform$counts >= filter, ]
-    return(sum_f)
+    df <- am_df %>%
+        dplyr::group_by_at(var) %>% 
+        dplyr::count(name = "count") %>%
+        as.data.frame()
+    
+    ## apply some filtering, only return those transformations that pass filter
+    df_f <- df[df$count >= filter, ]
+    
+    return(df_f)
     
   
 }
@@ -166,15 +149,18 @@ mz_summary <- function(am, filter = 0){
 #' @importFrom ggplot2 theme element_text
 #' 
 #' @export
-mz_vis <- function(df){
+mz_vis <- function(df, var){
    
   if (!is.data.frame(df)) 
     stop("'df' is not a data.frame")
   
-  if (!all(c("transformation", "mass_difference", "counts") %in% colnames(df))) 
-    stop("'df' does not contain the columns 'transformation', 'mass_difference', 'counts'")  
+  if (!"count" %in% colnames(df))
+      stop("'df' does not contain the column 'count'")
   
-  ggplot2::ggplot(df, ggplot2::aes_string(x="transformation", y="counts")) + 
+  if (!var %in% colnames(df))
+      stop(sprintf("'df' does not contain the column '%s'", var))
+  
+  ggplot2::ggplot(df, ggplot2::aes_string(x = var, y = "count")) + 
     ggplot2::geom_bar(stat = "identity") + 
     ggplot2::theme_minimal() + 
     ggplot2::coord_flip() + 

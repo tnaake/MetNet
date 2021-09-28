@@ -80,17 +80,20 @@
 #' am_struct <- structural(x_test, transformation, ppm = 5, directed = TRUE)
 #'
 #' @export
-structural <- function(x, transformation, ppm = 5, directed = FALSE) {
+structural <- function(x, transformation, var = c("group", "formula", "mass"), 
+    ppm = 5, directed = FALSE) {
 
     if (!is.data.frame(transformation))
         stop("transformation is not a data.frame")
-    if (!"group" %in% colnames(transformation))
-        stop("transformation does not contain the column group")
+    if (!"mz" %in% colnames(x)) stop("x does not contain the column mz")
+    #if (!"group" %in% scolnames(transformation))
+    #    stop("transformation does not contain the column group")
     if (!"mass" %in% colnames(transformation))
         stop("transformation does not contain the column mass")
-    if (!"mz" %in% colnames(x)) stop("x does not contain the column mz")
+    
 
     if (!is.numeric(ppm)) stop("ppm is not numeric")
+    if (ppm <= 0) stop("ppm has to be a positive value")
 
     mass <- x[, "mz"]
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
@@ -147,14 +150,19 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
         mat_2 <- ifelse(mat_1_abs > mat_2_abs, mat_2_abs, mat_1_abs) ## min
     }
 
-    ## create three matrices to store result, 
-    ## mat_bin contains binary information (0/1) if a connection between two
-    ## features is present
-    ## mat_type contains information on the type of transformation
-    ## mat_mass contains information on the mass difference
-    mat_bin <- matrix(0, nrow = length(mass), ncol = length(mass))
-    mat_type <- matrix("", nrow = length(mass), ncol = length(mass))
-    mat_mass <- matrix("", nrow = length(mass), ncol = length(mass))
+    ## create matrices to store result, 
+    ## binary contains binary information (0/1) if a connection between two
+    ## features is present (this matrix is hard-coded and required),
+    ## the other matrices are created depending on the var parameter, e.g.
+    ## if there is "group" and "mass" in var, the matrices with names "group"
+    ## and "mass" will be added to the list l
+    var_binary <- c("binary", var)
+    l <- lapply(var_binary, 
+        function(x) {
+            if (x == "binary") fill <- 0 else fill <- ""
+            matrix(fill, nrow = length(mass), ncol = length(mass))
+        })
+    names(l) <- var_binary
 
     ## iterate through each column and check if the "mass" is in the interval
     ## defined by the m/z value and ppm
@@ -167,30 +175,34 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
             (mat_1 >= transf_i[["mass"]] & mat_2 <= transf_i[["mass"]]) |
                 (mat_1 <= transf_i[["mass"]] & mat_2 >= transf_i[["mass"]]))
         
-        ## write to these indices 1, the "group", and the mass 
-        ## (paste the value to group and mass if there is already a value in the
-        ## cell)
-        mat_bin[ind_hit] <- 1
-        mat_type[ind_hit] <- ifelse(mat_type[ind_hit] != "",
-            yes = paste(mat_type[ind_hit], transf_i[["group"]], sep = "/"),
-            no = as.character(transf_i[["group"]]))
-        mat_mass[ind_hit] <- ifelse(mat_mass[ind_hit] != "",
-            yes = paste(mat_mass[ind_hit], transf_i[["mass"]], sep = "/"),
-            no = as.character(transf_i[["mass"]]))
+        ## write to these indices 1 in the case of the binary matrix
+        l[["binary"]][ind_hit] <- 1
+        
+        ## write to these indices the values stores in transf_i for the 
+        ## respective column (paste the value to group and mass if there is 
+        ## already a value in the cell)
+        l_var <- lapply(var, function(var_i) {
+            l[[var_i]][ind_hit] <- ifelse(l[[var_i]][ind_hit] != "",
+                yes = paste(l[[var_i]][ind_hit], transf_i[[var_i]], sep = "/"),
+                no = as.character(transf_i[[var_i]]))
+            return(l[[var_i]])
+        })
+        l[var] <- l_var
     }
 
-    rownames(mat_bin) <- colnames(mat_bin) <- rownames(x)
-    rownames(mat_type) <- colnames(mat_type) <- rownames(x)
-    rownames(mat_mass) <- colnames(mat_mass) <- rownames(x)
-    
+    ## add the rownames of x to the list entries (matrices)
+    l <- lapply(l, function(l_i) {
+        rownames(l_i) <- colnames(l_i) <- rownames(x)
+        return(l_i)
+    })
+
     ## create the AdjacencyMatrix object
-    l <- list(binary = mat_bin, transformation = mat_type, 
-        mass_difference = mat_mass)
-    rD <- DataFrame(names = rownames(mat_bin), row.names = rownames(mat_bin))
-    
+    rD <- DataFrame(names = rownames(l[["binary"]]), 
+                    row.names = rownames(l["binary"]))
+
     am <- AdjacencyMatrix(l, rowData = rD, type = "structural", 
         directed = directed, thresholded = FALSE)
-    
+
     return(am)
 }
 
@@ -298,8 +310,9 @@ structural <- function(x, transformation, ppm = 5, directed = FALSE) {
 #' plot(g, edge.width = 2, edge.arrow.size = 0.5, vertex.label.cex = 0.7)
 #' plot(g_rt, edge.width = 2, edge.arrow.size = 0.5, vertex.label.cex = 0.7)
 #'
+#' @importFrom SummarizedExperiment assay assayNames
 #' @export
-rtCorrection <- function(am, x, transformation) {
+rtCorrection <- function(am, x, transformation, var = "group") {
     
     if (!is(am, "AdjacencyMatrix")) {
         stop("'am_structural' is not an 'AdjacencyMatrix' object")
@@ -309,33 +322,36 @@ rtCorrection <- function(am, x, transformation) {
         stop("'am' must be a valid 'AdjacencyMatrix' object")
     }
     
-    if (thresholded(am)) {
+    if (am@thresholded) {
         stop("'am' has been already thresholded")
     }
-
-    ## allocate binary, transformation, and mass_difference to mat_bin,
-    ## mat_type, and mat_mass
-    mat_bin <- assay(am, "binary")
-    mat_type <- assay(am, "transformation")
-    mat_mass <- assay(am, "mass_difference")
-
+    
+    ## check for integrity of x
     if (!"rt" %in% colnames(x)) stop("x does not contain the column rt")
-
-    if (!"group" %in% colnames(transformation))
-        stop("transformation does not contain the column group")
+    if (!"mz" %in% colnames(x)) stop("x does not contain the column mz")
+    if (!all(rownames(x) == rownames(am))) 
+        stop("rownames(x) do not match rownames(am)/colnames(am)")
+    
+    ## check for integrity of transformation
+    if (!var %in% colnames(transformation))
+        stop(sprintf("transformation does not contain the column '%group'", 
+                                                                        var))
 
     if (!"rt" %in% colnames(transformation))
         stop("transformation does not contain the column rt")
 
-    if (!"mass" %in% colnames(transformation))
-        stop("transformation does not contain the column mz")
-
     if (!all(transformation[, "rt"] %in% c("+", "-", "?")))
         stop(c("transformation[, 'rt'] does contain other levels than",
-                " '+'', '-'' or '?'"))
-    
-    n <- nrow(mat_bin)
-    rn_mat_bin <- rownames(mat_bin)
+               " '+'', '-'' or '?'"))
+
+    ## allocate binary, transformation, and mass_difference to mat_bin,
+    ## mat_type, and mat_mass
+    .nms <- SummarizedExperiment::assayNames(am)
+    l <- lapply(.nms, function(.nms_i) SummarizedExperiment::assay(am, .nms_i))
+    names(l) <- .nms
+
+    n <- nrow(am)
+    rn_mat_bin <- names(am)
     mat_rt <- matrix(0, nrow = n, ncol = n)
     colnames(mat_rt) <- rownames(mat_rt) <- x[rn_mat_bin, "rt"]
     
@@ -360,39 +376,52 @@ rtCorrection <- function(am, x, transformation) {
 
     ## get indices of matching items
     ind <- lapply(seq_len(nrow(transformation)), function(x)
-        grep(mat_type, pattern = transformation[x, 1], fixed = TRUE))
+        grep(l[[var]], pattern = transformation[x, 1], fixed = TRUE))
 
     ## iterate through transformation rows
-    for (j in seq_len(nrow(transformation))) {
+    for (i in seq_len(nrow(transformation))) {
 
+        ind_i <- ind[[i]]
+        
         ## check if observed rt shift corresponds to expected one and
         ## remove connection if necessary
-        if (transformation[j, "rt"] == "+") {
-            mat_bin[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- 0
-            mat_type[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
-            mat_mass[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] < 0] <- ""
-            mat_bin[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- 0
-            mat_type[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
-            mat_mass[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] > 0] <- ""
-        }
-
-        if (transformation[j, "rt"] == "-") {
-            mat_bin[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- 0
-            mat_type[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
-            mat_mass[ind[[j]]][mat_mz[ind[[j]]] < 0 & mat_rt[ind[[j]]] > 0] <- ""
-            mat_bin[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- 0
-            mat_type[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
-            mat_mass[ind[[j]]][mat_mz[ind[[j]]] > 0 & mat_rt[ind[[j]]] < 0] <- ""
-        }
+        l <- lapply(.nms, function(.nms_i) {
+            
+            ## obtain the list entry at position .nms_i (e.g. the "binary" slot)
+            l_i <- l[[.nms_i]]
+            
+            ## define the value to which the element is set to
+            if (mode(l[[.nms_i]]) == "numeric") {
+                vals <- 0
+            } else { 
+                vals <- ""
+            }
+            
+            ## in case there is a shift to larger retention time for the 
+            ## addition, check if the mz/rt pairs match with the expected 
+            ## behaviour
+            if (transformation[i, "rt"] == "+") {
+                l_i[ind_i][mat_mz[ind_i] < 0 & mat_rt[ind_i] < 0] <- vals
+                l_i[ind_i][mat_mz[ind_i] > 0 & mat_rt[ind_i] > 0] <- vals
+            }
+            ## in case there is a shift to lower retention time for the 
+            ## addition, check if the mz/rt pairs match with the expected 
+            ## behaviour
+            if (transformation[i, "rt"] == "-") {
+                l_i[ind_i][mat_mz[ind_i] < 0 & mat_rt[ind_i] > 0] <- vals
+                l_i[ind_i][mat_mz[ind_i] > 0 & mat_rt[ind_i] < 0] <- vals
+            }
+            
+            return(l_i)
+        })
+        names(l) <- .nms
     }
 
     ## create the AdjacencyMatrix object
-    l <- list(binary = mat_bin, transformation = mat_type, 
-              mass_difference = mat_mass)
     rD <- DataFrame(names = rn_mat_bin, row.names = rn_mat_bin)
     
     am <- AdjacencyMatrix(l, rowData = rD, type = "structural", 
-        directed = directed(am), thresholded = TRUE)
+        directed = am@directed, thresholded = TRUE)
     
     return(am)
 }

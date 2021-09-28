@@ -316,7 +316,7 @@ To account for retention time shifts we enter
 
 ```{r rt_correction, eval=TRUE, echo=TRUE}
 struct_adj <- rtCorrection(am = struct_adj, x = x_test, 
-    transformation = transformations)
+    transformation = transformations, var = "group")
 ```
 in the `R` console. 
 
@@ -334,8 +334,8 @@ using the `mz_summary` function. The number of determined mass differences
 can be displayed by using the `mz_vis` function.
 
 ```{r mz_summary,eval=TRUE,echo=TRUE}
-mz_sum <- mz_summary(struct_adj)
-mz_vis(mz_sum)
+mz_sum <- mz_summary(struct_adj, var = "group")
+mz_vis(mz_sum, var = "group")
 ```
 For larger data-sets, also a `filter` can be 
 applied to visualize mass-difference above a defined threshold.
@@ -411,8 +411,8 @@ using
 Pearson and Spearman correlation using the intensity values as input data. 
 
 ```{r statistical,eval=TRUE,echo=TRUE}
-x_int <- x_test[, 3:dim(x_test)[2]]
-x_int <- as.matrix(x_int)
+x_int <- x_test[, 3:ncol(x_test)] |>
+    as.matrix()
 stat_adj <- statistical(x_int, model = c("pearson", "spearman"))
 ```
 
