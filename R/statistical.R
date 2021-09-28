@@ -324,9 +324,10 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
     ## for pearson/spearman correlation
     if (method %in% c("pearson", "spearman")) {
         cor_mat <- psych::corr.test(x = t(x), method = method, adjust = "none")
-        cor_mat$p.adj <- matrix(
-            stats::p.adjust(as.vector(cor_mat$P), method = p.adjust),
-            ncol = ncol(cor_mat$P), nrow = nrow(cor_mat$P), byrow = TRUE)
+        cor_mat$p <- matrix(
+            stats::p.adjust(as.vector(cor_mat$p), method = p.adjust),
+            ncol = ncol(cor_mat$p), nrow = nrow(cor_mat$p), byrow = TRUE)
+        cor_mat <- list(r = cor_mat[["r"]], p = cor_mat[["p"]])
     }
 
     ## for partial pearson/spearman correlation
@@ -679,7 +680,7 @@ statistical <- function(x, model, ...) {
         res <- threeDotsCall("correlation", x = x, method = "spearman", ...)
         spearman_coef <- res[["r"]]
         diag(spearman_coef) <- NaN
-        spearman_pvalue <- res[["P"]]
+        spearman_pvalue <- res[["p"]]
         diag(spearman_pvalue) <- NaN
         l <- addToList(l, "spearman_coef", spearman_coef)
         l <- addToList(l, "spearman_pvalue", spearman_pvalue)
@@ -918,7 +919,7 @@ threshold <- function(am,
         stop("'am' must be a valid 'AdjacencyMatrix' object")
     }
 
-    if (thresholded(am)) {
+    if (am@thresholded) {
         stop("'am' has been already thresholded")
     }
     
