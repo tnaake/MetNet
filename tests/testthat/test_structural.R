@@ -17,7 +17,6 @@ transformations_neg <- transformations <- data.frame(
     rt = transformations[, 4])
 transformations_neg[, 3] <- -1 * transformations_neg[, 3]
 
-
 ## START unit test structural ##
 struct_adj <- structural(mat_test,
         transformation = transformations, ppm = 5, directed = FALSE)
@@ -50,103 +49,110 @@ test_that("structural", {
     expect_error(structural(mat_test[, -1], transformations),
         "does not contain the column mz")
     expect_error(structural(NULL, transformations),
-        "does not contain the column mz")
+        "'x' has to be a matrix or data.frame")
     expect_error(structural(mat_test, transformations[, -1]),
-        "does not contain the column group")
+        "'transformation' does not contain the column 'group'")
     expect_error(structural(mat_test, transformations[, -3]),
         "does not contain the column mass")
     expect_error(structural(mat_test, matrix()),
         "is not a data.frame")
     expect_error(structural(mat_test, transformations, ppm = "a"),
-        "is not numeric")
+        "'ppm' has to be a numeric of length 1")
     expect_true(validObject(struct_adj))
     expect_equal(assayNames(struct_adj), 
-        c("binary", "transformation", "mass_difference"))
+        c("binary", "group", "formula", "mass"))
     expect_equal(length(struct_adj), 7)
     expect_equal(dim(struct_adj), c(7, 7))
     expect_equal(dim(assay(struct_adj, "binary")), c(7, 7))
-    expect_equal(dim(assay(struct_adj, "transformation")), c(7, 7))
-    expect_equal(dim(assay(struct_adj, "mass_difference")), c(7, 7))
+    expect_equal(dim(assay(struct_adj, "group")), c(7, 7))
+    expect_equal(dim(assay(struct_adj, "formula")), c(7, 7))
+    expect_equal(dim(assay(struct_adj, "mass")), c(7, 7))
     expect_equal(rownames(assay(struct_adj, 1)), colnames(assay(struct_adj, 1)))
     expect_equal(rownames(assay(struct_adj, 2)), colnames(assay(struct_adj, 2)))
     expect_equal(rownames(assay(struct_adj, 3)), rownames(assay(struct_adj, 3)))
+    expect_equal(rownames(assay(struct_adj, 4)), rownames(assay(struct_adj, 4)))
     expect_equal(rownames(assay(struct_adj, 1)), rownames(assay(struct_adj, 2)))
     expect_equal(rownames(assay(struct_adj, 1)), rownames(assay(struct_adj, 3)))
+    expect_equal(rownames(assay(struct_adj, 1)), rownames(assay(struct_adj, 4)))
     expect_equal(rownames(assay(struct_adj, 1)), paste(mz, rt, sep = "_"))
     expect_equal(sum(assay(struct_adj, "binary")), 12)
     expect_equal(sum(assay(struct_adj_neg, "binary")), 0)
     expect_equal(sum(assay(struct_adj_dir, "binary")), 6)
     expect_equal(sum(assay(struct_adj_dir_neg, "binary")), 6)
-    expect_equal(as.vector(assay(struct_adj, "transformation")[, 1]),
+    expect_equal(as.vector(assay(struct_adj, "group")[, 1]),
         c("", "", "Monosaccharide (-H2O)", "Monosaccharide (-H2O)", 
             "Monosaccharide (-H2O)", "", ""))
-    expect_equal(as.vector(assay(struct_adj, "transformation")[, 2]),
+    expect_equal(as.vector(assay(struct_adj, "group")[, 2]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj, "transformation")[, 3]),
+    expect_equal(as.vector(assay(struct_adj, "group")[, 3]),
         c("Monosaccharide (-H2O)", "", "", "", "", "Malonyl group (-H2O)", ""))
-    expect_equal(as.vector(assay(struct_adj, "transformation")[, 4]),
+    expect_equal(as.vector(assay(struct_adj, "group")[, 4]),
         c("Monosaccharide (-H2O)", "", "", "", "", "Malonyl group (-H2O)", ""))
-    expect_equal(as.vector(assay(struct_adj, "transformation")[, 5]),
+    expect_equal(as.vector(assay(struct_adj, "group")[, 5]),
         c("Monosaccharide (-H2O)", "", "", "", "", "Malonyl group (-H2O)", ""))
-    expect_equal(as.vector(assay(struct_adj, "transformation")[, 6]),
+    expect_equal(as.vector(assay(struct_adj, "group")[, 6]),
         c("", "", "Malonyl group (-H2O)", "Malonyl group (-H2O)", 
             "Malonyl group (-H2O)", "", ""))
-    expect_equal(as.vector(assay(struct_adj, "transformation")[, 7]),
+    expect_equal(as.vector(assay(struct_adj, "group")[, 7]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 1]),
+    expect_equal(as.vector(assay(struct_adj_neg, "group")[, 1]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 2]),
+    expect_equal(as.vector(assay(struct_adj_neg, "group")[, 2]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 3]),
+    expect_equal(as.vector(assay(struct_adj_neg, "group")[, 3]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 4]),
+    expect_equal(as.vector(assay(struct_adj_neg, "group")[, 4]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 5]),
+    expect_equal(as.vector(assay(struct_adj_neg, "group")[, 5]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 6]),
+    expect_equal(as.vector(assay(struct_adj_neg, "group")[, 6]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_neg, "transformation")[, 7]),
+    expect_equal(as.vector(assay(struct_adj_neg, "group")[, 7]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 1]),
+    expect_equal(as.vector(assay(struct_adj_dir, "group")[, 1]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 2]),
+    expect_equal(as.vector(assay(struct_adj_dir, "group")[, 2]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 3]),
+    expect_equal(as.vector(assay(struct_adj_dir, "group")[, 3]),
         c("Monosaccharide (-H2O)", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 4]),
+    expect_equal(as.vector(assay(struct_adj_dir, "group")[, 4]),
         c("Monosaccharide (-H2O)", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 5]),
+    expect_equal(as.vector(assay(struct_adj_dir, "group")[, 5]),
         c("Monosaccharide (-H2O)", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 6]),
+    expect_equal(as.vector(assay(struct_adj_dir, "group")[, 6]),
         c("", "", "Malonyl group (-H2O)", "Malonyl group (-H2O)", 
             "Malonyl group (-H2O)", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir, "transformation")[, 7]),
+    expect_equal(as.vector(assay(struct_adj_dir, "group")[, 7]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 1]),
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "group")[, 1]),
         c("", "", "Monosaccharide (-H2O)", "Monosaccharide (-H2O)", 
           "Monosaccharide (-H2O)", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 2]),
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "group")[, 2]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 3]),
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "group")[, 3]),
         c("", "", "", "", "", "Malonyl group (-H2O)", ""))
-    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 4]),
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "group")[, 4]),
         c("", "", "", "", "", "Malonyl group (-H2O)", ""))
-    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 5]),
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "group")[, 5]),
         c("", "", "", "", "", "Malonyl group (-H2O)", ""))
-    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 6]),
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "group")[, 6]),
         c("", "", "", "", "", "", ""))
-    expect_equal(as.vector(assay(struct_adj_dir_neg, "transformation")[, 7]),
+    expect_equal(as.vector(assay(struct_adj_dir_neg, "group")[, 7]),
         c("", "", "", "", "", "", ""))
-    expect_equal(unique(as.vector(assay(struct_adj, "transformation"))),
+    expect_equal(unique(as.vector(assay(struct_adj, "group"))),
         c("", "Monosaccharide (-H2O)", "Malonyl group (-H2O)"))
-    expect_equal(unique(as.vector(assay(struct_adj, "mass_difference"))),
+    expect_equal(unique(as.vector(assay(struct_adj, "mass"))),
         c("", "162.0528234315", "86.0003939305"))
+    expect_equal(unique(as.vector(assay(struct_adj, "formula"))),
+        c("", "C6H10O5", "C3H2O3"))
     expect_true(is.matrix(assay(struct_adj, "binary")))
-    expect_true(is.matrix(assay(struct_adj, "transformation")))
-    expect_true(is.matrix(assay(struct_adj, "mass_difference")))
+    expect_true(is.matrix(assay(struct_adj, "group")))
+    expect_true(is.matrix(assay(struct_adj, "mass")))
+    expect_true(is.matrix(assay(struct_adj, "formula")))
     expect_true(is.numeric(assay(struct_adj, "binary")))
-    expect_true(is.character(assay(struct_adj, "transformation")))
-    expect_true(is.character(assay(struct_adj, "mass_difference")))
+    expect_true(is.character(assay(struct_adj, "group")))
+    expect_true(is.character(assay(struct_adj, "mass")))
+    expect_true(is.character(assay(struct_adj, "formula")))
     expect_equal(directed(struct_adj), FALSE)
     expect_equal(directed(struct_adj_neg), FALSE)
     expect_equal(directed(struct_adj_dir), TRUE)
@@ -192,32 +198,32 @@ test_that("rtCorrection", {
     expect_error(rtCorrection(tmp, mat_test, transformations), 
         "must be character")
     tmp <- struct_adj
-    assay(tmp, "mass_difference") <- assay(tmp, "binary")
+    assay(tmp, "mass") <- assay(tmp, "binary")
     expect_error(rtCorrection(tmp, mat_test, transformations), 
         "must be character")
     expect_error(rtCorrection(struct_adj, NULL, transformations),
-        "does not contain the column rt")
+        "'x' does not contain the column 'rt'")
     expect_error(rtCorrection(struct_adj, mat_test[, -1], transformations),
-        "subscript out of bounds")
+        "'x' does not contain the column 'mz'")
     expect_error(rtCorrection(struct_adj, mat_test[, -2], transformations),
-        "does not contain the column rt")
+        "'x' does not contain the column 'rt'")
     expect_error(rtCorrection(struct_adj, mat_test, NULL),
-        "does not contain the column group")
+        "'transformation' does not contain the column 'group'")
     expect_error(rtCorrection(struct_adj, mat_test, transformations[, -1]),
-        "does not contain the column group")
-    expect_error(rtCorrection(struct_adj, mat_test, transformations[, -3]),
-        "does not contain the column mz")
+        "'transformation' does not contain the column 'group'")
     expect_error(rtCorrection(struct_adj, mat_test, transformations[, -4]),
-        "does not contain the column rt")
+        "'transformation' does not contain the column 'rt'")
     expect_error(rtCorrection(struct_adj, mat_test,
         transformation = cbind(transformations[, -4], rt = rep("a", 2))),
         "does contain other")
     expect_true(is.matrix(assay(struct_adj_rt, "binary")))
     expect_true(is.numeric(assay(struct_adj_rt, "binary")))
-    expect_true(is.matrix(assay(struct_adj_rt, "transformation")))
-    expect_true(is.character(assay(struct_adj_rt, "transformation")))
-    expect_true(is.matrix(assay(struct_adj_rt, "mass_difference")))
-    expect_true(is.character(assay(struct_adj_rt, "mass_difference")))
+    expect_true(is.matrix(assay(struct_adj_rt, "group")))
+    expect_true(is.character(assay(struct_adj_rt, "group")))
+    expect_true(is.matrix(assay(struct_adj_rt, "mass")))
+    expect_true(is.character(assay(struct_adj_rt, "mass")))
+    expect_true(is.matrix(assay(struct_adj_rt, "formula")))
+    expect_true(is.character(assay(struct_adj_rt, "formula")))
     expect_equal(colnames(assay(struct_adj_rt, "binary")), 
         paste(mz, rt, sep = "_"))
     expect_equal(colnames(assay(struct_adj_rt, 1)),
@@ -235,13 +241,17 @@ test_that("rtCorrection", {
     expect_equal(sum(assay(struct_adj_rt, "binary")), 8)
     expect_equal(sum(assay(struct_adj_rt_dir, "binary")), 4)
     expect_true(all(
-        table(assay(struct_adj_rt, "transformation")) == c(41, 6, 2)))
+        table(assay(struct_adj_rt, "group")) == c(41, 6, 2)))
     expect_true(all(
-        table(assay(struct_adj_rt, "mass_difference")) == c(41, 2, 6)))
+        table(assay(struct_adj_rt, "mass")) == c(41, 2, 6)))
     expect_true(all(
-        table(assay(struct_adj_rt_dir, "transformation")) == c(45, 3, 1)))
+        table(assay(struct_adj_rt, "formula")) == c(41, 6, 2)))
     expect_true(all(
-        table(assay(struct_adj_rt_dir, "mass_difference")) == c(45, 1, 3)))
+        table(assay(struct_adj_rt_dir, "group")) == c(45, 3, 1)))
+    expect_true(all(
+        table(assay(struct_adj_rt_dir, "mass")) == c(45, 1, 3)))
+    expect_true(all(
+        table(assay(struct_adj_rt_dir, "formula")) == c(45, 3, 1)))
 
     expect_equal(directed(struct_adj_rt), FALSE)
     expect_equal(directed(struct_adj_rt_dir), TRUE)
@@ -256,12 +266,13 @@ test_that("rtCorrection", {
                formula = "C6H10O5", mass = 162.05282, rt = "?"))
     struct_adj_pseudo <- structural(mat_test,
         transformation = transformations, ppm = 5, directed = FALSE)
-    expect_equal(assay(struct_adj_pseudo, "transformation")[3, 1],
+    expect_equal(assay(struct_adj_pseudo, "group")[3, 1],
         "Monosaccharide (-H2O)/pseudo Monosaccharide")
+    expect_equal(assay(struct_adj_pseudo, "mass")[3, 1],
+        "162.0528234315/162.05282")
+    expect_equal(assay(struct_adj_pseudo, "formula")[3, 1],
+        "C6H10O5/C6H10O5")
     struct_adj_pseudo_rt <- rtCorrection(struct_adj_pseudo, x = mat_test, 
         transformation = transformations)
-    
-    
-    
 })
 ## END unit test rtCorrection ##

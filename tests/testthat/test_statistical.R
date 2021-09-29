@@ -77,27 +77,27 @@ test_that("aracne", {
 ## END unit test aracne ##
 
 ## START unit test correlation ##
-correlation_p_mat <- correlation(mat_test[1:5, ], type = "pearson")
-correlation_p_p_mat <- correlation(mat_test[1:5, ], type = "pearson_partial")
+correlation_p_mat <- correlation(mat_test[1:5, ], method = "pearson")
+correlation_p_p_mat <- correlation(mat_test[1:5, ], method = "pearson_partial")
 correlation_p_sp_mat <- correlation(mat_test[1:5, ],
-    type = "pearson_semipartial")
-correlation_s_mat <- correlation(mat_test[1:5, ], type = "spearman")
-correlation_s_p_mat <- correlation(mat_test[1:5, ], type = "spearman_partial")
+    method = "pearson_semipartial")
+correlation_s_mat <- correlation(mat_test[1:5, ], method = "spearman")
+correlation_s_p_mat <- correlation(mat_test[1:5, ], method = "spearman_partial")
 correlation_s_sp_mat <- correlation(mat_test[1:5, ],
-    type = "spearman_semipartial")
+    method = "spearman_semipartial")
 
 test_that("correlation", {
 
-    expect_error(correlation(NULL, type = "pearson"),
+    expect_error(correlation(NULL, method = "pearson"),
         "argument is not a matrix")
-    expect_error(correlation(mat_test, type = "a"),
+    expect_error(correlation(mat_test, method = "a"),
         msg = "object [']cor_mat['] not found")
 
     ## pearson
     expect_equal(correlation_p_mat$r,
         cor(t(mat_test[1:5, ]), method = "pearson"), tolerance = 1e-06)
     expect_equal(sum(correlation_p_mat$r), 3.27161, tolerance = 1e-06)
-    expect_equal(sum(correlation_p_mat$P, na.rm = TRUE), 0.2890875, tolerance = 1e-06)
+    expect_equal(sum(correlation_p_mat$p, na.rm = TRUE), 0.2890875, tolerance = 1e-06)
     expect_equal(rownames(correlation_p_mat$r), colnames(correlation_p_mat$r))
     expect_equal(rownames(correlation_p_mat$r), rownames(mat_test)[1:5])
     expect_equal(ncol(correlation_p_mat$r), nrow(correlation_p_mat$r))
@@ -111,7 +111,7 @@ test_that("correlation", {
     expect_equal(correlation_s_mat$r,
         cor(t(mat_test[1:5, ]), method = "spearman"), tolerance = 1e-06)
     expect_equal(sum(correlation_s_mat$r), 3.153383, tolerance = 1e-06)
-    expect_equal(sum(correlation_s_mat$P, na.rm = TRUE), 0.3236611, tolerance = 1e-06)
+    expect_equal(sum(correlation_s_mat$p, na.rm = TRUE), 0.3236611, tolerance = 1e-06)
     expect_equal(rownames(correlation_s_mat$r), colnames(correlation_s_mat$r))
     expect_equal(rownames(correlation_s_mat$r), rownames(mat_test)[1:5])
     expect_equal(ncol(correlation_s_mat$r), nrow(correlation_s_mat$r))
@@ -140,8 +140,10 @@ test_that("correlation", {
     ## semi-partial pearson
     expect_true(all(correlation_p_sp_mat$estimate - 
         ppcor::spcor(t(mat_test[1:5, ]), method = "pearson")$estimate == 0))
-    expect_equal(sum(correlation_p_sp_mat$estimate), 5.729664, tolerance = 1e-06)
-    expect_equal(sum(correlation_p_sp_mat$p.value), 15.23957, tolerance = 1e-06)
+    expect_equal(sum(correlation_p_sp_mat$estimate), 5.729664, 
+        tolerance = 1e-06)
+    expect_equal(sum(correlation_p_sp_mat$p.value), 15.23957, 
+        tolerance = 1e-06)
     expect_equal(rownames(correlation_p_sp_mat$estimate), 
         colnames(correlation_p_sp_mat$estimate))
     expect_equal(rownames(correlation_p_sp_mat$estimate), rownames(mat_test)[1:5])
@@ -246,13 +248,13 @@ test_that("statistical", {
     expect_true(all(assay(stat_adj, "clr_coef") == tmp, na.rm = TRUE))
     tmp <- aracne_mat; diag(tmp) <- NaN
     expect_true(all(assay(stat_adj, "aracne_coef") == tmp, na.rm = TRUE))
-    tmp <-  correlation(mat_test[1:5, ], type = "pearson")
-    diag(tmp$r) <- NaN; diag(tmp$P) <- NaN
+    tmp <-  correlation(mat_test[1:5, ], method = "pearson")
+    diag(tmp$r) <- NaN; diag(tmp$p) <- NaN
     suppressWarnings(
         expect_true(all(assay(stat_adj, "pearson_coef"), tmp$r, na.rm = TRUE)))
     suppressWarnings(
-        expect_true(all(assay(stat_adj, "pearson_pvalue"), tmp$P, na.rm = TRUE)))
-    tmp <- correlation(mat_test[1:5, ], type = "pearson_partial")
+        expect_true(all(assay(stat_adj, "pearson_pvalue"), tmp$p, na.rm = TRUE)))
+    tmp <- correlation(mat_test[1:5, ], method = "pearson_partial")
     diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
     expect_true(
         all(assay(stat_adj, "pearson_partial_coef") == tmp$estimate, 
@@ -260,7 +262,7 @@ test_that("statistical", {
     expect_true(
         all(assay(stat_adj, "pearson_partial_pvalue") == tmp$p.value,
         na.rm = TRUE))
-    tmp <- correlation(mat_test[1:5, ], type = "pearson_semipartial")
+    tmp <- correlation(mat_test[1:5, ], method = "pearson_semipartial")
     diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
     expect_true(
         all(assay(stat_adj, "pearson_semipartial_coef") == tmp$estimate, 
@@ -268,15 +270,15 @@ test_that("statistical", {
     expect_true(
         all(assay(stat_adj, "pearson_semipartial_pvalue") == tmp$p.value, 
         na.rm = TRUE))
-    tmp <- correlation(mat_test[1:5, ], type = "spearman")
-    diag(tmp$r) <- NaN; diag(tmp$P) <- NaN
+    tmp <- correlation(mat_test[1:5, ], method = "spearman")
+    diag(tmp$r) <- NaN; diag(tmp$p) <- NaN
     expect_true(all(stat_adj[["spearman_coef"]] == tmp$r, na.rm = TRUE))
-    expect_true(all(stat_adj[["spearman_pvalue"]] == tmp$P, na.rm = TRUE))
-    suppressWarnings(tmp <- correlation(mat_test[1:5, ], type = "spearman_partial"))
+    expect_true(all(stat_adj[["spearman_pvalue"]] == tmp$p, na.rm = TRUE))
+    suppressWarnings(tmp <- correlation(mat_test[1:5, ], method = "spearman_partial"))
     diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
     expect_true(all(stat_adj[["spearman_partial_coef"]] == tmp$estimate, na.rm = TRUE))
     expect_true(all(stat_adj[["spearman_partial_pvalue"]] == tmp$p.value, na.rm = TRUE))
-    suppressWarnings(tmp <- correlation(mat_test[1:5, ], type = "spearman_semipartial"))
+    suppressWarnings(tmp <- correlation(mat_test[1:5, ], method = "spearman_semipartial"))
     diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
     expect_true(all(stat_adj[["spearman_semipartial_coef"]] == tmp$estimate, na.rm = TRUE))
     expect_true(all(stat_adj[["spearman_semipartial_pvalue"]] == tmp$p.value, na.rm = TRUE))

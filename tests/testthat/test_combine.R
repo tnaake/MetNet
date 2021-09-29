@@ -33,37 +33,47 @@ test_that("combine", {
         "'am_statistical' must contain assay 'consensus'")
     expect_true(validObject(cons_adj))
     expect_equal(assayNames(cons_adj), 
-        c("clr_coef", "aracne_coef", "pearson_coef", "pearson_pvalue", 
+        c("binary", "group", "formula", "mass", 
+            "clr_coef", "aracne_coef", "pearson_coef", "pearson_pvalue", 
             "spearman_coef", "spearman_pvalue", "bayes_coef", "consensus",
-            "binary", "transformation", "mass_difference", "combine_binary",        
-            "combine_transformation", "combine_mass_difference"))
+            "combine_binary", "combine_group", "combine_formula", 
+            "combine_mass"))
     expect_equal(sum(assay(cons_adj, "combine_binary"), na.rm = TRUE), 4)
+    expect_equal(as.vector(assay(cons_adj, "combine_binary")[1, ]), 
+        c(NA, 0, 0, 0, 1, 0, 0))
+    expect_equal(as.vector(assay(cons_adj, "combine_group")[1, ]), 
+        c(NA, "", "", "", "Monosaccharide (-H2O)", "", ""))
+    expect_equal(as.vector(assay(cons_adj, "combine_formula")[1, ]), 
+        c(NA, "", "", "", "C6H10O5", "", ""))
+    expect_equal(as.vector(assay(cons_adj, "combine_mass")[1, ]), 
+        c(NA, "", "", "", "162.0528234315", "", ""))
     expect_equal(dim(assay(cons_adj, "combine_binary")), c(7, 7))
     expect_equal(rownames(assay(cons_adj, "combine_binary")), paste0("x", 1:7))
-    expect_equal(rownames(assay(cons_adj, "combine_transformation")), 
-        paste0("x", 1:7))
-    expect_equal(rownames(assay(cons_adj, "combine_mass_difference")), 
-        paste0("x", 1:7))
+    expect_equal(rownames(assay(cons_adj, "combine_group")), paste0("x", 1:7))
+    expect_equal(rownames(assay(cons_adj, "combine_formula")), paste0("x", 1:7))
+    expect_equal(rownames(assay(cons_adj, "combine_mass")), paste0("x", 1:7))
     expect_equal(colnames(assay(cons_adj, "combine_binary")), paste0("x", 1:7))
-    expect_equal(colnames(assay(cons_adj, "combine_transformation")), 
-                 paste0("x", 1:7))
-    expect_equal(colnames(assay(cons_adj, "combine_mass_difference")), 
-                 paste0("x", 1:7))
+    expect_equal(colnames(assay(cons_adj, "combine_group")), paste0("x", 1:7))
+    expect_equal(colnames(assay(cons_adj, "combine_formula")), paste0("x", 1:7))
+    expect_equal(colnames(assay(cons_adj, "combine_mass")), paste0("x", 1:7))
     expect_equal(rownames(assay(cons_adj, "combine_binary")),
         colnames(assay(cons_adj, "combine_binary")))
-    expect_equal(rownames(assay(cons_adj, "combine_transformation")),
-        colnames(assay(cons_adj, "combine_transformation")))
-    expect_equal(rownames(assay(cons_adj, "combine_mass_difference")),
-        colnames(assay(cons_adj, "combine_mass_difference")))
+    expect_equal(rownames(assay(cons_adj, "combine_group")),
+        colnames(assay(cons_adj, "combine_group")))
+    expect_equal(rownames(assay(cons_adj, "combine_formula")),
+        colnames(assay(cons_adj, "combine_formula")))
+    expect_equal(rownames(assay(cons_adj, "combine_mass")),
+        colnames(assay(cons_adj, "combine_mass")))
     expect_true(is.numeric(assay(cons_adj, "combine_binary")))
-    expect_true(is.character(assay(cons_adj, "combine_transformation")))
-    expect_true(is.character(assay(cons_adj, "combine_mass_difference")))
+    expect_true(is.character(assay(cons_adj, "combine_group")))
+    expect_true(is.character(assay(cons_adj, "combine_formula")))
+    expect_true(is.character(assay(cons_adj, "combine_mass")))
 
     ## check rownames/colnames
     struct_adj_rev <- structural(mat_test[7:1, ],
         transformation = transformations, ppm = 5)
     
     expect_error(combine(struct_adj_rev, stat_adj_thr),
-        "when the dimnames on the supplied assay[(]s[)] are not|n")
+        "names of 'am_structural' do not match names of 'am_statistical'")
 })
 ## END unit test combine ##
