@@ -4,11 +4,17 @@
 \alias{structural}
 \title{Create adjacency matrix based on m/z (molecular weight) difference}
 \usage{
-structural(x, transformation, ppm = 5, directed = FALSE)
+structural(
+  x,
+  transformation,
+  var = c("group", "formula", "mass"),
+  ppm = 5,
+  directed = FALSE
+)
 }
 \arguments{
-\item{x}{`matrix`, where columns are the samples and the rows are features
-(metabolites), cell entries are intensity values. `x` contains the
+\item{x}{`matrix` or `data.frame`, where columns are the samples and the rows are 
+features (metabolites), cell entries are intensity values. `x` contains the
 column `"mz"` that has the m/z information (numerical values) for the
 calculation of mass differences between features}
 
@@ -16,9 +22,11 @@ calculation of mass differences between features}
 and `"mass"` that will be used for detection of transformation of
 (functional) groups}
 
-\item{ppm}{`numeric`, mass accuracy of m/z features in parts per million (ppm)}
+\item{var}{`character` corresponding to column names in `transformation`}
 
-\item{directed}{`logical`, if `TRUE`, absolute values of m/z differences will be
+\item{ppm}{`numeric(1)`, mass accuracy of m/z features in parts per million (ppm)}
+
+\item{directed}{`logical(1)`, if `TRUE`, absolute values of m/z differences will be
 taken to query against `transformation`  (irrespective the sign of `mass`)
 and undirected adjacency matrices will be returned as the respective
 assays. This means, if there is a negative mass in 

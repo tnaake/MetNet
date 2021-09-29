@@ -4,29 +4,29 @@
 \alias{correlation}
 \title{Create an adjacency matrix based on correlation}
 \usage{
-correlation(x, type = "pearson", p.adjust = "none")
+correlation(x, method = "pearson", p.adjust = "none")
 }
 \arguments{
 \item{x}{matrix, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values}
 
-\item{type}{`character`, either "pearson", "spearman", "pearson_partial",
+\item{method}{`character`, either "pearson", "spearman", "pearson_partial",
 "spearman_partial", "pearson_semipartial" or "spearman_semipartial".}
 
 \item{p.adjust}{`character`, method of p-value adjustment passed to `p.adjust`}
 }
 \value{
-list containing two matrix, 
+`list` containing two matrices, 
 the first matrix contains correlation coefficients and 
 the second matrix contains the corresponding p-values as obtained from the 
-correlation algorithms `rcorr`, `pcor` or `spcor` (depending on the 
+correlation algorithms `corr.test`, `pcor` or `spcor` (depending on the 
 chosen `method`) and optionally the adjusted p.values (argument
 `p.adjust`)
 }
 \description{
 `correlation` infers an adjacency matrix using
-correlation using the `rcorr` function (from the
-`Hmisc` package), `pcor` (from `ppcor`) or
+correlation using the `corr.test` function (from the
+`psych` package), `pcor` (from `ppcor`) or
 `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
 correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
 and will return
@@ -34,7 +34,7 @@ the weighted adjacency matrix of the absolute correlation values.
 }
 \details{
 If `"pearson"` or `"spearman"` is used as a `method`, the function
-`rcorr` from `Hmisc` will be employed.
+`corr.test` from `psych` will be employed.
 
 If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
 function `pcor` from `spcor` will be employed.
@@ -42,7 +42,7 @@ function `pcor` from `spcor` will be employed.
 If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
 `method` the function `spcor` from `spcor` will be employed.
 
-`type` will be passed to argument `method` in `rcorr`
+`method` will be passed to argument `method` in `corr.test`
 (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
 (`"pearson"` and `"spearman"` for `"pearson_partial"` and
 `"spearman_partial"`, respectively) or to `method` in `spcor`
@@ -53,7 +53,7 @@ If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
 data("x_test", package = "MetNet")
 x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
-correlation(x, type = "pearson")
+correlation(x, method = "pearson")
 
 }
 \author{

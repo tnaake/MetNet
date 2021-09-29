@@ -72,7 +72,7 @@ mass_difference[5, 4] <- "162"
 ## create adj_l and rowData
 adj_l <- list(binary = binary, transformation = transformation, 
     mass_difference = mass_difference)
-rowData <- DataFrame(features = rownames(binary), 
+rowData <- DataFrame(features = rownames(binary),
     row.names = rownames(binary))
 
 AdjacencyMatrix(adj_l = adj_l, rowData = rowData, type = "structural", 

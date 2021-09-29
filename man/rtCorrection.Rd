@@ -5,7 +5,7 @@
 \title{Correct connections in the structural adjacency matrices by
 retention time}
 \usage{
-rtCorrection(am, x, transformation)
+rtCorrection(am, x, transformation, var = "group")
 }
 \arguments{
 \item{am}{`AdjacencyMatrix` object returned by the function `structural`. 
@@ -27,6 +27,9 @@ have a putative connection assigned based on m/z value difference}
 \item{transformation}{`data.frame`, containing the columns `"group"`,
 and `"rt"` that will be used for correction of transformation of
 (functional) groups based on retention time shifts derived from `x`}
+
+\item{var}{`character(1)`, the key that is used for matching 
+between the column `var` in `transformation` and the assay `var` in `am`}
 }
 \value{
 `AdjacencyMatrix` containing the slots `binary`, `transformation`, and 

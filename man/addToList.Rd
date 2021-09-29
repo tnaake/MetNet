@@ -29,8 +29,8 @@ The function `addToList` is a helper function used internally in
 data("x_test", package = "MetNet")
 x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
-cor_pearson <- correlation(x, type = "pearson")
-cor_spearman <- correlation(x, type = "spearman")
+cor_pearson <- correlation(x, method = "pearson")
+cor_spearman <- correlation(x, method = "spearman")
 l <- list(pearson = cor_pearson)
 MetNet:::addToList(l, "spearman_coef", cor_spearman$r)
 }
