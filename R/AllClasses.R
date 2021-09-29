@@ -227,7 +227,7 @@ setValidity2("AdjacencyMatrix", function(object) {
         })
         msg <- c(msg, unlist(msg_l))
         
-        ## check for columns that originate from statistiacal 
+        ## check for columns that originate from statistical 
         ## (these should be numeric)
         .nms_cut <- .nms[.nms %in% valid_names_stat]
         
