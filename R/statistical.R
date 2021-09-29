@@ -275,7 +275,7 @@ aracne <- function(mi, eps = 0.05) {
 #' (metabolites), cell entries are intensity values
 #'
 #' @param
-#' type `character`, either "pearson", "spearman", "pearson_partial",
+#' method `character`, either "pearson", "spearman", "pearson_partial",
 #' "spearman_partial", "pearson_semipartial" or "spearman_semipartial".
 #' 
 #' @param 
@@ -299,10 +299,10 @@ aracne <- function(mi, eps = 0.05) {
 #' `"spearman_semipartial"`, respectively).
 #'
 #' @return
-#' list containing two matrix, 
+#' `list` containing two matrices, 
 #' the first matrix contains correlation coefficients and 
 #' the second matrix contains the corresponding p-values as obtained from the 
-#' correlation algorithms `rcorr`, `pcor` or `spcor` (depending on the 
+#' correlation algorithms `corr.test`, `pcor` or `spcor` (depending on the 
 #' chosen `method`) and optionally the adjusted p.values (argument
 #' `p.adjust`)
 #'
@@ -332,6 +332,11 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
 
     ## for partial pearson/spearman correlation
     if (method %in% c("pearson_partial", "spearman_partial")) {
+        if (method == "pearson_partial") {
+            method <- "pearson"
+        } else {
+            method <- "spearman"
+        }
         cor_mat <- ppcor::pcor(t(x), method = method)
         cor_mat$p.value <- matrix(
             stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
@@ -341,6 +346,11 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
 
     ## for semipartial pearson/spearman corelation
     if (method %in% c("pearson_semipartial", "spearman_semipartial")) {
+        if (method == "pearson_semipartial") {
+            method <- "pearson"
+        } else {
+            method <- "spearman"
+        }
         cor_mat <- ppcor::spcor(t(x), method = method)
         cor_mat$p.value <- matrix(
             stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
