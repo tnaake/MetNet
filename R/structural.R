@@ -16,21 +16,24 @@
 #' `mass_difference`). 
 #' 
 #' @param
-#' x `matrix`, where columns are the samples and the rows are features
-#' (metabolites), cell entries are intensity values. `x` contains the
+#' x `matrix` or `data.frame`, where columns are the samples and the rows are 
+#' features (metabolites), cell entries are intensity values. `x` contains the
 #' column `"mz"` that has the m/z information (numerical values) for the
 #' calculation of mass differences between features
 #'
-#' @param
-#' transformation `data.frame`, containing the columns `"group"`,
+#' @param transformation 
+#' `data.frame`, containing the columns `"group"`,
 #' and `"mass"` that will be used for detection of transformation of
 #' (functional) groups
-#'
-#' @param
-#' ppm `numeric`, mass accuracy of m/z features in parts per million (ppm)
 #' 
-#' @param
-#' directed `logical`, if `TRUE`, absolute values of m/z differences will be
+#' @param var
+#' `character` corresponding to column names in `transformation`
+#'
+#' @param ppm 
+#' `numeric(1)`, mass accuracy of m/z features in parts per million (ppm)
+#' 
+#' @param directed 
+#' `logical(1)`, if `TRUE`, absolute values of m/z differences will be
 #' taken to query against `transformation`  (irrespective the sign of `mass`)
 #' and undirected adjacency matrices will be returned as the respective
 #' assays. This means, if there is a negative mass in 
@@ -83,17 +86,31 @@
 structural <- function(x, transformation, var = c("group", "formula", "mass"), 
     ppm = 5, directed = FALSE) {
 
-    if (!is.data.frame(transformation))
-        stop("transformation is not a data.frame")
-    if (!"mz" %in% colnames(x)) stop("x does not contain the column mz")
-    #if (!"group" %in% scolnames(transformation))
-    #    stop("transformation does not contain the column group")
-    if (!"mass" %in% colnames(transformation))
-        stop("transformation does not contain the column mass")
+    ## check for integrity of x
+    if (!(is.matrix(x) | is.data.frame(x)))
+        stop("'x' has to be a matrix or data.frame")
+    if (!"mz" %in% colnames(x)) 
+        stop("'x' does not contain the column mz")
     
+    ## check for integrity of transformation
+    if (!is.data.frame(transformation))
+        stop("'transformation' is not a data.frame")
+    if (!"mass" %in% colnames(transformation))
+        stop("'transformation' does not contain the column mass")
+    var_err <- var[!var %in% colnames(transformation)]
+    if (length(var_err) > 0)
+        stop(sprintf("'transformation' does not contain the column '%s'", 
+                     paste(var_err, collapse = "', '")))
 
-    if (!is.numeric(ppm)) stop("ppm is not numeric")
-    if (ppm <= 0) stop("ppm has to be a positive value")
+    ## check for integrity of ppm
+    if (!is.numeric(ppm) | length(ppm) != 1) 
+        stop("'ppm' has to be a numeric of length 1")
+    if (ppm <= 0) 
+        stop("'ppm' has to be a positive value")
+    
+    ## check for integrity of directed
+    if (!is.logical(directed) | length(directed) != 1)
+        stop("'directed' has to be a logical vector of length 1")
 
     mass <- x[, "mz"]
     mat <- matrix(0, nrow = length(mass), ncol = length(mass))
@@ -105,7 +122,7 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
     ## receive indices of lower triangle
     lt <- lower.tri(mat)
 
-    ## outline of the function here
+    ## outline of the function:
     ## example: we have the two features M_1 and M_2, mz(M_1) > mz(M_2), 
     ## we calculate the ppm deviations from M_1 and M_2
     ## M_2+ppm, M_2, M_2-ppm
@@ -223,7 +240,7 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
 #' fit the expected behaviour, the connection will be removed (otherwise
 #' sustained).
 #'
-#' @param
+#' @param 
 #' am `AdjacencyMatrix` object returned by the function `structural`. 
 #' The object contains the assays `"binary"`, `"transformation"`, and 
 #' `"mass_difference"`. 
@@ -234,17 +251,21 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
 #' The assay `"mass_difference"` stores the `character` matrix with the type 
 #' (corresponding to the `"mass"` column in `transformation`).
 #'
-#' @param
+#' @param 
 #' x `matrix`, where columns are the samples and the rows are features
 #' (metabolites), cell entries are intensity values, `x` contains the
 #' column `"rt"` that has the rt information (numerical values) for the
 #' correction of retention time shifts between features that
 #' have a putative connection assigned based on m/z value difference
 #'
-#' @param
+#' @param 
 #' transformation `data.frame`, containing the columns `"group"`,
 #' and `"rt"` that will be used for correction of transformation of
 #' (functional) groups based on retention time shifts derived from `x`
+#' 
+#' @param 
+#' var `character(1)`, the key that is used for matching 
+#' between the column `var` in `transformation` and the assay `var` in `am` 
 #'
 #' @details
 #' `rtCorrection` is used to correct the (unweighted) adjacency matrices
@@ -314,6 +335,7 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
 #' @export
 rtCorrection <- function(am, x, transformation, var = "group") {
     
+    ## check for integrity of am
     if (!is(am, "AdjacencyMatrix")) {
         stop("'am_structural' is not an 'AdjacencyMatrix' object")
     }
@@ -326,22 +348,25 @@ rtCorrection <- function(am, x, transformation, var = "group") {
         stop("'am' has been already thresholded")
     }
     
-    ## check for integrity of x
-    if (!"rt" %in% colnames(x)) stop("x does not contain the column rt")
-    if (!"mz" %in% colnames(x)) stop("x does not contain the column mz")
-    if (!all(rownames(x) == rownames(am))) 
-        stop("rownames(x) do not match rownames(am)/colnames(am)")
+    if (am@type != "structural")
+        stop("'am' has to be of type 'structural'")
     
-    ## check for integrity of transformation
+    ## check for integrity of x
+    if (!"rt" %in% colnames(x)) stop("'x' does not contain the column 'rt'")
+    if (!"mz" %in% colnames(x)) stop("'x' does not contain the column 'mz'")
+    if (!all(rownames(x) == rownames(am))) 
+        stop("'rownames(x)' do not match 'rownames(am)'/'colnames(am)'")
+    
+    ## check for integrity of transformation and var
+    if (!is.character(var) | length(var) != 1)
+        stop("'var' has to be a character of length 1")
     if (!var %in% colnames(transformation))
-        stop(sprintf("transformation does not contain the column '%group'", 
+        stop(sprintf("'transformation' does not contain the column '%s'", 
                                                                         var))
-
     if (!"rt" %in% colnames(transformation))
-        stop("transformation does not contain the column rt")
-
+        stop("'transformation' does not contain the column 'rt'")
     if (!all(transformation[, "rt"] %in% c("+", "-", "?")))
-        stop(c("transformation[, 'rt'] does contain other levels than",
+        stop(c("'transformation[, 'rt']' does contain other levels than",
                " '+'', '-'' or '?'"))
 
     ## allocate binary, transformation, and mass_difference to mat_bin,
