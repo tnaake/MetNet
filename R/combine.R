@@ -53,10 +53,14 @@
 #'     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
 #'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
 #' transformation <- data.frame(group = transformation[, 1],
-#'      formula = transformation[, 2],
-#'      mass = as.numeric(transformation[, 3]))
+#'     formula = transformation[, 2],
+#'     mass = as.numeric(transformation[, 3]))
 #'      
-#' am_struct <- structural(x_test, transformation, ppm = 5)
+#' ## create AdjacencyMatrix object of type structural
+#' am_struct <- structural(x_test, transformation, var = c("group", "mass"), 
+#'     ppm = 10)
+#' 
+#' ## create AdjacencyMatrix object of type statistical
 #' x_test_cut <- as.matrix(x_test[, -c(1:2)])
 #' am_stat <- statistical(x_test_cut, model = c("pearson", "spearman"),
 #'     correlation_adjust = "bonferroni")
