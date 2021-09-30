@@ -35,7 +35,8 @@
 #' `data.frame` containing the numbers of present mz differences and
 #' corresponding name. 
 #'
-#' @author Liesa Salzer, \email{liesa.salzer@@helmholtz-muenchen.de}
+#' @author Liesa Salzer, \email{liesa.salzer@@helmholtz-muenchen.de} and
+#' Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
 #' @examples
 #' data("x_test", package = "MetNet") 
@@ -69,9 +70,13 @@ mz_summary <- function(am, var = c("group", "formula"), filter = 0){
     if (!(am@type == "combine" | am@type == "structural"))
         stop("'am' is not of type 'structural' or 'combine'")
   
+    ## check for integrity of var
+    if (!is.character(var) | length(var) == 0)
+        stop("'var' has to be a character of length > 0")
+  
     var_err <- var[!var %in% SummarizedExperiment::assayNames(am)]
     if (length(var_err) > 0)
-        stop(sprintf("assays '%s' not in 'am'", paste(var_err, collapse = "', '")))
+        stop(sprintf("assay '%s' not in 'am'", paste(var_err, collapse = "', '")))
       
     if (!is.numeric(filter)) 
         stop("'filter' needs to be numeric")
@@ -132,7 +137,8 @@ mz_summary <- function(am, var = c("group", "formula"), filter = 0){
 #' @return 
 #' `ggplot` object and corresponding barplot for visualizations
 #'
-#' @author Liesa Salzer, \email{liesa.salzer@@helmholtz-muenchen.de}
+#' @author Liesa Salzer, \email{liesa.salzer@@helmholtz-muenchen.de} and
+#' Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
 #' @examples
 #' data("x_test", package = "MetNet")
@@ -143,8 +149,9 @@ mz_summary <- function(am, var = c("group", "formula"), filter = 0){
 #' transformation <- data.frame(group = transformation[, 1],
 #'                                 formula = transformation[, 2],
 #'                                 mass = as.numeric(transformation[, 3]))
-#' am_struct <- structural(x_test, transformation, ppm = 5, directed = TRUE)
-#' mz_sum <- mz_summary(am_struct)
+#' am_struct <- structural(x_test, transformation, 
+#'     var = c("group", "formula", "mass"), ppm = 5, directed = TRUE)
+#' mz_sum <- mz_summary(am_struct, var = "group")
 #' mz_vis(mz_sum)
 #' 
 #' @importFrom ggplot2 ggplot aes_string geom_bar theme_minimal coord_flip labs
