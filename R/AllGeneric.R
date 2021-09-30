@@ -208,7 +208,8 @@ setMethod("as.data.frame", "AdjacencyMatrix",
         df <- cbind(tbl, df)
         
         ## remove rows with NA (directed(x) == FALSE)
-        df <- df[!apply(df[, .nms], 1, function(x) all(is.na(x))), ]
+        df <- df[!apply(df[, .nms, drop = FALSE], 1, 
+            function(x) all(is.na(x))), ]
                 
         return(df)
     }
