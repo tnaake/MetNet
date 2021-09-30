@@ -69,7 +69,7 @@
 #' (corresponding to the `"mass"` column in `transformation`).
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com} and 
-#' Liesa Salzer \email{liesa.salzer@@helmholtz-muenchen.de}
+#' Liesa Salzer, \email{liesa.salzer@@helmholtz-muenchen.de}
 #'
 #' @examples
 #' data("x_test", package = "MetNet")
@@ -80,10 +80,11 @@
 #' transformation <- data.frame(group = transformation[, 1],
 #'                                 formula = transformation[, 2],
 #'                                 mass = as.numeric(transformation[, 3]))
-#' am_struct <- structural(x_test, transformation, ppm = 5, directed = TRUE)
+#' am_struct <- structural(x_test, transformation, var = c("group", "mass"),
+#'     ppm = 10, directed = TRUE)
 #'
 #' @export
-structural <- function(x, transformation, var = c("group", "formula", "mass"), 
+structural <- function(x, transformation, var = character(), 
     ppm = 5, directed = FALSE) {
 
     ## check for integrity of x
@@ -97,6 +98,8 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
         stop("'transformation' is not a data.frame")
     if (!"mass" %in% colnames(transformation))
         stop("'transformation' does not contain the column mass")
+    if (!is.character(var)) 
+        stop("'var' is not a character vector")
     var_err <- var[!var %in% colnames(transformation)]
     if (length(var_err) > 0)
         stop(sprintf("'transformation' does not contain the column '%s'", 
@@ -196,7 +199,7 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
         l[["binary"]][ind_hit] <- 1
         
         ## write to these indices the values stores in transf_i for the 
-        ## respective column (paste the value to group and mass if there is 
+        ## respective column (paste the value to the entry if there is 
         ## already a value in the cell)
         l_var <- lapply(var, function(var_i) {
             l[[var_i]][ind_hit] <- ifelse(l[[var_i]][ind_hit] != "",
@@ -259,7 +262,7 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
 #' have a putative connection assigned based on m/z value difference
 #'
 #' @param 
-#' transformation `data.frame`, containing the columns `"group"`,
+#' transformation `data.frame`, containing the columns `var`,
 #' and `"rt"` that will be used for correction of transformation of
 #' (functional) groups based on retention time shifts derived from `x`
 #' 
@@ -276,7 +279,7 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
 #' different/unexpected retention time behaviour).
 #'
 #' `rtCorrection` accesses the assay `transformation` of 
-#' `am` and matches the elements in the `"group"` column
+#' `am` and matches the elements in the `var` column
 #' against the character matrix. In case of matches, `rtCorrection`
 #' accesses the `"rt"` column of `x` and calculates the retention
 #' time difference between the features. `rtCorrection` then checks
@@ -298,8 +301,8 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
 #' The first entry stores the
 #' `numeric` `matrix` with edges inferred mass differences corrected by
 #' retention time shifts. The second entry stores the `character` matrix with
-#' the type (corresponding to the `"group`" column
-#' in `transformation``) is stored.
+#' the type (corresponding to the `var` column
+#' in `transformation`) is stored.
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
@@ -317,7 +320,8 @@ structural <- function(x, transformation, var = c("group", "formula", "mass"),
 #'          formula = transformation[, 2],
 #'          mass = as.numeric(transformation[, 3]),
 #'          rt = transformation[, 4])
-#' am_struct <- structural(x = x_test, transformation = transformation, ppm = 10)
+#' am_struct <- structural(x = x_test, transformation = transformation, 
+#'     var = c("group", "mass"), ppm = 10, directed = FALSE)
 #' am_struct_rt <- rtCorrection(am = am_struct, x = x_test,
 #'      transformation = transformation)
 #'
