@@ -18,14 +18,14 @@ transformations_neg <- transformations <- data.frame(
 transformations_neg[, 3] <- -1 * transformations_neg[, 3]
 
 ## START unit test structural ##
-struct_adj <- structural(mat_test,
-        transformation = transformations, ppm = 5, directed = FALSE)
-struct_adj_neg <- structural(mat_test,
-        transformation = transformations_neg, ppm = 5, directed = FALSE)
-struct_adj_dir <- structural(mat_test,
-        transformation = transformations, ppm = 5, directed = TRUE)
-struct_adj_dir_neg <- structural(mat_test,
-        transformation = transformations_neg, ppm = 5, directed = TRUE)
+struct_adj <- structural(mat_test, transformation = transformations, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = FALSE)
+struct_adj_neg <- structural(mat_test, transformation = transformations_neg, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = FALSE)
+struct_adj_dir <- structural(mat_test, transformation = transformations, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = TRUE)
+struct_adj_dir_neg <- structural(mat_test, transformation = transformations_neg, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = TRUE)
 
 g_undir <- igraph::graph_from_adjacency_matrix(
     assay(struct_adj, "binary", mode = "directed", weighted = NULL))
@@ -50,14 +50,32 @@ test_that("structural", {
         "does not contain the column mz")
     expect_error(structural(NULL, transformations),
         "'x' has to be a matrix or data.frame")
-    expect_error(structural(mat_test, transformations[, -1]),
-        "'transformation' does not contain the column 'group'")
     expect_error(structural(mat_test, transformations[, -3]),
         "does not contain the column mass")
     expect_error(structural(mat_test, matrix()),
         "is not a data.frame")
     expect_error(structural(mat_test, transformations, ppm = "a"),
         "'ppm' has to be a numeric of length 1")
+    expect_error(structural(mat_test, transformations, var = c("group", "foo")),
+        "'transformation' does not contain the column 'foo'")
+    expect_error(structural(mat_test, transformations, var = "foo"),
+        "'transformation' does not contain the column 'foo'")
+    expect_error(structural(mat_test, transformations, 
+        var = c("group", "foo", "foo2")),
+        "'transformation' does not contain the column 'foo', 'foo2'")
+    expect_error(structural(mat_test, transformations, 
+        var = c("foo", "foo2")),
+        "'transformation' does not contain the column 'foo', 'foo2'")
+    expect_error(structural(mat_test, transformations, var = ""),
+        "'transformation' does not contain the column ''")
+    expect_error(structural(mat_test, transformations, var = NULL), 
+        "'var' is not a character vector")
+    expect_error(structural(mat_test, transformations, var = numeric()), 
+        "'var' is not a character vector")
+    expect_error(structural(mat_test, transformations, var = logical()), 
+        "'var' is not a character vector")
+    expect_equal(assayNames(structural(mat_test, transformations, 
+        var = character())), "binary")
     expect_true(validObject(struct_adj))
     expect_equal(assayNames(struct_adj), 
         c("binary", "group", "formula", "mass"))
@@ -169,8 +187,10 @@ test_that("structural", {
 ## END unit test structural ##
 
 ## START unit test rtCorrection ##
-struct_adj_rt <- rtCorrection(struct_adj, mat_test, transformations)
-struct_adj_rt_dir <- rtCorrection(struct_adj_dir, mat_test, transformations)
+struct_adj_rt <- rtCorrection(struct_adj, mat_test, transformations, 
+    var = "group")
+struct_adj_rt_dir <- rtCorrection(struct_adj_dir, mat_test, transformations,
+    var = "group")
 
 g_undir <- igraph::graph_from_adjacency_matrix(
     assay(struct_adj, "binary", mode = "directed", weighted = NULL))
@@ -264,8 +284,8 @@ test_that("rtCorrection", {
     transformations <- rbind(transformations, 
             data.frame(group = "pseudo Monosaccharide",
                formula = "C6H10O5", mass = 162.05282, rt = "?"))
-    struct_adj_pseudo <- structural(mat_test,
-        transformation = transformations, ppm = 5, directed = FALSE)
+    struct_adj_pseudo <- structural(mat_test, transformation = transformations,
+        var = c("group", "formula", "mass"), ppm = 5, directed = FALSE)
     expect_equal(assay(struct_adj_pseudo, "group")[3, 1],
         "Monosaccharide (-H2O)/pseudo Monosaccharide")
     expect_equal(assay(struct_adj_pseudo, "mass")[3, 1],
@@ -273,6 +293,6 @@ test_that("rtCorrection", {
     expect_equal(assay(struct_adj_pseudo, "formula")[3, 1],
         "C6H10O5/C6H10O5")
     struct_adj_pseudo_rt <- rtCorrection(struct_adj_pseudo, x = mat_test, 
-        transformation = transformations)
+        transformation = transformations, var = "group")
 })
 ## END unit test rtCorrection ##

@@ -13,8 +13,8 @@ transformations <- data.frame(group = as.character(transformations[, 1]),
                                 mass = as.numeric(transformations[, 3]))
 
 ## create structural network
-struct_adj <- structural(mat_test,
-        transformation = transformations, ppm = 5)
+struct_adj <- structural(mat_test, transformation = transformations, 
+    var = c("group", "formula", "mass"), ppm = 5)
 
 ## create statistical network
 stat_adj <- statistical(mat_test[, -1],

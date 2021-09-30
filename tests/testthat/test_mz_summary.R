@@ -16,17 +16,16 @@ transformations_neg <- transformations <- data.frame(
   rt = transformations[, 4])
 transformations_neg[, 3] <- -1 * transformations_neg[, 3]
 
-mz_summary(structural(mat_test,
-                     transformation = transformations, ppm = 5, directed = T))
 ## structural calculation
-struct_adj <- structural(mat_test,
-    transformation = transformations, ppm = 5, directed = FALSE)
+struct_adj <- structural(mat_test, transformation = transformations, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = FALSE)
+mz_summary(struct_adj, var = c("group", "formula"))
 
-struct_adj_neg <- structural(mat_test,
-    transformation = transformations_neg, ppm = 5, directed = FALSE)
+struct_adj_neg <- structural(mat_test, transformation = transformations_neg, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = FALSE)
 
-struct_adj_neg_dir <- structural(mat_test,
-    transformation = transformations_neg, ppm = 5, directed = TRUE)
+struct_adj_neg_dir <- structural(mat_test, transformation = transformations_neg, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = TRUE)
 
 ## statistical calculation
 stat_adj <- statistical(mat_test[, -1],
@@ -45,38 +44,47 @@ summary_cons_adj <- mz_summary(cons_adj, var = c("group", "formula"))
 
 
 test_that("mz_summary", {
-  expect_error(mz_summary(transformations),
-               "'am' is not an 'AdjacencyMatrix' object")
-  expect_error(mz_summary(struct_adj_neg),
+    expect_error(mz_summary(transformations, var = c("group", "formula")),
+        "'am' is not an 'AdjacencyMatrix' object")
+    expect_error(mz_summary(struct_adj_neg, var = c("group", "formula")),
                "assay 'binary' does not contain any mass differences")
-  expect_error(mz_summary(stat_adj),
+    expect_error(mz_summary(stat_adj, var = c("group", "formula")),
                "'am' is not of type 'structural' or 'combine'")
-  expect_error(mz_summary(struct_adj, filter = TRUE),
-               "'filter' needs to be numeric")
-  expect_error(mz_summary(struct_adj, filter = -1),
-               "'filter' needs to be 0 or positive numeric")
-  expect_equal(colnames(summary_struct_adj), 
-               c("group",  "formula", "count"))
-  expect_equal(length(summary_struct_adj), 3)
-  expect_equal(dim(summary_struct_adj), c(2, 3))
-  expect_equal(summary_struct_adj$group,
-               c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
-  expect_equal(summary_struct_adj$formula, c("C3H2O3", "C6H10O5"))
-  expect_equal(summary_struct_adj$count, c(3,3))
-  expect_true(is.data.frame(summary_struct_adj))
-  expect_equal(length(summary_struct_adj_neg_dir), 3)
-  expect_equal(dim(summary_struct_adj_neg_dir), c(2, 3))
-  expect_equal(summary_struct_adj_neg_dir$group,
-               c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
-  expect_equal(summary_struct_adj_neg_dir$formula, c("C3H2O3", "C6H10O5"))
-  expect_equal(summary_struct_adj_neg_dir$count, c(3,3))
-  expect_equal(length(summary_cons_adj), 3)
-  expect_equal(dim(summary_cons_adj), c(2, 3))
-  expect_equal(summary_cons_adj$group,
-               c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
-  expect_equal(summary_cons_adj$formula, c("C3H2O3", "C6H10O5"))
-  expect_equal(summary_cons_adj$count, c(4,4))
-  expect_true(is.data.frame(summary_cons_adj))
+    expect_error(mz_summary(struct_adj, var = c("group", "formula"), 
+        filter = TRUE), "'filter' needs to be numeric")
+    expect_error(mz_summary(struct_adj, filter = -1),
+        "'filter' needs to be 0 or positive numeric")
+    expect_equal(colnames(summary_struct_adj), 
+        c("group",  "formula", "count"))
+    expect_equal(length(summary_struct_adj), 3)
+    expect_equal(dim(summary_struct_adj), c(2, 3))
+    expect_equal(summary_struct_adj$group,
+        c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
+    expect_equal(summary_struct_adj$formula, c("C3H2O3", "C6H10O5"))
+    expect_equal(summary_struct_adj$count, c(3,3))
+    expect_true(is.data.frame(summary_struct_adj))
+    expect_equal(length(summary_struct_adj_neg_dir), 3)
+    expect_equal(dim(summary_struct_adj_neg_dir), c(2, 3))
+    expect_equal(summary_struct_adj_neg_dir$group,
+        c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
+    expect_equal(summary_struct_adj_neg_dir$formula, c("C3H2O3", "C6H10O5"))
+    expect_equal(summary_struct_adj_neg_dir$count, c(3,3))
+    expect_equal(length(summary_cons_adj), 3)
+    expect_equal(dim(summary_cons_adj), c(2, 3))
+    expect_equal(summary_cons_adj$group,
+        c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
+    expect_equal(summary_cons_adj$formula, c("C3H2O3", "C6H10O5"))
+    expect_equal(summary_cons_adj$count, c(4,4))
+    expect_true(is.data.frame(summary_cons_adj))
+    expect_error(mz_summary(struct_adj, var = "foo"), "assay 'foo' not in 'am'")
+    expect_error(mz_summary(struct_adj, var = NULL), 
+        "'var' has to be a character of length > 0")
+    expect_error(mz_summary(struct_adj, var = character()), 
+        "'var' has to be a character of length > 0")
+    expect_error(mz_summary(struct_adj, var = "group", filter = -1), 
+        "'filter' needs to be 0 or positive numeric")
+    expect_error(mz_summary(struct_adj, var = "group", filter = NULL), 
+        "'filter' needs to be numeric")
 })
 ## END unit test mz_summary ##
 

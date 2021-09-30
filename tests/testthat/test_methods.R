@@ -11,10 +11,10 @@ transformations <- data.frame(group = as.character(transformations[, 1]),
     rt = as.character(transformations[, 4]))
 
 ## create structural network
-struct_adj <- structural(x_test,
-    transformation = transformations, ppm = 5, directed = FALSE)
+struct_adj <- structural(x_test, transformation = transformations, 
+    var = c("group", "formula", "mass"), ppm = 5, directed = FALSE)
 struct_adj_thr <- rtCorrection(am = struct_adj, x = x_test, 
-    transformation = transformations)
+    transformation = transformations, var = "group")
 
 ## create statistical network
 x_test_cut <- as.matrix(x_test[, -c(1:2)])
@@ -93,6 +93,13 @@ test_that("as.data.frame", {
     expect_equal(df$mass[1:5], 
         c("", "86.0003939305", "", "", "162.0528234315"))
     expect_equal(as.vector(table(df$mass)), c(649, 6, 11))
+    tmp <- structural(x_test, transformation = transformations, 
+        var = character(), ppm = 5, directed = FALSE)
+    expect_equal(dim(as.data.frame(tmp)), c(666, 3))
+    expect_equal(as.vector(table(as.data.frame(tmp)$binary)), c(649, 17))
+    tmp <- structural(x_test, transformation = transformations, 
+        var = character(), ppm = 5, directed = FALSE)
+    expect_equal(dim(as.data.frame(tmp)), c(666, 3))
     
     ## struct_adj_thr
     df <- as.data.frame(struct_adj_thr)
