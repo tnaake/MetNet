@@ -5,7 +5,7 @@
 \title{Correct connections in the structural adjacency matrices by
 retention time}
 \usage{
-rtCorrection(am, x, transformation)
+rtCorrection(am, x, transformation, var = "group")
 }
 \arguments{
 \item{am}{`AdjacencyMatrix` object returned by the function `structural`. 
@@ -24,20 +24,23 @@ column `"rt"` that has the rt information (numerical values) for the
 correction of retention time shifts between features that
 have a putative connection assigned based on m/z value difference}
 
-\item{transformation}{`data.frame`, containing the columns `"group"`,
+\item{transformation}{`data.frame`, containing the columns `var`,
 and `"rt"` that will be used for correction of transformation of
 (functional) groups based on retention time shifts derived from `x`}
+
+\item{var}{`character(1)`, the key that is used for matching 
+between the column `var` in `transformation` and the assay `var` in `am`}
 }
 \value{
 `AdjacencyMatrix` containing the slots `binary`, `transformation`, and 
 `mass_difference`.
 The slot `directed` is inherited from `am`
 
-. The first entry stores the
+The first entry stores the
 `numeric` `matrix` with edges inferred mass differences corrected by
 retention time shifts. The second entry stores the `character` matrix with
-the type (corresponding to the `"group`" column
-in `transformation``) is stored.
+the type (corresponding to the `var` column
+in `transformation`) is stored.
 }
 \description{
 The function `rtCorrection` corrects the adjacency matrix
@@ -58,7 +61,7 @@ m/z differences that have by chance the same m/z difference but
 different/unexpected retention time behaviour).
 
 `rtCorrection` accesses the assay `transformation` of 
-`am` and matches the elements in the `"group"` column
+`am` and matches the elements in the `var` column
 against the character matrix. In case of matches, `rtCorrection`
 accesses the `"rt"` column of `x` and calculates the retention
 time difference between the features. `rtCorrection` then checks
@@ -66,14 +69,19 @@ if the observed retention time difference matches the expected behaviour
 (indicated by `"+"` for a higher retention time of the feature with
 the putative group, `"-"` for a lower retention time of the feature
 with the putative group or `"?"` when there is no information
-available or features with that group should not be checked). In case
-several transformation were assigned to a feature/feature pair connections
-will always be removed if there is an inconsistency with any of the given
-transformation.
+available or features with that group should not be checked). 
+
+In case several transformation were assigned to a feature/feature pair,
+the connection will always be removed if there is an inconsistency with any 
+of the given transformations.
 }
 \examples{
 data("x_test", package = "MetNet")
+rownames(x_test) <- paste(round(x_test[, "mz"], 2),
+    round(x_test[, "rt"]), sep = "_")
 transformation <- rbind(
+    c("Hydroxylation (-H)", "O", 15.9949146221, "+"),
+    c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "+"),
     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315", "-"),
     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851", "-"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945", "-"))
@@ -81,9 +89,20 @@ transformation <- data.frame(group = transformation[, 1],
          formula = transformation[, 2],
          mass = as.numeric(transformation[, 3]),
          rt = transformation[, 4])
-am_struct <- structural(x = x_test, transformation = transformation, ppm = 5)
-am_struct_rt <- rtCorrection(am = am_struct, x = x_test, 
+am_struct <- structural(x = x_test, transformation = transformation, 
+    var = c("group", "mass"), ppm = 10, directed = FALSE)
+am_struct_rt <- rtCorrection(am = am_struct, x = x_test,
      transformation = transformation)
+
+## visualize the adjacency matrices
+library(igraph)
+g <- graph_from_adjacency_matrix(assay(am_struct, "binary"),
+    mode = "undirected")
+g_rt <- graph_from_adjacency_matrix(assay(am_struct_rt, "binary"),
+    mode = "undirected")
+
+plot(g, edge.width = 2, edge.arrow.size = 0.5, vertex.label.cex = 0.7)
+plot(g_rt, edge.width = 2, edge.arrow.size = 0.5, vertex.label.cex = 0.7)
 
 }
 \author{

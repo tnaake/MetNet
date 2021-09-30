@@ -67,7 +67,7 @@
 #'
 #' @param adj_l `list` of adjacency matrices
 #' 
-#' @param rowData information on the features
+#' @param rowData `data.frame`, containing information on the features
 #' 
 #' @param type `character`, either `"structural"`, `"statistical"`, or 
 #' `"combine"`
@@ -85,40 +85,40 @@
 #'
 #' @examples
 #' binary <- matrix(0, ncol = 10, nrow = 10)
-#' type <- matrix("", ncol = 10, nrow = 10)
+#' transformation <- matrix("", ncol = 10, nrow = 10)
 #' mass_difference <- matrix("", ncol = 10, nrow = 10)
 #' 
-#' rownames(binary) <- rownames(type) <- rownames(mass_difference) <- paste("feature", 1:10)
-#' colnames(binary) <- rownames(type) <- rownames(mass_difference) <- paste("feature", 1:10)
+#' rownames(binary) <- rownames(transformation) <- rownames(mass_difference) <- paste("feature", 1:10)
+#' colnames(binary) <- rownames(transformation) <- rownames(mass_difference) <- paste("feature", 1:10)
 #' 
 #' binary[5, 4] <- 1
-#' type[5, 4] <- "glucose addition"
+#' transformation[5, 4] <- "glucose addition"
 #' mass_difference[5, 4] <- "162"
 #' 
 #' ## create adj_l and rowData
-#' adj_l <- list(binary = binary, type = type, 
+#' adj_l <- list(binary = binary, transformation = transformation, 
 #'     mass_difference = mass_difference)
-#' rowData <- DataFrame(features = rownames(binary), 
+#' rowData <- DataFrame(features = rownames(binary),
 #'     row.names = rownames(binary))
-#'     
-#' AdjacencyMatrix(adj_l = adj_l, rowData = rowData, type = structural", 
+#' 
+#' AdjacencyMatrix(adj_l = adj_l, rowData = rowData, type = "structural", 
 #'     directed = TRUE, thresholded = FALSE)
 #'
 #' @export
 #' 
 #' @importFrom SummarizedExperiment SummarizedExperiment assays 
 #' @importFrom methods new is
-AdjacencyMatrix <- function(adj_l, rowData, 
-    type = c("structural", "statistical", "combine"), 
+AdjacencyMatrix <- function(adj_l, rowData,
+    type = c("structural", "statistical", "combine"),
     directed = c(TRUE, FALSE), thresholded = c(TRUE, FALSE)) {
-    
+
     type <- match.arg(type)
-    
-    se <- SummarizedExperiment(adj_l, rowData = rowData, colData = rowData)
+
+    se <- SummarizedExperiment::SummarizedExperiment(adj_l, 
+        rowData = rowData, colData = rowData)
     .AdjacencyMatrix(se, type = type, directed = directed, 
         thresholded = thresholded)
 }
-
 
 ### 
 ### Validity
@@ -129,15 +129,15 @@ AdjacencyMatrix <- function(adj_l, rowData,
 setValidity2("AdjacencyMatrix", function(object) {
     msg <- NULL
     
-    type_obj <- type(object)
+    type_obj <- object@type
     
-    a <- assays(object)[[1]]
+    a <- SummarizedExperiment::assays(object)[[1]]
     if (nrow(a) != ncol(a)) {
         msg <- c(msg, "nrow not equal ncol for assays")
     }
     
     ## valid assay names for structural, statistical, and combine
-    valid_names_struct <- c("binary", "transformation", "mass_difference")
+    valid_names_struct <- "binary"
     valid_names_stat <- c(
         "lasso_coef", "randomForest_coef", "clr_coef", "aracne_coef",
         "pearson_coef", "pearson_pvalue", "spearman_coef", "spearman_pvalue",
@@ -146,11 +146,10 @@ setValidity2("AdjacencyMatrix", function(object) {
         "pearson_semipartial_coef", "pearson_semipartial_pvalue",
         "spearman_semipartial_coef", "spearman_semipartial_pvalue",
         "bayes_coef", "consensus")
-    valid_names_combine <- c("combine_binary", "combine_transformation", 
-        "combine_mass_difference")
-    
+    valid_names_combine <- "combine_binary"
+
     ## check if colnames, rownames for one assay are the same
-    .assays_have_identical_colnames_rownames(object)    
+    .assays_have_identical_colnames_rownames(object)
 
     ## check if colnames and rownames across assays are the same
     .assays_have_identical_dimnames(object)
@@ -158,32 +157,34 @@ setValidity2("AdjacencyMatrix", function(object) {
     ############################################################################
     ############################################################################
     
-    if (type_obj == "structural" | type_obj == "combine") {
+    if (type_obj == "structural") {
         
-        if (!all(valid_names_struct %in% assayNames(object)))
-            msg <- c(msg, 
-                "assay names must be 'binary', 'transformation', 'mass_difference'")
+        .nms <- SummarizedExperiment::assayNames(object)
         
-        .obj <- assay(object, "binary")
+        if (!all(valid_names_struct %in% .nms))
+            msg <- c(msg, "assay names must contain 'binary'")
+
+        .obj <- SummarizedExperiment::assay(object, "binary")
         if (!is.numeric(.obj))
             msg <- c(msg, "slot 'binary' must be numeric")
         
-        .obj <- assay(object, "transformation")
-        if (!is.character(.obj))
-            msg <- c(msg, "slot 'transformation' must be character")
+        .nms_cut <- .nms[!.nms %in% "binary"]
         
-        .obj <- assay(object, "mass_difference")
-        if (!is.character(.obj))
-            msg <- c(msg, "slot 'mass_difference' must be character")
+        msg_l <- lapply(.nms_cut, function(.nms_i) {
+            .obj <- SummarizedExperiment::assay(object, .nms_i)
+            if (!is.character(.obj))
+                sprintf("slot '%s' must be character", .nms_i)
+        })
+        msg <- c(msg, unlist(msg_l))
     }
-    
-    if (type_obj == "statistical" | type_obj == "combine") {
+
+    if (type_obj == "statistical") {
         
-        .nms <- assayNames(object)
+        .nms <- SummarizedExperiment::assayNames(object)
         
-        if (type_obj == "combine")
-            .nms <- .nms[!(.nms %in% c("binary", "transformation", "mass_difference",
-                "combine_binary", "combine_transformation", "combine_mass_difference"))]
+        # if (type_obj == "combine")
+        #     .nms <- .nms[!(.nms %in% c("binary", "transformation", "mass_difference",
+        #         "combine_binary", "combine_transformation", "combine_mass_difference"))]
         
         if (any(!(.nms %in% valid_names_stat)))
             msg <- c(msg, "assay names contain invalid entries")
@@ -196,21 +197,46 @@ setValidity2("AdjacencyMatrix", function(object) {
     
     if (type_obj == "combine") {
         
-        if (!all(valid_names_combine %in% assayNames(object)))
-            msg <- c(msg, 
-                "assay names must be 'combine_binary', 'combine_transformation', 'combine_mass_difference'")
+        .nms <- SummarizedExperiment::assayNames(object)
         
-        .obj <- assay(object, "combine_binary")
+        ## check for columns binary and combine binary 
+        ## (these should be numeric)
+        if (!all(valid_names_struct %in% .nms))
+            msg <- c(msg, "assay names must contain 'binary'")
+        
+        .obj <- SummarizedExperiment::assay(object, "binary")
+        if (!is.numeric(.obj))
+            msg <- c(msg, "slot 'binary' must be numeric")
+
+        if (!all(valid_names_combine %in% .nms))
+            msg <- c(msg, "assay names must contain 'combine_binary'")
+
+        .obj <- SummarizedExperiment::assay(object, "combine_binary")
         if (!is.numeric(.obj))
             msg <- c(msg, "slot 'combine_binary' must be numeric")
 
-        .obj <- assay(object, "combine_transformation")
-        if (!is.character(.obj))
-            msg <- c(msg, "slot 'combine_transformation' must be character")
-
-        .obj <- assay(object, "combine_mass_difference")
-        if (!is.character(.obj))
-            msg <- c(msg, "slot 'combine_mass_difference' must be character")
+        ## check for columns that originate from structural (expect for *binary)
+        ## these should be character
+        .nms_cut <- .nms[!.nms %in% 
+            c("binary", "combine_binary", valid_names_stat)]
+        
+        msg_l <- lapply(.nms_cut, function(.nms_cut_i) {
+            .obj <- SummarizedExperiment::assay(object, .nms_cut_i)
+            if (!is.character(.obj))
+                sprintf("slot '%s' must be character", .nms_cut_i)
+        })
+        msg <- c(msg, unlist(msg_l))
+        
+        ## check for columns that originate from statistical 
+        ## (these should be numeric)
+        .nms_cut <- .nms[.nms %in% valid_names_stat]
+        
+        msg_l <- lapply(.nms_cut, function(.nms_cut_i) {
+            .obj <- SummarizedExperiment::assay(object, .nms_cut_i)
+            if (!is.numeric(.obj))
+                sprintf("slot '%s' must be numeric", .nms_cut_i)
+        })
+        msg <- c(msg, unlist(msg_l))
     }
 
     if (is.null(msg)) {
@@ -218,7 +244,6 @@ setValidity2("AdjacencyMatrix", function(object) {
     } else {
         msg
     }
-
 })
 
 #' @name .assays_have_identical_dimnames
@@ -240,12 +265,13 @@ setValidity2("AdjacencyMatrix", function(object) {
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #' 
 #' @importFrom S4Vectors getListElement
+#' @importFrom SummarizedExperiment SummarizedExperiment
 .assays_have_identical_dimnames <- function(object) {
-    .assays <- assays(object)
-    a_1 <- getListElement(.assays, 1)
+    .assays <- SummarizedExperiment::assays(object)
+    a_1 <- S4Vectors::getListElement(.assays, 1)
     ident <- vapply(seq_along(.assays),
         function(i) {
-            a <- getListElement(.assays, i)
+            a <- S4Vectors::getListElement(.assays, i)
             a_dimnames <- dimnames(a)
             identical(rownames(a_dimnames), dimnames(a_1))
             },
@@ -271,11 +297,14 @@ setValidity2("AdjacencyMatrix", function(object) {
 #' @return `logical` of length 1
 #' 
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' 
+#' @importFrom S4Vectors getListElement
+#' @importFrom SummarizedExperiment SummarizedExperiment
 .assays_have_identical_colnames_rownames <- function(object) {
-    .assays <- assays(object)
+    .assays <- SummarizedExperiment::assays(object)
     ident <- vapply(seq_along(.assays),
         function(i) {
-            a <- getListElement(.assays, i)
+            a <- S4Vectors::getListElement(.assays, i)
             identical(colnames(a), rownames(a))
         }, 
         logical(1)

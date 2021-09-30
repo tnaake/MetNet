@@ -125,14 +125,15 @@ send a mail to the developer.
 To install `MetNet` enter the following to the `R` console
 
 ```{r install, eval=FALSE}
-install.packages("BiocManager")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
 BiocManager::install("MetNet")
 ```
 
 Before starting with the analysis, load the `MetNet` package. This 
-will also load the required packages `glmnet`, `stabs`,
-`randomForest`, `rfPermute`, `mpmi`,
-`parmigene`, `WGCNA` and `bnlearn` that are needed
+will also load the required packages `glmnet`, `stabs`, `GENIE3`, `mpmi`,
+`parmigene`, `Hmisc`, `ppcor` and `bnlearn` that are needed
 for functions in the statistical adjacency matrix inference.
 ```{r load_MetNet,eval=TRUE}
 library(MetNet)
@@ -270,7 +271,14 @@ struct_adj_dir <- structural(x = x_test, transformation = transformations,
 ```
 
 In the following we will visualize the results from the undirected and 
-directed structural network:
+directed structural network. 
+
+We will set the mode of the `igraph` object
+to `"directed"` in both cases to make the distinction between the returned
+outputs of `structural` for setting `directed = FALSE` and `directed = TRUE`.
+Alternatively, we could also set the `mode` for the first `igraph` object
+(using the undirected output of `structural`) to `"undirected"` which results
+in an `igraph` object where the directionality of the edges is not retained. 
 
 ```{r visualization_directed}
 g_undirected <- igraph::graph_from_adjacency_matrix(
@@ -308,7 +316,7 @@ To account for retention time shifts we enter
 
 ```{r rt_correction, eval=TRUE, echo=TRUE}
 struct_adj <- rtCorrection(am = struct_adj, x = x_test, 
-    transformation = transformations)
+    transformation = transformations, var = "group")
 ```
 in the `R` console. 
 
@@ -322,11 +330,19 @@ struct_df <- struct_df[struct_df$binary == 1, ]
 ```
 
 Some overview on the mass-difference distribution of the data can be observed 
-using the `mz_summary` function. For larger data-sets, also a `filter` can be 
-applied to visualize mass-difference above a defined threshold.
+using the `mz_summary` function. The number of determined mass differences
+can be displayed by using the `mz_vis` function.
 
-```{r,eval=TRUE,echo=TRUE}
-mz_summary(struct_adj)
+```{r mz_summary,eval=TRUE,echo=TRUE}
+mz_sum <- mz_summary(struct_adj, var = "group")
+mz_vis(mz_sum, var = "group")
+```
+For larger data-sets, also a `filter` can be 
+applied to visualize mass-difference above a defined threshold.
+A filter can be applied, by `filter`. Since the maximum count of any mass difference in `struct_adj` is 4, a filter of `5` results in 0 mass differences.
+```{r mz_summary_filter}
+mz_summary(struct_adj, filter = 4)
+mz_summary(struct_adj, filter = 5)
 ```
 
 The `AdjacencyMatrix` class allows storing further information on the features 
@@ -334,17 +350,18 @@ as putative annotations, database identifier, SMILES, etc. using `rowData()`.
 A `data.frame` containing the same `rownames` as the test data needs to be 
 provided. The columns can store different information as annotations, identifier, etc.
 We will load the `x_annotation` file, which contains an example annotation 
-and other identifier for feature x1856. All the other features contain `NA`'s 
+and other identifier for feature `x1856`. All the other features contain `NA`s 
 in corresponding columns. 
 
 ```{r,eval=TRUE,echo=TRUE}
 data("x_annotation", package = "MetNet")
 x_annotation <- as.data.frame(x_annotation)
 
-# Add annotations to the structural AdjacencyMatrix object
+## add annotations to the structural AdjacencyMatrix object
 rowData(struct_adj) <- x_annotation
-# And display of annotations (or other feature information)
-rowData(struct_adj)
+
+## display annotation for the feature "1856"
+rowData(struct_adj)["x1856", ]
 ```
 
 # Creating the statistical adjacency {#sec-statistical}
@@ -362,7 +379,7 @@ Mutual Information using a nonparametric bias correction by
 Bias Corrected Mutual Information, and the functions `clr` and 
 `aracne.a` from the `parmigene` package), Pearson and 
 Spearman correlation (based on the 
-`stats` package), partial and semipartial 
+`psych` package), partial and semipartial 
 Pearson and Spearman correlation (using the `ppcor` package) and 
 score-based structure learning returning the strength of the probabilistic 
 relationships of the arcs of 
@@ -394,8 +411,8 @@ using
 Pearson and Spearman correlation using the intensity values as input data. 
 
 ```{r statistical,eval=TRUE,echo=TRUE}
-x_int <- x_test[, 3:dim(x_test)[2]]
-x_int <- as.matrix(x_int)
+x_int <- x_test[, 3:ncol(x_test)] |>
+    as.matrix()
 stat_adj <- statistical(x_int, model = c("pearson", "spearman"))
 ```
 
@@ -500,7 +517,7 @@ adjacency matrix.
 
 We use here the assay `"combine_binary"` from the `AdjacencyMatrix` of type
 `combine` and pass it to the `graph_from_adjacency_matrix` function:
-```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='** _Ab initio_ network inferred from structural and  quantitative mass spectrometry data.** Vertices are connected that are separated by given metabolic transformation and statistical association.'}
+```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='_Ab initio_ network inferred from structural and  quantitative mass spectrometry data. Vertices are connected that are separated by given metabolic transformation and statistical association.'}
 adj <- assay(comb_adj, "combine_binary")
 g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected")
 plot(g, edge.width = 2, vertex.label.cex = 0.5, edge.color = "grey")

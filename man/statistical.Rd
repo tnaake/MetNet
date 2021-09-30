@@ -65,6 +65,7 @@ data("x_test", package = "MetNet")
 x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 statistical(x = x, model = c("pearson", "spearman"))
+statistical(x = x, model = c("pearson", "spearman"), p.adjust = "BH")
 
 }
 \author{

@@ -7,31 +7,39 @@
 combine(am_structural, am_statistical)
 }
 \arguments{
-\item{am_structural}{`AdjacencyMatrix` containing `numeric` structural 
-adjacency matrices (assays `binary`, `transformation`, and 
-`mass_difference`).}
+\item{am_structural}{`AdjacencyMatrix` containing the `numeric` structural 
+adjacency matrix (assay `binary`) and other `character` structural adjacency 
+matrices (e.g. `group` and  `mass`).}
 
-\item{am_statistical}{`AdjacencyMatrix` containing the assay `consensus`}
+\item{am_statistical}{`AdjacencyMatrix` containing the assay `consensus` and
+other `numeric` adjacency matrices depending on the chosen statistical 
+models}
 }
 \value{
 `AdjacencyMatrix` object containing the assays
-`combine_binary` (`numeric` adjacency matrix), 
-`combine_transformation` (`character` adjacency matrix), and 
-`combine_mass_difference` (`character` adjacency matrix). 
+`combine_binary` (`numeric` adjacency matrix), and the combined matrices
+derived from the structural `AdjacencyMatrix` (`character` adjacency 
+matrices).
 
 The `AdjacencyMatrix` object will also contain all other assays contained
 in `am_structural` and `am_statistical`.
 }
 \description{
-The function `combine` takes as
-input the structural and statistical `AdjacencyMatrix` objects, created in former
+The function `combine` takes as nput the structural and statistical 
+`AdjacencyMatrix` objects, created in former
 steps. It will access the assays `binary` and `consensus`, adds them 
 together and will report a connection between metabolites
 if the edge is present in both matrices. 
 
 `combine` returns an `AdjacencyMatrix` containing this consensus matrix 
-supported by the structural and statistical adjacency matrices (assays
-`combine_binary`, `combine_transformation`, and `combine_mass_difference`.
+supported by the structural and statistical adjacency matrices (assay
+`combine_binary`). The `AdjacencyMatrix` object furthermore contains the 
+assays from the statistical `AdjacencyMatrix` and the 
+combined assays from the structural `AdjacencyMatrix`, e.g. if the 
+structural `AdjacencyMatrix` has the assays `group` and `mass`, the 
+combine `AdjacencyMatrix` object will contain the assays `combine_group` and
+`combine_mass` that have support from the structural and statistical 
+`AdjacencyMatrix` object.
 }
 \details{
 The matrices from the assays `binary` and `consensus` will be added 
@@ -47,10 +55,14 @@ transformation <- rbind(
     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
 transformation <- data.frame(group = transformation[, 1],
-     formula = transformation[, 2],
-     mass = as.numeric(transformation[, 3]))
+    formula = transformation[, 2],
+    mass = as.numeric(transformation[, 3]))
      
-am_struct <- structural(x_test, transformation, ppm = 5)
+## create AdjacencyMatrix object of type structural
+am_struct <- structural(x_test, transformation, var = c("group", "mass"), 
+    ppm = 10)
+
+## create AdjacencyMatrix object of type statistical
 x_test_cut <- as.matrix(x_test[, -c(1:2)])
 am_stat <- statistical(x_test_cut, model = c("pearson", "spearman"),
     correlation_adjust = "bonferroni")

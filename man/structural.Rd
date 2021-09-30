@@ -4,11 +4,11 @@
 \alias{structural}
 \title{Create adjacency matrix based on m/z (molecular weight) difference}
 \usage{
-structural(x, transformation, ppm = 5, directed = FALSE)
+structural(x, transformation, var = character(), ppm = 5, directed = FALSE)
 }
 \arguments{
-\item{x}{`matrix`, where columns are the samples and the rows are features
-(metabolites), cell entries are intensity values. `x` contains the
+\item{x}{`matrix` or `data.frame`, where columns are the samples and the rows are 
+features (metabolites), cell entries are intensity values. `x` contains the
 column `"mz"` that has the m/z information (numerical values) for the
 calculation of mass differences between features}
 
@@ -16,12 +16,16 @@ calculation of mass differences between features}
 and `"mass"` that will be used for detection of transformation of
 (functional) groups}
 
-\item{ppm}{`numeric`, mass accuracy of m/z features in parts per million (ppm)}
+\item{var}{`character` corresponding to column names in `transformation`}
 
-\item{directed}{`logical`, if `TRUE` absolute values of m/z differences will be
+\item{ppm}{`numeric(1)`, mass accuracy of m/z features in parts per million (ppm)}
+
+\item{directed}{`logical(1)`, if `TRUE`, absolute values of m/z differences will be
 taken to query against `transformation`  (irrespective the sign of `mass`)
 and undirected adjacency matrices will be returned as the respective
-assays. if `FALSE` directed
+assays. This means, if there is a negative mass in 
+`transformation[, "mass"]`, this negative mass will not be reported. 
+If `FALSE`, directed
 adjacency matrices will be returned with links reported that match the
 transformations defined in `transformation` (respecting the sign of `mass`).
 The `directed` slot of the returned `AdjacencyMatrix` object will contain
@@ -71,10 +75,11 @@ transformation <- rbind(
 transformation <- data.frame(group = transformation[, 1],
                                 formula = transformation[, 2],
                                 mass = as.numeric(transformation[, 3]))
-am_struct <- structural(x_test, transformation, ppm = 5, directed = TRUE)
+am_struct <- structural(x_test, transformation, var = c("group", "mass"),
+    ppm = 10, directed = TRUE)
 
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com} and 
-Liesa Salzer \email{liesa.salzer@helmholtz-muenchen.de}
+Liesa Salzer, \email{liesa.salzer@helmholtz-muenchen.de}
 }

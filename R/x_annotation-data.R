@@ -1,11 +1,17 @@
 #' @name x_annotation
+#' 
 #' @title Example annotation for \code{MetNet}: data input
+#' 
 #' @description \code{x_annotation} contains one selected putative annotation of
 #' \code{x_test}. Missing annotations are filled with `NA`'s. It will be used as an example annotation in the vignette to
 #' show the functionality of the packages.
+#' 
 #' @docType data
+#' 
 #' @return \code{matrix}
+#' 
 #' @format \code{matrix}
+#' 
 #' @source
 #' data("x_test", package = "MetNet")
 #' 
@@ -23,8 +29,8 @@
 #'                      "charge" = NA,
 #'                      "database" = NA)
 #'
-#'x1856 <- cbind(x_annotation[rownames(x_annotation) == "x1856","mz"],
-#'               x_annotation[rownames(x_annotation) == "x1856","rt"],
+#'x1856 <- cbind(x_annotation["x1856", "mz"],
+#'               x_annotation["x1856", "rt"],
 #'               "database_mz" = 	308.2,
 #'               "database_identifier" = "N-caffeoylspermidine",
 #'               "chemical_formula" = "C16H25N3O3",

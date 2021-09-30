@@ -129,21 +129,21 @@ setMethod("show", "AdjacencyMatrix",
         cat("dim:", dim(object), "\n")
               
         ## type()
-        .type <- type(object)
+        .type <- object@type
         if (is.null(.type))
-            .type <- character(length(type(object)))
+            .type <- character(length(object@type))
         coolcat("type(%d): %s\n", .type)
         
         ## directed()
-        .directed <- directed(object)
+        .directed <- object@directed
         if (is.null(.directed))
-            .directed <- character(length(directed(object)))
+            .directed <- character(length(object@directed))
         coolcat("directed(%d): %s\n", .directed)
               
         ## threshold()
-        .threshold <- thresholded(object)
+        .threshold <- object@thresholded
         if (is.null(.threshold))
-            .threshold <- character(length(thresholded(object)))
+            .threshold <- character(length(object@thresholded))
         coolcat("thresholded(%d): %s\n", .threshold)
               
         ## assay()
@@ -190,18 +190,17 @@ setMethod("as.data.frame", "AdjacencyMatrix",
         .nms <- assayNames(x)
                   
         l <- lapply(seq_along(.nms),
-            function(i) assay(x, i))
+            function(.nms_i) assay(x, .nms_i))
         if (!directed(x)) {
-            l <- lapply(l, function(i) {
-                i[upper.tri(i)] <- NA
-                i   
+            l <- lapply(l, function(l_i) {
+                l_i[upper.tri(l_i)] <- NA
+                l_i   
             })
         }
         l <- lapply(seq_along(l), function(i) l[[i]] %>%
             as.data.frame() %>%
             rownames_to_column(var = "Row") %>%
             pivot_longer(-"Row", names_to = "Col", values_to = .nms[i]))
-            
         
         tbl <- dplyr::select(l[[1]], "Row", "Col")
         l <- lapply(l, function(x) x[, 3])
@@ -209,7 +208,8 @@ setMethod("as.data.frame", "AdjacencyMatrix",
         df <- cbind(tbl, df)
         
         ## remove rows with NA (directed(x) == FALSE)
-        df <- df[!apply(df[, .nms], 1, function(x) all(is.na(x))), ]
+        df <- df[!apply(df[, .nms, drop = FALSE], 1, 
+            function(x) all(is.na(x))), ]
                 
         return(df)
     }

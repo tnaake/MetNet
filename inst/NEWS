@@ -1,8 +1,36 @@
-Changes in version 1.9.3 (2021-03-30)
+Changes in version 1.11.4 (2021-09-09)
++ shift calculation of as.data.frame(am) in mz_summary
++ several fixes of typos in the comments and vignette
++ fix rtCorrection function
+
+Changes in version 1.11.3 (2021-08-30)
++ change calculation of mass differences, use the differences between 
+  (M_2+ppm)-(M_1-ppm) and (M_2-ppm)-(M_1+ppm) instead of (M_1-ppm)-(M_1) and 
+  (M_2+ppm)-(M_1) for querying against the list of transformations
+
+Changes in version 1.11.2 (2021-08-30)
++ change error message in test_combine
+
+Changes in version 1.9.6 (2021-08-27)
++ change error message in test_combine
+
+Changes in version 1.9.6 (2021-05-05)
++ reduce dependencies, remove the sna package
+
+Changes in version 1.9.5 (2021-05-04)
++ add functionality to adjust for multiple testing in correlation
++ return symmetric matrices when returning ppm ranges in structural
+
+Changes in version 1.9.4 (2021-04-30)
++ add font in mz_vis to mono
++ split the example on how to use filter in mz_summary from the visualisation
+
+Changes in version 1.9.3 (2021-04-28)
 + introduce AdjacencyMatrix S4 class, derived from SummarizedExperiment, to
   store the adjacency matrices. AdjacencyMatrix objects can be of type
   structural, statistical, and combine
 + adjust the documentation and tests for AdjacencyMatrix objects
++ add the functions mz_summary and mz_vis (contribution of Liesa Salzer)
   
 Changes in version 1.9.2 (2021-03-24)
 + add section on structual matrix generation for directed=FALSE
