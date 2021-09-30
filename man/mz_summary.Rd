@@ -55,5 +55,6 @@ mz_summary(am_struct, filter = 2)
 
 }
 \author{
-Liesa Salzer, \email{liesa.salzer@helmholtz-muenchen.de}
+Liesa Salzer, \email{liesa.salzer@helmholtz-muenchen.de} and
+Thomas Naake, \email{thomasnaake@googlemail.com}
 }

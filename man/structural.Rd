@@ -4,13 +4,7 @@
 \alias{structural}
 \title{Create adjacency matrix based on m/z (molecular weight) difference}
 \usage{
-structural(
-  x,
-  transformation,
-  var = c("group", "formula", "mass"),
-  ppm = 5,
-  directed = FALSE
-)
+structural(x, transformation, var = character(), ppm = 5, directed = FALSE)
 }
 \arguments{
 \item{x}{`matrix` or `data.frame`, where columns are the samples and the rows are 
@@ -81,10 +75,11 @@ transformation <- rbind(
 transformation <- data.frame(group = transformation[, 1],
                                 formula = transformation[, 2],
                                 mass = as.numeric(transformation[, 3]))
-am_struct <- structural(x_test, transformation, ppm = 5, directed = TRUE)
+am_struct <- structural(x_test, transformation, var = c("group", "mass"),
+    ppm = 10, directed = TRUE)
 
 }
 \author{
 Thomas Naake, \email{thomasnaake@googlemail.com} and 
-Liesa Salzer \email{liesa.salzer@helmholtz-muenchen.de}
+Liesa Salzer, \email{liesa.salzer@helmholtz-muenchen.de}
 }

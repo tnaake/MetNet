@@ -24,7 +24,7 @@ column `"rt"` that has the rt information (numerical values) for the
 correction of retention time shifts between features that
 have a putative connection assigned based on m/z value difference}
 
-\item{transformation}{`data.frame`, containing the columns `"group"`,
+\item{transformation}{`data.frame`, containing the columns `var`,
 and `"rt"` that will be used for correction of transformation of
 (functional) groups based on retention time shifts derived from `x`}
 
@@ -39,8 +39,8 @@ The slot `directed` is inherited from `am`
 The first entry stores the
 `numeric` `matrix` with edges inferred mass differences corrected by
 retention time shifts. The second entry stores the `character` matrix with
-the type (corresponding to the `"group`" column
-in `transformation``) is stored.
+the type (corresponding to the `var` column
+in `transformation`) is stored.
 }
 \description{
 The function `rtCorrection` corrects the adjacency matrix
@@ -61,7 +61,7 @@ m/z differences that have by chance the same m/z difference but
 different/unexpected retention time behaviour).
 
 `rtCorrection` accesses the assay `transformation` of 
-`am` and matches the elements in the `"group"` column
+`am` and matches the elements in the `var` column
 against the character matrix. In case of matches, `rtCorrection`
 accesses the `"rt"` column of `x` and calculates the retention
 time difference between the features. `rtCorrection` then checks
@@ -89,7 +89,8 @@ transformation <- data.frame(group = transformation[, 1],
          formula = transformation[, 2],
          mass = as.numeric(transformation[, 3]),
          rt = transformation[, 4])
-am_struct <- structural(x = x_test, transformation = transformation, ppm = 10)
+am_struct <- structural(x = x_test, transformation = transformation, 
+    var = c("group", "mass"), ppm = 10, directed = FALSE)
 am_struct_rt <- rtCorrection(am = am_struct, x = x_test,
      transformation = transformation)
 
