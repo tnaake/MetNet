@@ -35,7 +35,9 @@ i.e. either adjacency list from `structural`or `combine` may be used.
 The default is filter = F, so the unfiltered summary will be returned. 
 If filter is set to a `number`, e.g. 1000 only mz differences above 
 this threshold will be displayed. 
-The function can be applied for adjacency lists from `structural` and `combine`
+
+The function can be applied for adjacency lists from `structural` and 
+`combine`.
 }
 \examples{
 data("x_test", package = "MetNet") 
