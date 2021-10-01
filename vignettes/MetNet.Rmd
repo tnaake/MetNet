@@ -172,8 +172,8 @@ matrices based on structural properties (m/z values) of the features.
 The function expects a matrix with a column `"mz"` that contains the 
 mass information of a feature (typically the m/z value). Furthermore,
 `structural` takes a `data.frame`
-object as argument `transformations` with the `colnames`
-`"mass"`, `"name"` and additional columns (e.g. `"formula"` or `"rt"`). 
+object as argument `transformation` with the `colnames`
+`"mass"` and additional columns (e.g. `"group"`, `"formula"` or `"rt"`). 
 `structural` looks for transformations (in the 
 sense of additions/losses of functional groups mediated by biochemical,
 enzymatic reactions) in the data using the mass information. 
@@ -209,11 +209,13 @@ between the m/z feature values are calculated and matched against the
 of the additions/losses defined in `transformation` is found in the
 data, it will be reported as an (unweighted) connection in the assay
 `"binary"` of the returned `AdjacencyMatrix` object. 
-Together with this assay, an adjacency matrix with the type of
-connection/transformation (derived from the column `"name"` in the
-`transformation` object) will be written as a character matrix to the 
-assay `"transformation"`. Furthermore, the mass difference will be written
-as a character matrix to the assay (`"mass_difference"`).
+
+Together with this assay, additional `character` adjacency matrices can be 
+written to the assay slot of the `AdjacencyMatri` object.
+E.g. we can write the type of
+connection/transformation (derived e.g. from the column `"group"` in the
+`transformation` object) as a character matrix to the 
+assay `"group"` by setting `var = "group"`. 
 
 Before creating the `structural` `AdjacencyMatrix`, one must define the 
 search space, i.e. the transformation that will be looked for in the mass spectrometric
@@ -251,9 +253,15 @@ object `transformations`. To create the `AdjacencyMatrix` object derived
 from these structural information we enter
 
 ```{r structure, eval=TRUE,echo=TRUE}
-struct_adj <- structural(x = x_test, transformation = transformations, ppm = 10)
+struct_adj <- structural(x = x_test, transformation = transformations, 
+    var = c("group", "formula", "mass"), ppm = 10)
 ```
 in the `R` console. 
+
+As we set `var = c("group", "formula", "mass")`, the `AdjacencyMatrix` object
+will contain the assays `"group"`, `"formula"`, and `"mass"` that store the
+`character` adjacency matrices with the information defined in 
+the columns of `transformations`.
 
 ## Advanced topic: Creating a directed structural graph
 
@@ -267,7 +275,7 @@ This behaviour can be specified by setting `directed = TRUE`:
 
 ```{r structure_dir, eval=TRUE,echo=TRUE}
 struct_adj_dir <- structural(x = x_test, transformation = transformations, 
-    ppm = 10, directed = TRUE)
+    var = c("group", "formula", "mass"), ppm = 10, directed = TRUE)
 ```
 
 In the following we will visualize the results from the undirected and 
@@ -309,8 +317,8 @@ m/z and retention time will be taken from the object passed to the
 `x` argument. In case there is a discrepancy between the transformation
 and the retention time shift, the adjacency matrix at the specific position
 will be set to 0. `rtCorrection` will return the an `AdjacencyMatrix` object
-with updated adjacency matrices (`"binary"`, `"transformation"`, and 
-`"mass_difference"`). 
+with updated adjacency matrices (`"binary"` and the additional 
+`character` adjacecny matrices).
 
 To account for retention time shifts we enter
 
@@ -318,7 +326,9 @@ To account for retention time shifts we enter
 struct_adj <- rtCorrection(am = struct_adj, x = x_test, 
     transformation = transformations, var = "group")
 ```
-in the `R` console. 
+in the `R` console. The character `"group"` defined with `var` will serve 
+here as the link between the assay `"group"` and the column in `transformation`
+to calculate the retention time discrepancies between feature pairs.
 
 For data analysis a `data.frame` can be generated from `AdjacencyMatrix` objects 
 by applying `as.data.frame()`. Further filtering displays only feature-pairs 
@@ -337,6 +347,7 @@ can be displayed by using the `mz_vis` function.
 mz_sum <- mz_summary(struct_adj, var = "group")
 mz_vis(mz_sum, var = "group")
 ```
+
 For larger data-sets, also a `filter` can be 
 applied to visualize mass-difference above a defined threshold.
 A filter can be applied, by `filter`. Since the maximum count of any mass difference in `struct_adj` is 4, a filter of `5` results in 0 mass differences.
@@ -396,7 +407,6 @@ function. In addition,
 arguments that are defined in the functions `lasso`, 
 `randomForest`, `clr`, `aracne`, `correlation` and/or 
 `bayes` can be passed to the functions. 
-
 
 ## Creating an unweighted adjacency matrix using `threshold` {#subsec-threshold}
 
@@ -485,6 +495,7 @@ stat_adj_mean <- threshold(am = stat_adj, type = "mean",
 ```
 
 # Combining the structural and statistical matrix {#sec-combine}
+
 After creating the `structural`  and `statistical` `AdjacencyMatrix` objects, 
 the two objects are combined. The function `combine` 
 will combine these two objects and create an `AdjacencyMatrix` object of type
@@ -496,9 +507,11 @@ while for `am_statistical` the `AdjacencyMatrix` from `threshold` has to be
 used. 
 The edges that are present both in the `binary` assay and the `consensus` assay
 will be reported within the `combine_binary` assay in a `combine` 
-`AdjacencyMatrix` object. Furthermore, the information on the type of 
-transformation and the mass difference are returned in the 
-assays `"combine_transformation"` and `combine_mass_difference`.
+`AdjacencyMatrix` object. If there are additional assays in the 
+`AdjacencyMatrix` of type `structural` these matrices will be stored in the 
+`AdjacencyMatrix` of type `combine` and will contain the edges that are 
+supported by the `combine_binary` adjacency matrix (the other edges are 
+set to "").
 
 We will use here the thresholded `statistical` `AdjacencyMatrix` from 
 `type = "mean"` to combine it with the `structural` `AdjacencyMatrix`, 

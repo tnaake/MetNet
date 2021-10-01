@@ -29,7 +29,9 @@
 #' The default is filter = F, so the unfiltered summary will be returned. 
 #' If filter is set to a `number`, e.g. 1000 only mz differences above 
 #' this threshold will be displayed. 
-#' The function can be applied for adjacency lists from `structural` and `combine`
+#' 
+#' The function can be applied for adjacency lists from `structural` and 
+#' `combine`.
 #' 
 #' @return 
 #' `data.frame` containing the numbers of present mz differences and
@@ -166,9 +168,8 @@ mz_vis <- function(df, var = "group"){
   if (!"count" %in% colnames(df))
       stop("'df' does not contain the column 'count'")
   
-  if (length(var) != 1 & is.character(var)) {
+  if (length(var) != 1 | !is.character(var))
       stop("'var' has to be a character vector of length 1")
-  }
   
   if (!var %in% colnames(df))
       stop(sprintf("'df' does not contain the column '%s'", var))
