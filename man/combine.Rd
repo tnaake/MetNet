@@ -25,11 +25,11 @@ The `AdjacencyMatrix` object will also contain all other assays contained
 in `am_structural` and `am_statistical`.
 }
 \description{
-The function `combine` takes as nput the structural and statistical 
+The function `combine` takes as input the structural and statistical 
 `AdjacencyMatrix` objects, created in former
 steps. It will access the assays `binary` and `consensus`, adds them 
 together and will report a connection between metabolites
-if the edge is present in both matrices. 
+if the edge is present in both matrices.
 
 `combine` returns an `AdjacencyMatrix` containing this consensus matrix 
 supported by the structural and statistical adjacency matrices (assay
@@ -44,7 +44,7 @@ combine `AdjacencyMatrix` object will contain the assays `combine_group` and
 \details{
 The matrices from the assays `binary` and `consensus` will be added 
 and an unweighted connection will
-be reported when the edges are respectively present in both `binary` and 
+be reported when the edges are respectively present in both `binary` and
 `consensus`.
 }
 \examples{
