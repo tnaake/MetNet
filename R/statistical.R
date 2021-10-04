@@ -357,6 +357,23 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
             ncol = ncol(cor_mat$p.value), nrow = nrow(cor_mat$p.value), 
             byrow = TRUE)
     }
+    
+    ## for correlation based on graphical Gaussian models (ggm)
+    if (method == "ggm") {
+        
+        cor_mat <- GeneNet::ggm.estimate.pcor(t(x), method = "static")
+        cor_mat <- cor_mat[seq_len(dim(x)[1]), seq_len(dim(x)[1])] 
+        
+        # calculate p-values
+        p <- fdrtool::fdrtool(c(cor_mat), statistic = "correlation", plot = FALSE)
+        cor_mat <- list("estimate" = cor_mat, "p" = matrix(p$pval, ncol  = ncol(cor_mat)))
+        
+        cor_mat$p <- matrix(
+            stats::p.adjust(as.vector(cor_mat$p), method = p.adjust),
+            ncol = ncol(cor_mat$p), nrow = nrow(cor_mat$p), 
+            byrow = TRUE)
+        
+    }
 
     ## assign col- and rownames to cor_mat
     colnames(cor_mat[[1]]) <- rownames(cor_mat[[1]]) <- rownames(x)
@@ -594,7 +611,7 @@ statistical <- function(x, model, ...) {
     ## if not so
     if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne",
             "pearson", "pearson_partial", "pearson_semipartial",
-            "spearman", "spearman_partial", "spearman_semipartial", "bayes"))))
+            "spearman", "spearman_partial", "spearman_semipartial", "bayes", "ggm"))))
         stop("'model' not implemented in statistical")
 
     ## check if x is numeric matrix and return error if not so
@@ -721,6 +738,18 @@ statistical <- function(x, model, ...) {
         l <- addToList(l, "spearman_semipartial_coef", spearman_sp_coef)
         l <- addToList(l, "spearman_semipartial_pvalue", spearman_sp_pvalue)
         print("spearman_semipartial finished.")
+    }
+    
+    ## add entry for ggm if "ggm" is in model
+    if ("ggm" %in% model) {
+        res <- threeDotsCall("correlation", x = x, method = "ggm", ...)
+        ggm_coef <- res[["estimate"]]
+        diag(ggm_coef) <- NaN
+        ggm_pvalue <- res[["p"]]
+        diag(ggm_pvalue) <- NaN
+        l <- addToList(l, "ggm_coef", ggm_coef)
+        l <- addToList(l, "ggm_pvalue", ggm_pvalue)
+        print("ggm finished.")
     }
 
     ## add entry for bayes if "bayes" is in model
@@ -1009,7 +1038,7 @@ threshold <- function(am,
                 res <- getLinks(l_x, exclude = "== 0")
             }
             if (grepl(name_x, 
-                pattern = "pearson_coef|pearson_partial_coef|pearson_semipartial_coef|spearman_coef|spearman_partial_coef|spearman_semipartial_coef|clr_coef|aracne_coef")) {
+                pattern = "pearson_coef|pearson_partial_coef|pearson_semipartial_coef|spearman_coef|spearman_partial_coef|spearman_semipartial_coef|clr_coef|ggm_coef|aracne_coef")) {
                 
                 res <- getLinks(l_x, exclude = NULL)
             }
