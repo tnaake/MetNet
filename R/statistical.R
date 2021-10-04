@@ -365,7 +365,10 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
         cor_mat <- cor_mat[seq_len(dim(x)[1]), seq_len(dim(x)[1])] 
         
         # calculate p-values
-        p <- fdrtool::fdrtool(c(cor_mat), statistic = "correlation", plot = FALSE)
+        
+        # n2kappa converts sample size to the corresponding degree of freedom
+        kappa <- n2kappa(n = ncol(x), p = nrow(x))
+        p <- GeneNet::cor0.test(r = cor_mat, kappa = kappa, method = "student")
         cor_mat <- list("estimate" = cor_mat, "p" = matrix(p$pval, ncol  = ncol(cor_mat)))
         
         cor_mat$p <- matrix(
