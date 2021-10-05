@@ -360,6 +360,8 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
     
     ## for correlation based on graphical Gaussian models (ggm)
     if (method == "ggm") {
+        # remove NaN from dataset
+        x <- na.omit(x)
         
         cor_mat <- GeneNet::ggm.estimate.pcor(t(x), method = "static")
         cor_mat <- cor_mat[seq_len(dim(x)[1]), seq_len(dim(x)[1])] 
@@ -367,9 +369,9 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
         # calculate p-values
         
         # n2kappa converts sample size to the corresponding degree of freedom
-        kappa <- n2kappa(n = ncol(x), p = nrow(x))
+        kappa <- GeneNet::n2kappa(n = length(x), p = nrow(x))
         p <- GeneNet::cor0.test(r = cor_mat, kappa = kappa, method = "student")
-        cor_mat <- list("estimate" = cor_mat, "p" = matrix(p$pval, ncol  = ncol(cor_mat)))
+        cor_mat <- list("estimate" = cor_mat, "p" = p)
         
         cor_mat$p <- matrix(
             stats::p.adjust(as.vector(cor_mat$p), method = p.adjust),
