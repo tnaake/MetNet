@@ -169,8 +169,26 @@ structural <- function(x, transformation, var = character(),
     ## write the A and B values back to mat_1 and mat_2
     mat_1 <- .mat_1 ## max in lower.tri, min in upper.tri
     mat_2 <- .mat_2 ## min in lower.tri, max in upper.tri
+
     
     if (!directed) {
+ 
+        ## when the m/z differences between two features is small it is 
+        ## possible that one of the differences is negative while the other is 
+        ## positive, if we have a transformation with low m/z difference 
+        ## (e.g. 0) the link will be likely missed, e.g. when we take the 
+        ## absolute values of the differences, we mess up with the negatively 
+        ## signed difference, e.g. -1.12 will be converted to 1.12 -> we will 
+        ## then check in a interval of 1.12 and the upper bound. 
+        ## the following block will take this into account (e.g. by setting 
+        ## -1.12 to 0) when there are elements of different sign at the same 
+        ## corresponding cell, this will keep the links between the features
+        sign_mat <- sign(mat_1) * sign(mat_2)
+        mat_1 <- ifelse(sign_mat == -1 & mat_1 < 0, 0, mat_1)
+        mat_2 <- ifelse(sign_mat == -1 & mat_2 < 0, 0, mat_2)
+        
+        ## for the undirected case do not take into account the sign of the 
+        ## mass difference
         mat_1_abs <- abs(mat_1)
         mat_2_abs <- abs(mat_2)
         mat_1 <- ifelse(mat_1_abs <= mat_2_abs, mat_2_abs, mat_1_abs) ## max
