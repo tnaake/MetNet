@@ -364,7 +364,7 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
         x <- na.omit(x)
         
         cor_mat <- GeneNet::ggm.estimate.pcor(t(x), method = "static")
-        cor_mat <- cor_mat[seq_len(dim(x)[1]), seq_len(dim(x)[1])] 
+        cor_mat <- cor_mat[seq_len(nrow(x)), seq_len(nrow(x))] 
         
         # calculate p-values
         
