@@ -929,7 +929,7 @@ getLinks <- function(mat, exclude = "== 1") {
 #' @importFrom rlang parse_expr
 threshold <- function(am, 
     type = c("threshold", "top1", "top2", "mean"), 
-    args, values = c("all", "min", "max")) {
+    args, values = c("all", "min", "max"), na.rm = TRUE) {
 
     ## check match.arg for values
     type <- match.arg(type)
@@ -968,10 +968,40 @@ threshold <- function(am,
     rownames(cons) <- colnames(cons) <- colnames(a_1)
     diag(cons) <- NaN
     
+    ## 
+    df <- as.data.frame(am)
+    n_nas <- apply(df, 2, function(x) sum(is.na(x)))
+    n_nas <- n_nas[!names(n_nas) %in% c("Row", "Col")]
+    sprintf("There are %s NAs in %s", as.numeric(n_nas), names(n_nas))
+    
     if (type == "threshold") {
         
-        df_filter <- as.data.frame(am) %>% 
-            dplyr::filter(!!rlang::parse_expr(args$filter))
+        if (na.rm) {
+            ## get the Row and Col of the elements that match our filter 
+            ## condition
+            df_filter <- df |>
+                dplyr::filter(!!rlang::parse_expr(args$filter))    
+        } else {
+            ## get the Row and Col of the elements where there is at least one
+            ## NA
+            df_na <- df[apply(df, 1, function(x) any(is.na(x))), ]
+            
+            ## get the Row and Col of the elements that match our filter 
+            ## condition
+            df_filter <- df |>
+                dplyr::filter(!!rlang::parse_expr(args$filter))
+            
+            ## find the rows in df_na, that are not present in df_filter
+            df_na <- df_na |>
+                filter(!(Row %in% df_filter[, "Row"] & Col %in% df_filter[, "Col"]))
+                
+            ## set the elements in cons to NaN that are defined by df_na
+            inds_row <- match(df_na[, "Row"], rownames(cons))
+            inds_col <- match(df_na[, "Col"], colnames(cons))
+            cons[cbind(inds_row, inds_col)] <- NaN
+            
+        }
+        
         
         inds_row <- match(df_filter[, "Row"], rownames(cons))
         inds_col <- match(df_filter[, "Col"], colnames(cons))
@@ -1100,7 +1130,7 @@ threshold <- function(am,
 #'
 #' ## type = "mean"
 #' MetNet:::topKnet(ranks = ranks, type = "mean")
-topKnet <- function(ranks, type) {
+topKnet <- function(ranks, type, na.rm = TRUE) {
 
     if ((!is.matrix(ranks)) || !is.numeric(ranks)) {
         stop("ranks is not a numerical matrix")
@@ -1117,7 +1147,7 @@ topKnet <- function(ranks, type) {
         ## get the lowest rank
         cons_val <- apply(ranks, 1, function(x) {
             if (!all(is.na(x))) {
-                min(x, na.rm = TRUE)
+                min(x, na.rm = na.rm)
             } else {
                 NaN
             }
@@ -1136,17 +1166,22 @@ topKnet <- function(ranks, type) {
         ## non-NA values, otherwise return NA --> sort(x)[2] will return
         ## NA if there are less elements)
         cons_val <- apply(ranks, 1, function(x) {
-            if (!all(is.na(x))) {
-                sort(x)[2]
-            } else {
-                NaN
-            }
+           
+                if (!all(is.na(x))) {
+                    if (na.rm)
+                        sort(x)[2]
+                    else 
+                        NaN
+                } else {
+                    NaN
+                }    
+            
         })
     }
 
     if (type == "mean") {
         ## get the average of all ranks
-        cons_val <- apply(ranks, 1, mean, na.rm = TRUE)
+        cons_val <- apply(ranks, 1, mean, na.rm = na.rm)
     }
 
     return(cons_val)

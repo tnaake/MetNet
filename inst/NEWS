@@ -1,3 +1,11 @@
+Changes in version 1.11.5 (2021-10-12)
++ add assays in structural based on columns in transformations that are 
+  defined by the var argument in structural, adjacency matrices of type 
+  will be stored in the AdjacencyMatrix object defined in the columns of 
+  transformation
++ implement structural that it can also calculate mass differences of 0 for
+  undirected networks
+
 Changes in version 1.11.4 (2021-09-09)
 + shift calculation of as.data.frame(am) in mz_summary
 + several fixes of typos in the comments and vignette

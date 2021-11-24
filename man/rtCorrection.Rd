@@ -9,20 +9,17 @@ rtCorrection(am, x, transformation, var = "group")
 }
 \arguments{
 \item{am}{`AdjacencyMatrix` object returned by the function `structural`. 
-The object contains the assays `"binary"`, `"transformation"`, and 
-`"mass_difference"`. 
+The object contains the assays `"binary"` and additional assays with 
+`character` matrices (only the `"binary"` assay is required). 
 The assay `"binary"` stores the `numeric` matrix with edges inferred by mass
-differences. 
-The assay `"transformation"` stores the `character` matrix with the type 
-(corresponding to the `"group"` column in `transformation`).
-The assay `"mass_difference"` stores the `character` matrix with the type 
-(corresponding to the `"mass"` column in `transformation`).}
+differences.}
 
 \item{x}{`matrix`, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values, `x` contains the
-column `"rt"` that has the rt information (numerical values) for the
-correction of retention time shifts between features that
-have a putative connection assigned based on m/z value difference}
+columns "`mz`" and `"rt"` that has the m/z and rt information 
+(numerical values) for the correction of retention time shifts between 
+features that have a putative connection assigned based on m/z value 
+difference.}
 
 \item{transformation}{`data.frame`, containing the columns `var`,
 and `"rt"` that will be used for correction of transformation of
@@ -32,21 +29,19 @@ and `"rt"` that will be used for correction of transformation of
 between the column `var` in `transformation` and the assay `var` in `am`}
 }
 \value{
-`AdjacencyMatrix` containing the slots `binary`, `transformation`, and 
-`mass_difference`.
-The slot `directed` is inherited from `am`
+`AdjacencyMatrix` containing the slots `binary` and additional `character` 
+adjacency matrices.
+The slot `directed` is inherited from `am`.
 
-The first entry stores the
+The assay `binary` stores the
 `numeric` `matrix` with edges inferred mass differences corrected by
-retention time shifts. The second entry stores the `character` matrix with
-the type (corresponding to the `var` column
-in `transformation`) is stored.
+retention time shifts.
 }
 \description{
 The function `rtCorrection` corrects the adjacency matrix
 infered from structural data based on shifts in the retention time. For
 known chemical modifications (e.g. addition of glycosyl groups) molecules
-with the moiety should elue at a different time (in the case of glycosyl
+with the moiety should elute at a different time (in the case of glycosyl
 groups the metabolite should elute earlier in a reverse-phase
 liquid chromatography system). If the connection for the metabolite does not
 fit the expected behaviour, the connection will be removed (otherwise
@@ -63,7 +58,7 @@ different/unexpected retention time behaviour).
 `rtCorrection` accesses the assay `transformation` of 
 `am` and matches the elements in the `var` column
 against the character matrix. In case of matches, `rtCorrection`
-accesses the `"rt"` column of `x` and calculates the retention
+accesses the `"mz"` and `"rt"` columns of `x` and calculates the retention
 time difference between the features. `rtCorrection` then checks
 if the observed retention time difference matches the expected behaviour
 (indicated by `"+"` for a higher retention time of the feature with
@@ -72,7 +67,7 @@ with the putative group or `"?"` when there is no information
 available or features with that group should not be checked). 
 
 In case several transformation were assigned to a feature/feature pair,
-the connection will always be removed if there is an inconsistency with any 
+the connection will be removed if there is an inconsistency with any 
 of the given transformations.
 }
 \examples{

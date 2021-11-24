@@ -32,24 +32,23 @@ The `directed` slot of the returned `AdjacencyMatrix` object will contain
 the information on `directed`.}
 }
 \value{
-`AdjacencyMatrix` object. The object will store the adjacency matrices
-in the assay slots. The first entry stores the `numeric`
-`matrix` with binary edges inferred from mass differences. The second entry
-stores the `character` `matrix` with the type (corresponding to the
-`"group"` column in `transformation`) is stored. The third entry
-stores the `character` `matrix` with the `mass_difference` information
-(corresponding to the `"mass"` column in `transformation`).
+`AdjacencyMatrix` object. The object will store the adjacency matrix/matrices
+in the assay slot/slots. The numerical (unweighted) adjacency matrix
+inferred from mass differences is stored as the assay `"binary"`. Depending
+on the `var` argument, there are additional adjacency matrices stored
+in the assay slot.
 }
 \description{
 The function `structural` infers an unweighted
 adjacency matrix using differences in m/z values that are matched against a
-`data.frame` of calculated theoretical differences of
+`data.frame` (`transformation` of calculated theoretical differences of
 loss/addition of functional groups. `structural` returns
 an `AdjacencyMatrix` object containing
-the unweighted `numeric` `matrix` (assay `binary`), together with a 
-`character` `matrix` with the type of loss/addition (assay `transformation`), 
-and the `character` `matrix` with the mass differences (assay 
-`mass_difference`).
+the unweighted `numeric` `matrix` (assay `binary`), together with one or 
+multiple `character` matrices containing e.g. the type of loss/addition 
+or the mass differences. The creation of the additional `character` matrices
+is controlled by the `var` argument that specifies the column in 
+`transformation` as the data source for the adjacency matrices.
 }
 \details{
 `structural` accesses the column `"mz"` of
@@ -61,10 +60,18 @@ in parts per million (ppm) by the `ppm` argument. The m/z values in the
 the `ppm` argument (default `ppm = 5`).
 
 The returned `AdjacencyMatrix` object contains the assays 
-`binary`, `transformation`, and `mass_difference`. The `type` slot is
-set to `structural`. The `directed` slot is set accordingly to the 
-`directed` argument of the function `structural`.
-The `thresholded` slot is set to `FALSE`
+`binary` and additional adjacency matrices depending on the `var` 
+parameter. The assay `binary` stores the `numeric`
+`matrix` with binary edges inferred from mass differences. The `var` 
+parameter has to be set according to the column names in `transformation`.
+E.g. if the `transformation` object contains a `"group"` column that stores
+the name of the transformation, setting `var = "group"` will create an
+assay `"group"` that contains the adjacency matrices where the entries
+correspond to the `"group"` information for the respective feature pairs.
+
+The `type` slot is set to `structural`. The `directed` slot is set 
+accordingly to the `directed` argument of the function `structural`.
+The `thresholded` slot is set to `FALSE`.
 }
 \examples{
 data("x_test", package = "MetNet")
@@ -80,6 +87,6 @@ am_struct <- structural(x_test, transformation, var = c("group", "mass"),
 
 }
 \author{
-Thomas Naake, \email{thomasnaake@googlemail.com} and 
+Thomas Naake, \email{thomasnaake@googlemail.com} and
 Liesa Salzer, \email{liesa.salzer@helmholtz-muenchen.de}
 }
