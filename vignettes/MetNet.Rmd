@@ -86,7 +86,9 @@ adjacency matrix: Least absolute shrinkage and selection operator
 (LASSO, L1-norm regression, [@Tibshirani1994]), Random Forest 
 [@Breiman2001], Pearson and Spearman correlation (including partial and
 semipartial correlation, see @Steuer2006
-for a discussion on correlation-based metabolic networks), context likelihood 
+for a discussion on correlation-based metabolic networks), correlation based on 
+Gaussian Graphical Models (GGM, see @Krumsiek2011aa;@Benedetti2020aa for the advantages 
+of using GGM instead of Pearson and partial pearson correlation), context likelihood 
 of relatedness (CLR, [@Faith2007]), the algorithm for the reconstruction 
 of accurate cellular networks (ARACNE, [@Margolin2006]) and 
 constraint-based structure learning (Bayes, [@Scutari2010]). 
@@ -391,7 +393,8 @@ Bias Corrected Mutual Information, and the functions `clr` and
 `aracne.a` from the `parmigene` package), Pearson and 
 Spearman correlation (based on the 
 `psych` package), partial and semipartial 
-Pearson and Spearman correlation (using the `ppcor` package) and 
+Pearson and Spearman correlation (using the `ppcor` package), correlation based
+on Gaussian graphical models (using the `GeneNet` package [@Schafer2005aa])  and 
 score-based structure learning returning the strength of the probabilistic 
 relationships of the arcs of 
 a Bayesian network, as learned from bootstrapped data (using the 

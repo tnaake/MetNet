@@ -328,42 +328,68 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
             stats::p.adjust(as.vector(cor_mat$p), method = p.adjust),
             ncol = ncol(cor_mat$p), nrow = nrow(cor_mat$p), byrow = TRUE)
         cor_mat <- list(r = cor_mat[["r"]], p = cor_mat[["p"]])
+        
+        ## assign col- and rownames to cor_mat
+        colnames(cor_mat[[1]]) <- rownames(cor_mat[[1]]) <- rownames(x)
+        colnames(cor_mat[[2]]) <- rownames(cor_mat[[2]]) <- rownames(x)
     }
 
     ## for partial pearson/spearman correlation
-    if (method %in% c("pearson_partial", "spearman_partial")) {
+    if (method %in% c("pearson_partial", "spearman_partial", "ggm")) {
+        cor_mat <- list(r = matrix(NA, nrow = nrow(x), ncol = nrow(x)),
+                        p = matrix(NA, nrow = nrow(x), ncol = nrow(x)))
+        
+        ## assign col- and rownames to cor_mat
+        colnames(cor_mat[[1]]) <- rownames(cor_mat[[1]]) <- rownames(x)
+        colnames(cor_mat[[2]]) <- rownames(cor_mat[[2]]) <- rownames(x)
+        
+        x_na <- na.omit(x)
+        
+        if (method %in% c("pearson_partial", "spearman_partial")) {
         if (method == "pearson_partial") {
             method <- "pearson"
         } else {
             method <- "spearman"
         }
-        cor_mat <- ppcor::pcor(t(x), method = method)
-        cor_mat$p.value <- matrix(
-            stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
-            ncol = ncol(cor_mat$p.value), nrow = nrow(cor_mat$p.value), 
+        cor_mat_na <- ppcor::pcor(t(x_na), method = method)
+        cor_mat_na$p.value <- matrix(
+            stats::p.adjust(as.vector(cor_mat_na$p.value), method = p.adjust),
+            ncol = ncol(cor_mat_na$p.value), nrow = nrow(cor_mat_na$p.value), 
             byrow = TRUE)
-    }
-
-    ## for semipartial pearson/spearman corelation
-    if (method %in% c("pearson_semipartial", "spearman_semipartial")) {
-        if (method == "pearson_semipartial") {
-            method <- "pearson"
-        } else {
-            method <- "spearman"
+        names(cor_mat_na)[names(cor_mat_na) == "estimate"] <- "r"
+        names(cor_mat_na)[names(cor_mat_na) == "p.value"] <- "p"
+        
         }
-        cor_mat <- ppcor::spcor(t(x), method = method)
-        cor_mat$p.value <- matrix(
-            stats::p.adjust(as.vector(cor_mat$p.value), method = p.adjust),
-            ncol = ncol(cor_mat$p.value), nrow = nrow(cor_mat$p.value), 
-            byrow = TRUE)
+        
+        
+        ## for correlation based on graphical Gaussian models (ggm)
+        if (method == "ggm") {
+            
+            cor_mat_na <- GeneNet::ggm.estimate.pcor(t(x_na), method = "static")
+            cor_mat_na <- cor_mat_na[seq_len(nrow(x_na)), seq_len(nrow(x_na))] 
+            
+            # calculate p-values
+            
+            # n2kappa converts sample size to the corresponding degree of freedom
+            kappa <- GeneNet::n2kappa(n = length(x_na), p = nrow(x_na))
+            p <- GeneNet::cor0.test(r = cor_mat_na, kappa = kappa, method = "student")
+            cor_mat_na <- list("r" = cor_mat_na, "p" = p)
+            
+            cor_mat_na$p <- matrix(
+                stats::p.adjust(as.vector(cor_mat_na$p), method = p.adjust),
+                ncol = ncol(cor_mat_na$p), nrow = nrow(cor_mat_na$p), 
+                byrow = TRUE)
+            
+        }
+        ## assign col- and rownames to cor_mat
+        colnames(cor_mat_na[[1]]) <- rownames(cor_mat_na[[1]]) <- rownames(x_na)
+        colnames(cor_mat_na[[2]]) <- rownames(cor_mat_na[[2]]) <- rownames(x_na)
+        
+        ## overwrite values from cor_mat_na into cor_mat
+        cor_mat$r[rownames(cor_mat_na$r), colnames(cor_mat_na$r)] <- cor_mat_na$r
+        cor_mat$p[rownames(cor_mat_na$p), colnames(cor_mat_na$p)] <- cor_mat_na$p
+        
     }
-
-    ## assign col- and rownames to cor_mat
-    colnames(cor_mat[[1]]) <- rownames(cor_mat[[1]]) <- rownames(x)
-    colnames(cor_mat[[2]]) <- rownames(cor_mat[[2]]) <- rownames(x)
-
-    # ## get absolute values
-    # cor_mat <- abs(cor_mat)
 
     return(cor_mat)
 }
@@ -594,7 +620,7 @@ statistical <- function(x, model, ...) {
     ## if not so
     if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne",
             "pearson", "pearson_partial", "pearson_semipartial",
-            "spearman", "spearman_partial", "spearman_semipartial", "bayes"))))
+            "spearman", "spearman_partial", "spearman_semipartial", "bayes", "ggm"))))
         stop("'model' not implemented in statistical")
 
     ## check if x is numeric matrix and return error if not so
@@ -663,27 +689,15 @@ statistical <- function(x, model, ...) {
     if ("pearson_partial" %in% model) {
         res <- threeDotsCall("correlation", x = x,
             method = "pearson_partial", ...)
-        pearson_p_coef <- res[["estimate"]]
+        pearson_p_coef <- res[["r"]]
         diag(pearson_p_coef) <- NaN
-        pearson_p_pvalue <- res[["p.value"]]
+        pearson_p_pvalue <- res[["p"]]
         diag(pearson_p_pvalue) <- NaN
         l <- addToList(l, "pearson_partial_coef", pearson_p_coef)
         l <- addToList(l, "pearson_partial_pvalue", pearson_p_pvalue)
         print("pearson_partial finished.")
     } ## estimate, p.value
 
-    ## add entry for pearson_semipartial if "pearson_semipartial" is in model
-    if ("pearson_semipartial" %in% model) {
-        res <- threeDotsCall("correlation", x = x,
-            method = "pearson_semipartial", ...)
-        pearson_sp_coef <- res[["estimate"]]
-        diag(pearson_sp_coef) <- NaN
-        pearson_sp_pvalue <- res[["p.value"]]
-        diag(pearson_sp_pvalue) <- NaN
-        l <- addToList(l, "pearson_semipartial_coef", pearson_sp_coef)
-        l <- addToList(l, "pearson_semipartial_pvalue", pearson_sp_pvalue)
-        print("pearson_semipartial finished.")
-    }
 
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
@@ -701,26 +715,26 @@ statistical <- function(x, model, ...) {
     if ("spearman_partial" %in% model) {
         res <- threeDotsCall("correlation", x = x, 
             method = "spearman_partial", ...)
-        spearman_p_coef <- res[["estimate"]]
+        spearman_p_coef <- res[["r"]]
         diag(spearman_p_coef) <- NaN
-        spearman_p_pvalue <- res[["p.value"]]
+        spearman_p_pvalue <- res[["p"]]
         diag(spearman_p_pvalue) <- NaN
         l <- addToList(l, "spearman_partial_coef", spearman_p_coef)
         l <- addToList(l, "spearman_partial_pvalue", spearman_p_pvalue)
         print("spearman_partial finished.")
     }
 
-    ## add entry for spearman_semipartial if "spearman_semipartial" is in model
-    if ("spearman_semipartial" %in% model) {
-        res <- threeDotsCall("correlation", x = x,
-            method = "spearman_semipartial", ...)
-        spearman_sp_coef <- res[["estimate"]]
-        diag(spearman_sp_coef) <- NaN
-        spearman_sp_pvalue <- res[["p.value"]]
-        diag(spearman_sp_pvalue) <- NaN
-        l <- addToList(l, "spearman_semipartial_coef", spearman_sp_coef)
-        l <- addToList(l, "spearman_semipartial_pvalue", spearman_sp_pvalue)
-        print("spearman_semipartial finished.")
+    
+    ## add entry for ggm if "ggm" is in model
+    if ("ggm" %in% model) {
+        res <- threeDotsCall("correlation", x = x, method = "ggm", ...)
+        ggm_coef <- res[["r"]]
+        diag(ggm_coef) <- NaN
+        ggm_pvalue <- res[["p"]]
+        diag(ggm_pvalue) <- NaN
+        l <- addToList(l, "ggm_coef", ggm_coef)
+        l <- addToList(l, "ggm_pvalue", ggm_pvalue)
+        print("ggm finished.")
     }
 
     ## add entry for bayes if "bayes" is in model
@@ -1039,7 +1053,7 @@ threshold <- function(am,
                 res <- getLinks(l_x, exclude = "== 0")
             }
             if (grepl(name_x, 
-                pattern = "pearson_coef|pearson_partial_coef|pearson_semipartial_coef|spearman_coef|spearman_partial_coef|spearman_semipartial_coef|clr_coef|aracne_coef")) {
+                pattern = "pearson_coef|pearson_partial_coef|pearson_semipartial_coef|spearman_coef|spearman_partial_coef|spearman_semipartial_coef|clr_coef|ggm_coef|aracne_coef")) {
                 
                 res <- getLinks(l_x, exclude = NULL)
             }

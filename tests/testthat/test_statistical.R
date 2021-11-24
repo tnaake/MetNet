@@ -79,15 +79,12 @@ test_that("aracne", {
 ## START unit test correlation ##
 correlation_p_mat <- correlation(mat_test[1:5, ], method = "pearson")
 correlation_p_p_mat <- correlation(mat_test[1:5, ], method = "pearson_partial")
-correlation_p_sp_mat <- correlation(mat_test[1:5, ],
-    method = "pearson_semipartial")
 correlation_s_mat <- correlation(mat_test[1:5, ], method = "spearman")
 correlation_s_p_mat <- correlation(mat_test[1:5, ], method = "spearman_partial")
-correlation_s_sp_mat <- correlation(mat_test[1:5, ],
-    method = "spearman_semipartial")
+correlation_g_mat <- correlation(mat_test[1:5, ], method = "ggm")
+
 
 test_that("correlation", {
-
     expect_error(correlation(NULL, method = "pearson"),
         "argument is not a matrix")
     expect_error(correlation(mat_test, method = "a"),
@@ -122,71 +119,58 @@ test_that("correlation", {
     expect_true(min(correlation_s_mat$r) >= -1)
 
     ## partial pearson
-    expect_true(all(correlation_p_p_mat$estimate -
-        ppcor::pcor(t(mat_test[1:5, ]), method = "pearson")$estimate == 0))
-    expect_equal(sum(correlation_p_p_mat$estimate), 7.053181, tolerance = 1e-06)
-    expect_equal(sum(correlation_p_p_mat$p.value), 7.44441, tolerance = 1e-06)
-    expect_equal(rownames(correlation_p_p_mat$estimate), 
-        colnames(correlation_p_p_mat$estimate))
-    expect_equal(rownames(correlation_p_p_mat$estimate), rownames(mat_test[1:5, ]))
-    expect_equal(ncol(correlation_p_p_mat$estimate), 
-        nrow(correlation_p_p_mat$estimate))
-    expect_equal(nrow(correlation_p_p_mat$estimate), nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_p_p_mat$estimate))
-    expect_true(is.matrix(correlation_p_p_mat$estimate))
-    expect_true(max(correlation_p_p_mat$estimate) <= 1)
-    expect_true(min(correlation_p_p_mat$estimate) >= -1)
+    expect_true(all(correlation_p_p_mat$r -
+        ppcor::pcor(t(mat_test[1:5, ]), method = "pearson")$r == 0))
+    expect_equal(sum(correlation_p_p_mat$r), 7.053181, tolerance = 1e-06)
+    expect_equal(sum(correlation_p_p_mat$p), 7.44441, tolerance = 1e-06)
+    expect_equal(rownames(correlation_p_p_mat$r), 
+        colnames(correlation_p_p_mat$r))
+    expect_equal(rownames(correlation_p_p_mat$r), rownames(mat_test[1:5, ]))
+    expect_equal(ncol(correlation_p_p_mat$r), 
+        nrow(correlation_p_p_mat$r))
+    expect_equal(nrow(correlation_p_p_mat$r), nrow(mat_test[1:5, ]))
+    expect_true(is.numeric(correlation_p_p_mat$r))
+    expect_true(is.matrix(correlation_p_p_mat$r))
+    expect_true(max(correlation_p_p_mat$r) <= 1)
+    expect_true(min(correlation_p_p_mat$r) >= -1)
 
-    ## semi-partial pearson
-    expect_true(all(correlation_p_sp_mat$estimate - 
-        ppcor::spcor(t(mat_test[1:5, ]), method = "pearson")$estimate == 0))
-    expect_equal(sum(correlation_p_sp_mat$estimate), 5.729664, 
-        tolerance = 1e-06)
-    expect_equal(sum(correlation_p_sp_mat$p.value), 15.23957, 
-        tolerance = 1e-06)
-    expect_equal(rownames(correlation_p_sp_mat$estimate), 
-        colnames(correlation_p_sp_mat$estimate))
-    expect_equal(rownames(correlation_p_sp_mat$estimate), rownames(mat_test)[1:5])
-    expect_equal(ncol(correlation_p_sp_mat$estimate), 
-        nrow(correlation_p_sp_mat$estimate))
-    expect_equal(nrow(correlation_p_sp_mat$estimate), nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_p_sp_mat$estimate))
-    expect_true(is.matrix(correlation_p_sp_mat$estimate))
-    expect_true(max(correlation_p_sp_mat$estimate) <= 1)
-    expect_true(min(correlation_p_sp_mat$estimate) >= -1)
 
     ## partial spearman
-    suppressWarnings(expect_true(all(correlation_s_p_mat$estimate - 
-        ppcor::pcor(t(mat_test[1:5, ]), method = "spearman")$estimate == 0)))
-    expect_equal(sum(correlation_s_p_mat$estimate), 3.153383, tolerance = 1e-06)
-    expect_equal(sum(correlation_s_p_mat$p.value, na.rm = TRUE), 0.4969531, 
+    suppressWarnings(expect_true(all(correlation_s_p_mat$r - 
+        ppcor::pcor(t(mat_test[1:5, ]), method = "spearman")$r == 0)))
+    expect_equal(sum(correlation_s_p_mat$r), 3.153383, tolerance = 1e-06)
+    expect_equal(sum(correlation_s_p_mat$p, na.rm = TRUE), 0.4969531, 
         tolerance = 1e-06)
-    expect_equal(rownames(correlation_s_p_mat$estimate), 
-        colnames(correlation_s_p_mat$estimate))
-    expect_equal(rownames(correlation_s_p_mat$estimate), 
+    expect_equal(rownames(correlation_s_p_mat$r), 
+        colnames(correlation_s_p_mat$r))
+    expect_equal(rownames(correlation_s_p_mat$r), 
         rownames(mat_test)[1:5])
-    expect_equal(ncol(correlation_s_p_mat$estimate), 
-        nrow(correlation_s_p_mat$estimate))
-    expect_equal(nrow(correlation_s_p_mat$estimate), 
+    expect_equal(ncol(correlation_s_p_mat$r), 
+        nrow(correlation_s_p_mat$r))
+    expect_equal(nrow(correlation_s_p_mat$r), 
         nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_s_p_mat$estimate))
-    expect_true(is.matrix(correlation_s_p_mat$estimate))
-    expect_true(max(correlation_s_p_mat$estimate) <= 1.0000001)
-    expect_true(min(correlation_s_p_mat$estimate) >= -1.0000001)
-
-    ## semi-partial spearman
-    suppressWarnings(expect_true(all(correlation_s_sp_mat$estimate - 
-        ppcor::spcor(t(mat_test[1:5, ]), method = "spearman")$estimate == 0, 
-        na.rm = TRUE)))
-    expect_equal(rownames(correlation_s_sp_mat$estimate), 
-        colnames(correlation_s_sp_mat$estimate))
-    expect_equal(rownames(correlation_s_sp_mat$estimate), rownames(mat_test)[1:5])
-    expect_equal(ncol(correlation_s_sp_mat$estimate), 
-        nrow(correlation_s_sp_mat$estimate))
-    expect_equal(nrow(correlation_s_sp_mat$estimate), nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_s_sp_mat$estimate))
-    expect_true(is.matrix(correlation_s_sp_mat$estimate))
+    expect_true(is.numeric(correlation_s_p_mat$r))
+    expect_true(is.matrix(correlation_s_p_mat$r))
+    expect_true(max(correlation_s_p_mat$r) <= 1.0000001)
+    expect_true(min(correlation_s_p_mat$r) >= -1.0000001)
     
+    ## ggm
+    expect_true(all(correlation_g_mat$r -
+                        GeneNet::ggm.estimate.pcor(t(mat_test[1:5, ]), 
+                                                   method = "static")[seq_len(dim(mat_test[1:5, ])[1]), 
+                                                                      seq_len(dim(mat_test[1:5, ])[1])]== 0))
+    expect_equal(sum(correlation_g_mat$r), 5.421633, tolerance = 1e-06)
+    expect_equal(sum(correlation_g_mat$p), 2.889295, tolerance = 1e-06)
+    expect_equal(rownames(correlation_g_mat$r), 
+                 colnames(correlation_g_mat$r))
+    expect_equal(rownames(correlation_g_mat$r), rownames(mat_test[1:5, ]))
+    expect_equal(ncol(correlation_g_mat$r), 
+                 nrow(correlation_g_mat$r))
+    expect_equal(nrow(correlation_g_mat$r), nrow(mat_test[1:5, ]))
+    expect_true(is.numeric(correlation_g_mat$r))
+    expect_true(is.matrix(correlation_g_mat$r))
+    expect_true(max(correlation_g_mat$r) <= 1)
+    expect_true(min(correlation_g_mat$r) >= -1)
 })
 ## END unit test correlation ##
 
@@ -228,7 +212,7 @@ test_that("addToList", {
 stat_adj <- statistical(mat_test[1:5, ],
     model = c("randomForest", "clr", "aracne", "pearson",
         "pearson_partial", "pearson_semipartial", "spearman",
-        "spearman_partial", "spearman_semipartial", "bayes"),
+        "spearman_partial", "spearman_semipartial", "ggm", "bayes"),
     PFER = 0.75, cutoff = 0.95)
 
 test_that("statistical", {
@@ -282,20 +266,24 @@ test_that("statistical", {
     diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
     expect_true(all(stat_adj[["spearman_semipartial_coef"]] == tmp$estimate, na.rm = TRUE))
     expect_true(all(stat_adj[["spearman_semipartial_pvalue"]] == tmp$p.value, na.rm = TRUE))
-    expect_equal(length(assays(stat_adj)), 16) 
-    expect_equal(as.numeric(lapply(assays(stat_adj), nrow)), rep(5, 16))
-    expect_equal(as.numeric(lapply(assays(stat_adj), ncol)), rep(5, 16))
+    tmp <- correlation(mat_test[1:5, ], method = "ggm")
+    diag(tmp$estimate) <- NaN; diag(tmp$p) <- NaN
+    expect_true(all(stat_adj[["ggm_coef"]] == tmp$estimate, na.rm = TRUE))
+    expect_true(all(stat_adj[["ggm_pvalue"]] == tmp$p, na.rm = TRUE))
+    expect_equal(length(assays(stat_adj)), 18) 
+    expect_equal(as.numeric(lapply(assays(stat_adj), nrow)), rep(5, 18))
+    expect_equal(as.numeric(lapply(assays(stat_adj), ncol)), rep(5, 18))
     expect_equal(as.character(unlist((lapply(assays(stat_adj), rownames)))),
-        rep(c("x1", "x2", "x3", "x4", "x5"), 16))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 18))
     expect_equal(as.character(unlist((lapply(assays(stat_adj), colnames)))),
-        rep(c("x1", "x2", "x3", "x4", "x5"), 16))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 18))
     expect_equal(assayNames(stat_adj),
         c("randomForest_coef", "clr_coef", "aracne_coef", "pearson_coef",
             "pearson_pvalue", "pearson_partial_coef", "pearson_partial_pvalue", 
             "pearson_semipartial_coef", "pearson_semipartial_pvalue", 
             "spearman_coef", "spearman_pvalue", "spearman_partial_coef", 
             "spearman_partial_pvalue", "spearman_semipartial_coef", 
-            "spearman_semipartial_pvalue", "bayes_coef"))
+            "spearman_semipartial_pvalue",  "ggm_coef", "ggm_pvalue","bayes_coef"))
     expect_true(all(unlist(lapply(assays(stat_adj), function(x) is.numeric(x)))))
     expect_equal(length(stat_adj), 5)
     expect_equal(dim(stat_adj), c(5, 5))
@@ -304,6 +292,7 @@ test_that("statistical", {
     expect_equal(thresholded(stat_adj), FALSE)
     expect_equal(directed(statistical(mat_test, model = "pearson")), FALSE)
     expect_equal(directed(statistical(mat_test, model = "spearman")), FALSE)
+    expect_equal(directed(statistical(mat_test, model = "ggm")), FALSE)
     expect_equal(directed(statistical(mat_test, model = "randomForest")), TRUE)
 })
 ## END unit test statistical ##
@@ -340,9 +329,9 @@ test_that("getLinks", {
 ## START unit test threshold  ##
 ## remove partial/semipartial correlation from stat_adj_l
 stat_adj_cut <- statistical(mat_test[1:5, ], 
-    model = c("clr", "aracne", "pearson", "spearman"))
+    model = c("clr", "aracne", "pearson", "spearman", "ggm"))
 
-args_thr <- list(filter = "clr_coef > 0.5 & aracne_coef > 0.8 & abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95")
+args_thr <- list(filter = "clr_coef > 0.5 & aracne_coef > 0.8 & abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95 & abs(ggm_coef) > 0.2")
 thr_thr <- threshold(stat_adj_cut, type = "threshold", args = args_thr)
 
 args_top <- list(n = 2)
@@ -395,7 +384,8 @@ test_that("threshold", {
     expect_true(is(thr_mean, "AdjacencyMatrix"))
     expect_true(is(thr_thr, "AdjacencyMatrix"))
     assay_names <- c("clr_coef", "aracne_coef", "pearson_coef",
-        "pearson_pvalue", "spearman_coef", "spearman_pvalue", "consensus")
+        "pearson_pvalue", "spearman_coef", "spearman_pvalue",
+        "ggm_coef", "ggm_pvalue", "consensus")
     expect_equal(assayNames(thr_top1), assay_names)
     expect_equal(assayNames(thr_top2), assay_names)
     expect_equal(assayNames(thr_mean), assay_names)
@@ -419,9 +409,9 @@ test_that("threshold", {
     expect_equal(colnames(assay(thr_mean, "consensus")), 
         c("x1", "x2", "x3", "x4", "x5"))
     expect_equal(sum(assay(thr_thr, "consensus"), na.rm = TRUE), 1)
-    expect_equal(sum(assay(thr_top1, "consensus"), na.rm = TRUE), 12)
-    expect_equal(sum(assay(thr_top2, "consensus"), na.rm = TRUE), 6)
-    expect_equal(sum(assay(thr_mean, "consensus"), na.rm = TRUE), 4)
+    expect_equal(sum(assay(thr_top1, "consensus"), na.rm = TRUE), 4)
+    expect_equal(sum(assay(thr_top2, "consensus"), na.rm = TRUE), 4)
+    expect_equal(sum(assay(thr_mean, "consensus"), na.rm = TRUE), 2)
     expect_true(all(assay(thr_thr, "consensus") %in% c(0, 1, NaN)))
     expect_true(all(assay(thr_top1, "consensus") %in% c(0, 1, NaN)))
     expect_true(all(assay(thr_top2, "consensus") %in% c(0, 1, NaN)))
@@ -492,3 +482,4 @@ test_that("threeDotsCall", {
     expect_equal(MetNet:::threeDotsCall("mean", x = 1:10, foo = 1), mean(1:10))
 })
 ## END unit test threeDotsCall ##
+

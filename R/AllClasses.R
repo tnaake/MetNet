@@ -145,6 +145,7 @@ setValidity2("AdjacencyMatrix", function(object) {
         "spearman_partial_coef", "spearman_partial_pvalue",
         "pearson_semipartial_coef", "pearson_semipartial_pvalue",
         "spearman_semipartial_coef", "spearman_semipartial_pvalue",
+        "ggm_coef", "ggm_pvalue",
         "bayes_coef", "consensus")
     valid_names_combine <- "combine_binary"
 
