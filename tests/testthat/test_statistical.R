@@ -79,17 +79,12 @@ test_that("aracne", {
 ## START unit test correlation ##
 correlation_p_mat <- correlation(mat_test[1:5, ], method = "pearson")
 correlation_p_p_mat <- correlation(mat_test[1:5, ], method = "pearson_partial")
-correlation_p_sp_mat <- correlation(mat_test[1:5, ],
-    method = "pearson_semipartial")
 correlation_s_mat <- correlation(mat_test[1:5, ], method = "spearman")
 correlation_s_p_mat <- correlation(mat_test[1:5, ], method = "spearman_partial")
-correlation_s_sp_mat <- correlation(mat_test[1:5, ],
-    method = "spearman_semipartial")
 correlation_g_mat <- correlation(mat_test[1:5, ], method = "ggm")
 
 
 test_that("correlation", {
-
     expect_error(correlation(NULL, method = "pearson"),
         "argument is not a matrix")
     expect_error(correlation(mat_test, method = "a"),
@@ -124,86 +119,58 @@ test_that("correlation", {
     expect_true(min(correlation_s_mat$r) >= -1)
 
     ## partial pearson
-    expect_true(all(correlation_p_p_mat$estimate -
-        ppcor::pcor(t(mat_test[1:5, ]), method = "pearson")$estimate == 0))
-    expect_equal(sum(correlation_p_p_mat$estimate), 7.053181, tolerance = 1e-06)
-    expect_equal(sum(correlation_p_p_mat$p.value), 7.44441, tolerance = 1e-06)
-    expect_equal(rownames(correlation_p_p_mat$estimate), 
-        colnames(correlation_p_p_mat$estimate))
-    expect_equal(rownames(correlation_p_p_mat$estimate), rownames(mat_test[1:5, ]))
-    expect_equal(ncol(correlation_p_p_mat$estimate), 
-        nrow(correlation_p_p_mat$estimate))
-    expect_equal(nrow(correlation_p_p_mat$estimate), nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_p_p_mat$estimate))
-    expect_true(is.matrix(correlation_p_p_mat$estimate))
-    expect_true(max(correlation_p_p_mat$estimate) <= 1)
-    expect_true(min(correlation_p_p_mat$estimate) >= -1)
+    expect_true(all(correlation_p_p_mat$r -
+        ppcor::pcor(t(mat_test[1:5, ]), method = "pearson")$r == 0))
+    expect_equal(sum(correlation_p_p_mat$r), 7.053181, tolerance = 1e-06)
+    expect_equal(sum(correlation_p_p_mat$p), 7.44441, tolerance = 1e-06)
+    expect_equal(rownames(correlation_p_p_mat$r), 
+        colnames(correlation_p_p_mat$r))
+    expect_equal(rownames(correlation_p_p_mat$r), rownames(mat_test[1:5, ]))
+    expect_equal(ncol(correlation_p_p_mat$r), 
+        nrow(correlation_p_p_mat$r))
+    expect_equal(nrow(correlation_p_p_mat$r), nrow(mat_test[1:5, ]))
+    expect_true(is.numeric(correlation_p_p_mat$r))
+    expect_true(is.matrix(correlation_p_p_mat$r))
+    expect_true(max(correlation_p_p_mat$r) <= 1)
+    expect_true(min(correlation_p_p_mat$r) >= -1)
 
-    ## semi-partial pearson
-    expect_true(all(correlation_p_sp_mat$estimate - 
-        ppcor::spcor(t(mat_test[1:5, ]), method = "pearson")$estimate == 0))
-    expect_equal(sum(correlation_p_sp_mat$estimate), 5.729664, 
-        tolerance = 1e-06)
-    expect_equal(sum(correlation_p_sp_mat$p.value), 15.23957, 
-        tolerance = 1e-06)
-    expect_equal(rownames(correlation_p_sp_mat$estimate), 
-        colnames(correlation_p_sp_mat$estimate))
-    expect_equal(rownames(correlation_p_sp_mat$estimate), rownames(mat_test)[1:5])
-    expect_equal(ncol(correlation_p_sp_mat$estimate), 
-        nrow(correlation_p_sp_mat$estimate))
-    expect_equal(nrow(correlation_p_sp_mat$estimate), nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_p_sp_mat$estimate))
-    expect_true(is.matrix(correlation_p_sp_mat$estimate))
-    expect_true(max(correlation_p_sp_mat$estimate) <= 1)
-    expect_true(min(correlation_p_sp_mat$estimate) >= -1)
 
     ## partial spearman
-    suppressWarnings(expect_true(all(correlation_s_p_mat$estimate - 
-        ppcor::pcor(t(mat_test[1:5, ]), method = "spearman")$estimate == 0)))
-    expect_equal(sum(correlation_s_p_mat$estimate), 3.153383, tolerance = 1e-06)
-    expect_equal(sum(correlation_s_p_mat$p.value, na.rm = TRUE), 0.4969531, 
+    suppressWarnings(expect_true(all(correlation_s_p_mat$r - 
+        ppcor::pcor(t(mat_test[1:5, ]), method = "spearman")$r == 0)))
+    expect_equal(sum(correlation_s_p_mat$r), 3.153383, tolerance = 1e-06)
+    expect_equal(sum(correlation_s_p_mat$p, na.rm = TRUE), 0.4969531, 
         tolerance = 1e-06)
-    expect_equal(rownames(correlation_s_p_mat$estimate), 
-        colnames(correlation_s_p_mat$estimate))
-    expect_equal(rownames(correlation_s_p_mat$estimate), 
+    expect_equal(rownames(correlation_s_p_mat$r), 
+        colnames(correlation_s_p_mat$r))
+    expect_equal(rownames(correlation_s_p_mat$r), 
         rownames(mat_test)[1:5])
-    expect_equal(ncol(correlation_s_p_mat$estimate), 
-        nrow(correlation_s_p_mat$estimate))
-    expect_equal(nrow(correlation_s_p_mat$estimate), 
+    expect_equal(ncol(correlation_s_p_mat$r), 
+        nrow(correlation_s_p_mat$r))
+    expect_equal(nrow(correlation_s_p_mat$r), 
         nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_s_p_mat$estimate))
-    expect_true(is.matrix(correlation_s_p_mat$estimate))
-    expect_true(max(correlation_s_p_mat$estimate) <= 1.0000001)
-    expect_true(min(correlation_s_p_mat$estimate) >= -1.0000001)
-
-    ## semi-partial spearman
-    suppressWarnings(expect_true(all(correlation_s_sp_mat$estimate - 
-        ppcor::spcor(t(mat_test[1:5, ]), method = "spearman")$estimate == 0, 
-        na.rm = TRUE)))
-    expect_equal(rownames(correlation_s_sp_mat$estimate), 
-        colnames(correlation_s_sp_mat$estimate))
-    expect_equal(rownames(correlation_s_sp_mat$estimate), rownames(mat_test)[1:5])
-    expect_equal(ncol(correlation_s_sp_mat$estimate), 
-        nrow(correlation_s_sp_mat$estimate))
-    expect_equal(nrow(correlation_s_sp_mat$estimate), nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_s_sp_mat$estimate))
-    expect_true(is.matrix(correlation_s_sp_mat$estimate))
+    expect_true(is.numeric(correlation_s_p_mat$r))
+    expect_true(is.matrix(correlation_s_p_mat$r))
+    expect_true(max(correlation_s_p_mat$r) <= 1.0000001)
+    expect_true(min(correlation_s_p_mat$r) >= -1.0000001)
     
     ## ggm
-    expect_true(all(correlation_g_mat$estimate -
-                        GeneNet::ggm.estimate.pcor(t(mat_test[1:5, ]), method = "static")[seq_len(dim(mat_test[1:5, ])[1]), seq_len(dim(mat_test[1:5, ])[1])]== 0))
-    expect_equal(sum(correlation_g_mat$estimate), 5.421633, tolerance = 1e-06)
+    expect_true(all(correlation_g_mat$r -
+                        GeneNet::ggm.estimate.pcor(t(mat_test[1:5, ]), 
+                                                   method = "static")[seq_len(dim(mat_test[1:5, ])[1]), 
+                                                                      seq_len(dim(mat_test[1:5, ])[1])]== 0))
+    expect_equal(sum(correlation_g_mat$r), 5.421633, tolerance = 1e-06)
     expect_equal(sum(correlation_g_mat$p), 2.889295, tolerance = 1e-06)
-    expect_equal(rownames(correlation_g_mat$estimate), 
-                 colnames(correlation_g_mat$estimate))
-    expect_equal(rownames(correlation_g_mat$estimate), rownames(mat_test[1:5, ]))
-    expect_equal(ncol(correlation_g_mat$estimate), 
-                 nrow(correlation_g_mat$estimate))
-    expect_equal(nrow(correlation_g_mat$estimate), nrow(mat_test[1:5, ]))
-    expect_true(is.numeric(correlation_g_mat$estimate))
-    expect_true(is.matrix(correlation_g_mat$estimate))
-    expect_true(max(correlation_g_mat$estimate) <= 1)
-    expect_true(min(correlation_g_mat$estimate) >= -1)
+    expect_equal(rownames(correlation_g_mat$r), 
+                 colnames(correlation_g_mat$r))
+    expect_equal(rownames(correlation_g_mat$r), rownames(mat_test[1:5, ]))
+    expect_equal(ncol(correlation_g_mat$r), 
+                 nrow(correlation_g_mat$r))
+    expect_equal(nrow(correlation_g_mat$r), nrow(mat_test[1:5, ]))
+    expect_true(is.numeric(correlation_g_mat$r))
+    expect_true(is.matrix(correlation_g_mat$r))
+    expect_true(max(correlation_g_mat$r) <= 1)
+    expect_true(min(correlation_g_mat$r) >= -1)
 })
 ## END unit test correlation ##
 
