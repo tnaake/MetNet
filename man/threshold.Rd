@@ -38,7 +38,9 @@ edges with Pearson correlation coefficients > 0.8 and < -0.8.
 In the case of `type == "top1"`, `type == "top2"`, or `type == "mean"`, 
 `args` has the entry `n` (`numeric` of length 1), that 
 denotes the number of top ranks written to the
-consensus matrix.}
+consensus matrix. Optionally, `args` has the entry `abs` which will take 
+absolute values of the coefficients (will default to `FALSE` if `args$abs` 
+is not specified).}
 
 \item{values}{`character`, take from the adjacency matrix all values ("all"),
 the minimum of the pairs ("min") or the maximum ("max")
