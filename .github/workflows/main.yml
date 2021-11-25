@@ -177,8 +177,8 @@ jobs:
           remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE)
           ## Manually install required packages
           BiocManager::install("SummarizedExperiment", ask = FALSE, update = FALSE)
-          BiocManager::install("mpmi", ask = FALSE, update = FALSE)
-          BiocManager::install("igraph", ask = FALSE, update = FALSE)
+          install.packages("mpmi", ask = FALSE, update = FALSE)
+          install.packages("igraph", ask = FALSE, update = FALSE)
           # BiocManager::install(c("devtools"), dependencies = TRUE, ask = FALSE, update = FALSE)
           ## For running the checks
           message(paste('****', Sys.time(), 'installing rcmdcheck and BiocCheck ****'))
