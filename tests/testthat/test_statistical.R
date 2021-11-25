@@ -156,9 +156,9 @@ test_that("correlation", {
     
     ## ggm
     expect_true(all(correlation_g_mat$r -
-                        GeneNet::ggm.estimate.pcor(t(mat_test[1:5, ]), 
-                                                   method = "static")[seq_len(dim(mat_test[1:5, ])[1]), 
-                                                                      seq_len(dim(mat_test[1:5, ])[1])]== 0))
+        GeneNet::ggm.estimate.pcor(t(mat_test[1:5, ]), 
+            method = "static")[seq_len(dim(mat_test[1:5, ])[1]), 
+                seq_len(dim(mat_test[1:5, ])[1])]== 0))
     expect_equal(sum(correlation_g_mat$r), 5.421633, tolerance = 1e-06)
     expect_equal(sum(correlation_g_mat$p), 2.889295, tolerance = 1e-06)
     expect_equal(rownames(correlation_g_mat$r), 
@@ -239,51 +239,37 @@ test_that("statistical", {
     suppressWarnings(
         expect_true(all(assay(stat_adj, "pearson_pvalue"), tmp$p, na.rm = TRUE)))
     tmp <- correlation(mat_test[1:5, ], method = "pearson_partial")
-    diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
+    diag(tmp$r) <- NaN; diag(tmp$p) <- NaN
     expect_true(
-        all(assay(stat_adj, "pearson_partial_coef") == tmp$estimate, 
+        all(assay(stat_adj, "pearson_partial_coef") == tmp$r, 
         na.rm = TRUE))
     expect_true(
-        all(assay(stat_adj, "pearson_partial_pvalue") == tmp$p.value,
-        na.rm = TRUE))
-    tmp <- correlation(mat_test[1:5, ], method = "pearson_semipartial")
-    diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
-    expect_true(
-        all(assay(stat_adj, "pearson_semipartial_coef") == tmp$estimate, 
-        na.rm = TRUE))
-    expect_true(
-        all(assay(stat_adj, "pearson_semipartial_pvalue") == tmp$p.value, 
+        all(assay(stat_adj, "pearson_partial_pvalue") == tmp$p,
         na.rm = TRUE))
     tmp <- correlation(mat_test[1:5, ], method = "spearman")
     diag(tmp$r) <- NaN; diag(tmp$p) <- NaN
     expect_true(all(stat_adj[["spearman_coef"]] == tmp$r, na.rm = TRUE))
     expect_true(all(stat_adj[["spearman_pvalue"]] == tmp$p, na.rm = TRUE))
     suppressWarnings(tmp <- correlation(mat_test[1:5, ], method = "spearman_partial"))
-    diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
+    diag(tmp$r) <- NaN; diag(tmp$p) <- NaN
     expect_true(all(stat_adj[["spearman_partial_coef"]] == tmp$estimate, na.rm = TRUE))
     expect_true(all(stat_adj[["spearman_partial_pvalue"]] == tmp$p.value, na.rm = TRUE))
-    suppressWarnings(tmp <- correlation(mat_test[1:5, ], method = "spearman_semipartial"))
-    diag(tmp$estimate) <- NaN; diag(tmp$p.value) <- NaN
-    expect_true(all(stat_adj[["spearman_semipartial_coef"]] == tmp$estimate, na.rm = TRUE))
-    expect_true(all(stat_adj[["spearman_semipartial_pvalue"]] == tmp$p.value, na.rm = TRUE))
     tmp <- correlation(mat_test[1:5, ], method = "ggm")
-    diag(tmp$estimate) <- NaN; diag(tmp$p) <- NaN
+    diag(tmp$r) <- NaN; diag(tmp$p) <- NaN
     expect_true(all(stat_adj[["ggm_coef"]] == tmp$estimate, na.rm = TRUE))
     expect_true(all(stat_adj[["ggm_pvalue"]] == tmp$p, na.rm = TRUE))
-    expect_equal(length(assays(stat_adj)), 18) 
-    expect_equal(as.numeric(lapply(assays(stat_adj), nrow)), rep(5, 18))
-    expect_equal(as.numeric(lapply(assays(stat_adj), ncol)), rep(5, 18))
+    expect_equal(length(assays(stat_adj)), 14) 
+    expect_equal(as.numeric(lapply(assays(stat_adj), nrow)), rep(5, 14))
+    expect_equal(as.numeric(lapply(assays(stat_adj), ncol)), rep(5, 14))
     expect_equal(as.character(unlist((lapply(assays(stat_adj), rownames)))),
-        rep(c("x1", "x2", "x3", "x4", "x5"), 18))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 14))
     expect_equal(as.character(unlist((lapply(assays(stat_adj), colnames)))),
-        rep(c("x1", "x2", "x3", "x4", "x5"), 18))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 14))
     expect_equal(assayNames(stat_adj),
         c("randomForest_coef", "clr_coef", "aracne_coef", "pearson_coef",
             "pearson_pvalue", "pearson_partial_coef", "pearson_partial_pvalue", 
-            "pearson_semipartial_coef", "pearson_semipartial_pvalue", 
             "spearman_coef", "spearman_pvalue", "spearman_partial_coef", 
-            "spearman_partial_pvalue", "spearman_semipartial_coef", 
-            "spearman_semipartial_pvalue",  "ggm_coef", "ggm_pvalue","bayes_coef"))
+            "spearman_partial_pvalue", "ggm_coef", "ggm_pvalue","bayes_coef"))
     expect_true(all(unlist(lapply(assays(stat_adj), function(x) is.numeric(x)))))
     expect_equal(length(stat_adj), 5)
     expect_equal(dim(stat_adj), c(5, 5))
@@ -439,9 +425,50 @@ test_that("threshold", {
     expect_equal(type(am_all), "statistical")
     expect_equal(type(am_min), "statistical")
     expect_equal(type(am_max), "statistical")
+    
+    ## test NA values
+    mat_test_NA <- mat_test[1:5, ]
+    mat_test_NA[1, 5] <- NA
+    stat_adj_cut_NA <- statistical(mat_test_NA, model = c("pearson", "ggm"))
+    thr_NA_thr <- threshold(stat_adj_cut_NA, type = "threshold", 
+        args = list(filter = "ggm_coef > 0.01"), na.rm = TRUE)
+    expect_equal(as.vector(assay(thr_NA_thr, "consensus")[, 1]), 
+        c(NaN, 0, 0, 0, 0))
+    thr_NA_thr <- threshold(stat_adj_cut_NA, type = "threshold", 
+        args = list(filter = "ggm_coef > 0.01"), na.rm = FALSE)
+    expect_equal(as.vector(assay(thr_NA_thr, "consensus")[, 1]), 
+        c(NaN, NaN, NaN, NaN, NaN))
+    thr_NA_thr <- threshold(stat_adj_cut_NA, type = "threshold", 
+        args = list(filter = "ggm_coef > 0.01 | is.na(ggm_coef)"), 
+        na.rm = FALSE)
+    expect_equal(as.vector(assay(thr_NA_thr, "consensus")[, 1]), 
+        c(NaN, 1, 1, 1, 1))
+    thr_NA_top1 <- threshold(stat_adj_cut_NA, type = "top1", 
+        args = list(n = 5), na.rm = TRUE)
+    expect_equal(as.vector(assay(thr_NA_top1, "consensus")[, 1]), 
+        c(NaN, 1, 1, 0, 0))
+    thr_NA_top1 <- threshold(stat_adj_cut_NA, type = "top1", 
+        args = list(n = 5), na.rm = FALSE)
+    expect_equal(as.vector(assay(thr_NA_top1, "consensus")[, 1]), ##########
+        c(NaN, NaN, NaN, NaN, NaN))
+    thr_NA_top2 <- threshold(stat_adj_cut_NA, type = "top2", 
+        args = list(n = 5), na.rm = TRUE)
+    expect_equal(as.vector(assay(thr_NA_top2, "consensus")[, 1]), 
+        c(NaN, 0, 0, 0, 0))
+    thr_NA_top2 <- threshold(stat_adj_cut_NA, type = "top2", 
+        args = list(n = 5), na.rm = FALSE)
+    expect_equal(as.vector(assay(thr_NA_top2, "consensus")[, 1]), ###########
+        c(NaN, NaN, NaN, NaN, NaN))
+    thr_NA_mean <- threshold(stat_adj_cut_NA, type = "top2", 
+        args = list(n = 5), na.rm = TRUE)
+    expect_equal(as.vector(assay(thr_NA_mean, "consensus")[, 1]), 
+        c(NaN, 0, 0, 0, 0))
+    thr_NA_mean <- threshold(stat_adj_cut_NA, type = "top2", 
+        args = list(n = 5), na.rm = FALSE)
+    expect_equal(as.vector(assay(thr_NA_mean, "consensus")[, 1]), #########
+        c(NaN, NaN, NaN, NaN, NaN))
 })
 ## END unit test threshold  ##
-
 
 ## START unit test topKnet ##
 ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
@@ -449,27 +476,49 @@ ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
 test_that("topKnet", {
 
     ## type of ranks
-    expect_error(MetNet:::topKnet(ranks = 1:3), "ranks is not a numerical")
+    ## na.rm = TRUE
+    ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
+    expect_error(MetNet:::topKnet(ranks = 1:3, na.rm = TRUE), "ranks is not a numerical")
     expect_error(MetNet:::topKnet(ranks = data.frame(x = 1:3, y = 3:1),
-        type = "top1"), "ranks is not a numeric")
+        type = "top1", na.rm = TRUE), "ranks is not a numeric")
     expect_error(MetNet:::topKnet(ranks = matrix(c("a", "b", "c")),
-        type = "top1"), "ranks is not a numeric")
+        type = "top1", na.rm = TRUE), "ranks is not a numeric")
 
     ## type argument
-    expect_error(MetNet:::topKnet(ranks = ranks, type = "foo"), "type neither")
+    expect_error(MetNet:::topKnet(ranks = ranks, type = "foo", na.rm = TRUE), 
+        "type neither")
 
     ## check results
-    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top1"), c(1, 1, 3))
-    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top2"), c(2, 2, 3))
-    expect_equal(MetNet:::topKnet(ranks = ranks, type = "mean"), c(1.5, 1.5, 3))
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = TRUE), 
+        c(1, 1, 3))
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = TRUE), 
+        c(2, 2, 3))
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = TRUE), 
+        c(1.5, 1.5, 3))
 
     ## matrix with ncol 1
     expect_equal(MetNet:::topKnet(ranks = matrix(1:3, nrow = 3),
-        type = "top1"), 1:3)
+        type = "top1", na.rm = TRUE), 1:3)
     expect_error(MetNet:::topKnet(ranks = matrix(1:3, nrow = 3),
-        type = "top2"), "ncol[(]ranks[])] has to be")
+        type = "top2", na.rm = TRUE), "ncol[(]ranks[])] has to be")
     expect_equal(MetNet:::topKnet(ranks = matrix(1:3, nrow = 3),
-        type = "mean"), 1:3)
+        type = "mean", na.rm = TRUE), 1:3)
+    
+    ## na.rm = FALSE
+    ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = FALSE), 
+        c(1, 1, 3))
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = FALSE), 
+        c(2, 2, 3))
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = FALSE), 
+        c(1.5, 1.5, 3))
+    ranks <- matrix(c(c(1, 2, 3), c(2, 1, NA)), ncol = 2)
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = FALSE), 
+        c(1, 1, NA))
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = FALSE), 
+        c(2, 2, NA))
+    expect_equal(MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = FALSE), 
+        c(1.5, 1.5, NA))
 })
 ## END unit test topKnet ##
 

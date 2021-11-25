@@ -4,13 +4,20 @@
 \alias{topKnet}
 \title{Return consensus ranks from a matrix containing ranks}
 \usage{
-topKnet(ranks, type)
+topKnet(ranks, type, na.rm = TRUE)
 }
 \arguments{
 \item{ranks}{`matrix` containing the ranks per statistical model (in columns)
 and per feature pair (in rows)}
 
 \item{type}{`character`, either `"top1"`, `"top2"` or `"mean"`}
+
+\item{na.rm}{`logical`, if set to `TRUE`, the `NA`s in the assay slots will 
+not be taken into account when creating the `"top1"`, `"top2"` or `"mean"` 
+of ranks. If set to `FALSE`, the `NA`s will be taken into account 
+when creating the `"top1"`, `"top2"` or `"mean"` ranks. If `FALSE` the 
+resulting aggregations will be `NA` if an `NA` is present in the coeffients
+of one feature pair.}
 }
 \value{
 `numeric` `vector`` with consensus ranks
@@ -23,16 +30,41 @@ and per feature pair (in rows)}
 See Hase et al. (2014) for further details.
 }
 \examples{
+## na.rm == TRUE
 ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
 
 ## type = "top1"
-MetNet:::topKnet(ranks = ranks, type = "top1")
+MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = TRUE)
 
 ## type = "top2"
-MetNet:::topKnet(ranks = ranks, type = "top2")
+MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = TRUE)
 
 ## type = "mean"
-MetNet:::topKnet(ranks = ranks, type = "mean")
+MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = TRUE)
+
+## na.rm == FALSE
+ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
+
+## type = "top1"
+MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = FALSE)
+
+## type = "top2"
+MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = FALSE)
+
+## type = "mean"
+MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = FALSE)
+
+## na.rm == FALSE
+ranks <- matrix(c(c(1, 2, NA), c(2, 1, 3)), ncol = 2)
+
+## type = "top1"
+MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = FALSE)
+
+## type = "top2"
+MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = FALSE)
+
+## type = "mean"
+MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = FALSE)
 }
 \references{
 Hase et al. (2014):  Harnessing Diversity towards the Reconstructing of

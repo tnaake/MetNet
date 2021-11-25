@@ -8,7 +8,8 @@ threshold(
   am,
   type = c("threshold", "top1", "top2", "mean"),
   args,
-  values = c("all", "min", "max")
+  values = c("all", "min", "max"),
+  na.rm = TRUE
 )
 }
 \arguments{
@@ -43,6 +44,13 @@ consensus matrix.}
 the minimum of the pairs ("min") or the maximum ("max")
 a^*_{ij} = min(a_ij, a_ji)
 a^*_{ij} = max(a_ij, a_ji)}
+
+\item{na.rm}{`logical`, if set to `TRUE`, the `NA`s in the assay slots will 
+not be taken into account when creating the `"consensus"` assay. If set 
+to `FALSE`, the `NA`s will be taken into account and might be passed to the
+`"consensus"` assay. If `FALSE` the user can set the filter e.g. to 
+`(ggm_coef > 0 | is.na(ggm_coef))`, when there are `NA`s in 
+`ggm_coef` to disregard `NA`s.}
 }
 \value{
 `AdjacencyMatrix` object containing a binary adjacency matrix

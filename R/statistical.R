@@ -319,6 +319,7 @@ aracne <- function(mi, eps = 0.05) {
 #' @importFrom psych corr.test
 #' @importFrom ppcor pcor spcor
 #' @importFrom stats p.adjust
+#' @importFrom GeneNet ggm.estimate.pcor n2kappa cor0.test
 correlation <- function(x, method = "pearson", p.adjust = "none") {
 
     ## for pearson/spearman correlation
@@ -858,12 +859,21 @@ getLinks <- function(mat, exclude = "== 1") {
 #' In the case of `type == "top1"`, `type == "top2"`, or `type == "mean"`, 
 #' `args` has the entry `n` (`numeric` of length 1), that 
 #' denotes the number of top ranks written to the
-#' consensus matrix.
+#' consensus matrix. Optionally, `args` has the entry `abs` which will take 
+#' absolute values of the coefficients (will default to `FALSE` if `args$abs` 
+#' is not specified).
 #' 
 #' @param values `character`, take from the adjacency matrix all values ("all"),
 #' the minimum of the pairs ("min") or the maximum ("max")
 #' a^*_{ij} = min(a_ij, a_ji)
 #' a^*_{ij} = max(a_ij, a_ji)
+#' 
+#' @param na.rm `logical`, if set to `TRUE`, the `NA`s in the assay slots will 
+#' not be taken into account when creating the `"consensus"` assay. If set 
+#' to `FALSE`, the `NA`s will be taken into account and might be passed to the
+#' `"consensus"` assay. If `FALSE` the user can set the filter e.g. to 
+#' `(ggm_coef > 0 | is.na(ggm_coef))`, when there are `NA`s in 
+#' `ggm_coef` to disregard `NA`s. 
 #'
 #' @details
 #' `values` has to be set carefully depending on if the `AdjacencyMatrix` object
@@ -902,6 +912,7 @@ getLinks <- function(mat, exclude = "== 1") {
 #' i.e. all assays from `am`. The slot `threshold` is set to `TRUE`.
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' 
 #' @examples
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
@@ -934,6 +945,7 @@ threshold <- function(am,
     ## check match.arg for values
     type <- match.arg(type)
     values <- match.arg(values)
+    if (!is.list(args)) stop("'args' is not a list")
     
     if (!is(am, "AdjacencyMatrix")) {
         stop("'am' is not an 'AdjacencyMatrix' object")
@@ -993,15 +1005,14 @@ threshold <- function(am,
             
             ## find the rows in df_na, that are not present in df_filter
             df_na <- df_na |>
-                filter(!(Row %in% df_filter[, "Row"] & Col %in% df_filter[, "Col"]))
+                dplyr::filter(!("Row" %in% df_filter[, "Row"] &
+                                                "Col" %in% df_filter[, "Col"]))
                 
             ## set the elements in cons to NaN that are defined by df_na
             inds_row <- match(df_na[, "Row"], rownames(cons))
             inds_col <- match(df_na[, "Col"], colnames(cons))
             cons[cbind(inds_row, inds_col)] <- NaN
-            
         }
-        
         
         inds_row <- match(df_filter[, "Row"], rownames(cons))
         inds_col <- match(df_filter[, "Col"], colnames(cons))
@@ -1021,6 +1032,10 @@ threshold <- function(am,
 
             ## get corresponding adjacency matrix in l
             l_x <- l[[name_x]]
+            
+            if (is.null(args$abs)) args$abs <- FALSE
+            if (args$abs) 
+                l_x <- abs(l_x)
 
             ## take the respective minimum or maximum depending on `values`,
             ## do not do anything if `values` is equal to `all`
@@ -1053,11 +1068,11 @@ threshold <- function(am,
                 res <- getLinks(l_x, exclude = "== 0")
             }
             if (grepl(name_x, 
-                pattern = "pearson_coef|pearson_partial_coef|pearson_semipartial_coef|spearman_coef|spearman_partial_coef|spearman_semipartial_coef|clr_coef|ggm_coef|aracne_coef")) {
+                pattern = "pearson_coef|pearson_partial_coef|spearman_coef|spearman_partial_coef|clr_coef|ggm_coef|aracne_coef")) {
                 
                 res <- getLinks(l_x, exclude = NULL)
             }
-
+            
             res
         })
 
@@ -1069,7 +1084,7 @@ threshold <- function(am,
         ## calculate the consensus information, i.e. either get the first or
         ## second top rank per row or calculate the average across rows
         ## depending on the type argument
-        cons_val <- topKnet(ranks, type)
+        cons_val <- topKnet(ranks, type, na.rm = na.rm)
 
         ## bind row and col information with cons information
         row_col <- l_df[[1]][, c("row", "col")]
@@ -1081,6 +1096,12 @@ threshold <- function(am,
 
         ## write links in ranks_top to binary adjacency matrix cons
         cons[as.numeric(rownames(ranks_top))] <- 1
+        
+        ## write NA to the ones where ranks are NA if na.rm = FALSE
+        if (!na.rm) {
+            ranks_NA <- ranks[is.na(cons_val), ]
+            cons[as.numeric(rownames(ranks_NA))] <- NA    
+        }
     }
 
     ## assign the consensus matrix to a new slot
@@ -1105,6 +1126,13 @@ threshold <- function(am,
 #' and per feature pair (in rows)
 #'
 #' @param type `character`, either `"top1"`, `"top2"` or `"mean"`
+#' 
+#' @param na.rm `logical`, if set to `TRUE`, the `NA`s in the assay slots will 
+#' not be taken into account when creating the `"top1"`, `"top2"` or `"mean"` 
+#' of ranks. If set to `FALSE`, the `NA`s will be taken into account 
+#' when creating the `"top1"`, `"top2"` or `"mean"` ranks. If `FALSE` the 
+#' resulting aggregations will be `NA` if an `NA` is present in the coeffients
+#' of one feature pair.
 #'
 #' @details
 #' See Hase et al. (2014) for further details.
@@ -1120,16 +1148,41 @@ threshold <- function(am,
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
 #'
 #' @examples
+#' ## na.rm == TRUE
 #' ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
 #'
 #' ## type = "top1"
-#' MetNet:::topKnet(ranks = ranks, type = "top1")
+#' MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = TRUE)
 #'
 #' ## type = "top2"
-#' MetNet:::topKnet(ranks = ranks, type = "top2")
+#' MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = TRUE)
 #'
 #' ## type = "mean"
-#' MetNet:::topKnet(ranks = ranks, type = "mean")
+#' MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = TRUE)
+#' 
+#' ## na.rm == FALSE
+#' ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
+#'
+#' ## type = "top1"
+#' MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = FALSE)
+#'
+#' ## type = "top2"
+#' MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = FALSE)
+#'
+#' ## type = "mean"
+#' MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = FALSE)
+#' 
+#' ## na.rm == FALSE
+#' ranks <- matrix(c(c(1, 2, NA), c(2, 1, 3)), ncol = 2)
+#'
+#' ## type = "top1"
+#' MetNet:::topKnet(ranks = ranks, type = "top1", na.rm = FALSE)
+#'
+#' ## type = "top2"
+#' MetNet:::topKnet(ranks = ranks, type = "top2", na.rm = FALSE)
+#'
+#' ## type = "mean"
+#' MetNet:::topKnet(ranks = ranks, type = "mean", na.rm = FALSE)
 topKnet <- function(ranks, type, na.rm = TRUE) {
 
     if ((!is.matrix(ranks)) || !is.numeric(ranks)) {
@@ -1167,14 +1220,14 @@ topKnet <- function(ranks, type, na.rm = TRUE) {
         ## NA if there are less elements)
         cons_val <- apply(ranks, 1, function(x) {
            
-                if (!all(is.na(x))) {
-                    if (na.rm)
-                        sort(x)[2]
-                    else 
-                        NaN
-                } else {
-                    NaN
-                }    
+            if (!all(is.na(x))) {
+                if (na.rm)
+                    sort(x)[2]
+                else
+                    sort(x, na.last = TRUE)[2]
+            } else {
+                NaN
+            }    
             
         })
     }

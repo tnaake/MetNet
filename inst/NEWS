@@ -1,3 +1,10 @@
+Changes in version 1.11.6 (2021-11-24)
++ add ggm method in statistical and implement dealing with NA
+  values for partial correlation and ggm
++ add (optional) calculation of ranked absolute coefficients in 
+  threshold for the top1, top2, and mean types to take into account
+  negative coefficients (e.g. from pearson or spearman correlation)
+
 Changes in version 1.11.5 (2021-10-12)
 + add assays in structural based on columns in transformations that are 
   defined by the var argument in structural, adjacency matrices of type 
