@@ -8,7 +8,7 @@ of accurate cellular networks}
 aracne(mi, eps = 0.05)
 }
 \arguments{
-\item{mi}{matrix, where columns and the rows are features
+\item{mi}{matrix, where columns are the samples and the rows are features
 (metabolites), cell entries are mutual information values between the
 features. As input, the mutual information (e.g. raw MI estimates or
 Jackknife bias corrected MI estimates) from the `cmi` function of the

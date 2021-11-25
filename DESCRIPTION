@@ -22,7 +22,6 @@ Imports:
     methods (>= 3.5),
     mpmi (>= 0.42), 
     parmigene (>= 1.0.2),
-    ppcor (>= 1.1),
 	psych (>= 2.1.6),
     rlang (>= 0.4.10),
     stabs (>= 0.6),

@@ -4,50 +4,47 @@
 \alias{correlation}
 \title{Create an adjacency matrix based on correlation}
 \usage{
-correlation(x, method = "pearson", p.adjust = "none")
+correlation(x, method = "pearson", p.adjust = "none", ...)
 }
 \arguments{
-\item{x}{matrix, where columns are the samples and the rows are features
+\item{x}{`matrix`, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values}
 
-\item{method}{`character`, either "pearson", "spearman", "pearson_partial",
-"spearman_partial", "pearson_semipartial" or "spearman_semipartial".}
+\item{method}{`character`, either "pearson", "spearman", "pearson_partial", or
+"spearman_partial".}
 
 \item{p.adjust}{`character`, method of p-value adjustment passed to `p.adjust`}
+
+\item{...}{additional arguments passed to `corr.test` or `partialCorrelation`}
 }
 \value{
 `list` containing two matrices, 
 the first matrix contains correlation coefficients and 
 the second matrix contains the corresponding p-values as obtained from the 
-correlation algorithms `corr.test`, `pcor` or `spcor` (depending on the 
+correlation algorithms `corr.test` or `partialCorrelation` (depending on the 
 chosen `method`) and optionally the adjusted p.values (argument
 `p.adjust`)
 }
 \description{
 `correlation` infers an adjacency matrix using
 correlation using the `corr.test` function (from the
-`psych` package), `pcor` (from `ppcor`) or
-`spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
-correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
-and will return
-the weighted adjacency matrix of the absolute correlation values.
+`psych` package) or partialCorrelation. `correlation` extracts the 
+reported pair-wise correlation coefficients from the function 
+`corr.test` and `partialCorrelation` and will return
+the weighted adjacency matrix of the correlation coefficients, together 
+with the associated p-values.
 }
 \details{
 If `"pearson"` or `"spearman"` is used as a `method`, the function
 `corr.test` from `psych` will be employed.
 
 If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
-function `pcor` from `spcor` will be employed.
-
-If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
-`method` the function `spcor` from `spcor` will be employed.
+function `partialCorrelation` will be employed.
 
 `method` will be passed to argument `method` in `corr.test`
-(in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
-(`"pearson"` and `"spearman"` for `"pearson_partial"` and
-`"spearman_partial"`, respectively) or to `method` in `spcor`
-(`"pearson"` or `"spearman"` for `"pearson_semipartial"` and
-`"spearman_semipartial"`, respectively).
+(in the case of `"pearson"` or `"spearman"`) or to `method` in 
+`partialCorrelation` (`"pearson"` and `"spearman"` for `"pearson_partial"` 
+and `"spearman_partial"`, respectively).
 }
 \examples{
 data("x_test", package = "MetNet")

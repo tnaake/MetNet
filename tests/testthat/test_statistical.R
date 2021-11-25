@@ -76,13 +76,30 @@ test_that("aracne", {
 })
 ## END unit test aracne ##
 
-## START unit test correlation ##
+## START unit test partialCorrelation/correlation ##
 correlation_p_mat <- correlation(mat_test[1:5, ], method = "pearson")
 correlation_p_p_mat <- correlation(mat_test[1:5, ], method = "pearson_partial")
 correlation_s_mat <- correlation(mat_test[1:5, ], method = "spearman")
-correlation_s_p_mat <- correlation(mat_test[1:5, ], method = "spearman_partial")
+suppressWarnings(
+    correlation_s_p_mat <- correlation(mat_test[1:5, ], 
+                                                method = "spearman_partial"))
 correlation_g_mat <- correlation(mat_test[1:5, ], method = "ggm")
 
+test_that("partialCorrelation", {
+    pcor_p <- partialCorrelation(t(mat_test), method = "pearson")
+    expect_equal(names(pcor_p), c("r", "p"))
+    expect_equal(pcor_p$r, psych::partial.r(t(mat_test), method = "pearson"))
+    expect_equal(sum(pcor_p$r), 9.60788, tolerance = 1e-06)
+    expect_equal(sum(pcor_p$p, na.rm = TRUE), 26.78391, tolerance = 1e-06)
+    suppressWarnings(
+        pcor_s <- partialCorrelation(t(mat_test), method = "spearman"))
+    expect_equal(names(pcor_s), c("r", "p"))
+    suppressWarnings(
+        expect_equal(pcor_s$r, psych::partial.r(t(mat_test), 
+                                                method = "spearman")))
+    expect_equal(sum(pcor_s$r), 7.211808, tolerance = 1e-06)
+    expect_equal(sum(pcor_s$p, na.rm = TRUE), 43.12084, tolerance = 1e-06)
+})
 
 test_that("correlation", {
     expect_error(correlation(NULL, method = "pearson"),
@@ -91,6 +108,7 @@ test_that("correlation", {
         msg = "object [']cor_mat['] not found")
 
     ## pearson
+    expect_equal(names(correlation_p_mat), c("r", "p"))
     expect_equal(correlation_p_mat$r,
         cor(t(mat_test[1:5, ]), method = "pearson"), tolerance = 1e-06)
     expect_equal(sum(correlation_p_mat$r), 3.27161, tolerance = 1e-06)
@@ -105,6 +123,7 @@ test_that("correlation", {
     expect_true(min(correlation_p_mat$r) >= -1)
 
     ## spearman
+    expect_equal(names(correlation_s_mat), c("r", "p"))
     expect_equal(correlation_s_mat$r,
         cor(t(mat_test[1:5, ]), method = "spearman"), tolerance = 1e-06)
     expect_equal(sum(correlation_s_mat$r), 3.153383, tolerance = 1e-06)
@@ -119,10 +138,11 @@ test_that("correlation", {
     expect_true(min(correlation_s_mat$r) >= -1)
 
     ## partial pearson
+    expect_equal(names(correlation_p_p_mat), c("r", "p"))
     expect_true(all(correlation_p_p_mat$r -
         ppcor::pcor(t(mat_test[1:5, ]), method = "pearson")$r == 0))
     expect_equal(sum(correlation_p_p_mat$r), 7.053181, tolerance = 1e-06)
-    expect_equal(sum(correlation_p_p_mat$p), 7.44441, tolerance = 1e-06)
+    expect_equal(sum(correlation_p_p_mat$p), 12.44441, tolerance = 1e-06)
     expect_equal(rownames(correlation_p_p_mat$r), 
         colnames(correlation_p_p_mat$r))
     expect_equal(rownames(correlation_p_p_mat$r), rownames(mat_test[1:5, ]))
@@ -134,12 +154,12 @@ test_that("correlation", {
     expect_true(max(correlation_p_p_mat$r) <= 1)
     expect_true(min(correlation_p_p_mat$r) >= -1)
 
-
     ## partial spearman
+    expect_equal(names(correlation_s_p_mat), c("r", "p"))
     suppressWarnings(expect_true(all(correlation_s_p_mat$r - 
         ppcor::pcor(t(mat_test[1:5, ]), method = "spearman")$r == 0)))
-    expect_equal(sum(correlation_s_p_mat$r), 3.153383, tolerance = 1e-06)
-    expect_equal(sum(correlation_s_p_mat$p, na.rm = TRUE), 0.4969531, 
+    expect_equal(sum(correlation_s_p_mat$r), 4.479568, tolerance = 1e-06)
+    expect_equal(sum(correlation_s_p_mat$p, na.rm = TRUE), 19.09195, 
         tolerance = 1e-06)
     expect_equal(rownames(correlation_s_p_mat$r), 
         colnames(correlation_s_p_mat$r))
@@ -155,6 +175,7 @@ test_that("correlation", {
     expect_true(min(correlation_s_p_mat$r) >= -1.0000001)
     
     ## ggm
+    expect_equal(names(correlation_g_mat), c("r", "p"))
     expect_true(all(correlation_g_mat$r -
         GeneNet::ggm.estimate.pcor(t(mat_test[1:5, ]), 
             method = "static")[seq_len(dim(mat_test[1:5, ])[1]), 

@@ -1,5 +1,7 @@
 #' @name lasso
+#' 
 #' @aliases lasso
+#' 
 #' @title Create an adjacency matrix based on LASSO
 #'
 #' @description
@@ -146,7 +148,7 @@ randomForest <- function(x, ...) {
 #' Relatedness Network-adjusted scores of Mutual
 #' Information values.
 #'
-#' @param mi matrix, where columns and the rows are features
+#' @param mi matrix, where columns are samples and the rows are features
 #' (metabolites), cell entries are mutual information values between the
 #' features. As input, the mutual information (e.g. raw MI estimates or
 #' Jackknife bias corrected MI estimates) from the `cmi` function of the
@@ -207,7 +209,7 @@ clr <- function(mi) {
 #' `parmigene` package. The function `aracne` will return the weighted
 #' adjacency matrix of the inferred network after applying `aracne.a`.
 #'
-#' @param mi matrix, where columns and the rows are features
+#' @param mi matrix, where columns are the samples and the rows are features
 #' (metabolites), cell entries are mutual information values between the
 #' features. As input, the mutual information (e.g. raw MI estimates or
 #' Jackknife bias corrected MI estimates) from the `cmi` function of the
@@ -264,45 +266,43 @@ aracne <- function(mi, eps = 0.05) {
 #' @description
 #' `correlation` infers an adjacency matrix using
 #' correlation using the `corr.test` function (from the
-#' `psych` package), `pcor` (from `ppcor`) or
-#' `spcor` (from `ppcor`). `correlation` extracts the reported pair-wise
-#' correlation coefficients from the function `corAndPvalue`, `pcor` or `spcor`
-#' and will return
-#' the weighted adjacency matrix of the absolute correlation values.
+#' `psych` package) or partialCorrelation. `correlation` extracts the 
+#' reported pair-wise correlation coefficients from the function 
+#' `corr.test` and `partialCorrelation` and will return
+#' the weighted adjacency matrix of the correlation coefficients, together 
+#' with the associated p-values.
 #'
 #' @param
-#' x matrix, where columns are the samples and the rows are features
+#' x `matrix`, where columns are the samples and the rows are features
 #' (metabolites), cell entries are intensity values
 #'
 #' @param
-#' method `character`, either "pearson", "spearman", "pearson_partial",
-#' "spearman_partial", "pearson_semipartial" or "spearman_semipartial".
+#' method `character`, either "pearson", "spearman", "pearson_partial", or
+#' "spearman_partial".
 #' 
 #' @param 
 #' p.adjust `character`, method of p-value adjustment passed to `p.adjust`
+#' 
+#' @param
+#' ... additional arguments passed to `corr.test` or `partialCorrelation`
 #'
 #' @details
 #' If `"pearson"` or `"spearman"` is used as a `method`, the function
 #' `corr.test` from `psych` will be employed.
 #'
 #' If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
-#' function `pcor` from `spcor` will be employed.
-#'
-#' If `"pearson_semipartial"` or `"spearman_semipartial"` is used as a
-#' `method` the function `spcor` from `spcor` will be employed.
+#' function `partialCorrelation` will be employed.
 #'
 #' `method` will be passed to argument `method` in `corr.test`
-#' (in the case of `"pearson"` or `"spearman"`) or to `method` in `pcor`
-#' (`"pearson"` and `"spearman"` for `"pearson_partial"` and
-#' `"spearman_partial"`, respectively) or to `method` in `spcor`
-#' (`"pearson"` or `"spearman"` for `"pearson_semipartial"` and
-#' `"spearman_semipartial"`, respectively).
+#' (in the case of `"pearson"` or `"spearman"`) or to `method` in 
+#' `partialCorrelation` (`"pearson"` and `"spearman"` for `"pearson_partial"` 
+#' and `"spearman_partial"`, respectively).
 #'
 #' @return
 #' `list` containing two matrices, 
 #' the first matrix contains correlation coefficients and 
 #' the second matrix contains the corresponding p-values as obtained from the 
-#' correlation algorithms `corr.test`, `pcor` or `spcor` (depending on the 
+#' correlation algorithms `corr.test` or `partialCorrelation` (depending on the 
 #' chosen `method`) and optionally the adjusted p.values (argument
 #' `p.adjust`)
 #'
@@ -317,14 +317,14 @@ aracne <- function(mi, eps = 0.05) {
 #' @export
 #' 
 #' @importFrom psych corr.test
-#' @importFrom ppcor pcor spcor
 #' @importFrom stats p.adjust
 #' @importFrom GeneNet ggm.estimate.pcor n2kappa cor0.test
-correlation <- function(x, method = "pearson", p.adjust = "none") {
+correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
 
     ## for pearson/spearman correlation
     if (method %in% c("pearson", "spearman")) {
-        cor_mat <- psych::corr.test(x = t(x), method = method, adjust = "none")
+        cor_mat <- psych::corr.test(x = t(x), method = method, 
+            adjust = "none", ...)
         cor_mat$p <- matrix(
             stats::p.adjust(as.vector(cor_mat$p), method = p.adjust),
             ncol = ncol(cor_mat$p), nrow = nrow(cor_mat$p), byrow = TRUE)
@@ -344,36 +344,34 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
         colnames(cor_mat[[1]]) <- rownames(cor_mat[[1]]) <- rownames(x)
         colnames(cor_mat[[2]]) <- rownames(cor_mat[[2]]) <- rownames(x)
         
+        ## remove the rows that have NA values
         x_na <- na.omit(x)
         
         if (method %in% c("pearson_partial", "spearman_partial")) {
-        if (method == "pearson_partial") {
-            method <- "pearson"
-        } else {
-            method <- "spearman"
+            if (method == "pearson_partial") {
+                method <- "pearson"
+            } else {
+                method <- "spearman"
+            }
+            cor_mat_na <- partialCorrelation(x = t(x_na), method = method, ...)
+            cor_mat_na$p <- matrix(
+                stats::p.adjust(as.vector(cor_mat_na$p), method = p.adjust), 
+                ncol = ncol(cor_mat_na$p), nrow = nrow(cor_mat_na$p), 
+                byrow = TRUE)
         }
-        cor_mat_na <- ppcor::pcor(t(x_na), method = method)
-        cor_mat_na$p.value <- matrix(
-            stats::p.adjust(as.vector(cor_mat_na$p.value), method = p.adjust),
-            ncol = ncol(cor_mat_na$p.value), nrow = nrow(cor_mat_na$p.value), 
-            byrow = TRUE)
-        names(cor_mat_na)[names(cor_mat_na) == "estimate"] <- "r"
-        names(cor_mat_na)[names(cor_mat_na) == "p.value"] <- "p"
-        
-        }
-        
         
         ## for correlation based on graphical Gaussian models (ggm)
         if (method == "ggm") {
             
-            cor_mat_na <- GeneNet::ggm.estimate.pcor(t(x_na), method = "static")
+            cor_mat_na <- GeneNet::ggm.estimate.pcor(x = t(x_na), 
+                method = "static")
             cor_mat_na <- cor_mat_na[seq_len(nrow(x_na)), seq_len(nrow(x_na))] 
             
             # calculate p-values
-            
             # n2kappa converts sample size to the corresponding degree of freedom
             kappa <- GeneNet::n2kappa(n = length(x_na), p = nrow(x_na))
-            p <- GeneNet::cor0.test(r = cor_mat_na, kappa = kappa, method = "student")
+            p <- GeneNet::cor0.test(r = cor_mat_na, kappa = kappa, 
+                method = "student")
             cor_mat_na <- list("r" = cor_mat_na, "p" = p)
             
             cor_mat_na$p <- matrix(
@@ -393,6 +391,82 @@ correlation <- function(x, method = "pearson", p.adjust = "none") {
     }
 
     return(cor_mat)
+}
+
+#' @name partialCorrelation
+#'
+#' @aliases partialCorrelation
+#'
+#' @title Calculate the partial correlation and p-values
+#'
+#' @description
+#' `partialCorrelation` infers an adjacency matrix of partial correlation 
+#' values and associated p-values using using the `partial.r` function (from the
+#' `psych` package). `partialCorrelation` calculates the p-values from the 
+#' number of samples (`n`) and the number of controlling variables (`g`). 
+#' The function will return a list containing the 
+#' weighted adjacency matrix of the correlation values, together with the 
+#' associated p-values.
+#'
+#' @param
+#' x `matrix`, where columns are the features (metabolites) and the rows are 
+#' samples, cell entries are intensity values
+#'
+#' @param
+#' method `character`, either "pearson", "spearman"
+#' 
+#' @param 
+#' ... further arguments passed to `partial.r` from `psych`
+#' 
+#' @details
+#' The correlation coefficients $r_{ij|S}$ are obtained from `partial.r`
+#' (`psych` package).
+#' 
+#' The t-values are calculated via
+#' 
+#' \eqn{t_{ij|S} = r_{ij|S} \cdot \sqrt{\frac{n-2-g}{1-r_{ij|S}^2}}},
+#' where $n$ are the number of samples and $g$ the number of controlling
+#' variables (number of features - 2).
+#' 
+#' The p-values are calculated as follows
+#' \eqn{p_{ij|S} = 2 \cdot pt(-abs(t_{ij|S}), df = n - 2 - g)}
+#' 
+#' @return
+#' `list` containing two matrices, 
+#' the first matrix contains correlation coefficients and 
+#' the second matrix contains the corresponding p-values
+#'
+#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#'
+#' @examples
+#' data("x_test", package = "MetNet")
+#' x <- x_test[, 3:ncol(x_test)]
+#' x <- as.matrix(x)
+#' x <- t(x)
+#' partialCorrelation(x, use = "pairwise", method = "pearson")
+#'
+#' @export
+#' 
+#' @importFrom psych partial.r
+#' @importFrom stats pt
+partialCorrelation <- function(x, method = "pearson", ...) {
+    
+    ## calculate the partial correlation coefficients
+    r <- psych::partial.r(x, method = method, ...)
+    
+    ## obtain n, the sample size
+    n <- nrow(x)
+    
+    ## obtain g, the number of controlling variables
+    g <- ncol(x) - 2
+    
+    ## calculate the t-values and p-values
+    df <- n - 2 - g
+    t <- r * sqrt(df / (1 - r^2))
+    diag(t) <- 0
+    p <- 2 * stats::pt(-abs(t), df)
+    
+    return(list(r = r, p = p))
 }
 
 #' @name bayes
