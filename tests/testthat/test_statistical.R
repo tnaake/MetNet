@@ -2,12 +2,13 @@
 data("mat_test", package = "MetNet")
 
 ## START unit test lasso ##
-lasso_mat <- lasso(x = t(mat_test_z[, 1:5]), parallel = TRUE, PFER = 0.75, cutoff = 0.95)
+lasso_mat <- lasso(x = t(mat_test_z[, 1:5]), PFER = 0.75, cutoff = 0.95)
 
 test_that("lasso", {
-    expect_error(lasso(NULL, PFER = 0.75, cutoff = 0.95),
-        "must be coercible to non-negative integer")
-
+    suppressWarnings(
+        expect_error(lasso(NULL, PFER = 0.75, cutoff = 0.95),
+            "must be coercible to non-negative integer")    
+    )
     expect_error(lasso(mat_test), "Two of the three argumnets")
     expect_equal(rownames(lasso_mat), colnames(lasso_mat))
     expect_equal(rownames(lasso_mat), rownames(mat_test)[1:5])
@@ -140,7 +141,7 @@ test_that("correlation", {
     ## partial pearson
     expect_equal(names(correlation_p_p_mat), c("r", "p"))
     expect_true(all(correlation_p_p_mat$r -
-        ppcor::pcor(t(mat_test[1:5, ]), method = "pearson")$r == 0))
+        psych::partial.r(t(mat_test[1:5, ]), method = "pearson") == 0))
     expect_equal(sum(correlation_p_p_mat$r), 7.053181, tolerance = 1e-06)
     expect_equal(sum(correlation_p_p_mat$p), 12.44441, tolerance = 1e-06)
     expect_equal(rownames(correlation_p_p_mat$r), 
@@ -157,7 +158,7 @@ test_that("correlation", {
     ## partial spearman
     expect_equal(names(correlation_s_p_mat), c("r", "p"))
     suppressWarnings(expect_true(all(correlation_s_p_mat$r - 
-        ppcor::pcor(t(mat_test[1:5, ]), method = "spearman")$r == 0)))
+        psych::partial.r(t(mat_test[1:5, ]), method = "spearman") == 0)))
     expect_equal(sum(correlation_s_p_mat$r), 4.479568, tolerance = 1e-06)
     expect_equal(sum(correlation_s_p_mat$p, na.rm = TRUE), 19.09195, 
         tolerance = 1e-06)
@@ -241,7 +242,7 @@ test_that("statistical", {
     expect_error(statistical(mat_test, model = "foo"),
         "'model' not implemented in statistical")
     expect_error(statistical(mat_test, model = c("lasso")),
-        "Two of the three argumnets")
+       "Two of the three arguments ")
 
     ## take a high tolerance value for randomForest and bayes
     ## since these models are probabilistic

@@ -29,7 +29,7 @@ struct_adj_neg_dir <- structural(mat_test, transformation = transformations_neg,
 
 ## statistical calculation
 stat_adj <- statistical(mat_test[, -1],
-    model = c("clr", "aracne", "pearson", "spearman", "bayes"))
+    model = c("clr", "aracne", "pearson", "spearman"))
 stat_adj_thr <- threshold(stat_adj, type = "top2", args = list(n = 10))
 
 ## combine
@@ -74,7 +74,7 @@ test_that("mz_summary", {
     expect_equal(summary_cons_adj$group,
         c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
     expect_equal(summary_cons_adj$formula, c("C3H2O3", "C6H10O5"))
-    expect_equal(summary_cons_adj$count, c(4,4))
+    expect_equal(summary_cons_adj$count, c(2,3))
     expect_true(is.data.frame(summary_cons_adj))
     expect_error(mz_summary(struct_adj, var = "foo"), "assay 'foo' not in 'am'")
     expect_error(mz_summary(struct_adj, var = NULL), 

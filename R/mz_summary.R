@@ -58,7 +58,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr `%>%`
 #' @importFrom stats na.omit
 #' @importFrom rlang .data
 mz_summary <- function(am, var = c("group", "formula"), filter = 0){
@@ -105,9 +104,9 @@ mz_summary <- function(am, var = c("group", "formula"), filter = 0){
             stop("assay 'binary' does not contain any mass differences")
         am_df <- am_df[am_df$binary == 1, ]
     }
-    df <- am_df %>%
-        dplyr::group_by_at(var) %>% 
-        dplyr::count(name = "count") %>%
+    df <- am_df |>
+        dplyr::group_by_at(var) |>
+        dplyr::count(name = "count") |>
         as.data.frame()
     
     ## apply some filtering, only return those transformations that pass filter

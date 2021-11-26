@@ -4,6 +4,8 @@ Changes in version 1.11.6 (2021-11-24)
 + add (optional) calculation of ranked absolute coefficients in 
   threshold for the top1, top2, and mean types to take into account
   negative coefficients (e.g. from pearson or spearman correlation)
++ remove ppcor package and use psych::partial.r for partial correlation,
+  calculate the t-values/p-values based on the partial correlation coefficients
 
 Changes in version 1.11.5 (2021-10-12)
 + add assays in structural based on columns in transformations that are 
