@@ -3,7 +3,7 @@ title: "MetNet: Inferring metabolic networks from untargeted high-resolution mas
 author: 
  - name: Thomas Naake
    mail: thomasnaake@googlemail.com
-   affiliation: Max Planck Institute of Molecular Plant Physiology, 14476 Potsdam-Golm, Germany
+   affiliation: European Molecular Biology Laboratory (EMBL), 69117 Heidelberg, Germany
 package: MetNet
 abstract: >
     A major bottleneck of mass spectrometry-based metabolomic analysis is 
