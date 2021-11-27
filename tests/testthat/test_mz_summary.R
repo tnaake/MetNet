@@ -36,7 +36,6 @@ stat_adj_thr <- threshold(stat_adj, type = "top2", args = list(n = 10))
 cons_adj <- combine(struct_adj, stat_adj_thr)
 
 ## START unit test mz_summary##
-
 summary_struct_adj <- mz_summary(struct_adj, var = c("group", "formula"))
 summary_struct_adj_neg_dir <- mz_summary(struct_adj_neg_dir,
     var = c("group", "formula"))
@@ -74,7 +73,7 @@ test_that("mz_summary", {
     expect_equal(summary_cons_adj$group,
         c("Malonyl group (-H2O)", "Monosaccharide (-H2O)"))
     expect_equal(summary_cons_adj$formula, c("C3H2O3", "C6H10O5"))
-    expect_equal(summary_cons_adj$count, c(2,3))
+    expect_equal(summary_cons_adj$count, c(3,3))
     expect_true(is.data.frame(summary_cons_adj))
     expect_error(mz_summary(struct_adj, var = "foo"), "assay 'foo' not in 'am'")
     expect_error(mz_summary(struct_adj, var = NULL), 

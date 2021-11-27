@@ -39,20 +39,19 @@ test_that("randomForest", {
 ## END unit test randomForest ##
 
 ## START unit test clr ##
-mi_mat_test_z <- mpmi::cmi(mat_test_z[, 1:5])$bcmi
-rownames(mi_mat_test_z) <- colnames(mi_mat_test_z) <- colnames(mat_test_z)[1:5]
+mi_mat_test_z <- parmigene::knnmi.all(t(mat_test_z[, 1:5]))
 clr_mat <- clr(mi_mat_test_z)
 
 test_that("clr", {
     expect_error(clr(NULL), msg = "mi must be a matrix")
-    expect_equal(sum(clr_mat), 3.586808, tolerance = 1e-03)
+    expect_equal(sum(clr_mat), 14.46705, tolerance = 1e-03)
     expect_equal(rownames(clr_mat), colnames(clr_mat))
     expect_equal(rownames(clr_mat), rownames(mat_test)[1:5])
     expect_equal(ncol(clr_mat), nrow(clr_mat))
     expect_equal(nrow(clr_mat), nrow(mat_test[1:5, ]))
     expect_true(is.numeric(clr_mat))
     expect_true(is.matrix(clr_mat))
-    expect_true(max(clr_mat) <= 1)
+    expect_true(max(clr_mat) <= 1.35)
     expect_true(min(clr_mat) >= 0)
 })
 ## END unit test clr ##
@@ -65,14 +64,14 @@ test_that("aracne", {
     suppressWarnings(
         expect_error(aracne(mi_mat_test_z, eps = "a"), 
             "in foreign function call"))
-    expect_equal(sum(aracne_mat), 12.69407, tolerance = 1e-02)
+    expect_equal(sum(aracne_mat), 14.28923, tolerance = 1e-02)
     expect_equal(rownames(aracne_mat), colnames(aracne_mat))
     expect_equal(rownames(aracne_mat), rownames(mat_test)[1:5])
     expect_equal(ncol(aracne_mat), nrow(aracne_mat))
     expect_equal(nrow(aracne_mat), nrow(mat_test[1:5, ]))
     expect_true(is.numeric(aracne_mat))
     expect_true(is.matrix(aracne_mat))
-    expect_true(max(aracne_mat) <= 1.3)
+    expect_true(max(aracne_mat) <= 1.42)
     expect_true(min(aracne_mat) >= 0)
 })
 ## END unit test aracne ##
@@ -242,7 +241,7 @@ test_that("statistical", {
     expect_error(statistical(mat_test, model = "foo"),
         "'model' not implemented in statistical")
     expect_error(statistical(mat_test, model = c("lasso")),
-       "Two of the three arguments ")
+       "Two of the three argum")
 
     ## take a high tolerance value for randomForest and bayes
     ## since these models are probabilistic
@@ -308,27 +307,38 @@ test_that("statistical", {
 
 ## START unit test getLinks ##
 mat <- matrix(0:8, ncol = 3, nrow = 3)
-getLinks_df <- MetNet:::getLinks(mat, exclude = "== 0")
+getLinks_df_T <- getLinks(mat, exclude = "== 0", decreasing = TRUE)
+getLinks_df_F <- getLinks(mat, exclude = "== 0", decreasing = FALSE)
 
 test_that("getLinks", {
-    expect_error(MetNet:::getLinks(NULL), "argument is of length zero")
-    expect_error(MetNet:::getLinks(mat[, 1:2]), "not a square matrix")
-    expect_error(MetNet:::getLinks(mat, exclude = "foo"),
+    expect_error(getLinks(NULL), "argument is of length zero")
+    expect_error(getLinks(mat[, 1:2]), "not a square matrix")
+    expect_error(getLinks(mat, exclude = "foo"),
         "object 'matfoo' not found")
 
     ## checks for exclude = "== 0"
-    expect_true(is.data.frame(getLinks_df))
-    expect_equal(getLinks_df$row, rep(c(1, 2, 3), 3))
-    expect_equal(getLinks_df$col, rep(c(1, 2, 3), each = 3))
-    expect_equal(getLinks_df$confidence, c(NaN, 1:8))
-    expect_equal(getLinks_df$rank, c(NaN, 8:1))
+    expect_true(is.data.frame(getLinks_df_T))
+    expect_true(is.data.frame(getLinks_df_F))
+    expect_equal(getLinks_df_T$row, rep(c(1, 2, 3), 3))
+    expect_equal(getLinks_df_F$row, rep(c(1, 2, 3), 3))
+    expect_equal(getLinks_df_T$col, rep(c(1, 2, 3), each = 3))
+    expect_equal(getLinks_df_F$col, rep(c(1, 2, 3), each = 3))
+    expect_equal(getLinks_df_T$confidence, c(NaN, 1:8))
+    expect_equal(getLinks_df_F$confidence, c(NaN, 1:8))
+    expect_equal(getLinks_df_T$rank, c(NaN, 8:1))
+    expect_equal(getLinks_df_F$rank, c(NaN, 1:8))
 
     ## checks for exclude = NULL
-    getLinks_df <- MetNet:::getLinks(mat, exclude = NULL)
-    expect_equal(getLinks_df$row, rep(c(1, 2, 3), 3))
-    expect_equal(getLinks_df$col, rep(c(1, 2, 3), each = 3))
-    expect_equal(getLinks_df$confidence, 0:8)
-    expect_equal(getLinks_df$rank, 9:1)
+    getLinks_df_T <- getLinks(mat, exclude = NULL, decreasing = TRUE)
+    getLinks_df_F <- getLinks(mat, exclude = NULL, decreasing = FALSE)
+    expect_equal(getLinks_df_T$row, rep(c(1, 2, 3), 3))
+    expect_equal(getLinks_df_F$row, rep(c(1, 2, 3), 3))
+    expect_equal(getLinks_df_T$col, rep(c(1, 2, 3), each = 3))
+    expect_equal(getLinks_df_F$col, rep(c(1, 2, 3), each = 3))
+    expect_equal(getLinks_df_T$confidence, 0:8)
+    expect_equal(getLinks_df_F$confidence, 0:8)
+    expect_equal(getLinks_df_T$rank, 9:1)
+    expect_equal(getLinks_df_F$rank, 1:9)
 
 })
 ## END unit test getLinks ##
@@ -339,7 +349,7 @@ test_that("getLinks", {
 stat_adj_cut <- statistical(mat_test[1:5, ], 
     model = c("clr", "aracne", "pearson", "spearman", "ggm"))
 
-args_thr <- list(filter = "clr_coef > 0.5 & aracne_coef > 0.8 & abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95 & abs(ggm_coef) > 0.2")
+args_thr <- list(filter = "clr_coef > 0.3 & aracne_coef > 0.8 & abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95 & abs(ggm_coef) > 0.2")
 thr_thr <- threshold(stat_adj_cut, type = "threshold", args = args_thr)
 
 args_top <- list(n = 2)
@@ -416,9 +426,9 @@ test_that("threshold", {
         c("x1", "x2", "x3", "x4", "x5"))
     expect_equal(colnames(assay(thr_mean, "consensus")), 
         c("x1", "x2", "x3", "x4", "x5"))
-    expect_equal(sum(assay(thr_thr, "consensus"), na.rm = TRUE), 1)
-    expect_equal(sum(assay(thr_top1, "consensus"), na.rm = TRUE), 4)
-    expect_equal(sum(assay(thr_top2, "consensus"), na.rm = TRUE), 4)
+    expect_equal(sum(assay(thr_thr, "consensus"), na.rm = TRUE), 10)
+    expect_equal(sum(assay(thr_top1, "consensus"), na.rm = TRUE), 6)
+    expect_equal(sum(assay(thr_top2, "consensus"), na.rm = TRUE), 2)
     expect_equal(sum(assay(thr_mean, "consensus"), na.rm = TRUE), 2)
     expect_true(all(assay(thr_thr, "consensus") %in% c(0, 1, NaN)))
     expect_true(all(assay(thr_top1, "consensus") %in% c(0, 1, NaN)))

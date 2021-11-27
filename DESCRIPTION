@@ -20,7 +20,6 @@ Imports:
 	GeneNet (>= 1.2.15),
     GENIE3 (>= 1.7.0),
     methods (>= 3.5),
-    mpmi (>= 0.42), 
     parmigene (>= 1.0.2),
 	psych (>= 2.1.6),
     rlang (>= 0.4.10),

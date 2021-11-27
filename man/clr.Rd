@@ -10,9 +10,8 @@ clr(mi)
 \arguments{
 \item{mi}{matrix, where columns are samples and the rows are features
 (metabolites), cell entries are mutual information values between the
-features. As input, the mutual information (e.g. raw MI estimates or
-Jackknife bias corrected MI estimates) from the `cmi` function of the
-`mpmi` package can be used.}
+features. As input, the mutual information (e.g. raw MI estimates) from the 
+`knnmi.all` function of the `parmigene` package can be used.}
 }
 \value{
 matrix, matrix with edges inferred from Context Likelihood of
@@ -40,8 +39,8 @@ see Faith et al. (2007).
 data("x_test", package = "MetNet")
 x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
-x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-mi_x_z <- mpmi::cmi(x_z)$bcmi
+x_z <- apply(x, 1, function(y) (y - mean(y)) / sd(y))
+mi_x_z <- parmigene::knnmi.all(x_z)
 clr(mi_x_z)
 
 }

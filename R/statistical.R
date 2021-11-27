@@ -150,9 +150,8 @@ randomForest <- function(x, ...) {
 #'
 #' @param mi matrix, where columns are samples and the rows are features
 #' (metabolites), cell entries are mutual information values between the
-#' features. As input, the mutual information (e.g. raw MI estimates or
-#' Jackknife bias corrected MI estimates) from the `cmi` function of the
-#' `mpmi` package can be used.
+#' features. As input, the mutual information (e.g. raw MI estimates) from the 
+#' `knnmi.all` function of the `parmigene` package can be used.
 #'
 #' @details For more details on the `clr` function,
 #' refer to `?parmigene::clr`. CLR computes the score
@@ -178,8 +177,8 @@ randomForest <- function(x, ...) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
-#' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-#' mi_x_z <- mpmi::cmi(x_z)$bcmi
+#' x_z <- apply(x, 1, function(y) (y - mean(y)) / sd(y))
+#' mi_x_z <- parmigene::knnmi.all(x_z)
 #' clr(mi_x_z)
 #'
 #' @importFrom parmigene clr
@@ -211,9 +210,8 @@ clr <- function(mi) {
 #'
 #' @param mi matrix, where columns are the samples and the rows are features
 #' (metabolites), cell entries are mutual information values between the
-#' features. As input, the mutual information (e.g. raw MI estimates or
-#' Jackknife bias corrected MI estimates) from the `cmi` function of the
-#' `mpmi` package can be used.
+#' features. As input, the mutual information (e.g. raw MI estimates) from the 
+#' `knnmi.all` function of the `parmigene` package can be used.
 #'
 #' @param eps numeric, used to remove the weakest edge of each triple of nodes
 #'
@@ -239,8 +237,8 @@ clr <- function(mi) {
 #' data("x_test", package = "MetNet")
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
-#' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-#' mi_x_z <- mpmi::cmi(x_z)$bcmi
+#' x_z <- apply(x, 1, function(y) (y - mean(y)) / sd(y))
+#' mi_x_z <- parmigene::knnmi.all(x_z)
 #' aracne(mi_x_z, eps = 0.05)
 #'
 #' @importFrom parmigene aracne.a
@@ -687,8 +685,8 @@ addToList <- function(l, name, object) {
 #' @export
 #' 
 #' @importFrom S4Vectors DataFrame
-#' @importFrom mpmi cmi
 #' @importFrom stats sd
+#' @importFrom parmigene knnmi.all
 statistical <- function(x, model, ...) {
 
     ## check if model complies with the implemented model and return error
@@ -728,8 +726,7 @@ statistical <- function(x, model, ...) {
 
     ## calculate mutual information if "clr" or "aracne" is in model
     if (any(c("clr", "aracne") %in% model)) {
-        mi_x_z <- mpmi::cmi(t(x_z))$bcmi
-        rownames(mi_x_z) <- colnames(mi_x_z) <- rownames(x)
+        mi_x_z <- parmigene::knnmi.all(x_z)
     }
 
     ## add entry for clr if "clr" is in model
@@ -851,6 +848,10 @@ statistical <- function(x, model, ...) {
 #' exclude `character`, logical statement as `character` to set `TRUE`
 #' values to NaN in `mat`, will be omitted if `exclude = NULL`
 #'
+#' @param decreasing `logical`, if `TRUE`, the highest confidence value will 
+#' get the first rank, if `FALSE`, the lowest confidence value will get the 
+#' first rank
+#'
 #' @details
 #' `getLinks` is a helper function used in the function `threshold`.
 #'
@@ -860,10 +861,10 @@ statistical <- function(x, model, ...) {
 #'
 #' @examples
 #' mat <- matrix(0:8, ncol = 3, nrow = 3)
-#' MetNet:::getLinks(mat, exclude = "== 0")
+#' MetNet:::getLinks(mat, exclude = "== 0", decreasing = TRUE)
 #'
 #' @export
-getLinks <- function(mat, exclude = "== 1") {
+getLinks <- function(mat, exclude = "== 1", decreasing = TRUE) {
 
     if (ncol(mat) != nrow(mat)) {
         stop("`mat` is not a square matrix")
@@ -879,10 +880,15 @@ getLinks <- function(mat, exclude = "== 1") {
     ## vectorize mat and write values of mat to confidence
     df <- data.frame(row = c(row(mat)), col = c(col(mat)), confidence = c(mat))
 
-    ## the highest confidence value should get the first rank
-    ## recalculate the confidence values that the values with highest
+    ## if decreasing = TRUE, the highest confidence value will get the first 
+    ## rank, recalculate the confidence values that the values with highest
     ## support have low values
-    conf <- max(df$confidence, na.rm = TRUE) - df$confidence
+    ## if decreasing = FALSE, the lowest confidence value will get the first 
+    ## rank
+    if (decreasing)
+        conf <- max(df$confidence, na.rm = TRUE) - df$confidence
+    else
+        conf <- df$confidence
 
     ## calculate rank and add to data.frame
     df <- data.frame(df, rank = NaN)
@@ -1093,6 +1099,8 @@ threshold <- function(am,
         
         ## write the remaining elements to the consensus matrix
         cons[cbind(inds_row, inds_col)] <- 1
+        if (!am@directed) 
+            cons[cbind(inds_col, inds_row)] <- 1
 
     } else { ## if type is in "top1", "top2" or "mean"
         
@@ -1132,26 +1140,25 @@ threshold <- function(am,
             }
 
             ## for pearson/spearman correlation (incl. partial and
-            ## semi-partial), lasso, randomForest, clr, aracne and bayes
-            ## higher values corresond to higher confidence
+            ## semi-partial), lasso, randomForest, ggm, clr, aracne and bayes
+            ## higher values correspond to higher confidence
             if (grepl(name_x, 
                 pattern = "lasso_coef|randomForest_coef|bayes_coef")) {
                 
                 ## set values that are equal to 0 to NaN (values that are 0)
                 ## do not explain the variability
-                res <- getLinks(l_x, exclude = "== 0")
+                res <- getLinks(l_x, exclude = "== 0", decreasing = TRUE)
             }
             if (grepl(name_x, 
-                pattern = "pearson_coef|pearson_partial_coef|spearman_coef|spearman_partial_coef|clr_coef|ggm_coef|aracne_coef")) {
+                pattern = "pearson_coef|pearson_partial_coef|spearman_coef|spearman_partial_coef|ggm_coef|clr_coef|aracne_coef")) {
                 
-                res <- getLinks(l_x, exclude = NULL)
+                res <- getLinks(l_x, exclude = NULL, decreasing = TRUE)
             }
-            
             res
         })
 
         ## bind together the ranks of the models, stored in l_df
-        ranks <- lapply(l_df, function(x) x$rank)
+        ranks <- lapply(l_df, function(l_i) l_i$rank)
         ranks <- do.call("cbind", ranks)
         colnames(ranks) <- names(l)
 
