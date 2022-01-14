@@ -13,12 +13,13 @@ will add the slots `type`, `directed`, and `thresholded`.
 }
 \details{
 The slot `type` is of type `"character"`, storing the type of the 
-`"AdjacencyMatrix"`, i.e. `"structural"`, `"statistical"`, or `"combined"`.
+`"AdjacencyMatrix"`, i.e. `"structural"`, `"statistical"`,`"spectral"` , or 
+`"combined"`.
 The slot `directed` is of type `"logical"`, storing if the adjacency matrix
 is directed or not.
 The slot `thresholded` is of type `"logical"`, storing if the adjacency 
 matrix was thresholded, e.g. if the functions `rtCorrection` or `threshold`
-were applied on the `structural` or `statistical` `AdjacencyMatrix` objects.
+were applied on the `structural`,`"spectral"` or `statistical` `AdjacencyMatrix` objects.
 
 If any of the `AdjacencyMatrix` objects passed to the `combine` function
 was `directed = TRUE` or `thresholded = TRUEs` the `combine` 
