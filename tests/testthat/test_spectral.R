@@ -1,8 +1,6 @@
 ## create toy example data set
-data("mat_test", package = "MetNet")
-colnames(mat_test) <- paste0("intensity_", 1:20)
-mz <- c(100, 150, 200, 200, 262.0528, 348.0532, 448.0532)
-mat_test <- cbind(mz = mz, mat_test)
+data("x_test", package = "MetNet")
+x_test <- as.matrix(x_test)
 
 ## transformations object for structural calculation
 transformations <- rbind(
@@ -13,7 +11,7 @@ transformations <- data.frame(group = as.character(transformations[, 1]),
                               mass = as.numeric(transformations[, 3]))
 
 ## create structural network
-struct_adj <- structural(mat_test, transformation = transformations, 
+struct_adj <- structural(x_test, transformation = transformations, 
                          var = c("group", "formula", "mass"), ppm = 5)
 
 ## load MS2 

@@ -107,7 +107,7 @@ spectral <- function(x, am_structural, methods = c("ndotproduct"), ...) {
     colnames(adj_spec) <- x$id
     rownames(adj_spec) <- x$id
     
-    simil[rownames(spN), colnames(spN)] <- adj_spec
+    simil[rownames(adj_spec), colnames(adj_spec)] <- adj_spec
     
     ## add object to l
     new_index <- length(l) + 1
