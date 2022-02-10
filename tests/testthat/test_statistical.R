@@ -196,7 +196,7 @@ test_that("correlation", {
 ## END unit test correlation ##
 
 ## START unit test bayes ##
-bayes_mat <- bayes(mat_test[1:5, ])
+bayes_mat <- bayes(mat_test[1:5, ], R = 1000)
 
 test_that("bayes", {
     expect_true(sum(bayes_mat) > 9 & sum(bayes_mat) < 13)
