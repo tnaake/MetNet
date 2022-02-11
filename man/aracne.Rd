@@ -5,7 +5,7 @@
 \title{Create an adjacency matrix based on algorithm for the reconstruction
 of accurate cellular networks}
 \usage{
-aracne(mi, eps = 0.05)
+aracne(mi, eps = 0.05, ...)
 }
 \arguments{
 \item{mi}{matrix, where columns are the samples and the rows are features
@@ -14,6 +14,8 @@ features. As input, the mutual information (e.g. raw MI estimates) from the
 `knnmi.all` function of the `parmigene` package can be used.}
 
 \item{eps}{numeric, used to remove the weakest edge of each triple of nodes}
+
+\item{...}{not used here}
 }
 \value{
 matrix, matrix with edges inferred from Reconstruction of accurate
