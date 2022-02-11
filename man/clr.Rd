@@ -5,13 +5,15 @@
 \title{Create an adjacency matrix based on context likelihood or
 relatedness network}
 \usage{
-clr(mi)
+clr(mi, ...)
 }
 \arguments{
 \item{mi}{matrix, where columns are samples and the rows are features
 (metabolites), cell entries are mutual information values between the
 features. As input, the mutual information (e.g. raw MI estimates) from the 
 `knnmi.all` function of the `parmigene` package can be used.}
+
+\item{...}{not used here}
 }
 \value{
 matrix, matrix with edges inferred from Context Likelihood of
