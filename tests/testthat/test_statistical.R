@@ -347,7 +347,7 @@ test_that("getLinks", {
 stat_adj_cut <- statistical(mat_test[1:5, ], 
     model = c("clr", "aracne", "pearson", "spearman", "ggm"))
 
-args_thr <- list(filter = "clr_coef > 0.3 & aracne_coef > 0.8 & abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95 & abs(ggm_coef) > 0.2")
+args_thr <- list(filter = "clr_coef > 0.3 & aracne_coef > 0.8 & abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95")
 thr_thr <- threshold(stat_adj_cut, type = "threshold", args = args_thr)
 
 args_top <- list(n = 2)
