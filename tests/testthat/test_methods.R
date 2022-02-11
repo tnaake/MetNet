@@ -151,7 +151,7 @@ test_that("as.data.frame", {
     expect_equal(sum(df$spearman_coef), 25.74616, tolerance = 1e-06)
     expect_equal(sum(df$spearman_pvalue), 1.361522, tolerance = 1e-06)
     expect_equal(sum(df$consensus, na.rm = TRUE), 18)
-    
+
     ## combine
     df <- as.data.frame(cons_adj)
     expect_equal(dim(df), c(55, 17))

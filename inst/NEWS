@@ -1,3 +1,6 @@
+Changes in version 1.13.1 (2022-02-11)
++ update unit tests, e.g. remove ggm for as.data.frame, set R=1000 for bayes
+
 Changes in version 1.11.6 (2021-11-24)
 + add ggm method in statistical and implement dealing with NA
   values for partial correlation and ggm

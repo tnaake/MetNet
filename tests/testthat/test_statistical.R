@@ -455,7 +455,7 @@ test_that("threshold", {
     expect_equal(type(am_all), "statistical")
     expect_equal(type(am_min), "statistical")
     expect_equal(type(am_max), "statistical")
-    
+
     ## test NA values
     mat_test_NA <- mat_test[1:5, ]
     mat_test_NA[1, 5] <- NA
