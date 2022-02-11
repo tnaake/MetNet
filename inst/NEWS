@@ -1,3 +1,4 @@
+
 Changes in version 1.11.5 (2021-10-12)
 + add assays in structural based on columns in transformations that are 
   defined by the var argument in structural, adjacency matrices of type 

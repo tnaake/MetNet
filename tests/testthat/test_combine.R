@@ -72,7 +72,7 @@ test_that("combine", {
     ## check rownames/colnames
     struct_adj_rev <- structural(mat_test[7:1, ],
         transformation = transformations, ppm = 5)
-    
+
     expect_error(combine(struct_adj_rev, stat_adj_thr),
         "names of 'am_structural' do not match names of 'am_statistical'")
 })

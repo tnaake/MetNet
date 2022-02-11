@@ -142,14 +142,7 @@ test_that("as.data.frame", {
             "pearson_pvalue", "spearman_coef", "spearman_pvalue", "consensus"))
     expect_equal(df$Row[1:5], c("x7449", "x11179", "x11179", "x11374", "x11374"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
-    expect_equal(sum(df$clr_coef), 276.4948, tolerance = 1e-06)
-    expect_equal(sum(df$aracne_coef), 57.64072, tolerance = 1e-06)
-    expect_equal(sum(df$pearson_coef), 213.6638, tolerance = 1e-06)
-    expect_equal(sum(df$pearson_pvalue), 51.07814, tolerance = 1e-06)
-    expect_equal(sum(df$spearman_coef), 203.2846, tolerance = 1e-06)
-    expect_equal(sum(df$spearman_pvalue), 58.33817, tolerance = 1e-06)
-    expect_equal(sum(df$consensus), 14)
-    
+
     ## combine
     df <- as.data.frame(cons_adj)
     expect_equal(dim(df), c(666, 17))
