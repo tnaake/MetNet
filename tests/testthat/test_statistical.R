@@ -345,7 +345,7 @@ test_that("getLinks", {
 ## START unit test threshold  ##
 ## remove partial/semipartial correlation from stat_adj_l
 stat_adj_cut <- statistical(mat_test[1:5, ], 
-    model = c("clr", "aracne", "pearson", "spearman", "ggm"))
+    model = c("clr", "aracne", "pearson", "spearman"))
 
 args_thr <- list(filter = "clr_coef > 0.3 & aracne_coef > 0.8 & abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95")
 thr_thr <- threshold(stat_adj_cut, type = "threshold", args = args_thr)
@@ -401,7 +401,7 @@ test_that("threshold", {
     expect_true(is(thr_thr, "AdjacencyMatrix"))
     assay_names <- c("clr_coef", "aracne_coef", "pearson_coef",
         "pearson_pvalue", "spearman_coef", "spearman_pvalue",
-        "ggm_coef", "ggm_pvalue", "consensus")
+        "consensus")
     expect_equal(assayNames(thr_top1), assay_names)
     expect_equal(assayNames(thr_top2), assay_names)
     expect_equal(assayNames(thr_mean), assay_names)
@@ -425,9 +425,9 @@ test_that("threshold", {
     expect_equal(colnames(assay(thr_mean, "consensus")), 
         c("x1", "x2", "x3", "x4", "x5"))
     expect_equal(sum(assay(thr_thr, "consensus"), na.rm = TRUE), 10)
-    expect_equal(sum(assay(thr_top1, "consensus"), na.rm = TRUE), 6)
-    expect_equal(sum(assay(thr_top2, "consensus"), na.rm = TRUE), 2)
-    expect_equal(sum(assay(thr_mean, "consensus"), na.rm = TRUE), 2)
+    expect_equal(sum(assay(thr_top1, "consensus"), na.rm = TRUE), 10)
+    expect_equal(sum(assay(thr_top2, "consensus"), na.rm = TRUE), 8)
+    expect_equal(sum(assay(thr_mean, "consensus"), na.rm = TRUE), 4)
     expect_true(all(assay(thr_thr, "consensus") %in% c(0, 1, NaN)))
     expect_true(all(assay(thr_top1, "consensus") %in% c(0, 1, NaN)))
     expect_true(all(assay(thr_top2, "consensus") %in% c(0, 1, NaN)))
