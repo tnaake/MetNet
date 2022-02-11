@@ -144,8 +144,8 @@ test_that("as.data.frame", {
             "pearson_pvalue", "spearman_coef", "spearman_pvalue", "consensus"))
     expect_equal(df$Row[1:5], c("x7449", "x11179", "x11179", "x11374", "x11374"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
-    expect_equal(sum(df$clr_coef), 44.41226, tolerance = 1e-06)
-    expect_equal(sum(df$aracne_coef), 11.66527, tolerance = 1e-06)
+    expect_equal(sum(df$clr_coef), 44.41226, tolerance = 5e-02)
+    expect_equal(sum(df$aracne_coef), 11.66527, tolerance = 1e-02)
     expect_equal(sum(df$pearson_coef), 24.57051, tolerance = 1e-06)
     expect_equal(sum(df$pearson_pvalue), 2.197239, tolerance = 1e-06)
     expect_equal(sum(df$spearman_coef), 25.74616, tolerance = 1e-06)
@@ -164,9 +164,9 @@ test_that("as.data.frame", {
     expect_equal(df$Row[1:5], c("x9485", "x7449", "x7449", "x11179", "x11179"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
     expect_equal(sum(df$clr_coef, na.rm = TRUE), 44.41226,
-        tolerance = 1e-06)
+        tolerance = 5e-02)
     expect_equal(sum(df$aracne_coef, na.rm = TRUE), 11.66527,
-        tolerance = 1e-06)
+        tolerance = 1e-02)
     expect_equal(sum(df$pearson_coef, na.rm = TRUE), 24.57051,
         tolerance = 1e-06)
     expect_equal(sum(df$pearson_pvalue, na.rm = TRUE), 2.197239,
