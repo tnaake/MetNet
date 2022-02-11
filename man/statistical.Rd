@@ -13,8 +13,7 @@ features/metabolites (rows) per sample (columns).}
 
 \item{model}{`character` vector containing the methods that will be used
 (`"lasso"`, `"randomForest"`, `"clr"`, `"aracne"`, `"pearson"`,
-`"pearson_partial"`, `"pearson_semipartial"`, `"spearman"`,
-`"spearman_partial"`, `"spearman_semipartial"`, `"bayes"`)}
+`"pearson_partial"`, `"spearman"`, `"spearman_partial"`, `"bayes"`)}
 
 \item{...}{parameters passed to the functions  `lasso`, `randomForest`,
 `clr`, `aracne`, `correlation` and/or `bayes`}
@@ -30,8 +29,8 @@ statistical methods and returns matrices of these networks in an
 function includes functionality to calculate adjacency matrices based on
 LASSO (L1 norm)-regression, random forests, context likelihood of
 relatedness (CLR), the algorithm for the reconstruction of accurate
-cellular networks (ARACNE), Pearson correlation (also partial and
-semipartial), Spearman correlation (also partial and semipartial)
+cellular networks (ARACNE), Pearson correlation (also partial), 
+Spearman correlation (also partial)
 and score-based structure learning (Bayes). The function returns an
 `AdjacencyMatrix` object of adjacency matrices that are defined by `model`.
 }
@@ -40,14 +39,14 @@ The function `statistical` includes functionality to calculate adjacency
 matrices based on
 LASSO (L1 norm)-regression, random forests, context likelihood of
 relatedness (CLR), the algorithm for the reconstruction of accurate
-cellular networks (ARACNE), Pearson correlation (also partial and
-semipartial), Spearman correlation (also partial and semipartial)
-and Constraint-based structure learning (Bayes).
+cellular networks (ARACNE), Pearson correlation (also partial), 
+Spearman correlation (also partial) and Constraint-based structure learning 
+(Bayes).
 
 `statistical` calls the function
 `lasso`, `randomForest`, `clr`, `aracne`,
-`correlation` (for `"pearson"`, `"pearson_partial"`, `"pearson_semipartial"`,
-`"spearman"`, `"spearman_partial"`, `"spearman_semipartial"`) and/or `bayes`
+`correlation` (for `"pearson"`, `"pearson_partial"`, `"spearman"`, 
+`"spearman_partial"`) and/or `bayes`
 as specified by `model`. It will create adjacency matrices using the
 specified methods and will return an `AdjacencyMatrix` containing the weighted
 adjacency matrices in the `assays` slot.
