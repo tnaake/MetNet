@@ -65,7 +65,7 @@ am_struct <- structural(x_test, transformation, var = c("group", "mass"),
 ## create AdjacencyMatrix object of type statistical
 x_test_cut <- as.matrix(x_test[, -c(1:2)])
 am_stat <- statistical(x_test_cut, model = c("pearson", "spearman"),
-    correlation_adjust = "bonferroni")
+    adjust = "bonferroni")
 am_stat <- threshold(am_stat, type = "top2", args = list(n = 10))
 
 ## combine
