@@ -36,7 +36,7 @@ data("x_test", package = "MetNet")
 x <- x_test[1:10, 3:ncol(x_test)]
 x <- as.matrix(x)
 x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-\dontrun{lasso(x_z, PFER = 0.95, cutoff = 0.95)}
+\dontrun{lasso(x = x_z, PFER = 0.95, cutoff = 0.95)}
 
 }
 \author{
