@@ -92,7 +92,7 @@ gives the number of top ranks included in the returned adjacency matrix.
 In this case
 values that are 0 for the models `lasso`, `randomForest` and `bayes` are
 set to `NaN`; values from correlation (Pearson and Spearman, including
-for partial and semipartial correlation) and `clr` and `aracne` are
+for partial correlation) and `clr` and `aracne` are
 taken as they are.
 
 For `type = "top1"`, the best (i.e. lowest) rank in `am` is taken.
