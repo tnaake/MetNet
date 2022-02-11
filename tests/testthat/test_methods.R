@@ -20,7 +20,7 @@ struct_adj_thr <- rtCorrection(am = struct_adj, x = x_test,
 ## create statistical network
 x_test_cut <- as.matrix(x_test[, -c(1:2)])
 stat_adj <- statistical(x_test_cut,
-    model = c("clr", "aracne", "pearson", "spearman", "ggm"))
+    model = c("clr", "aracne", "pearson", "spearman"))
 stat_adj_thr <- threshold(am = stat_adj, type = "top2", args = list(n = 10))
 
 ## combine the two AdjacencyMatrix objects
@@ -123,11 +123,10 @@ test_that("as.data.frame", {
     
     ## stat_adj
     df <- as.data.frame(stat_adj)
-    expect_equal(dim(df), c(45, 10))
+    expect_equal(dim(df), c(45, 8))
     expect_equal(colnames(df), 
         c("Row", "Col", "clr_coef", "aracne_coef", "pearson_coef",
-            "pearson_pvalue", "spearman_coef", "spearman_pvalue", 
-            "ggm_coef", "ggm_pvalue"))
+            "pearson_pvalue", "spearman_coef", "spearman_pvalue"))
     expect_equal(df$Row[1:5], c("x7449", "x11179", "x11179", "x11374", "x11374"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485",  "x7449"))
     expect_equal(sum(df$clr_coef), 44.41226, tolerance = 1e-06)
@@ -136,16 +135,13 @@ test_that("as.data.frame", {
     expect_equal(sum(df$pearson_pvalue), 2.197239, tolerance = 1e-06)
     expect_equal(sum(df$spearman_coef), 25.74616, tolerance = 1e-06)
     expect_equal(sum(df$spearman_pvalue), 1.361522, tolerance = 1e-06)
-    expect_equal(sum(df$ggm_coef), 4.347346, tolerance = 1e-06)
-    expect_equal(sum(df$ggm_pvalue), 5.021974, tolerance = 1e-06)
     
     ## stat_adj_thr
     df <- as.data.frame(stat_adj_thr)
-    expect_equal(dim(df), c(45, 11))
+    expect_equal(dim(df), c(45, 9))
     expect_equal(colnames(df),
         c("Row", "Col", "clr_coef", "aracne_coef", "pearson_coef",
-            "pearson_pvalue", "spearman_coef", "spearman_pvalue", "ggm_coef", 
-            "ggm_pvalue", "consensus"))
+            "pearson_pvalue", "spearman_coef", "spearman_pvalue", "consensus"))
     expect_equal(df$Row[1:5], c("x7449", "x11179", "x11179", "x11374", "x11374"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
     expect_equal(sum(df$clr_coef), 44.41226, tolerance = 1e-06)
@@ -154,18 +150,16 @@ test_that("as.data.frame", {
     expect_equal(sum(df$pearson_pvalue), 2.197239, tolerance = 1e-06)
     expect_equal(sum(df$spearman_coef), 25.74616, tolerance = 1e-06)
     expect_equal(sum(df$spearman_pvalue), 1.361522, tolerance = 1e-06)
-    expect_equal(sum(df$ggm_coef), 4.347346, tolerance = 1e-06)
-    expect_equal(sum(df$ggm_pvalue), 5.021974, tolerance = 1e-06)
-    expect_equal(sum(df$consensus, na.rm = TRUE), 9)
+    expect_equal(sum(df$consensus, na.rm = TRUE), 18)
     
     ## combine
     df <- as.data.frame(cons_adj)
-    expect_equal(dim(df), c(55, 19))
+    expect_equal(dim(df), c(55, 17))
     expect_equal(colnames(df), 
         c("Row", "Col", "binary", "group", "formula", "mass",
             "clr_coef", "aracne_coef", "pearson_coef",
-            "pearson_pvalue", "spearman_coef", "spearman_pvalue", "ggm_coef", 
-            "ggm_pvalue","consensus", "combine_binary", "combine_group", 
+            "pearson_pvalue", "spearman_coef", "spearman_pvalue", 
+            "consensus", "combine_binary", "combine_group", 
             "combine_formula", "combine_mass"))
     expect_equal(df$Row[1:5], c("x9485", "x7449", "x7449", "x11179", "x11179"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
@@ -181,11 +175,7 @@ test_that("as.data.frame", {
         tolerance = 1e-06)
     expect_equal(sum(df$spearman_pvalue, na.rm = TRUE), 1.361522,
         tolerance = 1e-06)
-    expect_equal(sum(df$ggm_coef, na.rm = TRUE), 4.347346,
-        tolerance = 1e-06)
-    expect_equal(sum(df$ggm_pvalue, na.rm = TRUE), 5.021974,
-        tolerance = 1e-06)
-    expect_equal(sum(df$consensus, na.rm = TRUE), 9)
+    expect_equal(sum(df$consensus, na.rm = TRUE), 18)
     expect_equal(df$binary[1:5], c(0, 1, 0, 0, 1))
     expect_equal(as.vector(table(df$binary)), c(46, 9))
     expect_equal(df$group[1:5], 
@@ -195,11 +185,11 @@ test_that("as.data.frame", {
         c("", "86.0003939305", "", "", "162.0528234315"))
     expect_equal(as.vector(table(df$mass)), c(46, 3, 6))
     expect_equal(df$combine_binary[1:5], c(NA, 1, NA, 0, 1))
-    expect_equal(as.vector(table(df$combine_binary)), c(37, 8))
+    expect_equal(as.vector(table(df$combine_binary)), c(36, 9))
     expect_equal(df$combine_group[1:5], 
         c(NA, "Malonyl group (-H2O)", NA, "", "Monosaccharide (-H2O)"))
-    expect_equal(as.vector(table(df$combine_group)), c(37, 6, 2))
+    expect_equal(as.vector(table(df$combine_group)), c(36, 6, 3))
     expect_equal(df$combine_mass[1:5], 
         c(NA, "86.0003939305", NA, "", "162.0528234315"))
-    expect_equal(as.vector(table(df$combine_mass)), c(37, 2, 6))
+    expect_equal(as.vector(table(df$combine_mass)), c(36, 3, 6))
 })
