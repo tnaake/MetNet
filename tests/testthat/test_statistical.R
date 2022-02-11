@@ -179,7 +179,7 @@ test_that("correlation", {
     expect_true(all(correlation_g_mat$r -
         GeneNet::ggm.estimate.pcor(t(mat_test[1:5, ]), 
             method = "static")[seq_len(dim(mat_test[1:5, ])[1]), 
-                seq_len(dim(mat_test[1:5, ])[1])]== 0))
+                seq_len(dim(mat_test[1:5, ])[1])] == 0))
     expect_equal(sum(correlation_g_mat$r), 5.421633, tolerance = 1e-06)
     expect_equal(sum(correlation_g_mat$p), 2.889295, tolerance = 1e-06)
     expect_equal(rownames(correlation_g_mat$r), 
@@ -230,11 +230,11 @@ test_that("addToList", {
 
 
 ## START unit test statistical ##
-stat_adj <- statistical(mat_test[1:5, ],
+## do not run bayes since this results in unstable results
+suppressWarnings(stat_adj <- statistical(mat_test[1:5, ],
     model = c("randomForest", "clr", "aracne", "pearson",
-        "pearson_partial", "pearson_semipartial", "spearman",
-        "spearman_partial", "spearman_semipartial", "ggm", "bayes"),
-    PFER = 0.75, cutoff = 0.95)
+        "pearson_partial", "spearman", "spearman_partial",  "ggm"),
+    PFER = 0.75, cutoff = 0.95))
 
 test_that("statistical", {
     expect_error(statistical(NULL, model = "lasso"), "not a numerical matrix")
@@ -247,8 +247,6 @@ test_that("statistical", {
     ## since these models are probabilistic
     tmp <- rf_mat; diag(tmp) <- NaN
     expect_equal(assay(stat_adj, "randomForest_coef"), tmp, tolerance = 5e-01)
-    tmp <- bayes_mat; diag(tmp) <- NaN
-    expect_equal(assay(stat_adj, "bayes_coef"), tmp, tolerance = 5e-01)
     tmp <- clr_mat; diag(tmp) <- NaN
     expect_true(all(assay(stat_adj, "clr_coef") == tmp, na.rm = TRUE))
     tmp <- aracne_mat; diag(tmp) <- NaN
@@ -279,18 +277,18 @@ test_that("statistical", {
     diag(tmp$r) <- NaN; diag(tmp$p) <- NaN
     expect_true(all(stat_adj[["ggm_coef"]] == tmp$estimate, na.rm = TRUE))
     expect_true(all(stat_adj[["ggm_pvalue"]] == tmp$p, na.rm = TRUE))
-    expect_equal(length(assays(stat_adj)), 14) 
-    expect_equal(as.numeric(lapply(assays(stat_adj), nrow)), rep(5, 14))
-    expect_equal(as.numeric(lapply(assays(stat_adj), ncol)), rep(5, 14))
+    expect_equal(length(assays(stat_adj)), 13)
+    expect_equal(as.numeric(lapply(assays(stat_adj), nrow)), rep(5, 13))
+    expect_equal(as.numeric(lapply(assays(stat_adj), ncol)), rep(5, 13))
     expect_equal(as.character(unlist((lapply(assays(stat_adj), rownames)))),
-        rep(c("x1", "x2", "x3", "x4", "x5"), 14))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 13))
     expect_equal(as.character(unlist((lapply(assays(stat_adj), colnames)))),
-        rep(c("x1", "x2", "x3", "x4", "x5"), 14))
+        rep(c("x1", "x2", "x3", "x4", "x5"), 13))
     expect_equal(assayNames(stat_adj),
         c("randomForest_coef", "clr_coef", "aracne_coef", "pearson_coef",
             "pearson_pvalue", "pearson_partial_coef", "pearson_partial_pvalue", 
             "spearman_coef", "spearman_pvalue", "spearman_partial_coef", 
-            "spearman_partial_pvalue", "ggm_coef", "ggm_pvalue","bayes_coef"))
+            "spearman_partial_pvalue", "ggm_coef", "ggm_pvalue"))
     expect_true(all(unlist(lapply(assays(stat_adj), function(x) is.numeric(x)))))
     expect_equal(length(stat_adj), 5)
     expect_equal(dim(stat_adj), c(5, 5))
@@ -435,7 +433,7 @@ test_that("threshold", {
     expect_true(all(assay(thr_top2, "consensus") %in% c(0, 1, NaN)))
     expect_true(all(assay(thr_mean, "consensus") %in% c(0, 1, NaN)))
     
-    stat_adj_cut <- statistical(mat_test[1:5, ], model = "bayes")
+    stat_adj_cut <- statistical(mat_test[1:5, ], model = "bayes", R = 1000)
     am_all <- threshold(stat_adj_cut, type = "top1", args = args_top, 
         values = "all")
     am_min <- threshold(stat_adj_cut, type = "top1", args = args_top, 
@@ -510,7 +508,8 @@ test_that("topKnet", {
     ## type of ranks
     ## na.rm = TRUE
     ranks <- matrix(c(c(1, 2, 3), c(2, 1, 3)), ncol = 2)
-    expect_error(MetNet:::topKnet(ranks = 1:3, na.rm = TRUE), "ranks is not a numerical")
+    expect_error(MetNet:::topKnet(ranks = 1:3, type = "top1", na.rm = TRUE), 
+        "ranks is not a numerical")
     expect_error(MetNet:::topKnet(ranks = data.frame(x = 1:3, y = 3:1),
         type = "top1", na.rm = TRUE), "ranks is not a numeric")
     expect_error(MetNet:::topKnet(ranks = matrix(c("a", "b", "c")),
@@ -553,14 +552,4 @@ test_that("topKnet", {
         c(1.5, 1.5, NA))
 })
 ## END unit test topKnet ##
-
-
-## START unit test threeDotsCall ##
-
-test_that("threeDotsCall", {
-    expect_error(MetNet:::threeDotsCall("mean", x = 1:10, x = 1:10),
-        "duplicated args in ...")
-    expect_equal(MetNet:::threeDotsCall("mean", x = 1:10, foo = 1), mean(1:10))
-})
-## END unit test threeDotsCall ##
 

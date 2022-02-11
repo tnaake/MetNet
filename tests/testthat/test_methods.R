@@ -57,8 +57,9 @@ test_that("directed", {
     struct_adj_dir <- structural(x_test,
         transformation = transformations, ppm = 5, directed = TRUE)
     expect_equal(directed(struct_adj_dir), TRUE)
-    stat_adj_dir <- statistical(x_test_cut[1:5, 1:5],
-        model = c("clr", "aracne", "pearson", "spearman", "ggm","bayes"), R=10)
+    stat_adj_dir <- statistical(x_test_cut[1:10, 1:10],
+        model = c("clr", "aracne", "pearson", "spearman", "ggm", "bayes"), 
+        R = 10)
     expect_equal(directed(stat_adj_dir), TRUE)
     expect_equal(directed(stat_adj), FALSE)
     expect_equal(directed(stat_adj_thr), FALSE)
@@ -125,7 +126,8 @@ test_that("as.data.frame", {
     expect_equal(dim(df), c(45, 10))
     expect_equal(colnames(df), 
         c("Row", "Col", "clr_coef", "aracne_coef", "pearson_coef",
-            "pearson_pvalue", "spearman_coef", "spearman_pvalue", "ggm_coef", "ggm_pvalue"))
+            "pearson_pvalue", "spearman_coef", "spearman_pvalue", 
+            "ggm_coef", "ggm_pvalue"))
     expect_equal(df$Row[1:5], c("x7449", "x11179", "x11179", "x11374", "x11374"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485",  "x7449"))
     expect_equal(sum(df$clr_coef), 44.41226, tolerance = 1e-06)
@@ -154,7 +156,7 @@ test_that("as.data.frame", {
     expect_equal(sum(df$spearman_pvalue), 1.361522, tolerance = 1e-06)
     expect_equal(sum(df$ggm_coef), 4.347346, tolerance = 1e-06)
     expect_equal(sum(df$ggm_pvalue), 5.021974, tolerance = 1e-06)
-    expect_equal(sum(df$consensus, na.rm=TRUE), 9)
+    expect_equal(sum(df$consensus, na.rm = TRUE), 9)
     
     ## combine
     df <- as.data.frame(cons_adj)
@@ -162,9 +164,9 @@ test_that("as.data.frame", {
     expect_equal(colnames(df), 
         c("Row", "Col", "binary", "group", "formula", "mass",
             "clr_coef", "aracne_coef", "pearson_coef",
-            "pearson_pvalue", "spearman_coef", "spearman_pvalue", "ggm_coef", "ggm_pvalue","consensus",
-            "combine_binary", "combine_group", "combine_formula", 
-            "combine_mass"))
+            "pearson_pvalue", "spearman_coef", "spearman_pvalue", "ggm_coef", 
+            "ggm_pvalue","consensus", "combine_binary", "combine_group", 
+            "combine_formula", "combine_mass"))
     expect_equal(df$Row[1:5], c("x9485", "x7449", "x7449", "x11179", "x11179"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
     expect_equal(sum(df$clr_coef, na.rm = TRUE), 44.41226,
