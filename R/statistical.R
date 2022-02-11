@@ -19,7 +19,6 @@
 #' parallel logical, should computation be parallelized? If
 #' `parallel = TRUE` the `bplapply` will be applied if
 #' `parallel = FALSE` the `lapply` function will be applied.
-#'
 #' @param ... parameters passed to `stabsel.matrix`
 #'
 #' @details For use of the parameters used in the `stabsel.matrix` function,
@@ -36,7 +35,7 @@
 #' x <- x_test[1:10, 3:ncol(x_test)]
 #' x <- as.matrix(x)
 #' x_z <- t(apply(x, 1, function(y) (y - mean(y)) / sd(y)))
-#' \dontrun{lasso(x_z, PFER = 0.95, cutoff = 0.95)}
+#' \dontrun{lasso(x = x_z, PFER = 0.95, cutoff = 0.95)}
 #' 
 #' @importFrom BiocParallel bplapply
 #' @importFrom stabs stabsel.matrix glmnet.lasso
@@ -44,16 +43,22 @@
 #' @export
 lasso <- function(x, parallel = FALSE, ...) {
 
+    ## define list of arguments
+    args_l <- list(...)
+    args_l[["fitfun"]] <- stabs::glmnet.lasso
+    args_l[["args.fitfun"]] <- list("alpha" = 1)
+    
     ## x should be z-scaled
     if (parallel) {
         l1 <- BiocParallel::bplapply(seq_len(nrow(x)), function(i) {
-            x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
+            x_l1 <- t(x[-i, ])
+            y_l1 <- x[i, ]
 
             ## lasso: alpha set to 1
             ## allow for compatibility of arguments
-            l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
-                    y = y_l1, fitfun = stabs::glmnet.lasso,
-                    args.fitfun = list("alpha" = 1), ...)
+            args_l[["x"]] <- as.matrix(x_l1)
+            args_l[["y"]] <- y_l1
+            l1 <- do.call("stabsel.matrix", args_l)
 
             ## return selection probabilities of features that are not 0
             return(l1$max[l1$max != 0])
@@ -61,13 +66,14 @@ lasso <- function(x, parallel = FALSE, ...) {
 
     } else {
         l1 <- lapply(seq_len(nrow(x)), function(i) {
-            x_l1 <- t(x[-i, ]); y_l1 <- x[i, ]
+            x_l1 <- t(x[-i, ])
+            y_l1 <- x[i, ]
 
             ## lasso: alpha set to 1
             ## allow for compatibility of arguments
-            l1 <- threeDotsCall("stabsel.matrix", x = as.matrix(x_l1),
-                    y = y_l1, fitfun = stabs::glmnet.lasso,
-                    args.fitfun = list("alpha" = 1), ...)
+            args_l[["x"]] <- as.matrix(x_l1)
+            args_l[["y"]] <- y_l1
+            l1 <- do.call("stabsel.matrix", args_l)
 
             ## return selection probabilities of features that are not 0
             return(l1$max[l1$max != 0])
@@ -98,10 +104,8 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' `GENIE3` package. `randomForest` returns the importance of the link
 #' between features in the form of an adjacency matrix.
 #'
-#' @param
-#' x matrix, where columns are the samples and the rows are features
+#' @param x matrix, where columns are the samples and the rows are features
 #' (metabolites), cell entries are intensity values
-#'
 #' @param ... parameters passed to `GENIE3`
 #'
 #' @details For use of the parameters used in the `GENIE3` function,
@@ -125,11 +129,18 @@ lasso <- function(x, parallel = FALSE, ...) {
 #' @export
 randomForest <- function(x, ...) {
 
+    ## define a list with arguments
+    args_l <- list(...)
+    args_l[["exprMatrix"]] <- x
+    args_l[["regulators"]] <- NULL
+    args_l[["targets"]] <- NULL
+    args_genie3 <- names(formals("GENIE3"))
+    args_l <- args_l[names(args_l) %in% args_genie3]
+    
     ## GENIE3 returns the importance of the link from "regulator gene" i to
     ## target gene "j" in the form of a weighted adjacency matrix
     ## set regulators and targets to NULL that they cannot be changed
-    rf <- threeDotsCall(GENIE3::GENIE3, exprMatrix = x, regulators = NULL,
-        targets = NULL, ...)
+    rf <- do.call("GENIE3", args_l)
 
     return(rf)
 }
@@ -152,6 +163,7 @@ randomForest <- function(x, ...) {
 #' (metabolites), cell entries are mutual information values between the
 #' features. As input, the mutual information (e.g. raw MI estimates) from the 
 #' `knnmi.all` function of the `parmigene` package can be used.
+#' @param ... not used here
 #'
 #' @details For more details on the `clr` function,
 #' refer to `?parmigene::clr`. CLR computes the score
@@ -185,7 +197,7 @@ randomForest <- function(x, ...) {
 #' @importFrom stats sd
 #' 
 #' @export
-clr <- function(mi) {
+clr <- function(mi, ...) {
 
     ## call the clr function from the parmigene package
     clr_mat <- parmigene::clr(mi)
@@ -214,6 +226,7 @@ clr <- function(mi) {
 #' `knnmi.all` function of the `parmigene` package can be used.
 #'
 #' @param eps numeric, used to remove the weakest edge of each triple of nodes
+#' @param ... not used here
 #'
 #' @details For more details on the `aracne.a` function,
 #' refer to `?parmigene::aracne.a`. `aracne.a` considers each triple of
@@ -245,7 +258,7 @@ clr <- function(mi) {
 #' @importFrom stats sd
 #'
 #' @export
-aracne <- function(mi, eps = 0.05) {
+aracne <- function(mi, eps = 0.05, ...) {
 
     ## call the aracne.a function from the parmigene package
     aracne_mat <- parmigene::aracne.a(mi, eps = eps)
@@ -319,10 +332,19 @@ aracne <- function(mi, eps = 0.05) {
 #' @importFrom GeneNet ggm.estimate.pcor n2kappa cor0.test
 correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
 
+    ## define list with arguments
+    args_l <- list(...)
+    args_l[["method"]] <- method
+    
     ## for pearson/spearman correlation
     if (method %in% c("pearson", "spearman")) {
-        cor_mat <- psych::corr.test(x = t(x), method = method, 
-            adjust = "none", ...)
+        args_l[["x"]] <- t(x)
+        args_l[["adjust"]] <- "none"
+        args_corrtest <- names(formals("corr.test"))
+        args_l <- args_l[names(args_l) %in% args_corrtest]
+        cor_mat <- do.call("corr.test", args_l)
+        
+        ## calculate adjusted p-values
         cor_mat$p <- matrix(
             stats::p.adjust(as.vector(cor_mat$p), method = p.adjust),
             ncol = ncol(cor_mat$p), nrow = nrow(cor_mat$p), byrow = TRUE)
@@ -449,8 +471,15 @@ correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
 #' @importFrom stats pt
 partialCorrelation <- function(x, method = "pearson", ...) {
     
+    ## create a list with arguments
+    args_l <- list(...)
+    args_l[["data"]] <- x
+    args_l[["method"]] <- method
+    args_partialr <- names(formals("partial.r"))
+    args_l <- args_l[names(args_l) %in% args_partialr]
+    
     ## calculate the partial correlation coefficients
-    r <- psych::partial.r(x, method = method, ...)
+    r <- do.call("partial.r", args_l)
     
     ## obtain n, the sample size
     n <- nrow(x)
@@ -533,19 +562,25 @@ bayes <- function(x, algorithm = "tabu", R = 100, ...) {
 
     x_df <- data.frame(t(x))
 
-    ## allow for compatibility of arguments
-    strength <- threeDotsCall(bnlearn::boot.strength, data = x_df,
-        algorithm = algorithm, R = R, ...)
+    ## create list of arguments that is compatible with arguments of 
+    ## boot.strenth
+    args_l <- list(...)
+    args_l[["data"]] <- x_df
+    args_l[["algorithm"]] <- algorithm
+    args_l[["R"]] <- R
+    args_bootstrength <- names(formals("boot.strength"))
+    args_l <- args_l[names(args_l) %in% args_bootstrength]
+    
+    ## allow for compatibility of arguments by using do.call
+    strength <- do.call("boot.strength", args_l)
 
     ## create empty bs_mat to be filled with connections
     bs_mat <- matrix(0, nrow = nrow(x), ncol = nrow(x))
-    colnames(bs_mat) <- rownames(bs_mat) <- rownames(x)
+    colnames(bs_mat) <- rownames(bs_mat) <- make.names(rownames(x))
 
     ## write to bs_mat
     for (i in seq_len(nrow(strength))) {
-        tmp <- as.character(strength[i, ])
-        names(tmp) <- names(strength[i, ])
-        bs_mat[tmp["from"], tmp["to"]] <- tmp["strength"]
+        bs_mat[strength[i, "from"], strength[i, "to"]] <- strength[i, "strength"]
     }
 
     mode(bs_mat) <- "numeric"
@@ -626,8 +661,8 @@ addToList <- function(l, name, object) {
 #' function includes functionality to calculate adjacency matrices based on
 #' LASSO (L1 norm)-regression, random forests, context likelihood of
 #' relatedness (CLR), the algorithm for the reconstruction of accurate
-#' cellular networks (ARACNE), Pearson correlation (also partial and
-#' semipartial), Spearman correlation (also partial and semipartial)
+#' cellular networks (ARACNE), Pearson correlation (also partial), 
+#' Spearman correlation (also partial)
 #' and score-based structure learning (Bayes). The function returns an
 #' `AdjacencyMatrix` object of adjacency matrices that are defined by `model`.
 #'
@@ -638,8 +673,7 @@ addToList <- function(l, name, object) {
 #' @param
 #' model `character` vector containing the methods that will be used
 #' (`"lasso"`, `"randomForest"`, `"clr"`, `"aracne"`, `"pearson"`,
-#' `"pearson_partial"`, `"pearson_semipartial"`, `"spearman"`,
-#' `"spearman_partial"`, `"spearman_semipartial"`, `"bayes"`)
+#' `"pearson_partial"`, `"spearman"`, `"spearman_partial"`, `"bayes"`)
 #'
 #' @param
 #' ... parameters passed to the functions  `lasso`, `randomForest`,
@@ -650,14 +684,14 @@ addToList <- function(l, name, object) {
 #' matrices based on
 #' LASSO (L1 norm)-regression, random forests, context likelihood of
 #' relatedness (CLR), the algorithm for the reconstruction of accurate
-#' cellular networks (ARACNE), Pearson correlation (also partial and
-#' semipartial), Spearman correlation (also partial and semipartial)
-#' and Constraint-based structure learning (Bayes).
+#' cellular networks (ARACNE), Pearson correlation (also partial), 
+#' Spearman correlation (also partial) and Constraint-based structure learning 
+#' (Bayes).
 #'
 #' `statistical` calls the function
 #' `lasso`, `randomForest`, `clr`, `aracne`,
-#' `correlation` (for `"pearson"`, `"pearson_partial"`, `"pearson_semipartial"`,
-#' `"spearman"`, `"spearman_partial"`, `"spearman_semipartial"`) and/or `bayes`
+#' `correlation` (for `"pearson"`, `"pearson_partial"`, `"spearman"`, 
+#' `"spearman_partial"`) and/or `bayes`
 #' as specified by `model`. It will create adjacency matrices using the
 #' specified methods and will return an `AdjacencyMatrix` containing the weighted
 #' adjacency matrices in the `assays` slot.
@@ -692,8 +726,8 @@ statistical <- function(x, model, ...) {
     ## check if model complies with the implemented model and return error
     ## if not so
     if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne",
-            "pearson", "pearson_partial", "pearson_semipartial",
-            "spearman", "spearman_partial", "spearman_semipartial", "bayes", "ggm"))))
+            "pearson", "pearson_partial", "spearman", "spearman_partial", 
+            "bayes", "ggm"))))
         stop("'model' not implemented in statistical")
 
     ## check if x is numeric matrix and return error if not so
@@ -705,11 +739,16 @@ statistical <- function(x, model, ...) {
     })
     x_z <- t(x_z)
 
+    ## create list to store results of running the models
     l <- list()
+    
+    ## create list to store the arguments in ...
+    args_l <- list(...)
 
     ## add entry for lasso if "lasso" is in model
     if ("lasso" %in% model) {
-        res <- lasso(x = x_z, ...)
+        args_l[["x"]] <- x_z
+        res <- do.call("lasso", args_l)
         diag(res) <- NaN
         l <- addToList(l, "lasso_coef", res)
         print("lasso finished")
@@ -717,7 +756,8 @@ statistical <- function(x, model, ...) {
 
     ## add entry for randomForest if "randomForest" is in model
     if ("randomForest" %in% model) {
-        res <- randomForest(x = x, ...)
+        args_l[["x"]] <- x
+        res <- do.call("randomForest", args_l)
         diag(res) <- NaN
         res <- res[rownames(x), rownames(x)]
         l <- addToList(l, "randomForest_coef", res)
@@ -731,7 +771,8 @@ statistical <- function(x, model, ...) {
 
     ## add entry for clr if "clr" is in model
     if ("clr" %in% model) {
-        res <- threeDotsCall("clr", mi = mi_x_z, ...)
+        args_l[["mi"]] <- mi_x_z
+        res <- do.call("clr", args_l)
         diag(res) <- NaN
         l <- addToList(l, "clr_coef", res)
         print("clr finished.")
@@ -739,7 +780,8 @@ statistical <- function(x, model, ...) {
 
     ## add entry for aracne if "aracne" is in model
     if ("aracne" %in% model) {
-        res <- threeDotsCall("aracne", mi = mi_x_z, ...)
+        args_l[["mi"]] <- mi_x_z
+        res <- do.call("aracne", args_l)
         diag(res) <- NaN
         l <- addToList(l, "aracne_coef", res)
         print("aracne finished.")
@@ -747,7 +789,9 @@ statistical <- function(x, model, ...) {
 
     ## add entry for pearson if "pearson" is in model
     if ("pearson" %in% model) {
-        res <- threeDotsCall("correlation", x = x, method = "pearson", ...)
+        args_l[["x"]] <- x
+        args_l[["method"]] <- "pearson"
+        res <- do.call("correlation", args_l)
         pearson_coef <- res[["r"]]
         diag(pearson_coef) <- NaN
         pearson_pvalue <- res[["p"]]
@@ -759,8 +803,9 @@ statistical <- function(x, model, ...) {
 
     ## add entry for pearson_partial if "pearson_partial" is in model
     if ("pearson_partial" %in% model) {
-        res <- threeDotsCall("correlation", x = x,
-            method = "pearson_partial", ...)
+        args_l[["x"]] <- x
+        args_l[["method"]] <- "pearson_partial"
+        res <- do.call("correlation", args_l)
         pearson_p_coef <- res[["r"]]
         diag(pearson_p_coef) <- NaN
         pearson_p_pvalue <- res[["p"]]
@@ -773,7 +818,9 @@ statistical <- function(x, model, ...) {
 
     ## add entry for spearman if "spearman" is in model
     if ("spearman" %in% model) {
-        res <- threeDotsCall("correlation", x = x, method = "spearman", ...)
+        args_l[["x"]] <- x
+        args_l["method"] <- "spearman"
+        res <- do.call("correlation", args_l)
         spearman_coef <- res[["r"]]
         diag(spearman_coef) <- NaN
         spearman_pvalue <- res[["p"]]
@@ -785,8 +832,9 @@ statistical <- function(x, model, ...) {
 
     ## add entry for spearman_partial if "spearman_partial" is in model
     if ("spearman_partial" %in% model) {
-        res <- threeDotsCall("correlation", x = x, 
-            method = "spearman_partial", ...)
+        args_l[["x"]] <- x
+        args_l[["method"]] <- "spearman_partial"
+        res <- do.call("correlation", args_l)
         spearman_p_coef <- res[["r"]]
         diag(spearman_p_coef) <- NaN
         spearman_p_pvalue <- res[["p"]]
@@ -799,7 +847,9 @@ statistical <- function(x, model, ...) {
     
     ## add entry for ggm if "ggm" is in model
     if ("ggm" %in% model) {
-        res <- threeDotsCall("correlation", x = x, method = "ggm", ...)
+        args_l[["x"]] <- x
+        args_l[["method"]] <- "ggm"
+        res <- do.call("correlation", args_l)
         ggm_coef <- res[["r"]]
         diag(ggm_coef) <- NaN
         ggm_pvalue <- res[["p"]]
@@ -811,7 +861,8 @@ statistical <- function(x, model, ...) {
 
     ## add entry for bayes if "bayes" is in model
     if ("bayes" %in% model) {
-        res <- threeDotsCall("bayes", x = x, ...)
+        args_l[["x"]] <- x
+        res <- do.call("bayes", args_l)
         diag(res) <- NaN
         l <- addToList(l, "bayes_coef", res)
         print("bayes finished.")
@@ -977,7 +1028,7 @@ getLinks <- function(mat, exclude = "== 1", decreasing = TRUE) {
 #' In this case
 #' values that are 0 for the models `lasso`, `randomForest` and `bayes` are
 #' set to `NaN`; values from correlation (Pearson and Spearman, including
-#' for partial and semipartial correlation) and `clr` and `aracne` are
+#' for partial correlation) and `clr` and `aracne` are
 #' taken as they are.
 #'
 #' For `type = "top1"`, the best (i.e. lowest) rank in `am` is taken.
@@ -1321,49 +1372,3 @@ topKnet <- function(ranks, type, na.rm = TRUE) {
     return(cons_val)
 }
 
-#' @name threeDotsCall
-#'
-#' @aliases threeDotsCall
-#'
-#' @title Check if passed arguments match the function's formal arguments and
-#' call the function with the checked arguments
-#'
-#' @description
-#' The function `threeDotsCall` gets the formal arguments
-#' of a function `fun` and checks if the passed arguments `...`
-#' matches the formal arguments. `threeDotsCall` will call the function
-#' `fun` with the filtered arguments and will return the result of the function
-#' call and the given arguments.
-#'
-#' @param fun `function` to check for arguments and to call
-#'
-#' @param ... arguments to be tested to be passed to `fun`
-#'
-#' @details
-#' Used internally in `lasso`, `randomForest`, `bayes`,
-#' `statistical` and `threshold`.
-#'
-#' `threeDotsCall` will not remove duplicated arguments and throw an error.
-#'
-#' @return Returned object given the function call with passed arguments
-#'
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
-#'
-#' @importFrom methods formalArgs
-#' @examples
-#' MetNet:::threeDotsCall(stats::sd, x = 1:10, y = 1:10)
-#' ## in contrast to the above example, the following example will result in an
-#' ## error
-#' \dontrun{stats::sd(x = 1:10, y = 1:10)}
-threeDotsCall <- function(fun, ...) {
-
-    formal_args <- methods::formalArgs(fun)
-    args <- list(...)
-    if (any(duplicated(names(args)))) stop("duplicated args in ...")
-
-    input <- args[names(args) %in% formal_args]
-
-    ## call the function
-    res <- do.call(fun, input)
-    return(res)
-}
