@@ -32,8 +32,8 @@
 #' infrastructure, e.g. (`"ndotproduct"`(default), `"gnps"`). 
 #' `methods` are then forwarded to `FUN` in `Spectra::compareSpectra()`.
 #'
-#' @param
-#' ... parameters passed to the functions  `combineSpectra` from the `Spectra` 
+#' @param ... 
+#' parameters passed to the functions  `combineSpectra` from the `Spectra` 
 #' package (e.g. `MAPFUN`, `tolerance`, `ppm`, `type`, ...).
 #'
 #' @details
