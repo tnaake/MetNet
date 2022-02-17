@@ -8,12 +8,13 @@
 #' 
 #' @details
 #' The slot `type` is of type `"character"`, storing the type of the 
-#' `"AdjacencyMatrix"`, i.e. `"structural"`, `"statistical"`, or `"combined"`.
+#' `"AdjacencyMatrix"`, i.e. `"structural"`, `"statistical"`,`"spectral"` , or 
+#' `"combined"`.
 #' The slot `directed` is of type `"logical"`, storing if the adjacency matrix
 #' is directed or not.
 #' The slot `thresholded` is of type `"logical"`, storing if the adjacency 
 #' matrix was thresholded, e.g. if the functions `rtCorrection` or `threshold`
-#' were applied on the `structural` or `statistical` `AdjacencyMatrix` objects.
+#' were applied on the `structural`,`"spectral"` or `statistical` `AdjacencyMatrix` objects.
 #' 
 #' If any of the `AdjacencyMatrix` objects passed to the `combine` function
 #' was `directed = TRUE` or `thresholded = TRUEs` the `combine` 
@@ -29,7 +30,7 @@
 .AdjacencyMatrix <- setClass("AdjacencyMatrix",
     contains = c("SummarizedExperiment"),
     slots = c(
-        type = "character", ## structural, statistical, combined,
+        type = "character", ## structural, statistical, combined, spectral,
         directed = "logical",
         thresholded = "logical" ## thresholded, e.g. by rtCorrection or by threshold
     )
@@ -50,7 +51,7 @@
 #'   all its accessors and replacement methods.
 #'
 #' - The `type` accessor returns the `type` (`"structural"`, `"statistical"`, 
-#'   `"combine"`) slot.
+#' `"spectral"`,`"combine"`) slot.
 #'   
 #' - The `directed` accessor returns the `directed` (`logical` of length 1)
 #'   slot.
@@ -69,14 +70,14 @@
 #' 
 #' @param rowData `data.frame`, containing information on the features
 #' 
-#' @param type `character`, either `"structural"`, `"statistical"`, or 
+#' @param type `character`, either `"structural"`, `"statistical"`,`"spectral"`, or 
 #' `"combine"`
 #' 
 #' @param directed `logical`, if the adjacency matrix underlying the graph is
 #' directed or undirected 
 #' 
 #' @param thresholded `logical`, if the functions `rtCorrection` or `threshold`
-#' were applied on the `structural` or `statistical` `AdjacencyMatrix` objects
+#' were applied on the `structural`,`"spectral"` or `statistical` `AdjacencyMatrix` objects
 #'
 #' @return
 #' object of S4 class `AdjacencyMatrix`
@@ -109,7 +110,7 @@
 #' @importFrom SummarizedExperiment SummarizedExperiment assays 
 #' @importFrom methods new is
 AdjacencyMatrix <- function(adj_l, rowData,
-    type = c("structural", "statistical", "combine"),
+    type = c("structural", "statistical","spectral", "combine"),
     directed = c(TRUE, FALSE), thresholded = c(TRUE, FALSE)) {
 
     type <- match.arg(type)
@@ -195,6 +196,27 @@ setValidity2("AdjacencyMatrix", function(object) {
         if (!all(unlist(assay_num)))
             msg <- c(msg, "assays must be all numeric")
     }
+    
+    if (type_obj == "spectral") {
+      
+      .nms <- SummarizedExperiment::assayNames(object)
+      
+      # if (type_obj == "combine")
+      #     .nms <- .nms[!(.nms %in% c("binary", "transformation", "mass_difference",
+      #         "combine_binary", "combine_transformation", "combine_mass_difference"))]
+      
+      ## does not apply because variable methods names from Spectra package can 
+      ## be used
+      # if (any(!(.nms %in% valid_names_stat)))
+      #   msg <- c(msg, "assay names contain invalid entries")
+      # 
+      
+      assay_num <- lapply(seq_along(.nms),
+                          function(i) is.numeric(assay(object, i)))
+      if (!all(unlist(assay_num)))
+        msg <- c(msg, "assays must be all numeric")
+    }
+    
     
     if (type_obj == "combine") {
         

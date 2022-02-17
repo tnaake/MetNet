@@ -11,7 +11,9 @@ VignetteBuilder: knitr
 Depends:
     R (>= 4.0),
     S4Vectors (>= 0.28.1),
-    SummarizedExperiment (>= 1.20.0)
+    SummarizedExperiment (>= 1.20.0),
+    MsCoreUtils (>= 1.7.2),
+    Spectra (>= 1.5.2) 
 Imports:
     bnlearn (>= 4.3), 
     BiocParallel (>= 1.12.0),

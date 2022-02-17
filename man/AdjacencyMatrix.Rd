@@ -7,7 +7,7 @@
 AdjacencyMatrix(
   adj_l,
   rowData,
-  type = c("structural", "statistical", "combine"),
+  type = c("structural", "statistical", "spectral", "combine"),
   directed = c(TRUE, FALSE),
   thresholded = c(TRUE, FALSE)
 )
@@ -17,14 +17,14 @@ AdjacencyMatrix(
 
 \item{rowData}{`data.frame`, containing information on the features}
 
-\item{type}{`character`, either `"structural"`, `"statistical"`, or 
+\item{type}{`character`, either `"structural"`, `"statistical"`,`"spectral"`, or 
 `"combine"`}
 
 \item{directed}{`logical`, if the adjacency matrix underlying the graph is
 directed or undirected}
 
 \item{thresholded}{`logical`, if the functions `rtCorrection` or `threshold`
-were applied on the `structural` or `statistical` `AdjacencyMatrix` objects}
+were applied on the `structural`,`"spectral"` or `statistical` `AdjacencyMatrix` objects}
 }
 \value{
 object of S4 class `AdjacencyMatrix`
@@ -48,7 +48,7 @@ and `colnames` are identical).
   all its accessors and replacement methods.
 
 - The `type` accessor returns the `type` (`"structural"`, `"statistical"`, 
-  `"combine"`) slot.
+`"spectral"`,`"combine"`) slot.
   
 - The `directed` accessor returns the `directed` (`logical` of length 1)
   slot.
