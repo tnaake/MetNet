@@ -123,7 +123,7 @@ spectral <- function(x, am_structural, methods = c("ndotproduct"), ...) {
   rownames(rD) <- rownames(l[[1]])
   
   
-  adj <- AdjacencyMatrix(l, rowData = rD, directed = NA, 
+  adj <- AdjacencyMatrix(l, rowData = rD, directed = FALSE, 
                          thresholded = FALSE,
                          type = "spectral")
   

@@ -379,50 +379,6 @@ rowData(struct_adj)["x1856", ]
 
 
 
-# Creating the spectral adjacency {#sec-spectral}
-The function `spectral` will create an `AdjacencyMatrix` object of type 
-`spectral` containing the adjacency matrices based on MS2 spectral similarity. 
-It is a wrapper function that uses functionalities from `Spectra` and `MetNet` 
-in order to create the `AdjacencyMatrix`. 
-The function will create weighted adjacency matrices using the spectral 
-similarity methods defined by the `methods` argument. The default is the 
-normalized dotproduct `"ndotproduct"`. Moreover, different parameters (e.g. 
-`MAPFUN`, `tolerance`, `ppm`, `type`, ...) of are forwarded to the function
-`Spectra::compareSpectra()`. 
-`spectral` uses a `Spectra` object, containing a unique "id" (in 
-`spectraVariables()`), matching to the feature names of the MS1 data that will 
-be provided by the structural `AdjacencyMatrix`. Also, the `Spectra` object is 
-required to have unique `"id"`s, meaning on representative spectrum per feature. 
-If features store multiple spectra, spectra consolidation has to be performed 
-first (e.g. using the function `Spectra::combineSpectra`).
-
-For further information on the different spectral similarity methods and input 
-parameters take a look on the respective help pages of `Spectra::compareSpectra`.
-
-
-In the following example, we load a toy MS2 dataset, represented as `Spectra` 
-object. This object already stores unique id's and matching to the respective 
-MS1 data.
-We will then create a spectral similarity adjacency matrices using the 
-normalized dotproduct and the previously created "structural" `AdjacencyMatrix`
-as input data. 
-
-
-```{r spectral,eval=TRUE,echo=TRUE}
-data("ms2_test", package = "MetNet")
-
-spect_adj <- spectral(x = sps_sub, 
-                       am_structural = struct_adj, 
-                       methods = "ndotproduct", 
-                       tolerance = 0.05)
-
-```
-
-
-
-
-
-
 # Creating the statistical adjacency {#sec-statistical}
 
 ## Creating weighted adjacency matrices using `statistical` {#subsec-statistical}
@@ -543,17 +499,98 @@ stat_adj_mean <- threshold(am = stat_adj, type = "mean",
     args = args_top)
 ```
 
-# Combining the structural and statistical matrix {#sec-combine}
 
-After creating the `structural`  and `statistical` `AdjacencyMatrix` objects, 
-the two objects are combined. The function `combine` 
-will combine these two objects and create an `AdjacencyMatrix` object of type
-`combine`. The function accepts 
-the arguments `am_structural` and `am_statistical` for the respective
-`AdjacencyMatrix` objects. Please note that for `am_structural` the 
-`AdjacencyMatrix` obtained via `structural` or `rtCorrection` can be used,
-while for `am_statistical` the `AdjacencyMatrix` from `threshold` has to be 
-used. 
+
+# Creating the spectral adjacency {#sec-spectral}
+The function `spectral` will create an `AdjacencyMatrix` object of type 
+`spectral` containing the adjacency matrices based on MS2 spectral similarity. 
+It is a wrapper function that uses functionalities from `Spectra` and `MetNet` 
+in order to create the `AdjacencyMatrix`. 
+The function will create weighted adjacency matrices using the spectral 
+similarity methods defined by the `methods` argument. The default is the 
+normalized dotproduct `"ndotproduct"`. Moreover, different parameters (e.g. 
+`MAPFUN`, `tolerance`, `ppm`, `type`, ...) of are forwarded to the function
+`Spectra::compareSpectra()`. 
+`spectral` uses a `Spectra` object, containing a unique "id" (in 
+`spectraVariables()`), matching to the feature names of the MS1 data that will 
+be provided by the structural `AdjacencyMatrix`. Also, the `Spectra` object is 
+required to have unique `"id"`s, meaning on representative spectrum per feature. 
+If features store multiple spectra, spectra consolidation has to be performed 
+first (e.g. using the function `Spectra::combineSpectra`).
+
+For further information on the different spectral similarity methods and input 
+parameters take a look on the respective help pages of `Spectra::compareSpectra`.
+
+
+In the following example, we load a toy MS2 dataset, represented as `Spectra` 
+object. This object already stores unique id's and matching to the respective 
+MS1 data.
+We will then create a spectral similarity adjacency matrices using the 
+normalized dotproduct and the previously created "structural" `AdjacencyMatrix`
+as input data. 
+
+
+```{r spectral,eval=TRUE,echo=TRUE}
+data("ms2_test", package = "MetNet")
+
+spect_adj <- spectral(x = sps_sub, 
+                       am_structural = struct_adj, 
+                       methods = "ndotproduct", 
+                       tolerance = 0.05)
+
+```
+
+
+
+
+From the `spectral` `AdjacencyMatrix` object the function `threshold`
+will create an `AdjacencyMatrix` object with the derived 
+unweighted adjacency matrix from the weighted adjacency matrices
+unifying the information present from all spectral models. This 
+unweighted adjacency matrix is stored in the assay `"consensus"`.
+
+Parameters can be used, similarly as for `statistical` 
+`AdjacencyMatrix` objects. 
+
+```{r threshold,eval=TRUE,echo=TRUE}
+## type = "threshold" 
+
+## the assayNames in spec_adj are used to define the filter criteria
+assayNames(spect_adj)
+
+## return edges with a normal dotproduct > 0.1
+args_thr <- list(filter = "ndotproduct > 0.1")
+
+## pass the filtering criteria to the args argument and set type to "threshold"
+spect_adj_thr <- threshold(am = spect_adj, type = "threshold", 
+    args = args_thr)
+
+## alternatively, use the types "top1", "top2", "mean"
+## retrieve the feature pairs which have the 10 highest coefficients
+args_top <- list(n = 10)
+## type = "top1" 
+spect_adj_top1 <- threshold(am = spect_adj, type = "top1", 
+    args = args_top)
+
+## for type = "top2" minimum two models have to be included in spect_adj
+ 
+## type = "mean"
+spect_adj_mean <- threshold(am = spect_adj, type = "mean", 
+    args = args_top)
+```
+
+
+
+# Combining the structural, statistical and spectral matrix {#sec-combine}
+
+After creating the `structural`, `spectral`  and `statistical` `AdjacencyMatrix` 
+objects, two objects are combined. The function `combine` 
+will combine two objects and create an `AdjacencyMatrix` object of type
+`combine`. The function accepts the arguments `am_structural`, `am_structural` 
+or `am_statistical` for the respective `AdjacencyMatrix` objects. Please note 
+that for `am_structural` the `AdjacencyMatrix` obtained via `structural` or 
+`rtCorrection` can be used, while for `am_statistical` and `am_spectral` 
+the `AdjacencyMatrix` from `threshold` has to be used. 
 The edges that are present both in the `binary` assay and the `consensus` assay
 will be reported within the `combine_binary` assay in a `combine` 
 `AdjacencyMatrix` object. If there are additional assays in the 
@@ -566,7 +603,7 @@ We will use here the thresholded `statistical` `AdjacencyMatrix` from
 `type = "mean"` to combine it with the `structural` `AdjacencyMatrix`, 
 `stat_adj`: 
 ```{r combine,eval=TRUE,echo=TRUE}
-comb_adj <- combine(am_structural = struct_adj, am_statistical = stat_adj_mean)
+comb_adj <- combine(am_1 = stat_adj_mean, am_2 = spect_adj_thr)
 ```
 
 # Visualization and further analyses {#sec-visualization}

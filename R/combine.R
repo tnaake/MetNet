@@ -71,31 +71,45 @@
 #'
 #' @importFrom SummarizedExperiment assay assayNames rowData
 #' @export
-combine <- function(am_structural, am_statistical) {
+combine <- function(am_1, am_2) {
 
-    if (!is(am_structural, "AdjacencyMatrix")) 
-        stop("'am_structural' is not an 'AdjacencyMatrix' object")
-    
-    if (!validObject(am_structural)) 
-        stop("'am_structural' must be a valid 'AdjacencyMatrix' object")
-    
-    if (!is(am_statistical, "AdjacencyMatrix")) 
-        stop("'am_statistical' is not an 'AdjacencyMatrix' object")
-    
-    if (!validObject(am_statistical)) 
-        stop("'am_statistical' must be a valid 'AdjacencyMatrix' object")
-    
-    if (!("consensus" %in% SummarizedExperiment::assayNames(am_statistical))) 
-        stop("'am_statistical' must contain assay 'consensus'")
-    
-    if (!all(names(am_structural) == names(am_statistical)))
-        stop("names of 'am_structural' do not match names of 'am_statistical'")
+    # if (!is(am_structural, "AdjacencyMatrix")) 
+    #     stop("'am_structural' is not an 'AdjacencyMatrix' object")
+    # 
+    # if (!validObject(am_structural)) 
+    #     stop("'am_structural' must be a valid 'AdjacencyMatrix' object")
+    # 
+    # if (!is(am_statistical, "AdjacencyMatrix")) 
+    #     stop("'am_statistical' is not an 'AdjacencyMatrix' object")
+    # 
+    # if (!validObject(am_statistical)) 
+    #     stop("'am_statistical' must be a valid 'AdjacencyMatrix' object")
+    # 
+    # if (!("consensus" %in% SummarizedExperiment::assayNames(am_statistical))) 
+    #     stop("'am_statistical' must contain assay 'consensus'")
+    # 
+    # if (!all(names(am_structural) == names(am_statistical)))
+    #     stop("names of 'am_structural' do not match names of 'am_statistical'")
+  
+  if ("structural" %in% c(type(am_1), type(am_2))){
+  
+    if (type(am_1) %in% "structural") {
+      am_structural = am_1
+      am_cons = am_2
+    }
+  
+    else #if (type(am_2) %in% "structural") 
+      {
+      am_structural = am_2
+      am_cons = am_1
+    }
+      
 
     ## create the first entry of the list
     ## sum the matrices structural and statistical, if the value is above
     ## threshold then assign 1, otherwise 0
     l_comb_binary <- SummarizedExperiment::assay(am_structural, "binary") + 
-        SummarizedExperiment::assay(am_statistical, "consensus")
+        SummarizedExperiment::assay(am_cons, "consensus")
     l_comb_binary <- ifelse(l_comb_binary > 1, 1, 0)
     
     ## create the entries of the list
@@ -125,30 +139,66 @@ combine <- function(am_structural, am_statistical) {
         SummarizedExperiment::assay(am_structural, .nms_i))
     names(l_structural) <- .nms
     
-    .nms <- SummarizedExperiment::assayNames(am_statistical)
-    l_statistical <- lapply(.nms, function(.nms_i) 
-        SummarizedExperiment::assay(am_statistical, .nms_i))
-    names(l_statistical) <- .nms
+    .nms <- SummarizedExperiment::assayNames(am_cons)
+    l_cons <- lapply(.nms, function(.nms_i) 
+        SummarizedExperiment::assay(am_cons, .nms_i))
+    names(l_cons) <- .nms
     
     ## concatenate the lists from structural, statistical and combine
-    l <- c(l_structural, l_statistical, l_comb)
+    l <- c(l_structural, l_cons, l_comb)
     
+    
+  }
+  else {## structural not in am_1 or am_2
+        ## create the first entry of the list
+    ## sum the matrices structural and statistical, if the value is above
+    ## threshold then assign 1, otherwise 0
+    l_comb_binary <- SummarizedExperiment::assay(am_1, "consensus") + 
+        SummarizedExperiment::assay(am_2, "consensus")
+    l_comb_binary <- ifelse(l_comb_binary > 1, 1, 0)
+    
+    
+    ## add the l_comb_binary to l_comb
+    l_comb <- list(binary = l_comb_binary)
+    names(l_comb) <- paste("combine_", names(l_comb), sep = "")
+    
+   
+    ## create the AdjacencyMatrix object, start with the structural 
+    ## AdjacencyMatrix, then the statistical AdjacencyMatrix and add 
+    ## the l_comb
+    .nms <- SummarizedExperiment::assayNames(am_1)
+    l_1 <- lapply(.nms, function(.nms_i) 
+        SummarizedExperiment::assay(am_1, .nms_i))
+    names(l_1) <- .nms
+    
+    .nms <- SummarizedExperiment::assayNames(am_2)
+    l_2 <- lapply(.nms, function(.nms_i) 
+        SummarizedExperiment::assay(am_2, .nms_i))
+    names(l_2) <- .nms
+    
+    ## concatenate the lists from structural, statistical and combine
+    l <- c(l_1, l_2, l_comb)
+  }
+    
+    
+    
+    ####################### stop 
     ## directed slot
-    if (directed(am_structural) | directed(am_statistical)) {
+    if (directed(am_1) | directed(am_2)) {
         directed <- TRUE 
     } else {
         directed <- FALSE
     }
     
     ## thresholded slot
-    if (am_structural@thresholded | am_statistical@thresholded) {
+    if (am_1@thresholded | am_2@thresholded) {
         thresholded <- TRUE 
     } else {
         thresholded <- FALSE
     }
     
     ## create the rowData
-    rD <- SummarizedExperiment::rowData(am_statistical)
+    rD <- SummarizedExperiment::rowData(am_1)
     
     ## finally, combine the information and create the AdjacencyMatrix object
     am <- AdjacencyMatrix(l, rowData = rD, type = "combine", 

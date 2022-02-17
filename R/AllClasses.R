@@ -149,6 +149,8 @@ setValidity2("AdjacencyMatrix", function(object) {
         "ggm_coef", "ggm_pvalue",
         "bayes_coef", "consensus")
     valid_names_combine <- "combine_binary"
+    ## allow variable methods in spectral
+    valid_names_spec <- assayNames(object)
 
     ## check if colnames, rownames for one assay are the same
     .assays_have_identical_colnames_rownames(object)
@@ -224,12 +226,12 @@ setValidity2("AdjacencyMatrix", function(object) {
         
         ## check for columns binary and combine binary 
         ## (these should be numeric)
-        if (!all(valid_names_struct %in% .nms))
-            msg <- c(msg, "assay names must contain 'binary'")
-        
-        .obj <- SummarizedExperiment::assay(object, "binary")
-        if (!is.numeric(.obj))
-            msg <- c(msg, "slot 'binary' must be numeric")
+        # if (!all(valid_names_struct %in% .nms))
+        #     msg <- c(msg, "assay names must contain 'binary'")
+        # 
+        # .obj <- SummarizedExperiment::assay(object, "binary")
+        # if (!is.numeric(.obj))
+        #     msg <- c(msg, "slot 'binary' must be numeric")
 
         if (!all(valid_names_combine %in% .nms))
             msg <- c(msg, "assay names must contain 'combine_binary'")
@@ -241,7 +243,7 @@ setValidity2("AdjacencyMatrix", function(object) {
         ## check for columns that originate from structural (expect for *binary)
         ## these should be character
         .nms_cut <- .nms[!.nms %in% 
-            c("binary", "combine_binary", valid_names_stat)]
+            c("binary", "combine_binary", valid_names_stat, valid_names_spec)]
         
         msg_l <- lapply(.nms_cut, function(.nms_cut_i) {
             .obj <- SummarizedExperiment::assay(object, .nms_cut_i)
@@ -260,6 +262,8 @@ setValidity2("AdjacencyMatrix", function(object) {
                 sprintf("slot '%s' must be numeric", .nms_cut_i)
         })
         msg <- c(msg, unlist(msg_l))
+        
+        
     }
 
     if (is.null(msg)) {

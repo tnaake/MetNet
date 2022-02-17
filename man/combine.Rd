@@ -4,7 +4,7 @@
 \alias{combine}
 \title{Combine structural and statistical `AdjacencyMatrix` objects}
 \usage{
-combine(am_structural, am_statistical)
+combine(am_1, am_2)
 }
 \arguments{
 \item{am_structural}{`AdjacencyMatrix` containing the `numeric` structural 
