@@ -444,14 +444,6 @@ spect_adj_thr <- threshold(am = spect_adj, type = "threshold",
 
 ```
 
-
-
-
-
-
-
-
-
 # Creating the statistical adjacency {#sec-statistical}
 
 ## Creating weighted adjacency matrices using `statistical` {#subsec-statistical}
@@ -595,7 +587,7 @@ We will use here the thresholded `statistical` `AdjacencyMatrix` from
 `type = "mean"` to combine it with the `structural` `AdjacencyMatrix`, 
 `stat_adj`: 
 ```{r combine,eval=TRUE,echo=TRUE}
-comb_adj <- combine(am_structural = struct_adj, am_statistical = stat_adj_mean)
+comb_adj <- combine(am_structural = spect_adj_thr, am_statistical = stat_adj_mean)
 ```
 
 # Visualization and further analyses {#sec-visualization}

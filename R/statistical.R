@@ -1237,9 +1237,13 @@ threshold <- function(am,
             cons[as.numeric(rownames(ranks_NA))] <- NA    
         }
     }
-
+    
     ## assign the consensus matrix to a new slot
-    assay(am, "consensus") <- cons
+    if (am@type == "structural") {
+      assay(am, "binary") <- cons
+    } else 
+      assay(am, "consensus") <- cons
+    
     
     if (type %in% c("top1", "top2", "mean") & values %in% c("min", "max")) 
         am@directed <- FALSE
