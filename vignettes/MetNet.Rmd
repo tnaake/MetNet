@@ -436,7 +436,7 @@ args_thr <- list(filter = "ndotproduct > 0.1")
 
 ## return edges with normalized dotproduct > 0.10, even if no mass-difference 
 ## was detected between pairs of features
-args_thr <- list(filter = "ndotproduct > 0.1 | binary == 1 & is.na(ndotproduct))")
+args_thr <- list(filter = "ndotproduct > 0.1 | binary == 1 & is.na(ndotproduct)")
 
 ## pass the filtering criteria to the args argument and set type to "threshold"
 spect_adj_thr <- threshold(am = spect_adj, type = "threshold", 

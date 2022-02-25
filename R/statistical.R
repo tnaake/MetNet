@@ -1086,9 +1086,11 @@ threshold <- function(am,
         stop("'am' must be a valid 'AdjacencyMatrix' object")
     }
 
-    if (am@thresholded) {
-        stop("'am' has been already thresholded")
-    }
+    ## was removed because otherwise structural matrix containing spectral 
+    ## similarity matrix cannot be thresholded if rtCorrection was applied
+    # if (am@thresholded) {
+    #     stop("'am' has been already thresholded")
+    # }
     
     ## args, either N for tops
     ## or a list of threshold
