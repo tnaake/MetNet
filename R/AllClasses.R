@@ -173,7 +173,7 @@ setValidity2("AdjacencyMatrix", function(object) {
         
         msg_l <- lapply(.nms_cut, function(.nms_i) {
             .obj <- SummarizedExperiment::assay(object, .nms_i)
-            if (!is.character(.obj) | !is.numeric(.obj))
+            if (!is.character(.obj) & !is.numeric(.obj))
                 sprintf("slot '%s' must be character or numeric", .nms_i)
         })
         msg <- c(msg, unlist(msg_l))
