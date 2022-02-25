@@ -474,3 +474,141 @@ rtCorrection <- function(am, x, transformation, var = "group") {
     
     return(am)
 }
+
+
+#' @name addSpectSimil
+#'
+#' @aliases addSpectSimil
+#'
+#' @title Adding a spectral similarity matrix to the "structural" 
+#' `AdjacencyMatrix`.
+#' 
+#' @description
+#' The function `addSpectSimil` infers adjacency matrix topologies from
+#' spectral similarity methods and adds matrices of these networks into the 
+#' "structural" `AdjacencyMatrix` object. 
+#' The function includes functionality to calculate adjacency matrices based on 
+#' spectral similarity methods included in the `Spectra` package.
+#' It uses a `Spectra`-object, storing the ms2 information and using a previously 
+#' created `AdjacencyMatrix` object from the type "structural" in order to 
+#' perform the mapping on the ms1 features. 
+#' The function returns an `AdjacencyMatrix` object of adjacency matrices that 
+#' are defined by `methods`.
+#'
+#' @param spectral 
+#' `Spectra` object that contains a unique "id" (see `spectraVariables()`), 
+#' matching to the row-/colnames of the structural `AdjacencyMatrix` and storing
+#' important information of MS2 data (i.e. mz and intensity).
+#' 
+#' @param am_structural 
+#' `AdjacencyMatrix` of type "structural" that was created using matching MS1 
+#' data of the same data set. The respective spectral similarity matrices will 
+#' be added into am_structural 
+#'
+#' @param methods 
+#' `character` vector containing the methods that will be used. All methods can 
+#' be used that are already implemented in the `RforMassSpectrometry` 
+#' infrastructure, e.g. (`"ndotproduct"`(default), `"gnps"`). 
+#' `methods` are then forwarded to `FUN` in `Spectra::compareSpectra()`.
+#'
+#' @param ... 
+#' parameters passed to the functions  `combineSpectra` from the `Spectra` 
+#' package (e.g. `MAPFUN`, `tolerance`, `ppm`, `type`, ...).
+#'
+#' @details
+#' The function `addSpectSimil` includes functionality to calculate adjacency
+#' matrices based on different spectral similarity measures provided by the 
+#' `RforMassSpectrometry` infrastructure. 
+#' `addSpectSimil` calls the different functions (`FUN` parameter in 
+#' `Spectra::compareSpectra()`) as specified by `methods`. The default is the 
+#' normalized dotproduct `"ndotproduct"`. Moreover, different parameters (e.g. 
+#' `MAPFUN`, `tolerance`, `ppm`, `type`, ...) of the function 
+#' `Spectra::compareSpectra()` are forwarded by `...`. 
+#' `addSpectSimil` will create adjacency matrices using the specified methods 
+#' and will return the "structural" `AdjacencyMatrix` containing the added
+#' weighted adjacency matrices in the `assays` slot.
+#'
+#' It is very important that features IDs in the MS1 data (i.e. row/colnames of 
+#' `am_structural`) are matching to the IDs of the respective MS2 data (i.e. 
+#' `"id"` in the `spectraVariables()`). Also, the `Spectra` object `spectra` is 
+#' required to have unique `"id"`s, meaning on representative spectrum per 
+#' feature. If features store multiple spectra, spectra consolidation has to be 
+#' performed first (e.g. using the function `Spectra::combineSpectra`).
+#' 
+#'
+#' @return `AdjacencyMatrix` of type "structural" containing the respective 
+#' adjacency matrices in the `assay` slot as specified by `methods`
+#'
+#' @author Liesa Salzer
+#'
+#' @examples
+#' 
+#' data("x_test", package = "MetNet")
+#' transformation <- rbind(
+#'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
+#'     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
+#'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
+#' transformation <- data.frame(group = transformation[, 1],
+#'                                 formula = transformation[, 2],
+#'                                 mass = as.numeric(transformation[, 3]))
+#' am_struct <- structural(x_test, transformation, var = c("group", "mass"),
+#'     ppm = 10, directed = TRUE)
+#'
+#' data("ms2_test", package = "MetNet")
+#' 
+#' am_struct-spect <- addSpectSimil(spectra = sps_sub, 
+#'                            am_structural = am_struct, 
+#'                            methods = "ndotproduct", 
+#'                            tolerance = 0.05)
+#'
+#' @export
+#' 
+#' @import MsCoreUtils
+
+addSpectSimil <- function(spectra, am_structural, methods = c("ndotproduct"), ...) {
+  
+  ## sanity checks
+  if (!is(spectra, "Spectra")) 
+    stop("'x' is not a 'Spectra' object")
+  
+  if (!is(am_structural, "AdjacencyMatrix")) 
+    stop("'am_structural' is not an 'AdjacencyMatrix' object")
+  
+  if (!validObject(am_structural)) 
+    stop("'am_structural' must be a valid 'AdjacencyMatrix' object")
+  
+  if(!"id" %in% spectraVariables(spectra)) 
+    stop("Spectra does not contain id column!")
+ 
+  if(!length(unique(spectra$id)) == length(spectra)) 
+    stop("Spectra shall contain only unique entries!")
+    
+  l <- list()
+  
+  for(method in methods) {
+    ## create empty slots of adjacency matrix based on feature names of MS1 
+    ## data and where we can fill then similarity values of MS2 data
+    am = matrix(NA, nrow = nrow(am_structural), ncol = nrow(am_structural))
+    rownames(am) = rownames(am_structural)
+    colnames(am) = colnames(am_structural)
+    
+    
+    ## create spectral similarity matrix
+    adj_spec <- Spectra::compareSpectra(spectra,
+                                        FUN = get(method),
+                                        ...)
+    
+    colnames(adj_spec) <- spectra$id
+    rownames(adj_spec) <- spectra$id
+    
+    am[rownames(adj_spec), colnames(adj_spec)] <- adj_spec
+    
+    ## assign the spectral similarity matrix to a new slot in structural
+    assay(am_structural, method) <- am
+    
+  }
+  
+  
+ return(am_structural)
+  
+}
