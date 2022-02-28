@@ -585,9 +585,9 @@ set to "").
 
 We will use here the thresholded `statistical` `AdjacencyMatrix` from 
 `type = "mean"` to combine it with the `structural` `AdjacencyMatrix`, 
-`stat_adj`: 
+`struct_adj`: 
 ```{r combine,eval=TRUE,echo=TRUE}
-comb_adj <- combine(am_structural = stat_adj, am_statistical = stat_adj_mean)
+comb_adj <- combine(am_structural = struct_adj, am_statistical = stat_adj_mean)
 ```
 
 We can also combine the `statistical` `AdjacencyMatrix` 

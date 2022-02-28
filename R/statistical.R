@@ -953,12 +953,14 @@ getLinks <- function(mat, exclude = "== 1", decreasing = TRUE) {
 #'
 #' @aliases threshold
 #'
-#' @title  Threshold the statistical adjacency matrices
+#' @title  Threshold the statistical adjacency or spectral similarity matrices
 #'
 #' @description
 #' The function `threshold` takes as input an `AdjacencyMatrix` object 
 #' containing adjacency matrices
-#' as returned from the function `statistical`. Depending on the `type`
+#' as returned from the function `statistical` OR the `AdjacencyMatrix` 
+#' object of the type "structural" containing spectral similarity adjacency 
+#' matrices, that were added by `addSpectSimil()`.Depending on the `type`
 #' argument, `threshold` will identify the strongest link that are
 #' lower or higher a certain threshold (`type = "threshold"`) or
 #' identify the top `n` links (`type` either `"top1`, `"top2` or `"mean"`).
@@ -966,7 +968,9 @@ getLinks <- function(mat, exclude = "== 1", decreasing = TRUE) {
 #' of an `AdjacencyMatrix` object. 
 #'
 #' @param am `AdjacencyMatrix` object of `type` `"statistical"` as 
-#' created from the function `statistical`. The object will contain the
+#' created from the function `statistical` OR `AdjacencyMatrix` 
+#' object of the type "structural" containing spectral similarity adjacency 
+#' matrices, that were added by `addSpectSimil()`. The object will contain the
 #' adjacency matrices in the `assay` slot.
 #'
 #' @param type `character`, either `"threshold"`, `"top1`, `"top2` or
@@ -1002,7 +1006,8 @@ getLinks <- function(mat, exclude = "== 1", decreasing = TRUE) {
 #' @param na.rm `logical`, if set to `TRUE`, the `NA`s in the assay slots will 
 #' not be taken into account when creating the `"consensus"` assay. If set 
 #' to `FALSE`, the `NA`s will be taken into account and might be passed to the
-#' `"consensus"` assay. If `FALSE` the user can set the filter e.g. to 
+#' `"consensus"` assay (or `"binary"` if input was type "structural"). 
+#' If `FALSE` the user can set the filter e.g. to 
 #' `(ggm_coef > 0 | is.na(ggm_coef))`, when there are `NA`s in 
 #' `ggm_coef` to disregard `NA`s. 
 #'
@@ -1039,7 +1044,9 @@ getLinks <- function(mat, exclude = "== 1", decreasing = TRUE) {
 #'
 #' @return `AdjacencyMatrix` object containing a binary adjacency matrix
 #' given the links supported by the `type` and the `args` (in the slot 
-#' `"consensus"`. The object will furthermore contain the supplied data input,
+#' `"consensus"` if the input was type "statistical" or in the slot
+#' `"binary"` if it was type "structural". 
+#' The object will furthermore contain the supplied data input,
 #' i.e. all assays from `am`. The slot `threshold` is set to `TRUE`.
 #'
 #' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
@@ -1091,6 +1098,8 @@ threshold <- function(am,
     # if (am@thresholded) {
     #     stop("'am' has been already thresholded")
     # }
+    if (am@type == "structural" & type != "threshold") 
+      stop("'am' 'structural' can only be thresholded by 'type = threshold'")
     
     ## args, either N for tops
     ## or a list of threshold

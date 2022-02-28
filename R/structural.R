@@ -487,15 +487,15 @@ rtCorrection <- function(am, x, transformation, var = "group") {
 #' The function `addSpectSimil` infers adjacency matrix topologies from
 #' spectral similarity methods and adds matrices of these networks into the 
 #' "structural" `AdjacencyMatrix` object. 
-#' The function includes functionality to calculate adjacency matrices based on 
-#' spectral similarity methods included in the `Spectra` package.
-#' It uses a `Spectra`-object, storing the ms2 information and using a previously 
-#' created `AdjacencyMatrix` object from the type "structural" in order to 
-#' perform the mapping on the ms1 features. 
+#' The function includes functionality to calculate adjacency matrices 
+#' based on spectral similarity methods included in the `Spectra` package.
+#' It uses a `Spectra`-object, storing the ms2 information and using 
+#' a previously created `AdjacencyMatrix` object from the type "structural" 
+#' in order to perform the mapping on the ms1 features. 
 #' The function returns an `AdjacencyMatrix` object of adjacency matrices that 
 #' are defined by `methods`.
 #'
-#' @param spectral 
+#' @param spectra 
 #' `Spectra` object that contains a unique "id" (see `spectraVariables()`), 
 #' matching to the row-/colnames of the structural `AdjacencyMatrix` and storing
 #' important information of MS2 data (i.e. mz and intensity).
@@ -528,7 +528,7 @@ rtCorrection <- function(am, x, transformation, var = "group") {
 #' and will return the "structural" `AdjacencyMatrix` containing the added
 #' weighted adjacency matrices in the `assays` slot.
 #'
-#' It is very important that features IDs in the MS1 data (i.e. row/colnames of 
+#' It is important that features IDs in the MS1 data (i.e. row/colnames of 
 #' `am_structural`) are matching to the IDs of the respective MS2 data (i.e. 
 #' `"id"` in the `spectraVariables()`). Also, the `Spectra` object `spectra` is 
 #' required to have unique `"id"`s, meaning on representative spectrum per 
@@ -563,7 +563,7 @@ rtCorrection <- function(am, x, transformation, var = "group") {
 #'
 #' @export
 #' @importFrom MsCoreUtils ndotproduct
-#' @importFrom Spectra spectraVariables
+#' @importFrom Spectra spectraVariables compareSpectra
 
 addSpectSimil <- function(spectra, am_structural, 
                           methods = c("ndotproduct"), ...) {
