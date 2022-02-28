@@ -563,9 +563,9 @@ rtCorrection <- function(am, x, transformation, var = "group") {
 #'
 #' @export
 #' 
-#' @import MsCoreUtils
 
-addSpectSimil <- function(spectra, am_structural, methods = c("ndotproduct"), ...) {
+addSpectSimil <- function(spectra, am_structural, 
+                          methods = c("ndotproduct"), ...) {
   
   ## sanity checks
   if (!is(spectra, "Spectra")) 
