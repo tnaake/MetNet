@@ -71,7 +71,7 @@ test_that("threshold and combine similarity", {
                rownames(assay(spect_adj, "binary")))
   expect_equal(colnames(assay(thr_thr, "binary")), 
                colnames(assay(spect_adj, "binary")))
-  expect_equal(sum(assay(thr_thr, "binary"), na.rm = TRUE), 98)
+  expect_equal(sum(assay(thr_thr, "binary"), na.rm = TRUE), 60)
   expect_true(all(assay(thr_thr, "binary") %in% c(0, 1, NaN)))
   
   ## test combine
