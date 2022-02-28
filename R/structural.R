@@ -562,7 +562,7 @@ rtCorrection <- function(am, x, transformation, var = "group") {
 #'                            tolerance = 0.05)
 #'
 #' @export
-#' 
+#' @importFrom ndotproduct MsCoreUtils
 
 addSpectSimil <- function(spectra, am_structural, 
                           methods = c("ndotproduct"), ...) {
