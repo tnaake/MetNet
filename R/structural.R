@@ -484,56 +484,33 @@ rtCorrection <- function(am, x, transformation, var = "group") {
 #' `AdjacencyMatrix`.
 #' 
 #' @description
-#' The function `addSpectralSimilarity` infers adjacency matrix topologies from
-#' spectral similarity methods and adds matrices of these networks into the 
+#' The function `addSpectralSimilarity` adds adjacency matrices from
+#' spectral similarity into the 
 #' "structural" `AdjacencyMatrix` object. 
-#' The function includes functionality to calculate adjacency matrices 
-#' based on spectral similarity methods included in the `Spectra` package.
-#' It uses a `Spectra`-object, storing the ms2 information and using 
-#' a previously created `AdjacencyMatrix` object from the type "structural" 
-#' in order to perform the mapping on the ms1 features. 
-#' The function returns an `AdjacencyMatrix` object of adjacency matrices that 
-#' are defined by `methods`.
+#' It uses a list of spectral similarity matrices.
 #'
-#' @param spectra 
-#' `Spectra` object that contains a unique "id" (see `spectraVariables()`), 
-#' matching to the row-/colnames of the structural `AdjacencyMatrix` and storing
-#' important information of MS2 data (i.e. mz and intensity).
+#' @param ms2_similarity 
+#' `list` containing spectral similarity adjacency matrices with 
+#' matching row-/colnames of the structural `AdjacencyMatrix`. The name of the 
+#' list entries should match to the similarity calculus (e.g. "ndotproduct")
 #' 
 #' @param am_structural 
 #' `AdjacencyMatrix` of type "structural" that was created using matching MS1 
 #' data of the same data set. The respective spectral similarity matrices will 
 #' be added into am_structural 
 #'
-#' @param methods 
-#' `character` vector containing the methods that will be used. All methods can 
-#' be used that are already implemented in the `RforMassSpectrometry` 
-#' infrastructure, e.g. (`"ndotproduct"`(default), `"gnps"`). 
-#' `methods` are then forwarded to `FUN` in `Spectra::compareSpectra()`.
-#'
-#' @param ... 
-#' parameters passed to the functions  `combineSpectra` from the `Spectra` 
-#' package (e.g. `MAPFUN`, `tolerance`, `ppm`, `type`, ...).
-#'
 #' @details
-#' The function `addSpectralSimilarity` includes functionality to calculate adjacency
-#' matrices based on different spectral similarity measures provided by the 
+#' The function `addSpectralSimilarity` includes functionality to add 
+#' spectral adjacency matrices e.g. that were created by functionality from the 
 #' `RforMassSpectrometry` infrastructure. 
-#' `addSpectralSimilarity` calls the different functions (`FUN` parameter in 
-#' `Spectra::compareSpectra()`) as specified by `methods`. The default is the 
-#' normalized dotproduct `"ndotproduct"`. Moreover, different parameters (e.g. 
-#' `MAPFUN`, `tolerance`, `ppm`, `type`, ...) of the function 
-#' `Spectra::compareSpectra()` are forwarded by `...`. 
-#' `addSpectralSimilarity` will create adjacency matrices using the specified methods 
+#' `addSpectralSimilarity` iterates through a `list` with named spectral 
+#' similarity matrices and adds them to the "structural" `AdjacencyMatrix`.
+#' Matching between spectral similarity and "structural" `AdjacencyMatrix` is
+#' performed via rownames/colnames. Thus, it is important that the spectral 
+#' similarity matrices have row/colnames matching to the respective MS1 data.
+#' `addSpectralSimilarity` will add the adjacency matrices  
 #' and will return the "structural" `AdjacencyMatrix` containing the added
 #' weighted adjacency matrices in the `assays` slot.
-#'
-#' It is important that features IDs in the MS1 data (i.e. row/colnames of 
-#' `am_structural`) are matching to the IDs of the respective MS2 data (i.e. 
-#' `"id"` in the `spectraVariables()`). Also, the `Spectra` object `spectra` is 
-#' required to have unique `"id"`s, meaning on representative spectrum per 
-#' feature. If features store multiple spectra, spectra consolidation has to be 
-#' performed first (e.g. using the function `Spectra::combineSpectra`).
 #' 
 #'
 #' @return `AdjacencyMatrix` of type "structural" containing the respective 
@@ -554,26 +531,17 @@ rtCorrection <- function(am, x, transformation, var = "group") {
 #' am_struct <- structural(x_test, transformation, var = c("group", "mass"),
 #'     ppm = 10, directed = TRUE)
 #'
-#' data("ms2_test", package = "MetNet")
-#' 
-#' am_struct-spect <- addSpectralSimilarity(spectra = sps_sub, 
-#'                            am_structural = am_struct, 
-#'                            methods = "ndotproduct", 
-#'                            tolerance = 0.05)
+#' data("spectra_matrix", package = "MetNet")
+#'
+#'
+#'spect_adj <- addSpectralSimilarity(am_structural = struct_adj, 
+#'                                   ms2_similarity = list("ndotproduct" = adj_spec))
 #'
 #' @export
-<<<<<<< HEAD
 
 addSpectralSimilarity <- function(am_structural,
                                   ms2_similarity = list()) {
-=======
-#' @importFrom MsCoreUtils ndotproduct
-#' @importFrom Spectra spectraVariables compareSpectra
 
-addSpectSimil <- function(spectra, am_structural, 
-                          methods = c("ndotproduct"), ...) {
->>>>>>> 161b05c27983d1b21ea55e4301df4e7b9265b201
-  
   ## sanity checks
   if (!is(am_structural, "AdjacencyMatrix")) 
     stop("'am_structural' is not an 'AdjacencyMatrix' object")

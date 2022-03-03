@@ -380,34 +380,22 @@ rowData(struct_adj)["x1856", ]
 
 `MetNet` can also incorporate information from spectral similarity to the 
 `structural` `AdjacencyMatrix`. 
-`addSpectralSimilarity` uses functionality from the `Spectra` package, in order to 
-create a spectral similarity matrix using MS2 data and adds it to the previously 
-generated `structural` `AdjacencyMatrix`. 
-It requires a `Spectra` object as input, storing the MS2 information and 
-matching Feature ID's in the `spectra$id` slot. The "id" (see 
-`spectraVariables()`)needs to be unique, meaning there is only one 
-(representative) MS2 spectrum per feature. If features store multiple spectra, 
-spectra consolidation has to be performed first (e.g. using the function 
-`Spectra::combineSpectra()`).
+`addSpectralSimilarity` uses a `list` of spectral similarity matrices  
+(e.g. that were created using functionality from the `Spectra` package)
+and adds them to the `structural` `AdjacencyMatrix`.
+Column- and rownames of the spectral similarity matrix should match to the
+respective feature names in the respective MS1 data (i.e. colnames/rownames 
+in the `structural` `AdjacencyMatrix`)
 
-Features from `spectra` will be matched accordingly to the feature names in the 
-MS1 data (i.e. colnames/rownames in the `structural` `AdjacencyMatrix`).
 The function will create weighted adjacency matrices using the spectral 
-similarity methods defined by the `methods` argument. The default is the 
-normalized dotproduct `"ndotproduct"`. Moreover, different parameters (e.g. 
-`MAPFUN`, `tolerance`, `ppm`, `type`, ...) of are forwarded to the function
-`Spectra::compareSpectra()`. 
-For further information on the different spectral similarity methods and input 
-parameters take a look on the respective help pages of 
-`Spectra::compareSpectra`.
-
+similarity methods defined by names of the list-entries (e.g. "ndotproduct").
 
 In the following example, we load a toy MS2 dataset, represented as `Spectra` 
 object. This object stores unique id's, matching to the respective 
 MS1 data.
 We will then create a spectral similarity adjacency matrices using the 
-normalized dotproduct and the previously created "structural" `AdjacencyMatrix`
-as input. 
+normalized dotproduct and add them to the previously created "structural" 
+`AdjacencyMatrix`.
 
 
 ```{r spectral,eval=TRUE,echo=TRUE}
@@ -429,13 +417,14 @@ spect_adj <- addSpectralSimilarity(am_structural = struct_adj,
 ```
 
 
-Further, the spectral similarity matrix can be thresholded using the function `threshold`. 
-The user needs to define whether the data should be thresholded or not 
-If multiple methods have been used to generate the spectral matrices, different threshold parameters can be defined (for detailed description see thresholding of statistical)
+Further, the spectral similarity matrix can be thresholded using the 
+function `threshold`. 
+The user needs to define whether the data should be thresholded or not. 
+If multiple methods have been used to generate the spectral matrices, 
+different threshold parameters can be defined (for detailed description see 
+thresholding of `statistical`).
 
 ```{r threshold structural,eval=TRUE,echo=TRUE}
-## type = "threshold" 
-
 ## the assayNames in spect_adj are used to define the filter criteria
 assayNames(spect_adj)
 
