@@ -8,6 +8,10 @@
 addSpectSimil(spectra, am_structural, methods = c("ndotproduct"), ...)
 }
 \arguments{
+\item{spectra}{`Spectra` object that contains a unique "id" (see `spectraVariables()`), 
+matching to the row-/colnames of the structural `AdjacencyMatrix` and storing
+important information of MS2 data (i.e. mz and intensity).}
+
 \item{am_structural}{`AdjacencyMatrix` of type "structural" that was created using matching MS1 
 data of the same data set. The respective spectral similarity matrices will 
 be added into am_structural}
@@ -19,10 +23,6 @@ infrastructure, e.g. (`"ndotproduct"`(default), `"gnps"`).
 
 \item{...}{parameters passed to the functions  `combineSpectra` from the `Spectra` 
 package (e.g. `MAPFUN`, `tolerance`, `ppm`, `type`, ...).}
-
-\item{spectral}{`Spectra` object that contains a unique "id" (see `spectraVariables()`), 
-matching to the row-/colnames of the structural `AdjacencyMatrix` and storing
-important information of MS2 data (i.e. mz and intensity).}
 }
 \value{
 `AdjacencyMatrix` of type "structural" containing the respective 
@@ -32,11 +32,11 @@ adjacency matrices in the `assay` slot as specified by `methods`
 The function `addSpectSimil` infers adjacency matrix topologies from
 spectral similarity methods and adds matrices of these networks into the 
 "structural" `AdjacencyMatrix` object. 
-The function includes functionality to calculate adjacency matrices based on 
-spectral similarity methods included in the `Spectra` package.
-It uses a `Spectra`-object, storing the ms2 information and using a previously 
-created `AdjacencyMatrix` object from the type "structural" in order to 
-perform the mapping on the ms1 features. 
+The function includes functionality to calculate adjacency matrices 
+based on spectral similarity methods included in the `Spectra` package.
+It uses a `Spectra`-object, storing the ms2 information and using 
+a previously created `AdjacencyMatrix` object from the type "structural" 
+in order to perform the mapping on the ms1 features. 
 The function returns an `AdjacencyMatrix` object of adjacency matrices that 
 are defined by `methods`.
 }
@@ -53,7 +53,7 @@ normalized dotproduct `"ndotproduct"`. Moreover, different parameters (e.g.
 and will return the "structural" `AdjacencyMatrix` containing the added
 weighted adjacency matrices in the `assays` slot.
 
-It is very important that features IDs in the MS1 data (i.e. row/colnames of 
+It is important that features IDs in the MS1 data (i.e. row/colnames of 
 `am_structural`) are matching to the IDs of the respective MS2 data (i.e. 
 `"id"` in the `spectraVariables()`). Also, the `Spectra` object `spectra` is 
 required to have unique `"id"`s, meaning on representative spectrum per 

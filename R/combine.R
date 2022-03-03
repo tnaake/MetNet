@@ -22,8 +22,9 @@
 #' `AdjacencyMatrix` object.
 #'
 #' @param am_structural `AdjacencyMatrix` containing the `numeric` structural 
-#' adjacency matrix (assay `binary`) and other `character` structural adjacency 
-#' matrices (e.g. `group` and  `mass`).
+#' adjacency matrix (assay `binary`) and other `character` or `numeric` 
+#' structural and spectral similarity adjacency 
+#' matrices (e.g. `group`, `mass` or spectral similarity as `ndotprodcut`).
 #'
 #' @param am_statistical `AdjacencyMatrix` containing the assay `consensus` and
 #' other `numeric` adjacency matrices depending on the chosen statistical 
