@@ -474,3 +474,100 @@ rtCorrection <- function(am, x, transformation, var = "group") {
     
     return(am)
 }
+
+
+#' @name addSpectralSimilarity
+#'
+#' @aliases addSpectralSimilarity
+#'
+#' @title Adding a spectral similarity matrix to the "structural" 
+#' `AdjacencyMatrix`.
+#' 
+#' @description
+#' The function `addSpectralSimilarity` adds adjacency matrices from
+#' spectral similarity into the 
+#' "structural" `AdjacencyMatrix` object. 
+#' It uses a list of spectral similarity matrices.
+#'
+#' @param ms2_similarity 
+#' `list` containing spectral similarity adjacency matrices with 
+#' matching row-/colnames of the structural `AdjacencyMatrix`. The name of the 
+#' list entries should match to the similarity calculus (e.g. "ndotproduct")
+#' 
+#' @param am_structural 
+#' `AdjacencyMatrix` of type "structural" that was created using matching MS1 
+#' data of the same data set. The respective spectral similarity matrices will 
+#' be added into am_structural 
+#'
+#' @details
+#' The function `addSpectralSimilarity` includes functionality to add 
+#' spectral adjacency matrices e.g. that were created by functionality from the 
+#' `RforMassSpectrometry` infrastructure. 
+#' `addSpectralSimilarity` iterates through a `list` with named spectral 
+#' similarity matrices and adds them to the "structural" `AdjacencyMatrix`.
+#' Matching between spectral similarity and "structural" `AdjacencyMatrix` is
+#' performed via rownames/colnames. Thus, it is important that the spectral 
+#' similarity matrices have row/colnames matching to the respective MS1 data.
+#' `addSpectralSimilarity` will add the adjacency matrices  
+#' and will return the "structural" `AdjacencyMatrix` containing the added
+#' weighted adjacency matrices in the `assays` slot.
+#' 
+#'
+#' @return `AdjacencyMatrix` of type "structural" containing the respective 
+#' adjacency matrices in the `assay` slot as specified by `methods`
+#'
+#' @author Liesa Salzer
+#'
+#' @examples
+#' 
+#' data("x_test", package = "MetNet")
+#' transformation <- rbind(
+#'     c("Monosaccharide (-H2O)", "C6H10O5", "162.0528234315"),
+#'     c("Disaccharide (-H2O)", "C12H20O11", "340.1005614851"),
+#'     c("Trisaccharide (-H2O)", "C18H30O15", "486.1584702945"))
+#' transformation <- data.frame(group = transformation[, 1],
+#'                                 formula = transformation[, 2],
+#'                                 mass = as.numeric(transformation[, 3]))
+#' am_struct <- structural(x_test, transformation, var = c("group", "mass"),
+#'     ppm = 10, directed = TRUE)
+#'
+#' data("spectra_matrix", package = "MetNet")
+#'
+#'
+#'spect_adj <- addSpectralSimilarity(am_structural = struct_adj, 
+#'                                   ms2_similarity = list("ndotproduct" = adj_spec))
+#'
+#' @export
+
+addSpectralSimilarity <- function(am_structural,
+                                  ms2_similarity = list()) {
+
+  ## sanity checks
+  if (!is(am_structural, "AdjacencyMatrix")) 
+    stop("'am_structural' is not an 'AdjacencyMatrix' object")
+  
+  if (!validObject(am_structural)) 
+    stop("'am_structural' must be a valid 'AdjacencyMatrix' object")
+  
+    
+  for(i in names(ms2_similarity)) {
+    ## create empty slots of adjacency matrix based on feature names of MS1 
+    ## data and where we can fill then similarity values of MS2 data
+    am = matrix(NA, nrow = nrow(am_structural), ncol = nrow(am_structural))
+    rownames(am) = rownames(am_structural)
+    colnames(am) = colnames(am_structural)
+    
+
+    adj_spec <- ms2_similarity[[i]]
+    
+    am[rownames(adj_spec), colnames(adj_spec)] <- adj_spec
+    
+    ## assign the spectral similarity matrix to a new slot in structural
+    assay(am_structural, i) <- am
+    
+  }
+  
+  
+ return(am_structural)
+  
+}

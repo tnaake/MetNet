@@ -34,7 +34,9 @@ Suggests:
     igraph (>= 1.1.2), 
     knitr (>= 1.11),
     rmarkdown (>= 1.15),
-    testthat (>= 2.2.1)
+    testthat (>= 2.2.1),
+    Spectra (>= 1.5.11),
+    MsCoreUtils (>= 1.7.2)
 biocViews: ImmunoOncology, Metabolomics, MassSpectrometry, Network, Regression
 Description: MetNet contains functionality to infer metabolic network topologies from 
   quantitative data and high-resolution mass/charge information. Using statistical models

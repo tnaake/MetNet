@@ -376,6 +376,70 @@ rowData(struct_adj) <- x_annotation
 ## display annotation for the feature "1856"
 rowData(struct_adj)["x1856", ]
 ```
+## Adding spectral similarity to the structural adjacency 
+
+`MetNet` can also incorporate information from spectral similarity to the 
+`structural` `AdjacencyMatrix`. 
+`addSpectralSimilarity` uses a `list` of spectral similarity matrices  
+(e.g. that were created using functionality from the `Spectra` package)
+and adds them to the `structural` `AdjacencyMatrix`.
+Column- and rownames of the spectral similarity matrix should match to the
+respective feature names in the respective MS1 data (i.e. colnames/rownames 
+in the `structural` `AdjacencyMatrix`)
+
+The function will create weighted adjacency matrices using the spectral 
+similarity methods defined by names of the list-entries (e.g. "ndotproduct").
+
+In the following example, we load a toy MS2 dataset, represented as `Spectra` 
+object. This object stores unique id's, matching to the respective 
+MS1 data.
+We will then create a spectral similarity adjacency matrices using the 
+normalized dotproduct and add them to the previously created "structural" 
+`AdjacencyMatrix`.
+
+
+```{r spectral,eval=TRUE,echo=TRUE}
+data("ms2_test", package = "MetNet")
+# required for ndotproduct calculus
+library(MsCoreUtils)
+library(Spectra)
+
+## create spectral similarity matrix
+adj_spec <- Spectra::compareSpectra(sps_sub,
+                                     FUN = ndotproduct)
+colnames(adj_spec) <- sps_sub$id
+rownames(adj_spec) <- sps_sub$id
+
+spect_adj <- addSpectralSimilarity(am_structural = struct_adj, 
+                                   ms2_similarity = list("ndotproduct" = adj_spec))
+                                    
+                        
+```
+
+
+Further, the spectral similarity matrix can be thresholded using the 
+function `threshold`. 
+The user needs to define whether the data should be thresholded or not. 
+If multiple methods have been used to generate the spectral matrices, 
+different threshold parameters can be defined (for detailed description see 
+thresholding of `statistical`).
+
+```{r threshold structural,eval=TRUE,echo=TRUE}
+## the assayNames in spect_adj are used to define the filter criteria
+assayNames(spect_adj)
+
+## return edges with normalized dotproduct > 0.10
+args_thr <- list(filter = "ndotproduct > 0.1")
+
+## return edges with normalized dotproduct > 0.10, even if no mass-difference 
+## was detected between pairs of features
+args_thr <- list(filter = "ndotproduct > 0.1 | binary == 1 & is.na(ndotproduct)")
+
+## pass the filtering criteria to the args argument and set type to "threshold"
+spect_adj_thr <- threshold(am = spect_adj, type = "threshold", 
+    args = args_thr)
+
+```
 
 # Creating the statistical adjacency {#sec-statistical}
 
@@ -518,9 +582,18 @@ set to "").
 
 We will use here the thresholded `statistical` `AdjacencyMatrix` from 
 `type = "mean"` to combine it with the `structural` `AdjacencyMatrix`, 
-`stat_adj`: 
+`struct_adj`: 
 ```{r combine,eval=TRUE,echo=TRUE}
 comb_adj <- combine(am_structural = struct_adj, am_statistical = stat_adj_mean)
+```
+
+We can also combine the `statistical` `AdjacencyMatrix` 
+with the `structural` `AdjacencyMatrix` `spect_adj_thr`, based on the 
+thresholded spectral similarity values.
+
+```{r combine spect,eval=TRUE,echo=TRUE}
+comb_spect_adj <- combine(am_structural = spect_adj_thr, 
+                          am_statistical = stat_adj_mean)
 ```
 
 # Visualization and further analyses {#sec-visualization}
