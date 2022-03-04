@@ -1,3 +1,11 @@
+Changes in version 1.13.2 (2022-03-04)
++ add function addSpectralSimilarity and allow to add a MS2 similarity
+  matrix (contribution by Liesa Salzer)
++ adjust the functions threshold and combine to be able to deal with 
+  MS2 similarities  (contribution by Liesa Salzer)
++ adjust the vignette to the changes imposed by the new function 
+  addSpectralSimilarity (contribution by Liesa Salzer)
+ 
 Changes in version 1.13.1 (2022-02-11)
 + update unit tests, e.g. remove ggm for as.data.frame, set R=1000 for bayes
 

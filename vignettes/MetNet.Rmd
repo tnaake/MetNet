@@ -398,26 +398,24 @@ normalized dotproduct and add them to the previously created "structural"
 `AdjacencyMatrix`.
 
 
-```{r spectral,eval=TRUE,echo=TRUE}
-data("ms2_test", package = "MetNet")
+```{r spectral,eval = TRUE, echo = TRUE}
 # required for ndotproduct calculus
 library(MsCoreUtils)
 library(Spectra)
 
 ## create spectral similarity matrix
-adj_spec <- Spectra::compareSpectra(sps_sub,
-                                     FUN = ndotproduct)
+f <- system.file("spectra_matrix/ms2_test.RDS", package = "MetNet")
+sps_sub <- readRDS(f)
+ 
+adj_spec <- Spectra::compareSpectra(sps_sub, FUN = ndotproduct)
 colnames(adj_spec) <- sps_sub$id
 rownames(adj_spec) <- sps_sub$id
 
 spect_adj <- addSpectralSimilarity(am_structural = struct_adj, 
-                                   ms2_similarity = list("ndotproduct" = adj_spec))
-                                    
-                        
+    ms2_similarity = list("ndotproduct" = adj_spec))
 ```
 
-
-Further, the spectral similarity matrix can be thresholded using the 
+Furthermore, the spectral similarity matrix can be thresholded using the 
 function `threshold`. 
 The user needs to define whether the data should be thresholded or not. 
 If multiple methods have been used to generate the spectral matrices, 
@@ -438,7 +436,6 @@ args_thr <- list(filter = "ndotproduct > 0.1 | binary == 1 & is.na(ndotproduct)"
 ## pass the filtering criteria to the args argument and set type to "threshold"
 spect_adj_thr <- threshold(am = spect_adj, type = "threshold", 
     args = args_thr)
-
 ```
 
 # Creating the statistical adjacency {#sec-statistical}

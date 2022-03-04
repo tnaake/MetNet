@@ -169,6 +169,16 @@ setValidity2("AdjacencyMatrix", function(object) {
         if (!is.numeric(.obj))
             msg <- c(msg, "slot 'binary' must be numeric")
         
+        if ("transformation" %in% .nms) {
+            .obj <- SummarizedExperiment::assay(object, "transformation")  
+            if (!is.character(.obj))
+                msg <- c(msg, "slot 'transformation' must be character")
+        }
+        if ("mass" %in% .nms) {
+            .obj <- SummarizedExperiment::assay(object, "mass")  
+            if (!is.character(.obj))
+                msg <- c(msg, "slot 'mass' must be character")
+        }
         .nms_cut <- .nms[!.nms %in% "binary"]
         
         msg_l <- lapply(.nms_cut, function(.nms_i) {
