@@ -1,3 +1,6 @@
+Changes in version 1.12.2 (2022-04-09)
++ adjust tests when using bayes (increase to R = 1000) to pass tests
+  in test_methods (directed)
 
 Changes in version 1.11.5 (2021-10-12)
 + add assays in structural based on columns in transformations that are 

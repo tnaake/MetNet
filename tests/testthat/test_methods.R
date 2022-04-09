@@ -56,8 +56,9 @@ test_that("directed", {
     struct_adj_dir <- structural(x_test,
         transformation = transformations, ppm = 5, directed = TRUE)
     expect_equal(directed(struct_adj_dir), TRUE)
-    stat_adj_dir <- statistical(x_test_cut[1:5, 1:5],
-        model = c("clr", "aracne", "pearson", "spearman", "bayes"))
+    stat_adj_dir <- statistical(x_test_cut[1:10, 1:10],
+        model = c("clr", "aracne", "pearson", "spearman", "bayes"),
+        R = 1000)
     expect_equal(directed(stat_adj_dir), TRUE)
     expect_equal(directed(stat_adj), FALSE)
     expect_equal(directed(stat_adj_thr), FALSE)
