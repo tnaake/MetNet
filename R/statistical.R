@@ -340,6 +340,7 @@ correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
     if (method %in% c("pearson", "spearman")) {
         args_l[["x"]] <- t(x)
         args_l[["adjust"]] <- "none"
+        args_l[["ci"]] <- FALSE
         args_corrtest <- names(formals("corr.test"))
         args_l <- args_l[names(args_l) %in% args_corrtest]
         cor_mat <- do.call("corr.test", args_l)
