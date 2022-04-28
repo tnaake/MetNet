@@ -1,3 +1,7 @@
+Changes in version 1.15.1 (2022-04-27)
++ set ci in corr.test to FALSE to speed up calculation of correlation values
+  (function correlation)
+
 Changes in version 1.13.2 (2022-03-04)
 + add function addSpectralSimilarity and allow to add a MS2 similarity
   matrix (contribution by Liesa Salzer)
