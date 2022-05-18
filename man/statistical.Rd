@@ -13,7 +13,7 @@ features/metabolites (rows) per sample (columns).}
 
 \item{model}{`character` vector containing the methods that will be used
 (`"lasso"`, `"randomForest"`, `"clr"`, `"aracne"`, `"pearson"`,
-`"pearson_partial"`, `"spearman"`, `"spearman_partial"`, `"bayes"`)}
+`"pearson_partial"`, `"spearman"`, `"spearman_partial"`, `ggm`, `"bayes"`)}
 
 \item{...}{parameters passed to the functions  `lasso`, `randomForest`,
 `clr`, `aracne`, `correlation` and/or `bayes`}
@@ -46,7 +46,7 @@ Spearman correlation (also partial) and Constraint-based structure learning
 `statistical` calls the function
 `lasso`, `randomForest`, `clr`, `aracne`,
 `correlation` (for `"pearson"`, `"pearson_partial"`, `"spearman"`, 
-`"spearman_partial"`) and/or `bayes`
+`"spearman_partial"`, `"ggm"`) and/or `bayes`
 as specified by `model`. It will create adjacency matrices using the
 specified methods and will return an `AdjacencyMatrix` containing the weighted
 adjacency matrices in the `assays` slot.

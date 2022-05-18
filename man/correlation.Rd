@@ -10,8 +10,8 @@ correlation(x, method = "pearson", p.adjust = "none", ...)
 \item{x}{`matrix`, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values}
 
-\item{method}{`character`, either "pearson", "spearman", "pearson_partial", or
-"spearman_partial".}
+\item{method}{`character`, either "pearson", "spearman", "pearson_partial",
+"spearman_partial", or "ggm".}
 
 \item{p.adjust}{`character`, method of p-value adjustment passed to `p.adjust`}
 
@@ -38,6 +38,9 @@ with the associated p-values.
 If `"pearson"` or `"spearman"` is used as a `method`, the function
 `corr.test` from `psych` will be employed.
 
+If `"ggm"` is used as a `method`, the function `ggm.estimate.pcor` from
+`GeneNet` will be employed.
+
 If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
 function `partialCorrelation` will be employed.
 
@@ -54,5 +57,6 @@ correlation(x, method = "pearson")
 
 }
 \author{
-Thomas Naake, \email{thomasnaake@googlemail.com}
+Thomas Naake, \email{thomasnaake@googlemail.com},
+Liesa Salzer, \email{liesa.salzer@helmholtz-muenchen.de}
 }

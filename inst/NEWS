@@ -1,3 +1,7 @@
+Changes in version 1.15.2 (2022-05-18)
++ improve documentation for function correlation and statistical and 
+  include information that also ggm can be used
+
 Changes in version 1.15.1 (2022-04-27)
 + set ci in corr.test to FALSE to speed up calculation of correlation values
   (function correlation)

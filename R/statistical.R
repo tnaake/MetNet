@@ -288,8 +288,8 @@ aracne <- function(mi, eps = 0.05, ...) {
 #' (metabolites), cell entries are intensity values
 #'
 #' @param
-#' method `character`, either "pearson", "spearman", "pearson_partial", or
-#' "spearman_partial".
+#' method `character`, either "pearson", "spearman", "pearson_partial",
+#' "spearman_partial", or "ggm".
 #' 
 #' @param 
 #' p.adjust `character`, method of p-value adjustment passed to `p.adjust`
@@ -300,6 +300,9 @@ aracne <- function(mi, eps = 0.05, ...) {
 #' @details
 #' If `"pearson"` or `"spearman"` is used as a `method`, the function
 #' `corr.test` from `psych` will be employed.
+#' 
+#' If `"ggm"` is used as a `method`, the function `ggm.estimate.pcor` from
+#' `GeneNet` will be employed.
 #'
 #' If `"pearson_partial"` or `"spearman_partial"` is used as a `method` the
 #' function `partialCorrelation` will be employed.
@@ -317,7 +320,8 @@ aracne <- function(mi, eps = 0.05, ...) {
 #' chosen `method`) and optionally the adjusted p.values (argument
 #' `p.adjust`)
 #'
-#' @author Thomas Naake, \email{thomasnaake@@googlemail.com}
+#' @author Thomas Naake, \email{thomasnaake@@googlemail.com},
+#' Liesa Salzer, \email{liesa.salzer@@helmholtz-muenchen.de}
 #'
 #' @examples
 #' data("x_test", package = "MetNet")
@@ -674,7 +678,7 @@ addToList <- function(l, name, object) {
 #' @param
 #' model `character` vector containing the methods that will be used
 #' (`"lasso"`, `"randomForest"`, `"clr"`, `"aracne"`, `"pearson"`,
-#' `"pearson_partial"`, `"spearman"`, `"spearman_partial"`, `"bayes"`)
+#' `"pearson_partial"`, `"spearman"`, `"spearman_partial"`, `ggm`, `"bayes"`)
 #'
 #' @param
 #' ... parameters passed to the functions  `lasso`, `randomForest`,
@@ -692,7 +696,7 @@ addToList <- function(l, name, object) {
 #' `statistical` calls the function
 #' `lasso`, `randomForest`, `clr`, `aracne`,
 #' `correlation` (for `"pearson"`, `"pearson_partial"`, `"spearman"`, 
-#' `"spearman_partial"`) and/or `bayes`
+#' `"spearman_partial"`, `"ggm"`) and/or `bayes`
 #' as specified by `model`. It will create adjacency matrices using the
 #' specified methods and will return an `AdjacencyMatrix` containing the weighted
 #' adjacency matrices in the `assays` slot.
@@ -728,7 +732,7 @@ statistical <- function(x, model, ...) {
     ## if not so
     if (!(all(model %in% c("lasso", "randomForest", "clr", "aracne",
             "pearson", "pearson_partial", "spearman", "spearman_partial", 
-            "bayes", "ggm"))))
+            "ggm", "bayes"))))
         stop("'model' not implemented in statistical")
 
     ## check if x is numeric matrix and return error if not so

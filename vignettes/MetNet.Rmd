@@ -376,6 +376,7 @@ rowData(struct_adj) <- x_annotation
 ## display annotation for the feature "1856"
 rowData(struct_adj)["x1856", ]
 ```
+
 ## Adding spectral similarity to the structural adjacency 
 
 `MetNet` can also incorporate information from spectral similarity to the 
