@@ -426,8 +426,8 @@ correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
 #'
 #' @description
 #' `partialCorrelation` infers an adjacency matrix of partial correlation 
-#' values and associated p-values using using the `partial.r` function (from the
-#' `psych` package). `partialCorrelation` calculates the p-values from the 
+#' values and associated p-values using using the `cor2pcor` function (from the
+#' `corpcor` package). `partialCorrelation` calculates the p-values from the 
 #' number of samples (`n`) and the number of controlling variables (`g`). 
 #' The function will return a list containing the 
 #' weighted adjacency matrix of the correlation values, together with the 
@@ -441,11 +441,12 @@ correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
 #' method `character`, either "pearson", "spearman"
 #' 
 #' @param 
-#' ... further arguments passed to `partial.r` from `psych`
+#' ... further arguments passed to `cor` from `base` or 
+#' `cor2pcor` from `corpcor`
 #' 
 #' @details
-#' The correlation coefficients $r_{ij|S}$ are obtained from `partial.r`
-#' (`psych` package).
+#' The correlation coefficients $r_{ij|S}$ are obtained from `cor2pcor`
+#' (`corpcor` package).
 #' 
 #' The t-values are calculated via
 #' 
@@ -472,19 +473,26 @@ correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
 #'
 #' @export
 #' 
-#' @importFrom psych partial.r
+#' @importFrom corpcor cor.shrink cor2pcor
 #' @importFrom stats pt
 partialCorrelation <- function(x, method = "pearson", ...) {
     
+    ## calculate the correlation coefficients
     ## create a list with arguments
     args_l <- list(...)
-    args_l[["data"]] <- x
+    args_l[["x"]] <- x
     args_l[["method"]] <- method
-    args_partialr <- names(formals("partial.r"))
-    args_l <- args_l[names(args_l) %in% args_partialr]
+    args_r <- names(formals("cor"))
+    args_l <- args_l[names(args_l) %in% args_r]
+    r_raw <- do.call("cor", args_l)
     
     ## calculate the partial correlation coefficients
-    r <- do.call("partial.r", args_l)
+    ## create a list with arguments
+    args_l <- list(...)
+    args_l[["m"]] <- corpcor::cor.shrink(r_raw)
+    args_partialr <- names(formals("cor2pcor"))
+    args_l <- args_l[names(args_l) %in% args_partialr]
+    r <- do.call("cor2pcor", args_l)
     
     ## obtain n, the sample size
     n <- nrow(x)

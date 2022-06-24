@@ -4,7 +4,7 @@ data("mat_test", package = "MetNet")
 ## START unit test lasso ##
 lasso_mat <- lasso(x = t(mat_test_z[, 1:5]), PFER = 0.75, cutoff = 0.95)
 
-test_that("lasso", {
+test_that("lasso works.", {
     suppressWarnings(
         expect_error(lasso(NULL, PFER = 0.75, cutoff = 0.95),
             "must be coercible to non-negative integer")    
@@ -24,7 +24,7 @@ test_that("lasso", {
 ## START unit test randomForest ##
 rf_mat <- randomForest(mat_test[1:5, ])
 
-test_that("randomForest", {
+test_that("randomForest works.", {
     expect_error(randomForest(NULL), "find an inherited method for")
     expect_equal(sum(rf_mat), 5, tolerance = 1e-06)
     expect_equal(rownames(rf_mat), colnames(rf_mat))
@@ -42,7 +42,7 @@ test_that("randomForest", {
 mi_mat_test_z <- parmigene::knnmi.all(t(mat_test_z[, 1:5]))
 clr_mat <- clr(mi_mat_test_z)
 
-test_that("clr", {
+test_that("clr works.", {
     expect_error(clr(NULL), msg = "mi must be a matrix")
     expect_equal(sum(clr_mat), 14.46705, tolerance = 1e-03)
     expect_equal(rownames(clr_mat), colnames(clr_mat))
@@ -59,7 +59,7 @@ test_that("clr", {
 ## START unit test aracne ##
 aracne_mat <- aracne(mi_mat_test_z)
 
-test_that("aracne", {
+test_that("aracne works.", {
     expect_error(aracne(NULL, eps = 0.05), "mi must be a matrix")
     suppressWarnings(
         expect_error(aracne(mi_mat_test_z, eps = "a"), 
@@ -80,25 +80,22 @@ test_that("aracne", {
 correlation_p_mat <- correlation(mat_test[1:5, ], method = "pearson")
 correlation_p_p_mat <- correlation(mat_test[1:5, ], method = "pearson_partial")
 correlation_s_mat <- correlation(mat_test[1:5, ], method = "spearman")
-suppressWarnings(
-    correlation_s_p_mat <- correlation(mat_test[1:5, ], 
-                                                method = "spearman_partial"))
+correlation_s_p_mat <- correlation(mat_test[1:5, ], method = "spearman_partial")
 correlation_g_mat <- correlation(mat_test[1:5, ], method = "ggm")
 
 test_that("partialCorrelation", {
     pcor_p <- partialCorrelation(t(mat_test), method = "pearson")
     expect_equal(names(pcor_p), c("r", "p"))
-    expect_equal(pcor_p$r, psych::partial.r(t(mat_test), method = "pearson"))
-    expect_equal(sum(pcor_p$r), 9.60788, tolerance = 1e-06)
-    expect_equal(sum(pcor_p$p, na.rm = TRUE), 26.78391, tolerance = 1e-06)
-    suppressWarnings(
-        pcor_s <- partialCorrelation(t(mat_test), method = "spearman"))
+    expect_equal(pcor_p$r[1, ], c(1.0, 0.19784475, 0.20796421, -0.03173953, 
+        -0.19645076, -0.19125186, -0.19407893), tolerance = 1e-06)
+    expect_equal(sum(pcor_p$r), 6.480885, tolerance = 1e-06)
+    expect_equal(sum(pcor_p$p, na.rm = TRUE), 30.713, tolerance = 1e-06)
+    pcor_s <- partialCorrelation(t(mat_test), method = "spearman")
     expect_equal(names(pcor_s), c("r", "p"))
-    suppressWarnings(
-        expect_equal(pcor_s$r, psych::partial.r(t(mat_test), 
-                                                method = "spearman")))
-    expect_equal(sum(pcor_s$r), 7.211808, tolerance = 1e-06)
-    expect_equal(sum(pcor_s$p, na.rm = TRUE), 43.12084, tolerance = 1e-06)
+    expect_equal(pcor_s$r[1, ], c(1.0, 0.19654690, 0.19654690, -0.04612239,
+        -0.19654690, -0.19654690, -0.19654690), tolerance = 1e-06)
+    expect_equal(sum(pcor_s$r), 5.820719, tolerance = 1e-06)
+    expect_equal(sum(pcor_s$p, na.rm = TRUE), 31.92304, tolerance = 1e-06)
 })
 
 test_that("correlation", {
@@ -139,10 +136,11 @@ test_that("correlation", {
 
     ## partial pearson
     expect_equal(names(correlation_p_p_mat), c("r", "p"))
-    expect_true(all(correlation_p_p_mat$r -
-        psych::partial.r(t(mat_test[1:5, ]), method = "pearson") == 0))
-    expect_equal(sum(correlation_p_p_mat$r), 7.053181, tolerance = 1e-06)
-    expect_equal(sum(correlation_p_p_mat$p), 12.44441, tolerance = 1e-06)
+    expect_equal(as.vector(correlation_p_p_mat$r[1, ]), 
+        c(1.0, 0.2923843, 0.3076073, -0.1504953, -0.2961682), 
+        tolerance = 1e-06)
+    expect_equal(sum(correlation_p_p_mat$r), 4.498658, tolerance = 1e-06)
+    expect_equal(sum(correlation_p_p_mat$p), 12.75326, tolerance = 1e-06)
     expect_equal(rownames(correlation_p_p_mat$r), 
         colnames(correlation_p_p_mat$r))
     expect_equal(rownames(correlation_p_p_mat$r), rownames(mat_test[1:5, ]))
@@ -156,10 +154,11 @@ test_that("correlation", {
 
     ## partial spearman
     expect_equal(names(correlation_s_p_mat), c("r", "p"))
-    suppressWarnings(expect_true(all(correlation_s_p_mat$r - 
-        psych::partial.r(t(mat_test[1:5, ]), method = "spearman") == 0)))
-    expect_equal(sum(correlation_s_p_mat$r), 4.479568, tolerance = 1e-06)
-    expect_equal(sum(correlation_s_p_mat$p, na.rm = TRUE), 19.09195, 
+    expect_equal(as.vector(correlation_s_p_mat$r[1, ]), 
+        c(1.0, 0.3016220,  0.3016220, -0.1296346, -0.3016220), 
+        tolerance = 1e-06)
+    expect_equal(sum(correlation_s_p_mat$r), 4.481462, tolerance = 1e-06)
+    expect_equal(sum(correlation_s_p_mat$p, na.rm = TRUE), 12.83232, 
         tolerance = 1e-06)
     expect_equal(rownames(correlation_s_p_mat$r), 
         colnames(correlation_s_p_mat$r))

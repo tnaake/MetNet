@@ -12,7 +12,8 @@ samples, cell entries are intensity values}
 
 \item{method}{`character`, either "pearson", "spearman"}
 
-\item{...}{further arguments passed to `partial.r` from `psych`}
+\item{...}{further arguments passed to `cor` from `base` or 
+`cor2pcor` from `corpcor`}
 }
 \value{
 `list` containing two matrices, 
@@ -21,16 +22,16 @@ the second matrix contains the corresponding p-values
 }
 \description{
 `partialCorrelation` infers an adjacency matrix of partial correlation 
-values and associated p-values using using the `partial.r` function (from the
-`psych` package). `partialCorrelation` calculates the p-values from the 
+values and associated p-values using using the `cor2pcor` function (from the
+`corpcor` package). `partialCorrelation` calculates the p-values from the 
 number of samples (`n`) and the number of controlling variables (`g`). 
 The function will return a list containing the 
 weighted adjacency matrix of the correlation values, together with the 
 associated p-values.
 }
 \details{
-The correlation coefficients $r_{ij|S}$ are obtained from `partial.r`
-(`psych` package).
+The correlation coefficients $r_{ij|S}$ are obtained from `cor2pcor`
+(`corpcor` package).
 
 The t-values are calculated via
 
