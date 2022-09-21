@@ -16,7 +16,7 @@ Please visit the Bioconductor page of
 
 You are welcome to 
 
- * write a mail to <thomasnaake@googlemail.com> 
+ * write a mail to <thomasnaake (at) googlemail (dot) com> 
  * submit suggestions and issues: <https://github.com/tnaake/MetNet/issues>
  * send a pull request: <https://github.com/tnaake/MetNet/issues> 
 
