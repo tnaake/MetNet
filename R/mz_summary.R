@@ -156,7 +156,7 @@ mz_summary <- function(am, var = c("group", "formula"), filter = 0){
 #' mz_vis(mz_sum)
 #' 
 #' @importFrom ggplot2 ggplot aes_string geom_bar theme_minimal coord_flip labs
-#' @importFrom ggplot2 theme element_text
+#' @importFrom ggplot2 theme element_text sym
 #' 
 #' @export
 mz_vis <- function(df, var = "group"){
@@ -173,7 +173,8 @@ mz_vis <- function(df, var = "group"){
   if (!var %in% colnames(df))
       stop(sprintf("'df' does not contain the column '%s'", var))
   
-  ggplot2::ggplot(df, ggplot2::aes_string(x = var, y = "count")) + 
+  ggplot2::ggplot(df, ggplot2::aes(x = !!ggplot2::sym(var), 
+        y = !!ggplot2::sym("count"))) + 
     ggplot2::geom_bar(stat = "identity") + 
     ggplot2::theme_minimal() + 
     ggplot2::coord_flip() + 
