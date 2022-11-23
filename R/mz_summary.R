@@ -173,7 +173,7 @@ mz_vis <- function(df, var = "group"){
   if (!var %in% colnames(df))
       stop(sprintf("'df' does not contain the column '%s'", var))
   
-  ggplot2::ggplot(df, ggplot2::aes(x = !!ggplot2::sym(var), 
+  ggplot2::ggplot(df, ggplot2::aes(x = !!ggplot2::sym(var),  
         y = !!ggplot2::sym("count"))) + 
     ggplot2::geom_bar(stat = "identity") + 
     ggplot2::theme_minimal() + 

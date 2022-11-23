@@ -1,3 +1,7 @@
+Changes in version 1.17.1 (2022-11-23)
++ replace aes_string by aes since aes_string is deprecated in newest ggplot2 
+  version
+
 Changes in version 1.15.2 (2022-05-18)
 + improve documentation for function correlation and statistical and 
   include information that also ggm can be used
