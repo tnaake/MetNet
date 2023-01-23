@@ -211,7 +211,7 @@ structural <- function(x, transformation, var = character(),
 
     ## iterate through each column and check if the "mass" is in the interval
     ## defined by the m/z value and ppm
-    for (i in seq_along(transformation[, "mass"])) {
+    for (i in seq_len(nrow(transformation))) {
         
         transf_i <- transformation[i, ]
         
