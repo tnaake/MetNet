@@ -19,7 +19,7 @@ Depends:
 Imports:
     bnlearn (>= 4.3), 
     BiocParallel (>= 1.12.0),
-	corpcor (>= 1.6.10),
+	  corpcor (>= 1.6.10),
     dplyr (>= 1.0.3),
     ggplot2 (>= 3.3.3),
     GeneNet (>= 1.2.15),

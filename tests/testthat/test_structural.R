@@ -254,7 +254,7 @@ transformations <-
   rbind(c("Malonyl group (-H2O)", "C3H2O3", 86.0003939305, "+"),
   c("Monosaccharide (-H2O)", "C6H10O5", 162.0528234315, "-"))
 transformations_neg <- transformations_old <-  transformations <-
-  as_tibble(data.frame(
+  tibble::as_tibble(data.frame(
   group = transformations[, 1],
   formula = transformations[, 2],
   mass = as.numeric(transformations[, 3]),

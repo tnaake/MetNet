@@ -90,6 +90,7 @@
 #' am_struct <- structural(x_test, transformation, var = c("group", "mass"),
 #'     ppm = 10, directed = TRUE)
 #'
+#' @importFrom tibble is_tibble
 #' @export
 structural <- function(x, transformation, var = character(),
     ppm = 5, directed = FALSE) {
@@ -101,7 +102,7 @@ structural <- function(x, transformation, var = character(),
         stop("'x' does not contain the column mz")
 
     ## check for integrity of transformation
-    if (is_tibble(transformation))
+    if (tibble::is_tibble(transformation))
         transformation <- as.data.frame(transformation)
     if (!is.data.frame(transformation))
         stop("'transformation' is not a data.frame")
