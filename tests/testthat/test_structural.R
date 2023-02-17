@@ -625,6 +625,169 @@ test_that("rtCorrection", {
     struct_adj_pseudo_rt <- rtCorrection(struct_adj_pseudo, x = mat_test,
         transformation = transformations, var = "group")
 })
+
+## test rtCorrection with the transformation table as tibble
+struct_adj <- struct_adj_old
+struct_adj_dir <- struct_adj_dir_old
+mat_test <- mat_test_old
+transformations <- tibble::as_tibble(transformations_old)
+
+struct_adj_rt <-
+  rtCorrection(struct_adj, mat_test, transformations, var = "group")
+struct_adj_rt_dir <-
+  rtCorrection(struct_adj_dir, mat_test, transformations, var = "group")
+
+g_undir <-
+  igraph::graph_from_adjacency_matrix(
+    assay(struct_adj, "binary", mode = "directed", weighted = NULL)
+    )
+g_undir_rt <-
+  igraph::graph_from_adjacency_matrix(
+    assay(struct_adj_rt, "binary", mode = "directed", weighted = NULL)
+    )
+g_dir <-
+  igraph::graph_from_adjacency_matrix(
+    assay(struct_adj_dir, "binary"), mode = "directed", weighted = NULL
+    )
+g_dir_rt <-
+  igraph::graph_from_adjacency_matrix(
+    assay(struct_adj_rt_dir, "binary"), mode = "directed", weighted = NULL
+    )
+
+plot(
+  g_undir, edge.width = 1, edge.arrow.size = 0.5, vertex.label.cex = 0.8,
+  edge.color = "grey"
+    )
+plot(
+  g_undir_rt, edge.width = 1, edge.arrow.size = 0.5, vertex.label.cex = 0.8,
+  edge.color = "grey"
+    )
+plot(
+  g_dir, edge.width = 1, edge.arrow.size = 0.5, vertex.label.cex = 0.8,
+  edge.color = "grey"
+    )
+plot(
+  g_dir_rt, edge.width = 1, edge.arrow.size = 0.5, vertex.label.cex = 0.8,
+  edge.color = "grey"
+    )
+
+test_that("rtCorrection", {
+  expect_error(
+    rtCorrection(struct_adj[[1]], mat_test, transformations),
+    "is not an 'AdjacencyMatrix'"
+    )
+  tmp <- struct_adj
+  assay(tmp, "transformation") <- assay(tmp, "binary")
+  expect_error(
+    rtCorrection(tmp, mat_test, transformations), "must be character"
+    )
+  tmp <- struct_adj
+  assay(tmp, "mass") <- assay(tmp, "binary")
+  expect_error(
+    rtCorrection(tmp, mat_test, transformations), "must be character"
+    )
+  expect_error(
+    rtCorrection(struct_adj, NULL, transformations),
+    "'x' does not contain the column 'rt'"
+    )
+  expect_error(
+    rtCorrection(struct_adj, mat_test[, -1], transformations),
+    "'x' does not contain the column 'mz'"
+    )
+  expect_error(
+    rtCorrection(struct_adj, mat_test[, -2], transformations),
+    "'x' does not contain the column 'rt'"
+    )
+  expect_error(
+    rtCorrection(struct_adj, mat_test, NULL),
+    "'transformation' does not contain the column 'group'"
+    )
+  expect_error(
+    rtCorrection(struct_adj, mat_test, transformations[, -1]),
+    "'transformation' does not contain the column 'group'"
+    )
+  expect_error(
+    rtCorrection(struct_adj, mat_test, transformations[, -4]),
+    "'transformation' does not contain the column 'rt'"
+    )
+  expect_error(
+    rtCorrection(
+      struct_adj, mat_test,
+      transformation = cbind(transformations[, -4], rt = rep("a", 2))
+      ), "does contain other"
+    )
+  expect_true(is.matrix(assay(struct_adj_rt, "binary")))
+  expect_true(is.numeric(assay(struct_adj_rt, "binary")))
+  expect_true(is.matrix(assay(struct_adj_rt, "group")))
+  expect_true(is.character(assay(struct_adj_rt, "group")))
+  expect_true(is.matrix(assay(struct_adj_rt, "mass")))
+  expect_true(is.character(assay(struct_adj_rt, "mass")))
+  expect_true(is.matrix(assay(struct_adj_rt, "formula")))
+  expect_true(is.character(assay(struct_adj_rt, "formula")))
+  expect_equal(
+    colnames(assay(struct_adj_rt, "binary")), paste(mz, rt, sep = "_")
+    )
+  expect_equal(
+    colnames(assay(struct_adj_rt, 1)), rownames(assay(struct_adj_rt, 1))
+    )
+  expect_equal(
+    colnames(assay(struct_adj_rt, 2)), rownames(assay(struct_adj_rt, 2))
+    )
+  expect_equal(
+    colnames(assay(struct_adj_rt, 3)), rownames(assay(struct_adj_rt, 3))
+    )
+  expect_equal(
+    colnames(assay(struct_adj_rt, 1)), colnames(assay(struct_adj_rt, 2))
+    )
+  expect_equal(
+    colnames(assay(struct_adj_rt, 1)), colnames(assay(struct_adj_rt, 3))
+    )
+  expect_true(table(assay(struct_adj_rt, "binary"))[1] == 41)
+  expect_true(table(assay(struct_adj_rt_dir, "binary"))[1] == 45)
+  expect_equal(sum(assay(struct_adj_rt, "binary")), 8)
+  expect_equal(sum(assay(struct_adj_rt_dir, "binary")), 4)
+  expect_true(all(table(assay(struct_adj_rt, "group")) == c(41, 6, 2)))
+  expect_true(all(table(assay(struct_adj_rt, "mass")) == c(41, 2, 6)))
+  expect_true(all(table(assay(struct_adj_rt, "formula")) == c(41, 6, 2)))
+  expect_true(all(table(assay(struct_adj_rt_dir, "group")) == c(45, 3, 1)))
+  expect_true(all(table(assay(struct_adj_rt_dir, "mass")) == c(45, 1, 3)))
+  expect_true(all(table(assay(struct_adj_rt_dir, "formula")) == c(45, 3, 1)))
+
+  expect_equal(directed(struct_adj_rt), FALSE)
+  expect_equal(directed(struct_adj_rt_dir), TRUE)
+  expect_equal(type(struct_adj_rt), "structural")
+  expect_equal(type(struct_adj_rt_dir), "structural")
+  expect_equal(thresholded(struct_adj_rt), TRUE)
+  expect_equal(thresholded(struct_adj_rt_dir), TRUE)
+
+  ## create a double assignment to certain cells
+  transformations <-
+    rbind(
+      transformations,
+      data.frame(
+        group = "pseudo Monosaccharide", formula = "C6H10O5", mass = 162.05282,
+        rt = "?"
+        )
+      )
+  struct_adj_pseudo <-
+    structural(
+      mat_test, transformation = transformations,
+      var = c("group", "formula", "mass"), ppm = 5, directed = FALSE
+      )
+  expect_equal(
+    assay(struct_adj_pseudo, "group")[3, 1],
+    "Monosaccharide (-H2O)/pseudo Monosaccharide"
+    )
+  expect_equal(
+    assay(struct_adj_pseudo, "mass")[3, 1], "162.0528234315/162.05282"
+    )
+  expect_equal(assay(struct_adj_pseudo, "formula")[3, 1], "C6H10O5/C6H10O5")
+  struct_adj_pseudo_rt <-
+    rtCorrection(
+      struct_adj_pseudo, x = mat_test, transformation = transformations,
+      var = "group"
+      )
+})
 ## END unit test rtCorrection ##
 
 ## create toy example data set

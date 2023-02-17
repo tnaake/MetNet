@@ -359,6 +359,7 @@ structural <- function(x, transformation, var = character(),
 #' plot(g_rt, edge.width = 2, edge.arrow.size = 0.5, vertex.label.cex = 0.7)
 #'
 #' @importFrom SummarizedExperiment assay assayNames
+#' @importFrom tibble is_tibble
 #' @export
 rtCorrection <- function(am, x, transformation, var = "group") {
 
@@ -387,6 +388,8 @@ rtCorrection <- function(am, x, transformation, var = "group") {
     ## check for integrity of transformation and var
     if (!is.character(var) | length(var) != 1)
         stop("'var' has to be a character of length 1")
+    if (tibble::is_tibble(transformation))
+      transformation <- as.data.frame(transformation)
     if (!var %in% colnames(transformation))
         stop(sprintf("'transformation' does not contain the column '%s'",
                                                                         var))
