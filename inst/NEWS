@@ -1,9 +1,15 @@
+Changes in version 1.17.2 (2023-02-03)
++ improve structural function to work with transformation tables that are
+  tibble objects (contribution by Elva Maria Novoa-del-Toro)
++ added unit tests for the transformation tibble case (contribution by Elva
+  Maria Novoa-del-Toro)
+
 Changes in version 1.17.1 (2022-11-23)
-+ replace aes_string by aes since aes_string is deprecated in newest ggplot2 
++ replace aes_string by aes since aes_string is deprecated in newest ggplot2
   version
 
 Changes in version 1.15.2 (2022-05-18)
-+ improve documentation for function correlation and statistical and 
++ improve documentation for function correlation and statistical and
   include information that also ggm can be used
 
 Changes in version 1.15.1 (2022-04-27)
@@ -13,30 +19,30 @@ Changes in version 1.15.1 (2022-04-27)
 Changes in version 1.13.2 (2022-03-04)
 + add function addSpectralSimilarity and allow to add a MS2 similarity
   matrix (contribution by Liesa Salzer)
-+ adjust the functions threshold and combine to be able to deal with 
++ adjust the functions threshold and combine to be able to deal with
   MS2 similarities  (contribution by Liesa Salzer)
-+ adjust the vignette to the changes imposed by the new function 
++ adjust the vignette to the changes imposed by the new function
   addSpectralSimilarity (contribution by Liesa Salzer)
- 
+
 Changes in version 1.13.1 (2022-02-11)
 + update unit tests, e.g. remove ggm for as.data.frame, set R=1000 for bayes
 
 Changes in version 1.11.6 (2021-11-24)
 + add ggm method in statistical and implement dealing with NA
   values for partial correlation and ggm
-+ add (optional) calculation of ranked absolute coefficients in 
++ add (optional) calculation of ranked absolute coefficients in
   threshold for the top1, top2, and mean types to take into account
   negative coefficients (e.g. from pearson or spearman correlation)
 + remove ppcor package and use psych::partial.r for partial correlation,
-  calculate the t-values/p-values based on the partial correlation 
+  calculate the t-values/p-values based on the partial correlation
   coefficients
-+ use knnmi.all from parmigene to calculate MI scores, remove mpmi::cmi 
++ use knnmi.all from parmigene to calculate MI scores, remove mpmi::cmi
   dependency
 
 Changes in version 1.11.5 (2021-10-12)
-+ add assays in structural based on columns in transformations that are 
-  defined by the var argument in structural, adjacency matrices of type 
-  will be stored in the AdjacencyMatrix object defined in the columns of 
++ add assays in structural based on columns in transformations that are
+  defined by the var argument in structural, adjacency matrices of type
+  will be stored in the AdjacencyMatrix object defined in the columns of
   transformation
 + implement structural that it can also calculate mass differences of 0 for
   undirected networks
@@ -47,8 +53,8 @@ Changes in version 1.11.4 (2021-09-09)
 + fix rtCorrection function
 
 Changes in version 1.11.3 (2021-08-30)
-+ change calculation of mass differences, use the differences between 
-  (M_2+ppm)-(M_1-ppm) and (M_2-ppm)-(M_1+ppm) instead of (M_1-ppm)-(M_1) and 
++ change calculation of mass differences, use the differences between
+  (M_2+ppm)-(M_1-ppm) and (M_2-ppm)-(M_1+ppm) instead of (M_1-ppm)-(M_1) and
   (M_2+ppm)-(M_1) for querying against the list of transformations
 
 Changes in version 1.11.2 (2021-08-30)
@@ -74,7 +80,7 @@ Changes in version 1.9.3 (2021-04-28)
   structural, statistical, and combine
 + adjust the documentation and tests for AdjacencyMatrix objects
 + add the functions mz_summary and mz_vis (contribution of Liesa Salzer)
-  
+
 Changes in version 1.9.2 (2021-03-24)
 + add section on structual matrix generation for directed=FALSE
 
@@ -82,7 +88,7 @@ Changes in version 1.9.1 (2021-02-20)
 + fix typos in the vignette
 
 Changes in version 1.5.3 (2020-03-09)
-+ change tests for rtCorrection, do not use function levels to test for 
++ change tests for rtCorrection, do not use function levels to test for
   if `+`, `.` or `?` is present in the transformation list
 + update vignette that formulas are displayed properly
 
@@ -112,11 +118,11 @@ Changes in version 1.5.1 (2019-12-05)
   the corresponding feature pairs (in the upper and lower triangle) should be
   taken in statistical
 
-Changes in version 1.3.1 (2019-09-06) 
+Changes in version 1.3.1 (2019-09-06)
 + change License to GPL (>= 3)
 + add codecov
 + add Travis-CI for continuous integration
-+ add CITATION file 
++ add CITATION file
 
 Changes in version 1.1.2 (2019-04-16)
 + check that MetNet passes all builds without any errors or warnings
@@ -125,97 +131,97 @@ Changes in version 1.1.1 (2019-04-03)
 + correct typo in vignette
 
 Changes in version 0.99.24 (2018-10-22)
-+ adjust NEWS file to new format according to ?news: 
-  o entries are grouped according to version, with version header 
-    'Changes in version' at the beginning of a line, followed by a version 
-    number, optionally followed by an ISO 8601 format date, possibly 
++ adjust NEWS file to new format according to ?news:
+  o entries are grouped according to version, with version header
+    'Changes in version' at the beginning of a line, followed by a version
+    number, optionally followed by an ISO 8601 format date, possibly
     parenthesized
-  o entries may be grouped according to category, with a category header 
+  o entries may be grouped according to category, with a category header
     (different from a version header) starting at the beginning of a line
-  o entries are written as itemize-type lists, using one of o, *, - or + as 
-    item tag. Entries must be indented, and ideally use a common indentation 
+  o entries are written as itemize-type lists, using one of o, *, - or + as
+    item tag. Entries must be indented, and ideally use a common indentation
     for the item texts
 
 Changes in version 0.99.23 (2018-10-16)
-+ improve createStructuralAdjacency function 
++ improve createStructuralAdjacency function
 
 Changes in version 0.99.20 (2018-08-06)
-+ replace psych::corr.test by WGCNA::corAndPvalue to improve speed 
++ replace psych::corr.test by WGCNA::corAndPvalue to improve speed
 
 Changes in version 0.99.19 (2018-07-26)
-+ print message when model calculation in createStatisticalAdjacency is 
-  finished 
++ print message when model calculation in createStatisticalAdjacency is
+  finished
 
 Changes in version 0.99.18 (2018-07-19)
-+ set rfPermute.formula to rfPermute.default in order to use num.cores 
++ set rfPermute.formula to rfPermute.default in order to use num.cores
 
 Changes in version 0.99.17 (2018-07-19)
-+ set num.cores to 1 in test_statistical for randomForest 
++ set num.cores to 1 in test_statistical for randomForest
 
 Changes in version 0.99.15 (2018-07-16)
-+ do not import stabsel from stabs 
++ do not import stabsel from stabs
 
 Changes in version 0.99.14 (2018-07-14)
-+ use BiocManager instead of BiocLite for installation 
++ use BiocManager instead of BiocLite for installation
 
 Changes in version 0.99.13 (2018-07-12)
-+ do not export functions threeDotsCall and addToList 
++ do not export functions threeDotsCall and addToList
 
 Changes in version 0.99.12 (2018-07-12)
-+ use BiocStyle package for vignette 
++ use BiocStyle package for vignette
 + remove Makefile
 + use BiocParallel instead of parallel, for instance use bplapply instead
   of mclapply
 
 Changes in version 0.99.11 (2018-07-03)
-+ speed up function rtCorrection by vectorizing 
++ speed up function rtCorrection by vectorizing
 
 Changes in version 0.99.10 (2018-07-03)
-+ speed up function createStructuralAdjacencyMatrix by vectorizing  
++ speed up function createStructuralAdjacencyMatrix by vectorizing
 
 Changes in version 0.99.9 (2018-06-26)
-+ change 1:... to seq_len() 
++ change 1:... to seq_len()
 
 Changes in version 0.99.8 (2018-06-26)
-+ implement function rtCorrection 
++ implement function rtCorrection
 
 Changes in version 0.99.6 (2018-06-13)
-+ use camelCaps for functions 
++ use camelCaps for functions
 + use no spaces between '=' and named arguments
 
 Changes in version 0.99.6 (2018-06-12)
-+ fix typo in lasso function 
++ fix typo in lasso function
 
 Changes in version 0.99.5 (2018-06-12)
-+ change 1:... to seq_len() 
++ change 1:... to seq_len()
 
 Changes in version 0.99.4 (2018-06-12)
-+ change 1:... to seq_len() 
++ change 1:... to seq_len()
 
 Changes in version 0.99.3 (2018-06-11)
-+ remove sum check for correlation 
++ remove sum check for correlation
 
 Changes in version 0.99.2 (2018-06-11)
-+ require R version >= 3.5 
++ require R version >= 3.5
 
 Changes in version 0.99.1 (2018-06-11)
-+ remove bugs that there are no WARNINGS and ERRORs when running 
-  R CMD check and R CMD BiocCheck 
++ remove bugs that there are no WARNINGS and ERRORs when running
+  R CMD check and R CMD BiocCheck
 + reduce file size of peaklist_example.RData
 + submit to Bioconductor
 
 Changes in version 0.99.0 (2018-05-14)
-+ implement functionality to calculate statistical models of correlation 
-  (Pearson, Spearman), LASSO, Random Forest, Context likelihood or 
-  relatedness network algorithm, algorithm for the reconstruction of 
-  accurate cellular networks, constraint-based structure learning 
-  algorithm 
-+ implement the function create_statistical_network to calcululate the 
++ implement functionality to calculate statistical models of correlation
+  (Pearson, Spearman), LASSO, Random Forest, Context likelihood or
+  relatedness network algorithm, algorithm for the reconstruction of
+  accurate cellular networks, constraint-based structure learning
+  algorithm
++ implement the function create_statistical_network to calcululate the
   consensus matrix from the different statistically-infered networks
-+ implement the function create_structural_network to calculate 
++ implement the function create_structural_network to calculate
   molecular weight differences and create a network
-+ implement the function combine_structural_statistical to combine 
-  the structurally-derived and statistically-derived network 
++ implement the function combine_structural_statistical to combine
+  the structurally-derived and statistically-derived network
 + implement model partial and semi-partial pearson/spearman correlation
-  using the ppcor package 
+  using the ppcor package
 
