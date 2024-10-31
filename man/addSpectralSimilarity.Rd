@@ -2,41 +2,41 @@
 % Please edit documentation in R/structural.R
 \name{addSpectralSimilarity}
 \alias{addSpectralSimilarity}
-\title{Adding a spectral similarity matrix to the "structural" 
+\title{Adding a spectral similarity matrix to the "structural"
 `AdjacencyMatrix`}
 \usage{
 addSpectralSimilarity(am_structural, ms2_similarity = list())
 }
 \arguments{
-\item{am_structural}{`AdjacencyMatrix` of type "structural" that was created using matching MS1 
-data of the same data set. The respective spectral similarity matrices will 
+\item{am_structural}{`AdjacencyMatrix` of type "structural" that was created using matching MS1
+data of the same data set. The respective spectral similarity matrices will
 be added into `am_structural`}
 
-\item{ms2_similarity}{`list` containing spectral similarity adjacency matrices with 
-matching row-/colnames of the structural `AdjacencyMatrix`. The name of the 
+\item{ms2_similarity}{`list` containing spectral similarity adjacency matrices with
+matching row-/colnames of the structural `AdjacencyMatrix`. The name of the
 list entries should reference to the similarity calcululation method
 (e.g. "ndotproduct")}
 }
 \value{
-`AdjacencyMatrix` of type "structural" containing the respective 
+`AdjacencyMatrix` of type "structural" containing the respective
 adjacency matrices in the `assay` slot as specified by `methods`
 }
 \description{
 The function `addSpectralSimilarity` adds adjacency matrices from
-spectral similarity into the "structural" `AdjacencyMatrix` object. 
+spectral similarity into the "structural" `AdjacencyMatrix` object.
 One or multiple spectral similarity matrices can be added to the
 "structural" `AdjacencyMatrix` object.
 }
 \details{
-The function `addSpectralSimilarity` includes functionality to add 
-spectral adjacency matrices e.g. that were created by functionality from the 
-`RforMassSpectrometry` infrastructure. 
-`addSpectralSimilarity` iterates through a `list` with named spectral 
+The function `addSpectralSimilarity` includes functionality to add
+spectral adjacency matrices e.g. that were created by functionality from the
+`RforMassSpectrometry` infrastructure.
+`addSpectralSimilarity` iterates through a `list` with named spectral
 similarity matrices and adds them to the "structural" `AdjacencyMatrix`.
 Matching between spectral similarity and "structural" `AdjacencyMatrix` is
-performed via rownames/colnames. Thus, it is important that the spectral 
+performed via rownames/colnames. Thus, it is important that the spectral
 similarity matrices have row/colnames matching to the respective MS1 data.
-`addSpectralSimilarity` will add the adjacency matrices  
+`addSpectralSimilarity` will add the adjacency matrices
 and will return the "structural" `AdjacencyMatrix` containing the added
 weighted adjacency matrices in the `assays` slot.
 }
@@ -57,7 +57,7 @@ f <- system.file("spectra_matrix/spectra_matrix.RDS", package = "MetNet")
 adj_spec <- readRDS(f)
 
 ## run the addSpectralSimilarity function
-spect_adj <- addSpectralSimilarity(am_structural = am_struct, 
+spect_adj <- addSpectralSimilarity(am_structural = am_struct,
    ms2_similarity = list("ndotproduct" = adj_spec))
 
 }

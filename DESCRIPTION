@@ -54,4 +54,4 @@ Description: MetNet contains functionality to infer metabolic network topologies
   from both quantitative and structure information. 
 License: GPL (>= 3)
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.2

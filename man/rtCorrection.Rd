@@ -8,28 +8,28 @@ retention time}
 rtCorrection(am, x, transformation, var = "group")
 }
 \arguments{
-\item{am}{`AdjacencyMatrix` object returned by the function `structural`. 
-The object contains the assays `"binary"` and additional assays with 
-`character` matrices (only the `"binary"` assay is required). 
+\item{am}{`AdjacencyMatrix` object returned by the function `structural`.
+The object contains the assays `"binary"` and additional assays with
+`character` matrices (only the `"binary"` assay is required).
 The assay `"binary"` stores the `numeric` matrix with edges inferred by mass
 differences.}
 
 \item{x}{`matrix`, where columns are the samples and the rows are features
 (metabolites), cell entries are intensity values, `x` contains the
-columns "`mz`" and `"rt"` that has the m/z and rt information 
-(numerical values) for the correction of retention time shifts between 
-features that have a putative connection assigned based on m/z value 
+columns "`mz`" and `"rt"` that has the m/z and rt information
+(numerical values) for the correction of retention time shifts between
+features that have a putative connection assigned based on m/z value
 difference.}
 
 \item{transformation}{`data.frame`, containing the columns `var`,
 and `"rt"` that will be used for correction of transformation of
 (functional) groups based on retention time shifts derived from `x`}
 
-\item{var}{`character(1)`, the key that is used for matching 
+\item{var}{`character(1)`, the key that is used for matching
 between the column `var` in `transformation` and the assay `var` in `am`}
 }
 \value{
-`AdjacencyMatrix` containing the slots `binary` and additional `character` 
+`AdjacencyMatrix` containing the slots `binary` and additional `character`
 adjacency matrices.
 The slot `directed` is inherited from `am`.
 
@@ -55,7 +55,7 @@ about the retention time and shifts when certain transformation occur
 m/z differences that have by chance the same m/z difference but
 different/unexpected retention time behaviour).
 
-`rtCorrection` accesses the assay `transformation` of 
+`rtCorrection` accesses the assay `transformation` of
 `am` and matches the elements in the `var` column
 against the character matrix. In case of matches, `rtCorrection`
 accesses the `"mz"` and `"rt"` columns of `x` and calculates the retention
@@ -64,10 +64,10 @@ if the observed retention time difference matches the expected behaviour
 (indicated by `"+"` for a higher retention time of the feature with
 the putative group, `"-"` for a lower retention time of the feature
 with the putative group or `"?"` when there is no information
-available or features with that group should not be checked). 
+available or features with that group should not be checked).
 
 In case several transformation were assigned to a feature/feature pair,
-the connection will be removed if there is an inconsistency with any 
+the connection will be removed if there is an inconsistency with any
 of the given transformations.
 }
 \examples{
@@ -84,7 +84,7 @@ transformation <- data.frame(group = transformation[, 1],
          formula = transformation[, 2],
          mass = as.numeric(transformation[, 3]),
          rt = transformation[, 4])
-am_struct <- structural(x = x_test, transformation = transformation, 
+am_struct <- structural(x = x_test, transformation = transformation,
     var = c("group", "mass"), ppm = 10, directed = FALSE)
 am_struct_rt <- rtCorrection(am = am_struct, x = x_test,
      transformation = transformation)

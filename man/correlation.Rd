@@ -28,7 +28,7 @@ chosen `method`) and optionally the adjusted p.values (argument
 \description{
 `correlation` infers an adjacency matrix using
 correlation using the `corr.test` function (from the
-`psych` package) or partialCorrelation. `correlation` extracts the 
+`psych` package) or `partialCorrelation`. `correlation` extracts the 
 reported pair-wise correlation coefficients from the function 
 `corr.test` and `partialCorrelation` and will return
 the weighted adjacency matrix of the correlation coefficients, together 
