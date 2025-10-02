@@ -445,12 +445,12 @@ correlation <- function(x, method = "pearson", p.adjust = "none", ...) {
 #' `cor2pcor` from `corpcor`
 #' 
 #' @details
-#' The correlation coefficients $r_{ij|S}$ are obtained from `cor2pcor`
+#' The correlation coefficients \eqn{r_{ij|S}} are obtained from `cor2pcor`
 #' (`corpcor` package).
 #' 
 #' The t-values are calculated via
 #' 
-#' \eqn{t_{ij|S} = r_{ij|S} \cdot \sqrt{\frac{n-2-g}{1-r_{ij|S}^2}}},
+#' \eqn{t_{ij|S} = r_{ij|S} \cdot \sqrt{\frac{n-2-g}{1-r_{ij|S}^2}} },
 #' where $n$ are the number of samples and $g$ the number of controlling
 #' variables (number of features - 2).
 #' 

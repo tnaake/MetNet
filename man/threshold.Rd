@@ -19,7 +19,7 @@ object of the type "structural" containing spectral similarity adjacency
 matrices, that were added by `addSpectSimil()`. The object will contain the
 adjacency matrices in the `assay` slot.}
 
-\item{type}{`character`, either `"threshold"`, `"top1`, `"top2` or
+\item{type}{`character`, either `"threshold"`, `"top1"`, `"top2"` or
 `"mean"`}
 
 \item{args}{`list`. Depending on the `type` arguments the list element
@@ -35,7 +35,8 @@ correlation coefficients > 0.8.
 edges with Pearson correlation coefficients > 0.8 AND Spearman correlation
 coefficients > 0.5. 
 `list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all 
-edges with Pearson correlation coefficients > 0.8 and < -0.8.
+edges with Pearson correlation coefficients > 0.8 or < -0.8 AND Spearman 
+correlation coefficients > 0.5.
 
 In the case of `type == "top1"`, `type == "top2"`, or `type == "mean"`, 
 `args` has the entry `n` (`numeric` of length 1), that 
@@ -45,9 +46,8 @@ absolute values of the coefficients (will default to `FALSE` if `args$abs`
 is not specified).}
 
 \item{values}{`character`, take from the adjacency matrix all values ("all"),
-the minimum of the pairs ("min") or the maximum ("max")
-a^*_{ij} = min(a_ij, a_ji)
-a^*_{ij} = max(a_ij, a_ji)}
+the minimum of the pairs ("min"), \eqn{a^* _{ij} = min(a_{ij}, a_{ji})},
+or the maximum ("max"), \eqn{a^*_{ij} = max(a_{ij}, a_{ji})}}
 
 \item{na.rm}{`logical`, if set to `TRUE`, the `NA`s in the assay slots will 
 not be taken into account when creating the `"consensus"` assay. If set 
@@ -73,7 +73,7 @@ object of the type "structural" containing spectral similarity adjacency
 matrices, that were added by `addSpectSimil()`.Depending on the `type`
 argument, `threshold` will identify the strongest link that are
 lower or higher a certain threshold (`type = "threshold"`) or
-identify the top `n` links (`type` either `"top1`, `"top2` or `"mean"`).
+identify the top `n` links (`type` either `"top1"`, `"top2"` or `"mean"`).
 It will return this kind of information as a binary matrix in the form
 of an `AdjacencyMatrix` object.
 }
