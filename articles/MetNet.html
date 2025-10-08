@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.25.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.27.1</span>
       </span>
     </div>
 
@@ -490,6 +490,12 @@ previously created “structural” <code>AdjacencyMatrix</code>.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RforMassSpectrometry/MsCoreUtils" class="external-link">MsCoreUtils</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Attaching package: 'MsCoreUtils'</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:GenomicRanges':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     reduce</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:IRanges':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     reduce</span></span></code></pre>
 <pre><code><span><span class="co">## The following object is masked from 'package:MatrixGenerics':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     colCounts</span></span></code></pre>
@@ -499,7 +505,7 @@ previously created “structural” <code>AdjacencyMatrix</code>.</p>
 <pre><code><span><span class="co">## The following object is masked from 'package:stats':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     smooth</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RforMassSpectrometry/Spectra" class="external-link">Spectra</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: BiocParallel</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
@@ -507,7 +513,7 @@ previously created “structural” <code>AdjacencyMatrix</code>.</p>
 <pre><code><span><span class="co">## The following object is masked from 'package:MsCoreUtils':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     entropy</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## create spectral similarity matrix</span></span>
 <span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"spectra_matrix/ms2_test.RDS"</span>, package <span class="op">=</span> <span class="st">"MetNet"</span><span class="op">)</span></span>
 <span><span class="va">sps_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
@@ -524,11 +530,11 @@ the data should be thresholded or not. If multiple methods have been
 used to generate the spectral matrices, different threshold parameters
 can be defined (for detailed description see thresholding of
 <code>statistical</code>).</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## the assayNames in spect_adj are used to define the filter criteria</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assayNames</a></span><span class="op">(</span><span class="va">spect_adj</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "binary"      "group"       "formula"     "mass"        "ndotproduct"</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## return edges with normalized dotproduct &gt; 0.10</span></span>
 <span><span class="va">args_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"ndotproduct &gt; 0.1"</span><span class="op">)</span></span>
 <span></span>
@@ -554,11 +560,11 @@ containing the adjacency matrices based on statistical associations. The
 function will create<br>
 weighted adjacency matrices using the statistical models defined by the
 <code>model</code> argument. Currently, the following models are
-available: LASSO (using <code>stabs</code>, <span class="citation">(Hofner, Boccuto, and Göker 2015; Thomas et al.
-2017)</span>), Random Forest (using <code>GENIE3</code>, CLR, ARACNE
-(the two latter using the package <code>mpmi</code> to calculate Mutual
-Information using a nonparametric bias correction by Bias Corrected
-Mutual Information, and the functions <code>clr</code> and
+available: LASSO (using <code>stabs</code>, <span class="citation">(Hofner et al. 2015; Thomas et al. 2017)</span>),
+Random Forest (using <code>GENIE3</code>, CLR, ARACNE (the two latter
+using the package <code>mpmi</code> to calculate Mutual Information
+using a nonparametric bias correction by Bias Corrected Mutual
+Information, and the functions <code>clr</code> and
 <code>aracne.a</code> from the <code>parmigene</code> package), Pearson
 and Spearman correlation (based on the <code>psych</code> package),
 partial and semipartial Pearson and Spearman correlation (using the
@@ -591,7 +597,7 @@ adjacency matrix is stored in the assay <code>"consensus"</code>.</p>
 <p>In the following example, we will create a list of unweighted
 adjacency matrices using Pearson and Spearman correlation using the
 intensity values as input data.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x_int</span> <span class="op">&lt;-</span> <span class="va">x_test</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x_test</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">stat_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/statistical.html">statistical</a></span><span class="op">(</span><span class="va">x_int</span>, model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pearson"</span>, <span class="st">"spearman"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -621,13 +627,13 @@ unweighted consensus adjacency matrix.</p>
 <p>We will create here for all ways the thresholded
 <code>AdjacencyMatrix</code> objects of type <code>statistical</code>
 containing the consensus adjacency matrix.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## type = "threshold" </span></span>
 <span></span>
 <span><span class="co">## the assayNames in stat_adj are used to define the filter criteria</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assayNames</a></span><span class="op">(</span><span class="va">stat_adj</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "pearson_coef"    "pearson_pvalue"  "spearman_coef"   "spearman_pvalue"</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## return edges with positive Pearson correlation coefficients &gt; 0.95</span></span>
 <span><span class="va">args_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"pearson_coef &gt; 0.95"</span><span class="op">)</span></span>
 <span></span>
@@ -690,13 +696,13 @@ adjacency matrix (the other edges are set to ““).</p>
 <code>AdjacencyMatrix</code> from <code>type = "mean"</code> to combine
 it with the <code>structural</code> <code>AdjacencyMatrix</code>,
 <code>struct_adj</code>:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comb_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine.html">combine</a></span><span class="op">(</span>am_structural <span class="op">=</span> <span class="va">struct_adj</span>, am_statistical <span class="op">=</span> <span class="va">stat_adj_mean</span><span class="op">)</span></span></code></pre></div>
 <p>We can also combine the <code>statistical</code>
 <code>AdjacencyMatrix</code> with the <code>structural</code>
 <code>AdjacencyMatrix</code> <code>spect_adj_thr</code>, based on the
 thresholded spectral similarity values.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comb_spect_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine.html">combine</a></span><span class="op">(</span>am_structural <span class="op">=</span> <span class="va">spect_adj_thr</span>, </span>
 <span>                          am_statistical <span class="op">=</span> <span class="va">stat_adj_mean</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -712,7 +718,7 @@ matrix as a text file. In this example, we will use the
 <p>We use here the assay <code>"combine_binary"</code> from the
 <code>AdjacencyMatrix</code> of type <code>combine</code> and pass it to
 the <code>graph_from_adjacency_matrix</code> function:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">comb_adj</span>, <span class="st">"combine_binary"</span><span class="op">)</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">adj</span>, mode <span class="op">=</span> <span class="st">"undirected"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">g</span>, edge.width <span class="op">=</span> <span class="fl">2</span>, vertex.label.cex <span class="op">=</span> <span class="fl">0.5</span>, edge.color <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></span></code></pre></div>
@@ -737,13 +743,13 @@ software tools outside of the <code>R</code> environment.</p>
 </h3>
 <p>All software and respective versions to build this vignette are
 listed here:</p>
-<pre><code><span><span class="co">## R version 4.4.1 (2024-06-14)</span></span>
+<pre><code><span><span class="co">## R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 22.04.5 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## locale:</span></span>
 <span><span class="co">##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span></span>
@@ -761,43 +767,42 @@ listed here:</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] Spectra_1.16.0              BiocParallel_1.40.0        </span></span>
-<span><span class="co">##  [3] MsCoreUtils_1.18.0          MetNet_1.25.0              </span></span>
-<span><span class="co">##  [5] SummarizedExperiment_1.36.0 Biobase_2.66.0             </span></span>
-<span><span class="co">##  [7] GenomicRanges_1.58.0        GenomeInfoDb_1.42.0        </span></span>
-<span><span class="co">##  [9] IRanges_2.40.0              MatrixGenerics_1.18.0      </span></span>
-<span><span class="co">## [11] matrixStats_1.4.1           S4Vectors_0.44.0           </span></span>
-<span><span class="co">## [13] BiocGenerics_0.52.0         knitr_1.48                 </span></span>
-<span><span class="co">## [15] BiocStyle_2.34.0           </span></span>
+<span><span class="co">##  [1] Spectra_1.18.2              BiocParallel_1.42.2        </span></span>
+<span><span class="co">##  [3] MsCoreUtils_1.20.0          MetNet_1.27.1              </span></span>
+<span><span class="co">##  [5] SummarizedExperiment_1.38.1 Biobase_2.68.0             </span></span>
+<span><span class="co">##  [7] GenomicRanges_1.60.0        GenomeInfoDb_1.44.3        </span></span>
+<span><span class="co">##  [9] IRanges_2.42.0              MatrixGenerics_1.20.0      </span></span>
+<span><span class="co">## [11] matrixStats_1.5.0           S4Vectors_0.46.0           </span></span>
+<span><span class="co">## [13] BiocGenerics_0.54.0         generics_0.1.4             </span></span>
+<span><span class="co">## [15] knitr_1.50                  BiocStyle_2.36.0           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] tidyselect_1.2.1        psych_2.4.6.26          farver_2.1.2           </span></span>
-<span><span class="co">##  [4] dplyr_1.1.4             fastmap_1.2.0           digest_0.6.37          </span></span>
-<span><span class="co">##  [7] lifecycle_1.0.4         cluster_2.1.6           ProtGenerics_1.38.0    </span></span>
-<span><span class="co">## [10] magrittr_2.0.3          compiler_4.4.1          rlang_1.1.4            </span></span>
-<span><span class="co">## [13] sass_0.4.9              tools_4.4.1             igraph_2.1.1           </span></span>
-<span><span class="co">## [16] utf8_1.2.4              yaml_2.3.10             S4Arrays_1.6.0         </span></span>
+<span><span class="co">##  [1] tidyselect_1.2.1        psych_2.5.6             dplyr_1.1.4            </span></span>
+<span><span class="co">##  [4] farver_2.1.2            S7_0.2.0                fastmap_1.2.0          </span></span>
+<span><span class="co">##  [7] digest_0.6.37           lifecycle_1.0.4         cluster_2.1.8.1        </span></span>
+<span><span class="co">## [10] ProtGenerics_1.40.0     magrittr_2.0.4          compiler_4.5.1         </span></span>
+<span><span class="co">## [13] rlang_1.1.6             sass_0.4.10             tools_4.5.1            </span></span>
+<span><span class="co">## [16] igraph_2.1.4            yaml_2.3.10             S4Arrays_1.8.1         </span></span>
 <span><span class="co">## [19] labeling_0.4.3          htmlwidgets_1.6.4       mnormt_2.1.1           </span></span>
-<span><span class="co">## [22] DelayedArray_0.32.0     abind_1.4-8             withr_3.0.2            </span></span>
-<span><span class="co">## [25] purrr_1.0.2             desc_1.4.3              grid_4.4.1             </span></span>
-<span><span class="co">## [28] fansi_1.0.6             colorspace_2.1-1        ggplot2_3.5.1          </span></span>
-<span><span class="co">## [31] MASS_7.3-61             scales_1.3.0            cli_3.6.3              </span></span>
-<span><span class="co">## [34] rmarkdown_2.28          crayon_1.5.3            ragg_1.3.3             </span></span>
-<span><span class="co">## [37] generics_0.1.3          httr_1.4.7              cachem_1.1.0           </span></span>
-<span><span class="co">## [40] bnlearn_5.0.1           zlibbioc_1.52.0         GENIE3_1.27.0          </span></span>
-<span><span class="co">## [43] parallel_4.4.1          GeneNet_1.2.16          BiocManager_1.30.25    </span></span>
-<span><span class="co">## [46] XVector_0.46.0          vctrs_0.6.5             Matrix_1.7-1           </span></span>
-<span><span class="co">## [49] jsonlite_1.8.9          bookdown_0.41           clue_0.3-65            </span></span>
-<span><span class="co">## [52] parmigene_1.1.1         systemfonts_1.1.0       longitudinal_1.1.13    </span></span>
-<span><span class="co">## [55] jquerylib_0.1.4         tidyr_1.3.1             glue_1.8.0             </span></span>
-<span><span class="co">## [58] pkgdown_2.1.1           stabs_0.6-4             codetools_0.2-20       </span></span>
-<span><span class="co">## [61] gtable_0.3.6            UCSC.utils_1.2.0        munsell_0.5.1          </span></span>
-<span><span class="co">## [64] tibble_3.2.1            pillar_1.9.0            htmltools_0.5.8.1      </span></span>
-<span><span class="co">## [67] GenomeInfoDbData_1.2.13 R6_2.5.1                textshaping_0.4.0      </span></span>
-<span><span class="co">## [70] evaluate_1.0.1          lattice_0.22-6          highr_0.11             </span></span>
-<span><span class="co">## [73] corpcor_1.6.10          bslib_0.8.0             MetaboCoreUtils_1.14.0 </span></span>
-<span><span class="co">## [76] fdrtool_1.2.18          SparseArray_1.6.0       nlme_3.1-166           </span></span>
-<span><span class="co">## [79] xfun_0.48               fs_1.6.4                pkgconfig_2.0.3</span></span></code></pre>
+<span><span class="co">## [22] DelayedArray_0.34.1     RColorBrewer_1.1-3      abind_1.4-8            </span></span>
+<span><span class="co">## [25] withr_3.0.2             purrr_1.1.0             desc_1.4.3             </span></span>
+<span><span class="co">## [28] grid_4.5.1              ggplot2_4.0.0           scales_1.4.0           </span></span>
+<span><span class="co">## [31] MASS_7.3-65             cli_3.6.5               rmarkdown_2.30         </span></span>
+<span><span class="co">## [34] crayon_1.5.3            ragg_1.5.0              httr_1.4.7             </span></span>
+<span><span class="co">## [37] cachem_1.1.0            bnlearn_5.1             GENIE3_1.30.0          </span></span>
+<span><span class="co">## [40] parallel_4.5.1          GeneNet_1.2.17          BiocManager_1.30.26    </span></span>
+<span><span class="co">## [43] XVector_0.48.0          vctrs_0.6.5             Matrix_1.7-4           </span></span>
+<span><span class="co">## [46] jsonlite_2.0.0          bookdown_0.45           clue_0.3-66            </span></span>
+<span><span class="co">## [49] parmigene_1.1.1         systemfonts_1.3.1       longitudinal_1.1.13    </span></span>
+<span><span class="co">## [52] jquerylib_0.1.4         tidyr_1.3.1             glue_1.8.0             </span></span>
+<span><span class="co">## [55] pkgdown_2.1.3           stabs_0.6-4             codetools_0.2-20       </span></span>
+<span><span class="co">## [58] gtable_0.3.6            UCSC.utils_1.4.0        tibble_3.3.0           </span></span>
+<span><span class="co">## [61] pillar_1.11.1           htmltools_0.5.8.1       GenomeInfoDbData_1.2.14</span></span>
+<span><span class="co">## [64] R6_2.6.1                textshaping_1.0.3       evaluate_1.0.5         </span></span>
+<span><span class="co">## [67] lattice_0.22-7          corpcor_1.6.10          bslib_0.9.0            </span></span>
+<span><span class="co">## [70] MetaboCoreUtils_1.16.1  fdrtool_1.2.18          SparseArray_1.8.1      </span></span>
+<span><span class="co">## [73] nlme_3.1-168            xfun_0.53               fs_1.6.6               </span></span>
+<span><span class="co">## [76] pkgconfig_2.0.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 class="unnumbered" id="transformations">Transformations<a class="anchor" aria-label="anchor" href="#transformations"></a>
@@ -806,7 +811,7 @@ listed here:</p>
 values were calculated by using the structural formula and the
 Biological Magnetic Resonance Data Bank <a href="http://www.bmrb.wisc.edu/metabolomics/mol_mass.php" class="external-link">web
 tool</a>.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alanine"</span>, <span class="st">"C3H5NO"</span>, <span class="st">"71.0371137878"</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Arginine"</span>, <span class="st">"C6H12N4O"</span>, <span class="st">"156.1011110281"</span><span class="op">)</span>,</span>
@@ -900,13 +905,11 @@ tool</a>.</p>
 <div class="section level3">
 <h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Benedetti2020aa" class="csl-entry">
-Benedetti, Elisa, Maja Pučić-Baković, Toma Keser, Nathalie Gerstner,
-Mustafa Büyüközkan, Tamara Štambuk, Maurice H. J. Selman, et al. 2020.
-<span>“A Strategy to Incorporate Prior Knowledge into Correlation
-Network Cutoff Selection.”</span> <em>Nature Communications</em> 11:
-5153. <a href="https://doi.org/10.1038/s41467-020-18675-3" class="external-link">https://doi.org/10.1038/s41467-020-18675-3</a>.
+Benedetti, Elisa, Maja Pučić-Baković, Toma Keser, et al. 2020. <span>“A
+Strategy to Incorporate Prior Knowledge into Correlation Network Cutoff
+Selection.”</span> <em>Nature Communications</em> 11: 5153. <a href="https://doi.org/10.1038/s41467-020-18675-3" class="external-link">https://doi.org/10.1038/s41467-020-18675-3</a>.
 </div>
 <div id="ref-Breiman2001" class="csl-entry">
 Breiman, L. 2001. <span>“Random Forests.”</span> <em>Machine
@@ -924,11 +927,10 @@ Complex Network Research.”</span> <em>InterJournal</em> Complex Systems:
 1695. <a href="http://igraph.org" class="external-link">http://igraph.org</a>.
 </div>
 <div id="ref-Faith2007" class="csl-entry">
-Faith, J. J., B. Hayete, J. T. Thaden, I. Mogno, J. Wierzbowski, G.
-Cottarel, S. Kasif, J. J. Collins, and T. S. Gardner. 2007.
-<span>“Large-Scale Mapping and Validation of Escherichia Coli
-Transcriptional Regulation from a Compendium of Expression
-Profiles.”</span> <em>Plos Biology</em> 5: e8. <a href="https://doi.org/10.1371/journal.pbio.0050008" class="external-link">https://doi.org/10.1371/journal.pbio.0050008</a>.
+Faith, J. J., B. Hayete, J. T. Thaden, et al. 2007. <span>“Large-Scale
+Mapping and Validation of Escherichia Coli Transcriptional Regulation
+from a Compendium of Expression Profiles.”</span> <em>Plos Biology</em>
+5: e8. <a href="https://doi.org/10.1371/journal.pbio.0050008" class="external-link">https://doi.org/10.1371/journal.pbio.0050008</a>.
 </div>
 <div id="ref-Hase2013" class="csl-entry">
 Hase, T., S. Ghosh, R. Yamanaka, and H. Kitano. 2013. <span>“Harnessing
@@ -952,15 +954,15 @@ Reactions from High-Throughput Metabolomics Data.”</span> <em>BMC
 Systems Biology</em> 5: 21. <a href="https://doi.org/10.1186/1752-0509-5-21" class="external-link">https://doi.org/10.1186/1752-0509-5-21</a>.
 </div>
 <div id="ref-Marbach2012" class="csl-entry">
-Marbach, D., J. C. Costello, R. Küffner, N. M. Vega, R. J. Prill, D. M.
-Camacho, K. R. Allison, et al. 2012. <span>“Wisdom of Crowds for Robust
-Gene Network Inference.”</span> <em>Nature Methods</em> 9: 796–804. <a href="https://doi.org/10.1038/nmeth.2016" class="external-link">https://doi.org/10.1038/nmeth.2016</a>.
+Marbach, D., J. C. Costello, R. Küffner, et al. 2012. <span>“Wisdom of
+Crowds for Robust Gene Network Inference.”</span> <em>Nature
+Methods</em> 9: 796–804. <a href="https://doi.org/10.1038/nmeth.2016" class="external-link">https://doi.org/10.1038/nmeth.2016</a>.
 </div>
 <div id="ref-Margolin2006" class="csl-entry">
-Margolin, A. A., I. Nemenman, K. Basso, C. Wiggins, G. Stolovitzky, R.
-Dalla Favera, and A. Califano. 2006. <span>“ARACNE: An Algorithm for the
-Reconstruction of Gene Regulatory Networks in a Mammalian Cellular
-Context.”</span> <em>BMC Bioinformatics</em> 7: S7. <a href="https://doi.org/10.1186/1471-2105-7-S1-S7" class="external-link">https://doi.org/10.1186/1471-2105-7-S1-S7</a>.
+Margolin, A. A., I. Nemenman, K. Basso, et al. 2006. <span>“ARACNE: An
+Algorithm for the Reconstruction of Gene Regulatory Networks in a
+Mammalian Cellular Context.”</span> <em>BMC Bioinformatics</em> 7: S7.
+<a href="https://doi.org/10.1186/1471-2105-7-S1-S7" class="external-link">https://doi.org/10.1186/1471-2105-7-S1-S7</a>.
 </div>
 <div id="ref-Schafer2005aa" class="csl-entry">
 Schäfer, Juliane, and Korbinian Strimmer. 2005. <span>“A Shrinkage
@@ -1008,7 +1010,7 @@ Lasso.”</span> <em>Journal of the Royal Statistical Society. Series B
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer>
