@@ -1,3 +1,9 @@
+Changes in version 1.27.2 (2025-10-10)
++ extend unit test to larger data table in test_methods.R
+
+Changes in version 1.27.1 (2025-10-02)
++ adjust unit tests after ggplot2 changes
+
 Changes in version 1.17.2 (2023-02-03)
 + improve structural function to work with transformation tables that are
   tibble objects (contribution by Elva Maria Novoa-del-Toro)
