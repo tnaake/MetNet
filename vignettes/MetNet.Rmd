@@ -606,7 +606,8 @@ We use here the assay `"combine_binary"` from the `AdjacencyMatrix` of type
 `combine` and pass it to the `graph_from_adjacency_matrix` function:
 ```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='_Ab initio_ network inferred from structural and  quantitative mass spectrometry data. Vertices are connected that are separated by given metabolic transformation and statistical association.'}
 adj <- assay(comb_adj, "combine_binary")
-g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected")
+diag(adj) <- 1
+g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected", diag = FALSE)
 plot(g, edge.width = 2, vertex.label.cex = 0.5, edge.color = "grey")
 ```
 
