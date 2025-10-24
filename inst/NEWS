@@ -1,4 +1,7 @@
-Changes in version 1.27.3 (2025-10-27)
+Changes in version 1.27.4 (2025-10-24)
++ adjust unit tests for aracne 
+
+Changes in version 1.27.3 (2025-10-23)
 + add 1 as diagonal values in adj in vignette
 
 Changes in version 1.27.2 (2025-10-10)
