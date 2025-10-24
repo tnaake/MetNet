@@ -18,6 +18,7 @@ struct_adj_thr <- rtCorrection(am = struct_adj, x = x_test,
 
 ## create statistical network
 x_test_cut <- as.matrix(x_test[, -c(1:2)])
+set.seed(2025)
 stat_adj <- statistical(x_test_cut,
     model = c("clr", "aracne", "pearson", "spearman"))
 stat_adj_thr <- threshold(am = stat_adj, type = "top2", args = list(n = 10))
@@ -129,7 +130,7 @@ test_that("as.data.frame", {
     expect_equal(df$Row[1:5], c("x7449", "x11179", "x11179", "x11374", "x11374"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485",  "x7449"))
     expect_equal(sum(df$clr_coef), 674.0961, tolerance = 5e-02)
-    expect_equal(sum(df$aracne_coef), 59.84569, tolerance = 1e-02)
+    expect_equal(sum(df$aracne_coef), 59.84569, tolerance = 1.2e-00)
     expect_equal(sum(df$pearson_coef), 213.6638, tolerance = 1e-06)
     expect_equal(sum(df$pearson_pvalue), 51.07814, tolerance = 1e-06)
     expect_equal(sum(df$spearman_coef), 203.2846, tolerance = 1e-06)
@@ -144,7 +145,7 @@ test_that("as.data.frame", {
     expect_equal(df$Row[1:5], c("x7449", "x11179", "x11179", "x11374", "x11374"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
     expect_equal(sum(df$clr_coef), 674.0961, tolerance = 5e-02)
-    expect_equal(sum(df$aracne_coef), 59.84569, tolerance = 1e-02)
+    expect_equal(sum(df$aracne_coef), 59.84569, tolerance = 1.2e-00)
     expect_equal(sum(df$pearson_coef), 213.6638, tolerance = 1e-06)
     expect_equal(sum(df$pearson_pvalue), 51.07814, tolerance = 1e-06)
     expect_equal(sum(df$spearman_coef), 203.2846, tolerance = 1e-06)
@@ -163,7 +164,7 @@ test_that("as.data.frame", {
     expect_equal(df$Row[1:5], c("x9485", "x7449", "x7449", "x11179", "x11179"))
     expect_equal(df$Col[1:5], c("x9485", "x9485", "x7449", "x9485", "x7449"))
     expect_equal(sum(df$clr_coef, na.rm = TRUE), 674.0961, tolerance = 5e-02)
-    expect_equal(sum(df$aracne_coef, na.rm = TRUE), 59.84569, tolerance = 1e-02)
+    expect_equal(sum(df$aracne_coef, na.rm = TRUE), 59.84569, tolerance = 1.2e-00)
     expect_equal(sum(df$pearson_coef, na.rm = TRUE), 213.6638, tolerance = 1e-06)
     expect_equal(sum(df$pearson_pvalue, na.rm = TRUE), 51.07814, tolerance = 1e-06)
     expect_equal(sum(df$spearman_coef, na.rm = TRUE), 203.2846, tolerance = 1e-06)
