@@ -23,7 +23,7 @@ set.seed(2025)
 Sys.setenv(OMP_NUM_THREADS = 1)
 Sys.setenv(OMP_DYNAMIC = "FALSE")
 Sys.setenv(MKL_NUM_THREADS = 1)
-options(digits = 30)
+options(digits = 22)
 stat_adj <- statistical(x_test_cut,
     model = c("clr", "aracne", "pearson", "spearman"))
 stat_adj_thr <- threshold(am = stat_adj, type = "top2", args = list(n = 10))
