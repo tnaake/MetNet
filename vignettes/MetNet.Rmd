@@ -346,6 +346,20 @@ using the `mz_summary` function. The number of determined mass differences
 can be displayed by using the `mz_vis` function.
 
 ```{r mz_summary,eval=TRUE,echo=TRUE}
+message("class(am): ", paste(class(struct_adj), collapse = ", "))
+message("is AdjacencyMatrix: ", is(struct_adj, "AdjacencyMatrix"))
+
+message("selected method:")
+print(methods::selectMethod(
+    "as.data.frame",
+    class(struct_adj),
+    optional = TRUE
+))
+
+message("class definition:")
+print(methods::getClass(class(struct_adj)[1]))
+
+
 mz_sum <- mz_summary(struct_adj, var = "group")
 mz_vis(mz_sum, var = "group")
 ```
