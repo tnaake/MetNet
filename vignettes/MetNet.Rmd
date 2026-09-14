@@ -327,6 +327,26 @@ To account for retention time shifts we enter
 ```{r rt_correction, eval=TRUE, echo=TRUE}
 # struct_adj <- rtCorrection(am = struct_adj, x = x_test, 
 #     transformation = transformations, var = "group")
+cat("CLASS:\n")
+print(class(am))
+
+cat("\nSELECTED METHOD:\n")
+print(methods::selectMethod(
+    "as.data.frame",
+    class(am),
+    optional = TRUE
+))
+
+cat("\nDIRECT METHOD:\n")
+print(
+    methods::selectMethod(
+        "as.data.frame",
+        "AdjacencyMatrix"
+    )
+)
+
+cat("\nNORMAL DISPATCH:\n")
+print(as.data.frame(am))
 ```
 in the `R` console. The character `"group"` defined with `var` will serve 
 here as the link between the assay `"group"` and the column in `transformation`
