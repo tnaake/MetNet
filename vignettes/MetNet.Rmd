@@ -346,16 +346,16 @@ using the `mz_summary` function. The number of determined mass differences
 can be displayed by using the `mz_vis` function.
 
 ```{r mz_summary,eval=TRUE,echo=TRUE}
-mz_sum <- mz_summary(struct_adj, var = "group")
-mz_vis(mz_sum, var = "group")
+#mz_sum <- mz_summary(struct_adj, var = "group")
+#mz_vis(mz_sum, var = "group")
 ```
 
 For larger data-sets, also a `filter` can be 
 applied to visualize mass-difference above a defined threshold.
 A filter can be applied, by `filter`. Since the maximum count of any mass difference in `struct_adj` is 4, a filter of `5` results in 0 mass differences.
 ```{r mz_summary_filter}
-mz_summary(struct_adj, filter = 4)
-mz_summary(struct_adj, filter = 5)
+#mz_summary(struct_adj, filter = 4)
+#mz_summary(struct_adj, filter = 5)
 ```
 
 The `AdjacencyMatrix` class allows storing further information on the features 
@@ -367,14 +367,14 @@ and other identifier for feature `x1856`. All the other features contain `NA`s
 in corresponding columns. 
 
 ```{r,eval=TRUE,echo=TRUE}
-data("x_annotation", package = "MetNet")
-x_annotation <- as.data.frame(x_annotation)
+#data("x_annotation", package = "MetNet")
+#x_annotation <- as.data.frame(x_annotation)
 
 ## add annotations to the structural AdjacencyMatrix object
-rowData(struct_adj) <- x_annotation
+#rowData(struct_adj) <- x_annotation
 
 ## display annotation for the feature "1856"
-rowData(struct_adj)["x1856", ]
+#rowData(struct_adj)["x1856", ]
 ```
 
 ## Adding spectral similarity to the structural adjacency 
