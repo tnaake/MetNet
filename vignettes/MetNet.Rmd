@@ -325,8 +325,8 @@ with updated adjacency matrices (`"binary"` and the additional
 To account for retention time shifts we enter
 
 ```{r rt_correction, eval=TRUE, echo=TRUE}
-struct_adj <- rtCorrection(am = struct_adj, x = x_test, 
-    transformation = transformations, var = "group")
+# struct_adj <- rtCorrection(am = struct_adj, x = x_test, 
+#     transformation = transformations, var = "group")
 ```
 in the `R` console. The character `"group"` defined with `var` will serve 
 here as the link between the assay `"group"` and the column in `transformation`
@@ -337,8 +337,8 @@ by applying `as.data.frame()`. Further filtering displays only feature-pairs
 which were matched to a transformation. 
 
 ```{r,eval=TRUE,echo=TRUE}
-struct_df <- as.data.frame(struct_adj)
-struct_df <- struct_df[struct_df$binary == 1, ]
+# struct_df <- as.data.frame(struct_adj)
+# struct_df <- struct_df[struct_df$binary == 1, ]
 ```
 
 Some overview on the mass-difference distribution of the data can be observed 
@@ -400,20 +400,20 @@ normalized dotproduct and add them to the previously created "structural"
 
 
 ```{r spectral,eval = TRUE, echo = TRUE}
-# required for ndotproduct calculus
-library(MsCoreUtils)
-library(Spectra)
-
-## create spectral similarity matrix
-f <- system.file("spectra_matrix/ms2_test.RDS", package = "MetNet")
-sps_sub <- readRDS(f)
- 
-adj_spec <- Spectra::compareSpectra(sps_sub, FUN = ndotproduct)
-colnames(adj_spec) <- sps_sub$id
-rownames(adj_spec) <- sps_sub$id
-
-spect_adj <- addSpectralSimilarity(am_structural = struct_adj, 
-    ms2_similarity = list("ndotproduct" = adj_spec))
+# # required for ndotproduct calculus
+# library(MsCoreUtils)
+# library(Spectra)
+# 
+# ## create spectral similarity matrix
+# f <- system.file("spectra_matrix/ms2_test.RDS", package = "MetNet")
+# sps_sub <- readRDS(f)
+#  
+# adj_spec <- Spectra::compareSpectra(sps_sub, FUN = ndotproduct)
+# colnames(adj_spec) <- sps_sub$id
+# rownames(adj_spec) <- sps_sub$id
+# 
+# spect_adj <- addSpectralSimilarity(am_structural = struct_adj, 
+#     ms2_similarity = list("ndotproduct" = adj_spec))
 ```
 
 Furthermore, the spectral similarity matrix can be thresholded using the 
@@ -486,9 +486,9 @@ using
 Pearson and Spearman correlation using the intensity values as input data. 
 
 ```{r statistical,eval=TRUE,echo=TRUE}
-x_int <- x_test[, 3:ncol(x_test)] |>
-    as.matrix()
-stat_adj <- statistical(x_int, model = c("pearson", "spearman"))
+# x_int <- x_test[, 3:ncol(x_test)] |>
+#     as.matrix()
+# stat_adj <- statistical(x_int, model = c("pearson", "spearman"))
 ```
 
 The reasoning behind this step is to circumvent disadvantages arising from each 
@@ -518,45 +518,45 @@ We will create here for all ways the thresholded `AdjacencyMatrix` objects of
 type `statistical` containing the consensus adjacency matrix.
 
 ```{r threshold,eval=TRUE,echo=TRUE}
-## type = "threshold" 
-
-## the assayNames in stat_adj are used to define the filter criteria
-assayNames(stat_adj)
-
-## return edges with positive Pearson correlation coefficients > 0.95
-args_thr <- list(filter = "pearson_coef > 0.95")
-
-## return edges with positive Spearman correlation coefficients > 0.95
-args_thr <- list(filter = "spearman_coef > 0.95")
-
-## return edges with absolute Pearson correlation coefficients > 0.95 and 
-## associated p-values <= 0.05
-args_thr <- list(filter = "abs(pearson_coef) > 0.95 & pearson_pvalue <= 0.05")
-
-## return edges with absolute Pearson OR Spearman correlation coefficients > 0.95
-args_thr <- list(filter = "abs(pearson_coef) > 0.95 | abs(spearman_coef) > 0.95")
-
-## return edges with absolute Pearson AND Spearman correlation coefficients > 0.95
-args_thr <- list(filter = "abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95")
-
-## pass the filtering criteria to the args argument and set type to "threshold"
-stat_adj_thr <- threshold(am = stat_adj, type = "threshold", 
-    args = args_thr)
-
-## alternatively, use the types "top1", "top2", "mean"
-## retrieve the feature pairs which have the 100 highest coefficients
-args_top <- list(n = 100)
-## type = "top1" 
-stat_adj_top1 <- threshold(am = stat_adj, type = "top1", 
-    args = args_top)
-
-## type = "top2"
-stat_adj_top2 <- threshold(am = stat_adj, type = "top2", 
-    args = args_top)
- 
-## type = "mean"
-stat_adj_mean <- threshold(am = stat_adj, type = "mean", 
-    args = args_top)
+# ## type = "threshold" 
+# 
+# ## the assayNames in stat_adj are used to define the filter criteria
+# assayNames(stat_adj)
+# 
+# ## return edges with positive Pearson correlation coefficients > 0.95
+# args_thr <- list(filter = "pearson_coef > 0.95")
+# 
+# ## return edges with positive Spearman correlation coefficients > 0.95
+# args_thr <- list(filter = "spearman_coef > 0.95")
+# 
+# ## return edges with absolute Pearson correlation coefficients > 0.95 and 
+# ## associated p-values <= 0.05
+# args_thr <- list(filter = "abs(pearson_coef) > 0.95 & pearson_pvalue <= 0.05")
+# 
+# ## return edges with absolute Pearson OR Spearman correlation coefficients > 0.95
+# args_thr <- list(filter = "abs(pearson_coef) > 0.95 | abs(spearman_coef) > 0.95")
+# 
+# ## return edges with absolute Pearson AND Spearman correlation coefficients > 0.95
+# args_thr <- list(filter = "abs(pearson_coef) > 0.95 & abs(spearman_coef) > 0.95")
+# 
+# ## pass the filtering criteria to the args argument and set type to "threshold"
+# stat_adj_thr <- threshold(am = stat_adj, type = "threshold", 
+#     args = args_thr)
+# 
+# ## alternatively, use the types "top1", "top2", "mean"
+# ## retrieve the feature pairs which have the 100 highest coefficients
+# args_top <- list(n = 100)
+# ## type = "top1" 
+# stat_adj_top1 <- threshold(am = stat_adj, type = "top1", 
+#     args = args_top)
+# 
+# ## type = "top2"
+# stat_adj_top2 <- threshold(am = stat_adj, type = "top2", 
+#     args = args_top)
+#  
+# ## type = "mean"
+# stat_adj_mean <- threshold(am = stat_adj, type = "mean", 
+#     args = args_top)
 ```
 
 # Combining the structural and statistical matrix {#sec-combine}
@@ -582,7 +582,7 @@ We will use here the thresholded `statistical` `AdjacencyMatrix` from
 `type = "mean"` to combine it with the `structural` `AdjacencyMatrix`, 
 `struct_adj`: 
 ```{r combine,eval=TRUE,echo=TRUE}
-comb_adj <- combine(am_structural = struct_adj, am_statistical = stat_adj_mean)
+# comb_adj <- combine(am_structural = struct_adj, am_statistical = stat_adj_mean)
 ```
 
 We can also combine the `statistical` `AdjacencyMatrix` 
@@ -590,8 +590,8 @@ with the `structural` `AdjacencyMatrix` `spect_adj_thr`, based on the
 thresholded spectral similarity values.
 
 ```{r combine spect,eval=TRUE,echo=TRUE}
-comb_spect_adj <- combine(am_structural = spect_adj_thr, 
-                          am_statistical = stat_adj_mean)
+# comb_spect_adj <- combine(am_structural = spect_adj_thr, 
+#                           am_statistical = stat_adj_mean)
 ```
 
 # Visualization and further analyses {#sec-visualization}
@@ -605,10 +605,10 @@ adjacency matrix.
 We use here the assay `"combine_binary"` from the `AdjacencyMatrix` of type
 `combine` and pass it to the `graph_from_adjacency_matrix` function:
 ```{r visualisation,eval=TRUE,echo=TRUE,fig.cap='_Ab initio_ network inferred from structural and  quantitative mass spectrometry data. Vertices are connected that are separated by given metabolic transformation and statistical association.'}
-adj <- assay(comb_adj, "combine_binary")
-diag(adj) <- 1
-g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected", diag = FALSE)
-plot(g, edge.width = 2, vertex.label.cex = 0.5, edge.color = "grey")
+# adj <- assay(comb_adj, "combine_binary")
+# diag(adj) <- 1
+# g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected", diag = FALSE)
+# plot(g, edge.width = 2, vertex.label.cex = 0.5, edge.color = "grey")
 ```
 
 Furthermore, the network can be analysed by network analysis techniques
