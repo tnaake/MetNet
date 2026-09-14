@@ -410,6 +410,88 @@ observed using the <code>mz_summary</code> function. The number of
 determined mass differences can be displayed by using the
 <code>mz_vis</code> function.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"class(am): "</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">struct_adj</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## class(am): AdjacencyMatrix</span></span></code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"is AdjacencyMatrix: "</span>, <span class="fu"><a href="https://rdrr.io/r/methods/is.html" class="external-link">is</a></span><span class="op">(</span><span class="va">struct_adj</span>, <span class="st">"AdjacencyMatrix"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## is AdjacencyMatrix: TRUE</span></span></code></pre>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"selected method:"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## selected method:</span></span></code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/getMethod.html" class="external-link">selectMethod</a></span><span class="op">(</span></span>
+<span>    <span class="st">"as.data.frame"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">struct_adj</span><span class="op">)</span>,</span>
+<span>    optional <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## new("MethodDefinition", .Data = function (x, row.names = NULL, </span></span>
+<span><span class="co">##     optional = FALSE, ...) </span></span>
+<span><span class="co">## {</span></span>
+<span><span class="co">##     .local &lt;- function (x) </span></span>
+<span><span class="co">##     {</span></span>
+<span><span class="co">##         .nms &lt;- assayNames(x)</span></span>
+<span><span class="co">##         l &lt;- lapply(seq_along(.nms), function(.nms_i) assay(x, </span></span>
+<span><span class="co">##             .nms_i))</span></span>
+<span><span class="co">##         if (!directed(x)) {</span></span>
+<span><span class="co">##             l &lt;- lapply(l, function(l_i) {</span></span>
+<span><span class="co">##                 l_i[upper.tri(l_i)] &lt;- NA</span></span>
+<span><span class="co">##                 l_i</span></span>
+<span><span class="co">##             })</span></span>
+<span><span class="co">##         }</span></span>
+<span><span class="co">##         l &lt;- lapply(seq_along(l), function(i) pivot_longer(rownames_to_column(as.data.frame(l[[i]]), </span></span>
+<span><span class="co">##             var = "Row"), -"Row", names_to = "Col", values_to = .nms[i]))</span></span>
+<span><span class="co">##         tbl &lt;- dplyr::select(l[[1]], "Row", "Col")</span></span>
+<span><span class="co">##         l &lt;- lapply(l, function(x) x[, 3])</span></span>
+<span><span class="co">##         df &lt;- do.call("cbind", l)</span></span>
+<span><span class="co">##         df &lt;- cbind(tbl, df)</span></span>
+<span><span class="co">##         df &lt;- df[!apply(df[, .nms, drop = FALSE], 1, function(x) all(is.na(x))), </span></span>
+<span><span class="co">##             ]</span></span>
+<span><span class="co">##         return(df)</span></span>
+<span><span class="co">##     }</span></span>
+<span><span class="co">##     .local(x, ...)</span></span>
+<span><span class="co">## }, target = new("signature", .Data = "AdjacencyMatrix", names = "x", </span></span>
+<span><span class="co">##     package = "MetNet"), defined = new("signature", .Data = "AdjacencyMatrix", </span></span>
+<span><span class="co">##     names = "x", package = "MetNet"), generic = "as.data.frame")</span></span>
+<span><span class="co">## &lt;bytecode: 0x55ee0321aef8&gt;</span></span>
+<span><span class="co">## &lt;environment: namespace:MetNet&gt;</span></span>
+<span><span class="co">## attr(,"target")</span></span></code></pre>
+<pre><code><span><span class="co">## An object of class "signature"</span></span></code></pre>
+<pre><code><span><span class="co">##                 x </span></span>
+<span><span class="co">## "AdjacencyMatrix" </span></span>
+<span><span class="co">## attr(,"defined")</span></span></code></pre>
+<pre><code><span><span class="co">## An object of class "signature"</span></span></code></pre>
+<pre><code><span><span class="co">##                 x </span></span>
+<span><span class="co">## "AdjacencyMatrix" </span></span>
+<span><span class="co">## attr(,"generic")</span></span>
+<span><span class="co">## [1] "as.data.frame"</span></span>
+<span><span class="co">## attr(,"generic")attr(,"package")</span></span>
+<span><span class="co">## [1] "BiocGenerics"</span></span>
+<span><span class="co">## attr(,"class")</span></span>
+<span><span class="co">## [1] "MethodDefinition"</span></span>
+<span><span class="co">## attr(,"class")attr(,"package")</span></span>
+<span><span class="co">## [1] "methods"</span></span></code></pre>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"class definition:"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## class definition:</span></span></code></pre>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/getClass.html" class="external-link">getClass</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">struct_adj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Class "AdjacencyMatrix" [package "MetNet"]</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Slots:</span></span>
+<span><span class="co">##                                                                               </span></span>
+<span><span class="co">## Name:               type          directed       thresholded           colData</span></span>
+<span><span class="co">## Class:         character           logical           logical         DataFrame</span></span>
+<span><span class="co">##                                                                               </span></span>
+<span><span class="co">## Name:             assays             NAMES   elementMetadata          metadata</span></span>
+<span><span class="co">## Class:    Assays_OR_NULL character_OR_NULL         DataFrame              list</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Extends: </span></span>
+<span><span class="co">## Class "SummarizedExperiment", directly</span></span>
+<span><span class="co">## Class "RectangularData", by class "SummarizedExperiment", distance 2</span></span>
+<span><span class="co">## Class "Vector", by class "SummarizedExperiment", distance 2</span></span>
+<span><span class="co">## Class "Annotated", by class "SummarizedExperiment", distance 3</span></span>
+<span><span class="co">## Class "vector_OR_Vector", by class "SummarizedExperiment", distance 3</span></span></code></pre>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mz_sum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mz_summary.html">mz_summary</a></span><span class="op">(</span><span class="va">struct_adj</span>, var <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/mz_vis.html">mz_vis</a></span><span class="op">(</span><span class="va">mz_sum</span>, var <span class="op">=</span> <span class="st">"group"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="MetNet_files/figure-html/mz_summary-1.png" class="r-plt" alt="" width="700"></p>
@@ -418,7 +500,7 @@ visualize mass-difference above a defined threshold. A filter can be
 applied, by <code>filter</code>. Since the maximum count of any mass
 difference in <code>struct_adj</code> is 4, a filter of <code>5</code>
 results in 0 mass differences.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mz_summary.html">mz_summary</a></span><span class="op">(</span><span class="va">struct_adj</span>, filter <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                               group    formula count</span></span>
 <span><span class="co">## 1                Hydroxylation (-H)          O    15</span></span>
@@ -427,7 +509,7 @@ results in 0 mass differences.</p>
 <span><span class="co">## 4                   Rhamnose (-H20)    C6H10O4     9</span></span>
 <span><span class="co">## 6                   feruloyl (-H2O) C9H6O2OCH2     4</span></span>
 <span><span class="co">## 7 putrescine to spermidine (+C3H7N)      C3H7N     4</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mz_summary.html">mz_summary</a></span><span class="op">(</span><span class="va">struct_adj</span>, filter <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                   group formula count</span></span>
 <span><span class="co">## 1    Hydroxylation (-H)       O    15</span></span>
@@ -443,7 +525,7 @@ information as annotations, identifier, etc. We will load the
 <code>x_annotation</code> file, which contains an example annotation and
 other identifier for feature <code>x1856</code>. All the other features
 contain <code>NA</code>s in corresponding columns.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"x_annotation"</span>, package <span class="op">=</span> <span class="st">"MetNet"</span><span class="op">)</span></span>
 <span><span class="va">x_annotation</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/AdjacencyMatrix-class.html">as.data.frame</a></span><span class="op">(</span><span class="va">x_annotation</span><span class="op">)</span></span>
 <span></span>
@@ -485,7 +567,7 @@ spectral similarity methods defined by names of the list-entries
 the respective MS1 data. We will then create a spectral similarity
 adjacency matrices using the normalized dotproduct and add them to the
 previously created “structural” <code>AdjacencyMatrix</code>.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># required for ndotproduct calculus</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RforMassSpectrometry/MsCoreUtils" class="external-link">MsCoreUtils</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
@@ -508,7 +590,7 @@ previously created “structural” <code>AdjacencyMatrix</code>.</p>
 <pre><code><span><span class="co">## The following object is masked from 'package:stats':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     smooth</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RforMassSpectrometry/Spectra" class="external-link">Spectra</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: BiocParallel</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
@@ -516,7 +598,7 @@ previously created “structural” <code>AdjacencyMatrix</code>.</p>
 <pre><code><span><span class="co">## The following object is masked from 'package:MsCoreUtils':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     entropy</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## create spectral similarity matrix</span></span>
 <span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"spectra_matrix/ms2_test.RDS"</span>, package <span class="op">=</span> <span class="st">"MetNet"</span><span class="op">)</span></span>
 <span><span class="va">sps_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
@@ -533,11 +615,11 @@ the data should be thresholded or not. If multiple methods have been
 used to generate the spectral matrices, different threshold parameters
 can be defined (for detailed description see thresholding of
 <code>statistical</code>).</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## the assayNames in spect_adj are used to define the filter criteria</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assayNames</a></span><span class="op">(</span><span class="va">spect_adj</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "binary"      "group"       "formula"     "mass"        "ndotproduct"</span></span></code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## return edges with normalized dotproduct &gt; 0.10</span></span>
 <span><span class="va">args_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"ndotproduct &gt; 0.1"</span><span class="op">)</span></span>
 <span></span>
@@ -600,7 +682,7 @@ adjacency matrix is stored in the assay <code>"consensus"</code>.</p>
 <p>In the following example, we will create a list of unweighted
 adjacency matrices using Pearson and Spearman correlation using the
 intensity values as input data.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x_int</span> <span class="op">&lt;-</span> <span class="va">x_test</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x_test</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">stat_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/statistical.html">statistical</a></span><span class="op">(</span><span class="va">x_int</span>, model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pearson"</span>, <span class="st">"spearman"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -630,13 +712,13 @@ unweighted consensus adjacency matrix.</p>
 <p>We will create here for all ways the thresholded
 <code>AdjacencyMatrix</code> objects of type <code>statistical</code>
 containing the consensus adjacency matrix.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## type = "threshold" </span></span>
 <span></span>
 <span><span class="co">## the assayNames in stat_adj are used to define the filter criteria</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assayNames</a></span><span class="op">(</span><span class="va">stat_adj</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "pearson_coef"    "pearson_pvalue"  "spearman_coef"   "spearman_pvalue"</span></span></code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## return edges with positive Pearson correlation coefficients &gt; 0.95</span></span>
 <span><span class="va">args_thr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"pearson_coef &gt; 0.95"</span><span class="op">)</span></span>
 <span></span>
@@ -699,13 +781,13 @@ adjacency matrix (the other edges are set to ““).</p>
 <code>AdjacencyMatrix</code> from <code>type = "mean"</code> to combine
 it with the <code>structural</code> <code>AdjacencyMatrix</code>,
 <code>struct_adj</code>:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comb_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine.html">combine</a></span><span class="op">(</span>am_structural <span class="op">=</span> <span class="va">struct_adj</span>, am_statistical <span class="op">=</span> <span class="va">stat_adj_mean</span><span class="op">)</span></span></code></pre></div>
 <p>We can also combine the <code>statistical</code>
 <code>AdjacencyMatrix</code> with the <code>structural</code>
 <code>AdjacencyMatrix</code> <code>spect_adj_thr</code>, based on the
 thresholded spectral similarity values.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comb_spect_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine.html">combine</a></span><span class="op">(</span>am_structural <span class="op">=</span> <span class="va">spect_adj_thr</span>, </span>
 <span>                          am_statistical <span class="op">=</span> <span class="va">stat_adj_mean</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -721,7 +803,7 @@ matrix as a text file. In this example, we will use the
 <p>We use here the assay <code>"combine_binary"</code> from the
 <code>AdjacencyMatrix</code> of type <code>combine</code> and pass it to
 the <code>graph_from_adjacency_matrix</code> function:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">comb_adj</span>, <span class="st">"combine_binary"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">adj</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/graph_from_adjacency_matrix.html" class="external-link">graph_from_adjacency_matrix</a></span><span class="op">(</span><span class="va">adj</span>, mode <span class="op">=</span> <span class="st">"undirected"</span>, diag <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -814,7 +896,7 @@ listed here:</p>
 values were calculated by using the structural formula and the
 Biological Magnetic Resonance Data Bank <a href="http://www.bmrb.wisc.edu/metabolomics/mol_mass.php" class="external-link">web
 tool</a>.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">transformations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alanine"</span>, <span class="st">"C3H5NO"</span>, <span class="st">"71.0371137878"</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Arginine"</span>, <span class="st">"C6H12N4O"</span>, <span class="st">"156.1011110281"</span><span class="op">)</span>,</span>
