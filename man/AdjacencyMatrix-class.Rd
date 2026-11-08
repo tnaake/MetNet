@@ -13,7 +13,7 @@
 \alias{thresholded}
 \alias{show,AdjacencyMatrix-method}
 \alias{show}
-\alias{as.data.frame,AdjacencyMatrix-method}
+\alias{.as.data.frame.AdjacencyMatrix}
 \alias{as.data.frame}
 \title{Methods for `AdjacencyMatrix` objects}
 \usage{
@@ -29,7 +29,7 @@
 
 \S4method{show}{AdjacencyMatrix}(object)
 
-\S4method{as.data.frame}{AdjacencyMatrix}(x)
+.as.data.frame.AdjacencyMatrix(x)
 }
 \arguments{
 \item{x}{instance of class `AdjacencyMatrix`}
@@ -44,23 +44,23 @@
 (number of rows of an assay, number of cols of an assay). `dim` returns
 a `numeric` of length 2.
 
-`type` will return the type of an `AdjacencyMatrix` (`statistical`, 
+`type` will return the type of an `AdjacencyMatrix` (`statistical`,
 `structural` or `combine`). `type` returns a `character` of length 1
 
 `directed` returns the information on directed of an `AdjacencyMatrix`, i.e.
 if the underlying graph is directed or undirected.
 `directed` returns `logical` of length 1.
 
-`thresholded` returns the information if the adjacency matrix is 
+`thresholded` returns the information if the adjacency matrix is
 thresholded, i.e. if the function `rtCorrection` or `threshold` was applied
-to the `AdjacencyMatrix` object. `thresholded` returns a `logical` of length 
+to the `AdjacencyMatrix` object. `thresholded` returns a `logical` of length
 1.
 
-`show` prints summary information on an object of class 
+`show` prints summary information on an object of class
 `AdjacencyMatrix`.
 
 `as.data.frame` returns the adjacency matrices (stored in the `assays` slot)
-and returns information on the nodes and the associated information on 
+and returns information on the nodes and the associated information on
 edges as a data frame. `as.data.frame` returns a `data.frame`.
 }
 \author{

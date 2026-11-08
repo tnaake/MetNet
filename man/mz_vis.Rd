@@ -21,7 +21,7 @@ which has been summarized by `mz_summary`.
 }
 \details{
 Plots the mass difference distribution, summarized
-by `mz_summary`. 
+by `mz_summary`.
 Visualization is performed using ggplot2
 }
 \examples{
@@ -33,7 +33,7 @@ transformation <- rbind(
 transformation <- data.frame(group = transformation[, 1],
                                 formula = transformation[, 2],
                                 mass = as.numeric(transformation[, 3]))
-am_struct <- structural(x_test, transformation, 
+am_struct <- structural(x_test, transformation,
     var = c("group", "formula", "mass"), ppm = 5, directed = TRUE)
 mz_sum <- mz_summary(am_struct, var = "group")
 mz_vis(mz_sum)

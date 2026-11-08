@@ -13,9 +13,9 @@ threshold(
 )
 }
 \arguments{
-\item{am}{`AdjacencyMatrix` object of `type` `"statistical"` as 
-created from the function `statistical` OR `AdjacencyMatrix` 
-object of the type "structural" containing spectral similarity adjacency 
+\item{am}{`AdjacencyMatrix` object of `type` `"statistical"` as
+created from the function `statistical` OR `AdjacencyMatrix`
+object of the type "structural" containing spectral similarity adjacency
 matrices, that were added by `addSpectSimil()`. The object will contain the
 adjacency matrices in the `assay` slot.}
 
@@ -23,53 +23,53 @@ adjacency matrices in the `assay` slot.}
 `"mean"`}
 
 \item{args}{`list`. Depending on the `type` arguments the list element
-will be different. 
+will be different.
 
-In the case of `type == "threshold"`, `args` has the 
-entry `filter` (`character` of length 1). The character vector will specify the 
+In the case of `type == "threshold"`, `args` has the
+entry `filter` (`character` of length 1). The character vector will specify the
 kind of filtering applied to the adjacency matrices. Elements in `filter`
-will refer to the `assayNames`, e.g. 
+will refer to the `assayNames`, e.g.
 `list(filter = "pearson_coef > 0.8")` will retain all edges with Pearson
-correlation coefficients > 0.8. 
-`list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all 
+correlation coefficients > 0.8.
+`list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all
 edges with Pearson correlation coefficients > 0.8 AND Spearman correlation
-coefficients > 0.5. 
-`list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all 
-edges with Pearson correlation coefficients > 0.8 or < -0.8 AND Spearman 
+coefficients > 0.5.
+`list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all
+edges with Pearson correlation coefficients > 0.8 or < -0.8 AND Spearman
 correlation coefficients > 0.5.
 
-In the case of `type == "top1"`, `type == "top2"`, or `type == "mean"`, 
-`args` has the entry `n` (`numeric` of length 1), that 
+In the case of `type == "top1"`, `type == "top2"`, or `type == "mean"`,
+`args` has the entry `n` (`numeric` of length 1), that
 denotes the number of top ranks written to the
-consensus matrix. Optionally, `args` has the entry `abs` which will take 
-absolute values of the coefficients (will default to `FALSE` if `args$abs` 
+consensus matrix. Optionally, `args` has the entry `abs` which will take
+absolute values of the coefficients (will default to `FALSE` if `args$abs`
 is not specified).}
 
 \item{values}{`character`, take from the adjacency matrix all values ("all"),
 the minimum of the pairs ("min"), \eqn{a^* _{ij} = min(a_{ij}, a_{ji})},
 or the maximum ("max"), \eqn{a^*_{ij} = max(a_{ij}, a_{ji})}}
 
-\item{na.rm}{`logical`, if set to `TRUE`, the `NA`s in the assay slots will 
-not be taken into account when creating the `"consensus"` assay. If set 
+\item{na.rm}{`logical`, if set to `TRUE`, the `NA`s in the assay slots will
+not be taken into account when creating the `"consensus"` assay. If set
 to `FALSE`, the `NA`s will be taken into account and might be passed to the
-`"consensus"` assay (or `"binary"` if input was type "structural"). 
-If `FALSE` the user can set the filter e.g. to 
-`(ggm_coef > 0 | is.na(ggm_coef))`, when there are `NA`s in 
+`"consensus"` assay (or `"binary"` if input was type "structural").
+If `FALSE` the user can set the filter e.g. to
+`(ggm_coef > 0 | is.na(ggm_coef))`, when there are `NA`s in
 `ggm_coef` to disregard `NA`s.}
 }
 \value{
 `AdjacencyMatrix` object containing a binary adjacency matrix
-given the links supported by the `type` and the `args` (in the slot 
+given the links supported by the `type` and the `args` (in the slot
 `"consensus"` if the input was type "statistical" or in the slot
-`"binary"` if it was type "structural". 
+`"binary"` if it was type "structural".
 The object will furthermore contain the supplied data input,
 i.e. all assays from `am`. The slot `threshold` is set to `TRUE`.
 }
 \description{
-The function `threshold` takes as input an `AdjacencyMatrix` object 
+The function `threshold` takes as input an `AdjacencyMatrix` object
 containing adjacency matrices
-as returned from the function `statistical` OR the `AdjacencyMatrix` 
-object of the type "structural" containing spectral similarity adjacency 
+as returned from the function `statistical` OR the `AdjacencyMatrix`
+object of the type "structural" containing spectral similarity adjacency
 matrices, that were added by `addSpectSimil()`.Depending on the `type`
 argument, `threshold` will identify the strongest link that are
 lower or higher a certain threshold (`type = "threshold"`) or
@@ -81,16 +81,16 @@ of an `AdjacencyMatrix` object.
 `values` has to be set carefully depending on if the `AdjacencyMatrix` object
 `am` is `directed` or not.
 
-In the case of `type == "threshold"`, `args` has the 
-entry `filter` (`character` of length 1). The character vector will specify the 
+In the case of `type == "threshold"`, `args` has the
+entry `filter` (`character` of length 1). The character vector will specify the
 kind of filtering applied to the adjacency matrices. Elements in `filter`
-will refer to the `assayNames`, e.g. 
+will refer to the `assayNames`, e.g.
 `list(filter = "pearson_coef > 0.8")` will retain all edges with Pearson
-correlation coefficients > 0.8. 
-`list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all 
+correlation coefficients > 0.8.
+`list(filter = "pearson_coef > 0.8 & spearman_coef > 0.5")` will retain all
 edges with Pearson correlation coefficients > 0.8 AND Spearman correlation
-coefficients > 0.5. 
-`list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all 
+coefficients > 0.5.
+`list(filter = "abs(pearson_coef) > 0.8 & spearman_coef > 0.5")` will retain all
 edges with Pearson correlation coefficients > 0.8 and < -0.8.
 
 If  `type` is equal to `"top1"`, `"top2"` or

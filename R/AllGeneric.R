@@ -180,11 +180,9 @@ setMethod("show", "AdjacencyMatrix",
 #' @param x instance of class `AdjacencyMatrix`
 #'
 #' @export
+#' @exportS3Method as.data.frame AdjacencyMatrix
 #'
-#' @importFrom tidyr pivot_longer
-#' @importFrom tibble rownames_to_column
-setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
-    function(x) {
+.as.data.frame.AdjacencyMatrix <- function(x) {
 
         nms <- assayNames(x)
 
@@ -235,7 +233,7 @@ setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
         rownames(df) <- NULL
         df
     }
-)
+
 #
 #
 #
@@ -266,3 +264,7 @@ setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
 #         return(df)
 #     }
 # )
+
+setMethod("as.data.frame", signature = "AdjacencyMatrix",
+    definition = .as.data.frame.AdjacencyMatrix
+)

@@ -12,10 +12,10 @@ and per feature pair (in rows)}
 
 \item{type}{`character`, either `"top1"`, `"top2"` or `"mean"`}
 
-\item{na.rm}{`logical`, if set to `TRUE`, the `NA`s in the assay slots will 
-not be taken into account when creating the `"top1"`, `"top2"` or `"mean"` 
-of ranks. If set to `FALSE`, the `NA`s will be taken into account 
-when creating the `"top1"`, `"top2"` or `"mean"` ranks. If `FALSE` the 
+\item{na.rm}{`logical`, if set to `TRUE`, the `NA`s in the assay slots will
+not be taken into account when creating the `"top1"`, `"top2"` or `"mean"`
+of ranks. If set to `FALSE`, the `NA`s will be taken into account
+when creating the `"top1"`, `"top2"` or `"mean"` ranks. If `FALSE` the
 resulting aggregations will be `NA` if an `NA` is present in the coeffients
 of one feature pair.}
 }

@@ -12,8 +12,8 @@ getLinks(mat, exclude = "== 1", decreasing = TRUE)
 \item{exclude}{`character`, logical statement as `character` to set `TRUE`
 values to NaN in `mat`, will be omitted if `exclude = NULL`}
 
-\item{decreasing}{`logical`, if `TRUE`, the highest confidence value will 
-get the first rank, if `FALSE`, the lowest confidence value will get the 
+\item{decreasing}{`logical`, if `TRUE`, the highest confidence value will
+get the first rank, if `FALSE`, the lowest confidence value will get the
 first rank}
 }
 \value{
