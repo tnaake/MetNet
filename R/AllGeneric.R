@@ -181,7 +181,6 @@ setMethod("show", "AdjacencyMatrix",
 #'
 #' @export
 #' @exportS3Method as.data.frame AdjacencyMatrix
-#'
 .as.data.frame.AdjacencyMatrix <- function(x) {
 
         nms <- assayNames(x)
@@ -233,6 +232,10 @@ setMethod("show", "AdjacencyMatrix",
         rownames(df) <- NULL
         df
     }
+setMethod("as.data.frame", signature = "AdjacencyMatrix",
+    definition = .as.data.frame.AdjacencyMatrix
+)
+
 
 #
 #
@@ -264,7 +267,3 @@ setMethod("show", "AdjacencyMatrix",
 #         return(df)
 #     }
 # )
-
-setMethod("as.data.frame", signature = "AdjacencyMatrix",
-    definition = .as.data.frame.AdjacencyMatrix
-)
