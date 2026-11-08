@@ -183,7 +183,7 @@ setMethod("show", "AdjacencyMatrix",
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble rownames_to_column
-setMethod(base::as.data.frame, "AdjacencyMatrix",
+setMethod(as.data.frame, "AdjacencyMatrix",
     function(x) {
 
         .nms <- assayNames(x)
