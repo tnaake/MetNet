@@ -186,7 +186,7 @@ setMethod("show", "AdjacencyMatrix",
 setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
     function(x) {
 
-        .nms <- assayNames(x)
+        nms <- assayNames(x)
 
         res <- lapply(seq_along(nms), function(i) {
 
