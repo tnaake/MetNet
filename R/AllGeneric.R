@@ -183,7 +183,7 @@ setMethod("show", "AdjacencyMatrix",
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble rownames_to_column
-setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
+setMethod(base::as.data.frame, "AdjacencyMatrix",
     function(x) {
 
         .nms <- assayNames(x)
@@ -197,9 +197,9 @@ setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
             })
         }
         l <- lapply(seq_along(l), function(i) l[[i]] |>
-            as.data.frame() |>
-            rownames_to_column(var = "Row") |>
-            pivot_longer(-"Row", names_to = "Col", values_to = .nms[i]))
+            base::as.data.frame() |>
+            tibble::rownames_to_column(var = "Row") |>
+            tidyr::pivot_longer(-"Row", names_to = "Col", values_to = .nms[i]))
 
         tbl <- dplyr::select(l[[1]], "Row", "Col")
         l <- lapply(l, function(x) x[, 3])
