@@ -219,9 +219,9 @@ setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
         })
 
         ## combine assays
-        result <- Filter(Negate(is.null), result)
+        res <- Filter(Negate(is.null), res)
 
-        if (length(result) == 0) {
+        if (length(res) == 0) {
             return(data.frame(
                 Row = character(),
                 Col = character()
@@ -230,7 +230,7 @@ setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
 
         ## merge by Row and Col
         df <- Reduce(
-            function(a, b) merge(a, b, by = c("Row", "Col"), all = TRUE), result
+            function(a, b) merge(a, b, by = c("Row", "Col"), all = TRUE), res
         )
         rownames(df) <- NULL
         df
