@@ -197,7 +197,7 @@ setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
             })
         }
         l <- lapply(seq_along(l), function(i) l[[i]] |>
-            base::as.data.frame() |>
+            data.frame() |>
             tibble::rownames_to_column(var = "Row") |>
             tidyr::pivot_longer(-"Row", names_to = "Col", values_to = .nms[i]))
 
