@@ -188,28 +188,81 @@ setMethod(S4Vectors::as.data.frame, "AdjacencyMatrix",
 
         .nms <- assayNames(x)
 
-        l <- lapply(seq_along(.nms),
-            function(.nms_i) assay(x, .nms_i))
-        if (!directed(x)) {
-            l <- lapply(l, function(l_i) {
-                l_i[upper.tri(l_i)] <- NA
-                l_i
-            })
+        res <- lapply(seq_along(nms), function(i) {
+
+            ## extract assay
+            mat <- assay(x, i)
+
+            ## keep only the upper triangle for undirected matrices
+            if (!directed(x)) {
+                mat[upper.tri(mat)] <- NA
+            }
+
+            ## identify non-NA entries
+            idx <- which(!is.na(mat), arr.ind = TRUE)
+
+            ## return NULL if no valid entries exist
+            if (nrow(idx) == 0) {
+                return(NULL)
+            }
+
+            ## extract values and create data.frame
+            values <- mat[idx]
+
+            data.frame(
+                Row = rownames(mat)[idx[, 1]],
+                Col = colnames(mat)[idx[, 2]],
+                value = values,
+                stringsAsFactors = FALSE
+            ) |>
+                stats::setNames(c("Row", "Col", nms[i]))
+        })
+
+        ## combine assays
+        result <- Filter(Negate(is.null), result)
+
+        if (length(result) == 0) {
+            return(data.frame(
+                Row = character(),
+                Col = character()
+            ))
         }
-        l <- lapply(seq_along(l), function(i) l[[i]] |>
-            data.frame() |>
-            tibble::rownames_to_column(var = "Row") |>
-            tidyr::pivot_longer(-"Row", names_to = "Col", values_to = .nms[i]))
 
-        tbl <- dplyr::select(l[[1]], "Row", "Col")
-        l <- lapply(l, function(x) x[, 3])
-        df <- do.call("cbind", l)
-        df <- cbind(tbl, df)
-
-        ## remove rows with NA (directed(x) == FALSE)
-        df <- df[!apply(df[, .nms, drop = FALSE], 1,
-            function(x) all(is.na(x))), ]
-
-        return(df)
+        ## merge by Row and Col
+        df <- Reduce(
+            function(a, b) merge(a, b, by = c("Row", "Col"), all = TRUE), result
+        )
+        rownames(df) <- NULL
+        df
     }
 )
+#
+#
+#
+#
+#
+#         l <- lapply(seq_along(.nms),
+#             function(.nms_i) assay(x, .nms_i))
+#         if (!directed(x)) {
+#             l <- lapply(l, function(l_i) {
+#                 l_i[upper.tri(l_i)] <- NA
+#                 l_i
+#             })
+#         }
+#         l <- lapply(seq_along(l), function(i) l[[i]] |>
+#             data.frame() |>
+#             tibble::rownames_to_column(var = "Row") |>
+#             tidyr::pivot_longer(-"Row", names_to = "Col", values_to = .nms[i]))
+#
+#         tbl <- dplyr::select(l[[1]], "Row", "Col")
+#         l <- lapply(l, function(x) x[, 3])
+#         df <- do.call("cbind", l)
+#         df <- cbind(tbl, df)
+#
+#         ## remove rows with NA (directed(x) == FALSE)
+#         df <- df[!apply(df[, .nms, drop = FALSE], 1,
+#             function(x) all(is.na(x))), ]
+#
+#         return(df)
+#     }
+# )
