@@ -17,7 +17,8 @@ Depends:
     S4Vectors (>= 0.28.1),
     SummarizedExperiment (>= 1.20.0)
 Imports:
-    bnlearn (>= 4.3), 
+    bnlearn (>= 4.3),
+    BiocGenerics (>= 0.59.13),
     BiocParallel (>= 1.12.0),
     corpcor (>= 1.6.10),
     dplyr (>= 1.0.3),
