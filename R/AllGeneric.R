@@ -178,10 +178,14 @@ setMethod("show", "AdjacencyMatrix",
 #' edges as a data frame. `as.data.frame` returns a `data.frame`.
 #'
 #' @param x instance of class `AdjacencyMatrix`
+#' @param row.names ignored
+#' @param optional ignored
+#' @param ... additional arguments
 #'
 #' @export
 #' @exportS3Method as.data.frame AdjacencyMatrix
-as.data.frame.AdjacencyMatrix <- function(x) {
+as.data.frame.AdjacencyMatrix <- function(x, row.names = NULL,
+    optional = FALSE, ...) {
 
         nms <- assayNames(x)
 

@@ -29,12 +29,18 @@
 
 \S4method{show}{AdjacencyMatrix}(object)
 
-as.data.frame.AdjacencyMatrix(x)
+as.data.frame.AdjacencyMatrix(x, row.names = NULL, optional = FALSE, ...)
 }
 \arguments{
 \item{x}{instance of class `AdjacencyMatrix`}
 
 \item{object}{instance of class `AdjacencyMatrix`}
+
+\item{row.names}{ignored}
+
+\item{optional}{ignored}
+
+\item{...}{additional arguments}
 }
 \description{
 `length` returns the length of an `AdjacencyMatrix` object
