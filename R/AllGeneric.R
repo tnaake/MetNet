@@ -181,7 +181,7 @@ setMethod("show", "AdjacencyMatrix",
 #'
 #' @export
 #' @exportS3Method as.data.frame AdjacencyMatrix
-.as.data.frame.AdjacencyMatrix <- function(x) {
+as.data.frame.AdjacencyMatrix <- function(x) {
 
         nms <- assayNames(x)
 
@@ -231,9 +231,11 @@ setMethod("show", "AdjacencyMatrix",
         )
         rownames(df) <- NULL
         df
-    }
+}
+
+#' @importFrom BiocGenerics as.data.frame
 setMethod("as.data.frame", signature = "AdjacencyMatrix",
-    definition = .as.data.frame.AdjacencyMatrix
+    definition = as.data.frame.AdjacencyMatrix
 )
 
 

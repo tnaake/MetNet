@@ -13,7 +13,7 @@
 \alias{thresholded}
 \alias{show,AdjacencyMatrix-method}
 \alias{show}
-\alias{.as.data.frame.AdjacencyMatrix}
+\alias{as.data.frame.AdjacencyMatrix}
 \alias{as.data.frame}
 \title{Methods for `AdjacencyMatrix` objects}
 \usage{
@@ -29,7 +29,7 @@
 
 \S4method{show}{AdjacencyMatrix}(object)
 
-.as.data.frame.AdjacencyMatrix(x)
+as.data.frame.AdjacencyMatrix(x)
 }
 \arguments{
 \item{x}{instance of class `AdjacencyMatrix`}
