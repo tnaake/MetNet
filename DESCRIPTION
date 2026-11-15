@@ -34,7 +34,6 @@ Imports:
     tibble (>= 3.0.5),
     tidyr (>= 1.1.2)
 Suggests:
-    BiocGenerics (>= 0.24.0),
     BiocStyle (>= 2.6.1), 
     glmnet (>= 4.1-1),
     igraph (>= 1.1.2), 
