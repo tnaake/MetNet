@@ -15,6 +15,7 @@
 \alias{show}
 \alias{as.data.frame.AdjacencyMatrix}
 \alias{as.data.frame}
+\alias{as.data.frame,AdjacencyMatrix-method}
 \title{Methods for `AdjacencyMatrix` objects}
 \usage{
 \S4method{length}{AdjacencyMatrix}(x)

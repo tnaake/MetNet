@@ -171,6 +171,7 @@ setMethod("show", "AdjacencyMatrix",
 #' @rdname AdjacencyMatrix-class
 #'
 #' @aliases as.data.frame
+#' @aliases as.data.frame,AdjacencyMatrix-method
 #'
 #' @description
 #' `as.data.frame` returns the adjacency matrices (stored in the `assays` slot)
