@@ -181,6 +181,8 @@ setMethod("show", "AdjacencyMatrix",
 #' @param row.names ignored
 #' @param optional ignored
 #' @param ... additional arguments
+#' @importFrom BiocGenerics as.data.frame
+#' @exportMethod as.data.frame
 as.data.frame.AdjacencyMatrix <- function(x, row.names = NULL,
     optional = FALSE, ...) {
 
@@ -211,9 +213,6 @@ as.data.frame.AdjacencyMatrix <- function(x, row.names = NULL,
 
     return(df)
 }
-
-#' @importFrom BiocGenerics as.data.frame
-#' @exportMethod as.data.frame
 setMethod("as.data.frame", signature = "AdjacencyMatrix",
     definition = as.data.frame.AdjacencyMatrix
 )
