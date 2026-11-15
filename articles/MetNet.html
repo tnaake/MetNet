@@ -414,32 +414,27 @@ matrices (<code>"binary"</code> and the additional
 <pre><code><span><span class="co">## new("MethodDefinition", .Data = function (x, row.names = NULL, </span></span>
 <span><span class="co">##     optional = FALSE, ...) </span></span>
 <span><span class="co">## {</span></span>
-<span><span class="co">##     .local &lt;- function (x) </span></span>
-<span><span class="co">##     {</span></span>
-<span><span class="co">##         .nms &lt;- assayNames(x)</span></span>
-<span><span class="co">##         l &lt;- lapply(seq_along(.nms), function(.nms_i) assay(x, </span></span>
-<span><span class="co">##             .nms_i))</span></span>
-<span><span class="co">##         if (!directed(x)) {</span></span>
-<span><span class="co">##             l &lt;- lapply(l, function(l_i) {</span></span>
-<span><span class="co">##                 l_i[upper.tri(l_i)] &lt;- NA</span></span>
-<span><span class="co">##                 l_i</span></span>
-<span><span class="co">##             })</span></span>
-<span><span class="co">##         }</span></span>
-<span><span class="co">##         l &lt;- lapply(seq_along(l), function(i) pivot_longer(rownames_to_column(as.data.frame(l[[i]]), </span></span>
-<span><span class="co">##             var = "Row"), -"Row", names_to = "Col", values_to = .nms[i]))</span></span>
-<span><span class="co">##         tbl &lt;- dplyr::select(l[[1]], "Row", "Col")</span></span>
-<span><span class="co">##         l &lt;- lapply(l, function(x) x[, 3])</span></span>
-<span><span class="co">##         df &lt;- do.call("cbind", l)</span></span>
-<span><span class="co">##         df &lt;- cbind(tbl, df)</span></span>
-<span><span class="co">##         df &lt;- df[!apply(df[, .nms, drop = FALSE], 1, function(x) all(is.na(x))), </span></span>
-<span><span class="co">##             ]</span></span>
-<span><span class="co">##         return(df)</span></span>
+<span><span class="co">##     .nms &lt;- assayNames(x)</span></span>
+<span><span class="co">##     l &lt;- lapply(seq_along(.nms), function(.nms_i) assay(x, .nms_i))</span></span>
+<span><span class="co">##     if (!directed(x)) {</span></span>
+<span><span class="co">##         l &lt;- lapply(l, function(l_i) {</span></span>
+<span><span class="co">##             l_i[upper.tri(l_i)] &lt;- NA</span></span>
+<span><span class="co">##             l_i</span></span>
+<span><span class="co">##         })</span></span>
 <span><span class="co">##     }</span></span>
-<span><span class="co">##     .local(x, ...)</span></span>
+<span><span class="co">##     l &lt;- lapply(seq_along(l), function(i) tidyr::pivot_longer(tibble::rownames_to_column(data.frame(l[[i]]), </span></span>
+<span><span class="co">##         var = "Row"), -"Row", names_to = "Col", values_to = .nms[i]))</span></span>
+<span><span class="co">##     tbl &lt;- dplyr::select(l[[1]], "Row", "Col")</span></span>
+<span><span class="co">##     l &lt;- lapply(l, function(x) x[, 3])</span></span>
+<span><span class="co">##     df &lt;- do.call("cbind", l)</span></span>
+<span><span class="co">##     df &lt;- cbind(tbl, df)</span></span>
+<span><span class="co">##     df &lt;- df[!apply(df[, .nms, drop = FALSE], 1, function(x) all(is.na(x))), </span></span>
+<span><span class="co">##         ]</span></span>
+<span><span class="co">##     return(df)</span></span>
 <span><span class="co">## }, target = new("signature", .Data = "AdjacencyMatrix", names = "x", </span></span>
 <span><span class="co">##     package = "MetNet"), defined = new("signature", .Data = "AdjacencyMatrix", </span></span>
 <span><span class="co">##     names = "x", package = "MetNet"), generic = "as.data.frame")</span></span>
-<span><span class="co">## &lt;bytecode: 0x55923cc85538&gt;</span></span>
+<span><span class="co">## &lt;bytecode: 0x5996c684c160&gt;</span></span>
 <span><span class="co">## &lt;environment: namespace:MetNet&gt;</span></span>
 <span><span class="co">## attr(,"target")</span></span></code></pre>
 <pre><code><span><span class="co">## An object of class "signature"</span></span></code></pre>
@@ -471,32 +466,27 @@ matrices (<code>"binary"</code> and the additional
 <pre><code><span><span class="co">## new("MethodDefinition", .Data = function (x, row.names = NULL, </span></span>
 <span><span class="co">##     optional = FALSE, ...) </span></span>
 <span><span class="co">## {</span></span>
-<span><span class="co">##     .local &lt;- function (x) </span></span>
-<span><span class="co">##     {</span></span>
-<span><span class="co">##         .nms &lt;- assayNames(x)</span></span>
-<span><span class="co">##         l &lt;- lapply(seq_along(.nms), function(.nms_i) assay(x, </span></span>
-<span><span class="co">##             .nms_i))</span></span>
-<span><span class="co">##         if (!directed(x)) {</span></span>
-<span><span class="co">##             l &lt;- lapply(l, function(l_i) {</span></span>
-<span><span class="co">##                 l_i[upper.tri(l_i)] &lt;- NA</span></span>
-<span><span class="co">##                 l_i</span></span>
-<span><span class="co">##             })</span></span>
-<span><span class="co">##         }</span></span>
-<span><span class="co">##         l &lt;- lapply(seq_along(l), function(i) pivot_longer(rownames_to_column(as.data.frame(l[[i]]), </span></span>
-<span><span class="co">##             var = "Row"), -"Row", names_to = "Col", values_to = .nms[i]))</span></span>
-<span><span class="co">##         tbl &lt;- dplyr::select(l[[1]], "Row", "Col")</span></span>
-<span><span class="co">##         l &lt;- lapply(l, function(x) x[, 3])</span></span>
-<span><span class="co">##         df &lt;- do.call("cbind", l)</span></span>
-<span><span class="co">##         df &lt;- cbind(tbl, df)</span></span>
-<span><span class="co">##         df &lt;- df[!apply(df[, .nms, drop = FALSE], 1, function(x) all(is.na(x))), </span></span>
-<span><span class="co">##             ]</span></span>
-<span><span class="co">##         return(df)</span></span>
+<span><span class="co">##     .nms &lt;- assayNames(x)</span></span>
+<span><span class="co">##     l &lt;- lapply(seq_along(.nms), function(.nms_i) assay(x, .nms_i))</span></span>
+<span><span class="co">##     if (!directed(x)) {</span></span>
+<span><span class="co">##         l &lt;- lapply(l, function(l_i) {</span></span>
+<span><span class="co">##             l_i[upper.tri(l_i)] &lt;- NA</span></span>
+<span><span class="co">##             l_i</span></span>
+<span><span class="co">##         })</span></span>
 <span><span class="co">##     }</span></span>
-<span><span class="co">##     .local(x, ...)</span></span>
+<span><span class="co">##     l &lt;- lapply(seq_along(l), function(i) tidyr::pivot_longer(tibble::rownames_to_column(data.frame(l[[i]]), </span></span>
+<span><span class="co">##         var = "Row"), -"Row", names_to = "Col", values_to = .nms[i]))</span></span>
+<span><span class="co">##     tbl &lt;- dplyr::select(l[[1]], "Row", "Col")</span></span>
+<span><span class="co">##     l &lt;- lapply(l, function(x) x[, 3])</span></span>
+<span><span class="co">##     df &lt;- do.call("cbind", l)</span></span>
+<span><span class="co">##     df &lt;- cbind(tbl, df)</span></span>
+<span><span class="co">##     df &lt;- df[!apply(df[, .nms, drop = FALSE], 1, function(x) all(is.na(x))), </span></span>
+<span><span class="co">##         ]</span></span>
+<span><span class="co">##     return(df)</span></span>
 <span><span class="co">## }, target = new("signature", .Data = "AdjacencyMatrix", names = "x", </span></span>
 <span><span class="co">##     package = "MetNet"), defined = new("signature", .Data = "AdjacencyMatrix", </span></span>
 <span><span class="co">##     names = "x", package = "MetNet"), generic = "as.data.frame")</span></span>
-<span><span class="co">## &lt;bytecode: 0x55923cc85538&gt;</span></span>
+<span><span class="co">## &lt;bytecode: 0x5996c684c160&gt;</span></span>
 <span><span class="co">## &lt;environment: namespace:MetNet&gt;</span></span>
 <span><span class="co">## attr(,"target")</span></span></code></pre>
 <pre><code><span><span class="co">## An object of class "signature"</span></span></code></pre>
@@ -2147,7 +2137,7 @@ software tools outside of the <code>R</code> environment.</p>
 listed here:</p>
 <pre><code><span><span class="co">## R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 24.04.4 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.5 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -2173,14 +2163,14 @@ listed here:</p>
 <span><span class="co">##  [3] Biobase_2.73.2              GenomicRanges_1.65.4       </span></span>
 <span><span class="co">##  [5] Seqinfo_1.3.2               IRanges_2.47.5             </span></span>
 <span><span class="co">##  [7] MatrixGenerics_1.25.0       matrixStats_1.5.0          </span></span>
-<span><span class="co">##  [9] S4Vectors_0.51.9            BiocGenerics_0.59.12       </span></span>
+<span><span class="co">##  [9] S4Vectors_0.51.10           BiocGenerics_0.59.13       </span></span>
 <span><span class="co">## [11] generics_0.1.4              knitr_1.52                 </span></span>
 <span><span class="co">## [13] BiocStyle_2.41.0           </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] GeneNet_1.2.17      gtable_0.3.6        xfun_0.60          </span></span>
+<span><span class="co">##  [1] GeneNet_1.2.17      gtable_0.3.6        xfun_0.62          </span></span>
 <span><span class="co">##  [4] bslib_0.12.0        ggplot2_4.0.3       htmlwidgets_1.6.4  </span></span>
-<span><span class="co">##  [7] psych_2.6.5         lattice_0.23-1      vctrs_0.7.3        </span></span>
+<span><span class="co">##  [7] psych_2.6.9         lattice_0.23-1      vctrs_0.7.3        </span></span>
 <span><span class="co">## [10] tools_4.6.1         parallel_4.6.1      tibble_3.3.1       </span></span>
 <span><span class="co">## [13] pkgconfig_2.0.3     Matrix_1.7-6        parmigene_1.1.1    </span></span>
 <span><span class="co">## [16] RColorBrewer_1.1-3  S7_0.2.2            desc_1.4.3         </span></span>
@@ -2190,13 +2180,13 @@ listed here:</p>
 <span><span class="co">## [28] longitudinal_1.1.13 yaml_2.3.12         tidyr_1.3.2        </span></span>
 <span><span class="co">## [31] pkgdown_2.2.1.9000  pillar_1.11.1       bnlearn_5.2.1      </span></span>
 <span><span class="co">## [34] jquerylib_0.1.4     GENIE3_1.35.0       BiocParallel_1.47.0</span></span>
-<span><span class="co">## [37] DelayedArray_0.39.6 cachem_1.1.0        abind_1.4-8        </span></span>
+<span><span class="co">## [37] DelayedArray_0.39.8 cachem_1.1.0        abind_1.4-8        </span></span>
 <span><span class="co">## [40] nlme_3.1-171        tidyselect_1.2.1    digest_0.6.39      </span></span>
 <span><span class="co">## [43] purrr_1.2.2         dplyr_1.2.1         bookdown_0.48      </span></span>
 <span><span class="co">## [46] fastmap_1.2.0       grid_4.6.1          cli_3.6.6          </span></span>
-<span><span class="co">## [49] SparseArray_1.13.2  magrittr_2.0.5      S4Arrays_1.13.0    </span></span>
+<span><span class="co">## [49] SparseArray_1.13.5  magrittr_2.0.5      S4Arrays_1.13.2    </span></span>
 <span><span class="co">## [52] withr_3.0.3         corpcor_1.6.10      scales_1.4.0       </span></span>
-<span><span class="co">## [55] rmarkdown_2.32      XVector_0.53.0      igraph_2.3.3       </span></span>
+<span><span class="co">## [55] rmarkdown_2.32      XVector_0.53.0      igraph_2.3.4       </span></span>
 <span><span class="co">## [58] otel_0.2.0          ragg_1.5.2          evaluate_1.0.5     </span></span>
 <span><span class="co">## [61] rlang_1.3.0         glue_1.8.1          BiocManager_1.30.27</span></span>
 <span><span class="co">## [64] jsonlite_2.0.0      R6_2.6.1            stabs_0.7-1        </span></span>
@@ -2332,7 +2322,7 @@ from a Compendium of Expression Profiles.”</span> <em>Plos Biology</em>
 </div>
 <div id="ref-Hase2013" class="csl-entry">
 Hase, T., S. Ghosh, R. Yamanaka, and H. Kitano. 2013. <span>“Harnessing
-Diversity Towards the Reconstructing of Large Scale Gene Regulatory
+Diversity towards the Reconstructing of Large Scale Gene Regulatory
 Networks.”</span> <em>PLoS Computational Biology</em> 9: e1003361. <a href="https://doi.org/10.1371/journal.pcbi.1003361" class="external-link">https://doi.org/10.1371/journal.pcbi.1003361</a>.
 </div>
 <div id="ref-Hofner2015" class="csl-entry">
